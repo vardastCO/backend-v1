@@ -5,6 +5,7 @@ import { Cache } from "cache-manager";
 import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import axios from "axios";
+import { Brand } from "./products/brand/entities/brand.entity";
 
 @Injectable()
 export class CronJobService {
@@ -35,12 +36,22 @@ export class CronJobService {
       key.startsWith("brand_views_"),
     );
 
-    const views: any[] = await Promise.all(
+    const views = await Promise.all(
       productKeys.map(async key => {
         const value = await this.cacheManager.get(key);
-
-        return { key, value };
-      }),
+        if (key.startsWith("brand_views_")) {
+          const brandId = key.replace("brand_views_", "");
+          const brandDocument = await Brand.findOneBy({ id: brandId });
+    
+          if (brandDocument) {
+            return { key: brandDocument.name, value: value };
+          } else {
+            return null; // Handle the case where the brand document is not found
+          }
+        } else {
+          return null; // Skip keys that don't start with "brand_views_"
+        }
+      })
     );
 
     await this.logBrandToElasticsearch(views);

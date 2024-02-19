@@ -76,14 +76,13 @@ export class BrandResolver {
   const userPhone = context.user ? context.user.phone : null;
 
   // Create the payload with IP and phone if available
-  const payload = {
-    'x-real-ip': context.req.headers['x-real-ip'],
+  const payload : any = {
+    'ip': context.req.headers['x-real-ip'],
     connection: context.req.connection,
     clientIp: context.req.connection.remoteAddress,
     phone: userPhone,
   };
-    console.log('Payload:', payload);
-    return this.brandService.findOne(id);
+    return this.brandService.findOne(id,payload);
   }
   @Permission("gql.products.brand.update")
   @Mutation(() => Brand)

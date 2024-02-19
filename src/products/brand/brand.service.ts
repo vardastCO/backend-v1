@@ -137,9 +137,9 @@ export class BrandService {
    
   }
   
-  async findOne(id: number, slug?: string): Promise<Brand> {
+  async findOne(id: number, payload?: any): Promise<Brand> {
     try {
-      this.logBrandView(id);
+      this.logBrandView(id,payload);
       const cacheKey = `brand_${JSON.stringify(id)}`;
   
       const cachedData = await this.cacheManager.get<Brand>(cacheKey);
@@ -179,7 +179,7 @@ export class BrandService {
       
         return cachedData
       }
-      const brand = await Brand.findOneBy({ id, slug });
+      const brand = await Brand.findOneBy({ id });
       if (!brand) {
         throw new NotFoundException();
       }
@@ -209,11 +209,14 @@ export class BrandService {
     
   }
 
-  async logBrandView(brandId: number): Promise<void> {
+  async logBrandView(brandId: number,payload:any): Promise<void> {
     const viewsKey = `brand_views_${brandId}`;
     const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
 
-    views.push({ timestamp: new Date().toISOString() });
+    views.push({
+      timestamp: new Date().toISOString(),
+      payload : payload
+    });
 
     await this.cacheManager.set(viewsKey, views);
   }
