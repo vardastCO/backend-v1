@@ -77,10 +77,11 @@ export class BrandResolver {
 
   // Create the payload with IP and phone if available
   const payload : any = {
-    'ip': context.req.headers['x-real-ip'],
+    ip: context.req.headers['x-real-ip'],
     connection: context.req.connection,
     clientIp: context.req.connection.remoteAddress,
     phone: userPhone,
+    timestamp: new Date().toISOString(),
   };
     return this.brandService.findOne(id,payload);
   }
