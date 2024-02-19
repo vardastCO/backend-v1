@@ -45,13 +45,7 @@ export class CronJobService {
           console.log(brandId)
           const id: number = parseInt(brandId, 10);
 
-          console.log(id)
-
           const brandDocument = await Brand.findOneBy({ id: id });
-
-          console.log(brandDocument)
-
-          console.log( { key: brandDocument.name, value: value })
     
           if (brandDocument) {
             return { key: brandDocument.name, value: value };
@@ -155,6 +149,7 @@ export class CronJobService {
     }
   }
   private async logBrandToElasticsearch(views: any[]): Promise<void> {
+    console.log('viewwww',views)
     const elasticsearchUrl = "http://elasticsearch:9200";
     const indexName = "brand_views";
     if (views.length == 0) {
