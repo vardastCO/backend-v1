@@ -307,13 +307,13 @@ export class OfferService {
       const cacheData = await this.cacheManager.get<PaginationSellerResponse>(
         cacheKey
       );
-      // if (cacheData) {
-      //   cacheData.data.forEach(seller => {
-      //     seller.createdAt = new Date(seller.createdAt);
-      //     seller.updatedAt = new Date(seller.updatedAt);
-      //   })
-      //   return cacheData;
-      // }
+      if (cacheData) {
+        cacheData.data.forEach(seller => {
+          seller.createdAt = new Date(seller.createdAt);
+          seller.updatedAt = new Date(seller.updatedAt);
+        })
+        return cacheData;
+      }
 
       const uniqueProductsIds = await this.brandIdToProductsIds(
         indexBrandToSeller,
