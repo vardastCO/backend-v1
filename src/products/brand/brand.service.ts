@@ -209,13 +209,16 @@ export class BrandService {
     
   }
 
-  async logBrandView(brandId: number,payload:any): Promise<void> {
-    const viewsKey = `brand_views_${brandId}`;
-    const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
-  
-    views.push(payload);
-  
-    await this.cacheManager.set(viewsKey, JSON.stringify(views));
+  async logBrandView(brandId: number, payload: any): Promise<void> {
+    try {
+      const viewsKey = `brand_views_${brandId}`;
+
+      await this.cacheManager.set(viewsKey, JSON.stringify(payload));
+      
+    } catch (e) {
+     console.log('logBrandView',e) 
+    }
+ 
   }
 
   async getBrandViewCount(brandId: number): Promise<number> {
