@@ -22,6 +22,7 @@ import { IndexBrandInput } from "./dto/index-brand.input";
 import { PaginationBrandResponse } from "./dto/pagination-brand.response";
 import { UpdateBrandInput } from "./dto/update-brand.input";
 import { Brand } from "./entities/brand.entity";
+import { PayloadDto } from "./dto/payload-brand";
 
 @Resolver(() => Brand)
 export class BrandResolver {
@@ -76,7 +77,7 @@ export class BrandResolver {
   const userPhone = context.user ? context.user.phone : null;
 
   // Create the payload with IP and phone if available
-  const payload : any = {
+  const payload : PayloadDto = {
     ip: context.req.headers['x-real-ip'],
     clientIp: context.req.connection.remoteAddress,
     phone: userPhone,

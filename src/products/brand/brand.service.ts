@@ -17,6 +17,7 @@ import { IndexBrandInput } from "./dto/index-brand.input";
 import { PaginationBrandResponse } from "./dto/pagination-brand.response";
 import { UpdateBrandInput } from "./dto/update-brand.input";
 import { Brand } from "./entities/brand.entity";
+import { PayloadDto } from "./dto/payload-brand";
 
 
 @Injectable()
@@ -137,7 +138,7 @@ export class BrandService {
    
   }
   
-  async findOne(id: number, payload?: any): Promise<Brand> {
+  async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
     try {
       this.logBrandView(id,payload);
       const cacheKey = `brand_${JSON.stringify(id)}`;
@@ -209,12 +210,15 @@ export class BrandService {
     
   }
 
-  async logBrandView(brandId: number, payload: any): Promise<void> {
+  async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
     try {
       const viewsKey = `brand_views_${brandId}`;
 
-      await this.cacheManager.set(viewsKey, JSON.stringify(payload));
-      console.log('done0 logBrandView')
+      const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
+  
+      views.push(payload);
+
+      await this.cacheManager.set(viewsKey, views);
       
     } catch (e) {
      console.log('logBrandView',e) 
