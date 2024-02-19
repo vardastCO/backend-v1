@@ -41,7 +41,8 @@ export class CronJobService {
         const value = await this.cacheManager.get(key);
         if (key.startsWith("brand_views_")) {
           const brandId = key.replace("brand_views_", "");
-          const brandDocument = await Brand.findOneBy({ id: brandId });
+          const id: number = parseInt(brandId, 10);
+          const brandDocument = await Brand.findOneBy({ id: id });
     
           if (brandDocument) {
             return { key: brandDocument.name, value: value };
