@@ -214,6 +214,7 @@ export class BrandService {
       const viewsKey = `brand_views_${brandId}`;
 
       await this.cacheManager.set(viewsKey, JSON.stringify(payload));
+      console.log('done0 logBrandView')
       
     } catch (e) {
      console.log('logBrandView',e) 
