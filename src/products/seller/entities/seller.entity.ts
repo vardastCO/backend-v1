@@ -28,6 +28,8 @@ export class Seller extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  
+
   @Field(() => Int, { nullable:true ,defaultValue: 1 })
   @Column( {nullable: true } )
   sum : number;
