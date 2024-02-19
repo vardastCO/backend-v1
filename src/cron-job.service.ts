@@ -46,7 +46,7 @@ export class CronJobService {
           const id: number = parseInt(brandId, 10);
 
           const brandDocument = await Brand.findOneBy({ id: id });
-    
+          await this.cacheManager.del(key);
           if (brandDocument) {
             return { key: brandDocument.name, value: value };
           } else {
@@ -55,7 +55,9 @@ export class CronJobService {
         } else {
           return null; // Skip keys that don't start with "brand_views_"
         }
+
       })
+     
     );
 
     await this.logBrandToElasticsearch(views);
