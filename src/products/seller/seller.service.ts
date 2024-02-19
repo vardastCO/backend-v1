@@ -231,12 +231,13 @@ export class SellerService {
   
   async findOne(id: number): Promise<Seller> {
     try {
+      this.logSellerView(id);
       const cacheKey = `seller_${JSON.stringify(id)}`;
   
       const cachedData = await this.cacheManager.get<Seller>(cacheKey);
     
       if (cachedData) {
-        // return cachedData;
+        return cachedData;
       }
       const seller = await Seller.findOne({
         where: { id: id },
@@ -262,7 +263,7 @@ export class SellerService {
       // Parse the modified JSON back to objects
       const modifiedDataWithOutText = JSON.parse(jsonString);
         await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK);
-        this.logSellerView(id);
+      
 
       } catch (e) {
         throw e
