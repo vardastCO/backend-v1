@@ -40,9 +40,18 @@ export class CronJobService {
       productKeys.map(async key => {
         const value = await this.cacheManager.get(key);
         if (key.startsWith("brand_views_")) {
+          console.log('hi')
           const brandId = key.replace("brand_views_", "");
+          console.log(brandId)
           const id: number = parseInt(brandId, 10);
+
+          console.log(id)
+
           const brandDocument = await Brand.findOneBy({ id: id });
+
+          console.log(brandDocument)
+
+          console.log( { key: brandDocument.name, value: value })
     
           if (brandDocument) {
             return { key: brandDocument.name, value: value };
