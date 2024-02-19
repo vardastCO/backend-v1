@@ -1,0 +1,5 @@
+{
+  "image": {
+    "file_not_found": "No file with id {uuid} found for attaching to product."
+  }
+}

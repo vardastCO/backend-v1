@@ -1,0 +1,21 @@
+{
+  "HELLO": "سلام",
+  "PRODUCT": {
+    "NEW": "محصول جدید: {name}"
+  },
+  "ENGLISH": "انگلیسی",
+  "ARRAY": ["یک", "دو", "سه"],
+  "cat": "گربه",
+  "cat_name": "گربه: {name}",
+  "set-up-password": {
+    "heading": "سلام، {username}",
+    "title": "فراموشی رمزعبور",
+    "followLink": "لطفا جهت تعریف پسورد جدید از لینک زیر استفاده کنید"
+  },
+  "day_interval": {
+    "one": "هر روز",
+    "other": "هر {count} روز",
+    "zero": "هیچ‌وقت"
+  },
+  "nested": "$t(test.day_interval, {{\"count\": {count} }}) ما به خرید می‌رودیم"
+}

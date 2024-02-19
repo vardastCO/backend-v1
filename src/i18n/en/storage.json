@@ -1,0 +1,5 @@
+{
+  "file": {
+    "not_found": "No newly uploaded file with id {uuid} found."
+  }
+}

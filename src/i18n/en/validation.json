@@ -1,0 +1,5 @@
+{
+  "MAX_LENGTH": "The {property} must be shorter than {constraints.0} characters.",
+  "IS_SLUG": "Only dash, lower-case alphabet and numbers with no leading/trailing slashes are allowed in {property} field.",
+  "IS_UNIQUE": "The {property} has already been taken."
+}

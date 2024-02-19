@@ -1,0 +1,177 @@
+import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
+import { ContactInfo } from "./entities/contact-info.entity";
+import { ContactInfoRelatedTypes } from "./enums/contact-info-related-types.enum";
+import { ContactInfoTypes } from "./enums/contact-info-types.enum";
+
+export default class ContactInfoSeeder {
+  private readonly data = [
+    // Iliya Steel
+    {
+      relatedType: ContactInfoRelatedTypes.SELLER,
+      relatedId: 1,
+      title: "مرکز تماس",
+      countryId: 1,
+      code: "021",
+      number: "72964883",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 0,
+      isPublic: true,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.SELLER,
+      relatedId: 1,
+      title: "فروش",
+      countryId: 1,
+      code: "0901",
+      number: "8747110",
+      ext: null,
+      type: ContactInfoTypes.MOBILE,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.SELLER,
+      relatedId: 1,
+      title: "شوروم مرکزی",
+      countryId: 1,
+      code: "021",
+      number: "22264422",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.SELLER,
+      relatedId: 1,
+      title: "کارخانه",
+      countryId: 1,
+      code: "021",
+      number: "56419107-9",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.SELLER,
+      relatedId: 1,
+      title: "دفتر مرکزی",
+      countryId: 1,
+      code: "021",
+      number: "28130",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+
+    // Kasra
+    {
+      relatedType: ContactInfoRelatedTypes.BRAND,
+      relatedId: 1,
+      title: "مرکز تماس",
+      countryId: 1,
+      code: "021",
+      number: "79226",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 0,
+      isPublic: true,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+
+    // Iliya Steel
+    {
+      relatedType: ContactInfoRelatedTypes.BRAND,
+      relatedId: 2,
+      title: "مرکز تماس",
+      countryId: 1,
+      code: "021",
+      number: "72964883",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 0,
+      isPublic: true,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.BRAND,
+      relatedId: 2,
+      title: "فروش",
+      countryId: 1,
+      code: "0901",
+      number: "8747110",
+      ext: null,
+      type: ContactInfoTypes.MOBILE,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.BRAND,
+      relatedId: 2,
+      title: "شوروم مرکزی",
+      countryId: 1,
+      code: "021",
+      number: "22264422",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.BRAND,
+      relatedId: 2,
+      title: "کارخانه",
+      countryId: 1,
+      code: "021",
+      number: "56419107-9",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+    {
+      relatedType: ContactInfoRelatedTypes.BRAND,
+      relatedId: 2,
+      title: "دفتر مرکزی",
+      countryId: 1,
+      code: "021",
+      number: "28130",
+      ext: null,
+      type: ContactInfoTypes.TEL,
+      sort: 1,
+      isPublic: false,
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
+      adminId: 1,
+    },
+  ];
+
+  async run(): Promise<any> {
+    if ((await ContactInfo.count()) == 0) {
+      for (const contactData of this.data) {
+        const contact = ContactInfo.create(contactData);
+        await contact.save();
+      }
+    }
+  }
+}
