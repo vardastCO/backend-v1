@@ -16,7 +16,7 @@ export class EventTrackerResolver {
   @Public()
   @Mutation(() => EventTracker)
     
-  @Permission("gql.base.event_tracker.create")
+  // @Permission("gql.base.event_tracker.create")
   createEventTracker(
     @Args("createEventTrackerInput")
     createEventTrackerInput: CreateEventTrackerInput,
