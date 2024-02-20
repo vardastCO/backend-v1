@@ -11,17 +11,17 @@ export class EventTrackerService {
     request,
   ) {
     
-    // if (user) {
-    //   createEventTrackerInput.userId = user.id;
-    // }
+    if (user) {
+      createEventTrackerInput.userId = user.id;
+    }
 
-    // createEventTrackerInput.ipAddress = request.ip ?? "0.0.0.0";
-    // createEventTrackerInput.agent = request.headers["user-agent"] ?? "Unknown";
+    createEventTrackerInput.ipAddress = request.ip ?? "0.0.0.0";
+    createEventTrackerInput.agent = request.headers["user-agent"] ?? "Unknown";
 
-    // const event = EventTracker.create<EventTracker>(createEventTrackerInput);
-    // // await event.save();
+    const event = EventTracker.create<EventTracker>(createEventTrackerInput);
+    await event.save();
 
-    return true;
+    return event;
   }
 
   findAll() {
