@@ -44,7 +44,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.use(compression());
-  // app.use(new TimeoutMiddleware().use);
+  app.use(new TimeoutMiddleware().use);
   // app.useLogger(logger);
 
   // try {

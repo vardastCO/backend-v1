@@ -8,22 +8,16 @@ import { takeUntil } from 'rxjs/operators';
 @Injectable()
 export class TimeoutMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    const timeout$ = timer(10000); // Set a timeout of 5 seconds
+    const timeoutDuration = 10000; // Set a timeout of 10 seconds
 
-    // Use takeUntil to complete the observable after the timeout
-    const source$ = new Observable(subscriber => {
-      timeout$.subscribe(() => {
-        subscriber.error(new Error('Request timeout'));
-      });
-    });
+    // Using throwError with delay to create a delayed error observable
+    const timeout$ = throwError(new Error('Request timeout')).pipe(
+      takeUntil(timer(timeoutDuration))
+    );
 
-    source$.pipe(takeUntil(timeout$)).subscribe({
-      error: (error) => {
-        next(error);
-      },
-      complete: () => {
-        next();
-      },
+    timeout$.subscribe({
+      error: (error) => next(error),
+      complete: () => next(),
     });
   }
 }
