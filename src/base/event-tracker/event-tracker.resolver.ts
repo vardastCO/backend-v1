@@ -25,7 +25,7 @@ export class EventTrackerResolver {
     @CurrentUser() user: User,
     @Context() context: any,
     @Request() request,
-  )  : Promise<void> {
+  )  :  Promise<boolean>{
 
     const userPhone = context.user ? context.user.phone : null;
     const payload : PayloadDto = {

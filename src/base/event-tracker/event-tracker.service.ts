@@ -14,7 +14,7 @@ export class EventTrackerService {
 
   async create(
     payload:PayloadDto
-  ) : Promise<void>{
+  ) :  Promise<boolean>{
     try {
       const viewsKey = `contact_views_${payload}`;
 
@@ -23,9 +23,11 @@ export class EventTrackerService {
       views.push(payload);
 
       await this.cacheManager.set(viewsKey, views);
+      return Promise.resolve(true);
       
     } catch (e) {
-     console.log('contact_views',e) 
+      console.log('contact_views', e) 
+      return Promise.resolve(false);
     }
   }
 
