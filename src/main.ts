@@ -8,6 +8,7 @@ import { AppModule } from "./app.module";
 // import 'winston-elasticsearch';
 // import { initializeApm } from './initapm';
 import * as compression from 'compression';
+import { TimeoutMiddleware } from "./timeout.middleware";
 
 
 
@@ -43,6 +44,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.use(compression());
+  app.use(new TimeoutMiddleware().use);
   // app.useLogger(logger);
 
   // try {
