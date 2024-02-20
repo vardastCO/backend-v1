@@ -10,7 +10,6 @@ export class EventTrackerService {
     user: User,
     request,
   ) {
-    
     if (user) {
       createEventTrackerInput.userId = user.id;
     }
@@ -19,7 +18,7 @@ export class EventTrackerService {
     createEventTrackerInput.agent = request.headers["user-agent"] ?? "Unknown";
 
     const event = EventTracker.create<EventTracker>(createEventTrackerInput);
-    // await event.save();
+    await event.save();
 
     return event;
   }
