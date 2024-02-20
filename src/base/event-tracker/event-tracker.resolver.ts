@@ -23,7 +23,7 @@ export class EventTrackerResolver {
     @Args("createEventTrackerInput")
     createEventTrackerInput: CreateEventTrackerInput,
     @CurrentUser() user: User,
-    @Context() context: ExecutionContext,
+    @Context() context: any,
     @Request() request,
   )  : Promise<void> {
 

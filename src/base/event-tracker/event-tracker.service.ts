@@ -18,7 +18,7 @@ export class EventTrackerService {
     try {
       const viewsKey = `contact_views_${payload}`;
 
-      const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
+      const views: any[] = [];
   
       views.push(payload);
 
