@@ -1,27 +1,32 @@
-import { Injectable } from "@nestjs/common";
 import { User } from "src/users/user/entities/user.entity";
 import { CreateEventTrackerInput } from "./dto/create-event-tracker.input";
 import { EventTracker } from "./entities/event-tracker.entity";
+import { PayloadDto } from "src/products/brand/dto/payload-brand";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class EventTrackerService {
+  constructor(
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+  ) {}
+
   async create(
-    createEventTrackerInput: CreateEventTrackerInput,
-    user: User,
-    request,
-  ) {
-    
-    if (user) {
-      createEventTrackerInput.userId = user.id;
+    payload:PayloadDto
+  ) : Promise<void>{
+    try {
+      const viewsKey = `contact_views_${payload}`;
+
+      const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
+  
+      views.push(payload);
+
+      await this.cacheManager.set(viewsKey, views);
+      
+    } catch (e) {
+     console.log('contact_views',e) 
     }
-
-    createEventTrackerInput.ipAddress = request.ip ?? "0.0.0.0";
-    createEventTrackerInput.agent = request.headers["user-agent"] ?? "Unknown";
-
-    const event = EventTracker.create<EventTracker>(createEventTrackerInput);
-    await event.save();
-
-    return event;
   }
 
   findAll() {
