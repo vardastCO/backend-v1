@@ -1,6 +1,8 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsOptional } from "class-validator";
+import { IsOptional,IsNotEmpty, IsEnum } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
+import { SortBrandEnum } from "../enum/sort-types.enum";
+
 
 @InputType()
 export class IndexBrandInput extends IndexInput {
@@ -24,4 +26,11 @@ export class IndexBrandInput extends IndexInput {
   @IsOptional()
   hasPriceList?: boolean ;
   
+  @Field(() => SortBrandEnum, {
+    defaultValue: SortBrandEnum.SUM,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  @IsEnum(SortBrandEnum)
+  sortType?: SortBrandEnum = SortBrandEnum.SUM;
 }

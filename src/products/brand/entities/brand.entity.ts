@@ -44,7 +44,6 @@ export class Brand extends BaseEntity {
   sellersCount?: number = 0;
 
   
-  
   @Field(() => Int, { nullable: true })
   @Column( {nullable: true })
   categoriesCount?: number= 0;
@@ -88,6 +87,4 @@ export class Brand extends BaseEntity {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
-
-
 }

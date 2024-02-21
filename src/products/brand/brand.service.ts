@@ -15,9 +15,10 @@ import { Product } from "../product/entities/product.entity";
 import { CreateBrandInput } from "./dto/create-brand.input";
 import { IndexBrandInput } from "./dto/index-brand.input";
 import { PaginationBrandResponse } from "./dto/pagination-brand.response";
+import { PayloadDto } from "./dto/payload-brand";
 import { UpdateBrandInput } from "./dto/update-brand.input";
 import { Brand } from "./entities/brand.entity";
-import { PayloadDto } from "./dto/payload-brand";
+import { SortBrandEnum } from "./enum/sort-types.enum";
 
 
 @Injectable()
@@ -90,7 +91,23 @@ export class BrandService {
       })
       return cachedData;
     }
+
     const whereConditions: any = {};
+    const order: any = {}
+
+    switch (indexBrandInput.sortType) {
+      case SortBrandEnum.NEWEST:
+        order['createdAt'] = "DESC";
+        break;
+      case SortBrandEnum.RATING:
+        order['rating'] = "DESC";
+        break;
+      default:
+        order['sum'] = "DESC";
+        break;
+    }
+    
+    
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
@@ -115,9 +132,7 @@ export class BrandService {
       skip,
       take,
       where: whereConditions,
-      order: {
-        sum: "DESC",
-      },
+      order: order,
     });
 
     try {
