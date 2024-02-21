@@ -9,7 +9,7 @@ export class EventTrackerService {
     createEventTrackerInput: CreateEventTrackerInput,
     user: User,
     request,
-  ) : Promise<EventTracker> {
+  ) : Promise<Boolean> {
     if (user) {
       createEventTrackerInput.userId = user.id;
     }
@@ -20,9 +20,12 @@ export class EventTrackerService {
 
     // Save the event in the cache
     // cache.set(`event:${event.id}`, event);
-  
-  
-    return event;
+    try {
+      return true; 
+    } catch (error) {
+      console.error(`Error processing event: ${error.message}`);
+      return false; // Indicate failure
+    }
   }
 
   findAll() {
