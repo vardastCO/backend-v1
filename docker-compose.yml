@@ -68,6 +68,8 @@ services:
     #   - logstash_image
     #   - kibana
 
+    
+
   # elasticsearch:
   #   image: elasticsearch:7.16.2
   #   container_name: elasticsearch
