@@ -1,5 +1,7 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { File } from "src/base/storage/file/entities/file.entity";
+import { Category } from "src/base/taxonomy/category/entities/category.entity";
+import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { Product } from "src/products/product/entities/product.entity";
 import {
   BaseEntity,
@@ -26,6 +28,23 @@ export class Brand extends BaseEntity {
   @Field()
   @Column({ unique: true })
   name: string;
+
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  name_en?: string;
+
+  @Field(() => Category, { nullable: true })
+  @OneToOne(() => Category, category => null, { eager: true, nullable: true })
+  @JoinColumn()
+  category: Promise<Category>;
+
+  @Field(() => ThreeStateSupervisionStatuses)
+  @Column("enum", {
+    enum: ThreeStateSupervisionStatuses,
+    default: ThreeStateSupervisionStatuses.CONFIRMED,
+  })
+  status: ThreeStateSupervisionStatuses;
 
   @Field(() => Int, { defaultValue: 1 })
   @Column( )
