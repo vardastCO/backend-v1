@@ -81,13 +81,15 @@ export class ProductService {
       case ProductSortablesEnum.MOST_EXPENSIVE:
         return {
           prices: {
-          amount : 'DESC'
+            id: 'DESC',
+            amount : 'DESC'
           }
         }; // Assuming 'prices.amount' is the correct path
       case ProductSortablesEnum.MOST_AFFORDABLE:
         return {
-        prices: {
-          amount : 'DESC'
+          prices: {
+            id: 'DESC',
+            amount : 'DESC'
         }
         };  // Assuming 'prices.amount' is the correct path
       default:
