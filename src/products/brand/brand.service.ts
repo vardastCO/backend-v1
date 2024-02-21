@@ -15,9 +15,10 @@ import { Product } from "../product/entities/product.entity";
 import { CreateBrandInput } from "./dto/create-brand.input";
 import { IndexBrandInput } from "./dto/index-brand.input";
 import { PaginationBrandResponse } from "./dto/pagination-brand.response";
+import { PayloadDto } from "./dto/payload-brand";
 import { UpdateBrandInput } from "./dto/update-brand.input";
 import { Brand } from "./entities/brand.entity";
-import { PayloadDto } from "./dto/payload-brand";
+import { SortBrandEnum } from "./enum/sort-types.enum";
 
 
 @Injectable()
@@ -79,18 +80,34 @@ export class BrandService {
     indexBrandInput?.boot();
     const { take, skip, name,hasLogoFile,hasBannerFile,hasCatalogeFile,hasPriceList } = indexBrandInput || {};
   
-    const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
+    // const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
   
-    const cachedData = await this.cacheManager.get<PaginationBrandResponse>(cacheKey);
+    // const cachedData = await this.cacheManager.get<PaginationBrandResponse>(cacheKey);
   
-    if (cachedData) {
-      cachedData.data.forEach(category => {
-        category.createdAt = new Date(category.createdAt);
-        category.updatedAt = new Date(category.updatedAt);
-      })
-      return cachedData;
-    }
+    // if (cachedData) {
+    //   cachedData.data.forEach(category => {
+    //     category.createdAt = new Date(category.createdAt);
+    //     category.updatedAt = new Date(category.updatedAt);
+    //   })
+    //   return cachedData;
+    // }
     const whereConditions: any = {};
+    const order: any = {}
+
+    switch (indexBrandInput.sortType) {
+      case SortBrandEnum.NEWEST:
+        order['createdAt'] = "DESC";
+        break;
+      case SortBrandEnum.RATING:
+        order['rating'] = "DESC";
+        break;
+      default:
+        order['sum'] = "DESC";
+        break;
+    }
+    
+    console.log(order);
+    
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
@@ -115,9 +132,7 @@ export class BrandService {
       skip,
       take,
       where: whereConditions,
-      order: {
-        sum: "DESC",
-      },
+      order: order,
     });
 
     try {
@@ -129,7 +144,7 @@ export class BrandService {
 
       const response = PaginationBrandResponse.make(indexBrandInput, total, modifiedDataWithOutText);
       
-      await this.cacheManager.set(cacheKey, response,  CacheTTL.ONE_WEEK);
+      // await this.cacheManager.set(cacheKey, response,  CacheTTL.ONE_WEEK);
     
       return response;
     } catch (e) {
