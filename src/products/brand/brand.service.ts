@@ -80,17 +80,18 @@ export class BrandService {
     indexBrandInput?.boot();
     const { take, skip, name,hasLogoFile,hasBannerFile,hasCatalogeFile,hasPriceList } = indexBrandInput || {};
   
-    // const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
+    const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
   
-    // const cachedData = await this.cacheManager.get<PaginationBrandResponse>(cacheKey);
+    const cachedData = await this.cacheManager.get<PaginationBrandResponse>(cacheKey);
   
-    // if (cachedData) {
-    //   cachedData.data.forEach(category => {
-    //     category.createdAt = new Date(category.createdAt);
-    //     category.updatedAt = new Date(category.updatedAt);
-    //   })
-    //   return cachedData;
-    // }
+    if (cachedData) {
+      cachedData.data.forEach(category => {
+        category.createdAt = new Date(category.createdAt);
+        category.updatedAt = new Date(category.updatedAt);
+      })
+      return cachedData;
+    }
+
     const whereConditions: any = {};
     const order: any = {}
 
@@ -106,7 +107,6 @@ export class BrandService {
         break;
     }
     
-    console.log(order);
     
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
@@ -144,7 +144,7 @@ export class BrandService {
 
       const response = PaginationBrandResponse.make(indexBrandInput, total, modifiedDataWithOutText);
       
-      // await this.cacheManager.set(cacheKey, response,  CacheTTL.ONE_WEEK);
+      await this.cacheManager.set(cacheKey, response,  CacheTTL.ONE_WEEK);
     
       return response;
     } catch (e) {
