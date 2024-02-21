@@ -72,7 +72,20 @@ export class ProductService {
     return product;
   }
 
-
+   getOrderClause(orderBy: ProductSortablesEnum) {
+    switch (orderBy) {
+      case ProductSortablesEnum.NEWEST:
+        return { createdAt: 'DESC' };
+      case ProductSortablesEnum.OLDEST:
+        return { createdAt: 'ASC' };
+      case ProductSortablesEnum.MOST_EXPENSIVE:
+        return { 'prices.amount': 'DESC' }; // Assuming 'prices.amount' is the correct path
+      case ProductSortablesEnum.MOST_AFFORDABLE:
+        return { 'prices.amount': 'ASC' };  // Assuming 'prices.amount' is the correct path
+      default:
+        return { rank: 'DESC' }; // Default sorting by rank in descending order
+    }
+  }
   async findAll(indexProductInput?: IndexProductInput): Promise<Product[]> {
     const {
       take,
@@ -196,15 +209,7 @@ export class ProductService {
     const [products, totalCount] = await Product.findAndCount({
       where: whereConditions,
       relations: ["images", "prices","uom","category"],
-      order: {
-        rank: "DESC",
-        // prices: {
-        //   amount: indexProductInput.orderBy == ProductSortablesEnum.MOST_EXPENSIVE ?
-        //   'DESC': 'ASC'  
-        // },
-        createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
-          'DESC' : 'ASC'
-      },
+      order: this.getOrderClause(indexProductInput.orderBy),
       skip: skip,
       take: take,
     });
