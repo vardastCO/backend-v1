@@ -71,6 +71,7 @@ services:
   elasticsearch:
     image: elasticsearch:7.16.2
     container_name: elasticsearch
+    restart: always
     volumes:
       - elastic_data:/usr/share/elasticsearch/data/
     environment:
@@ -91,6 +92,7 @@ services:
     volumes:
       - ./logstash/:/logstash_dir
     command: logstash -f /logstash_dir/logstash.conf
+    restart: always
     depends_on:
       - elasticsearch
     ports:
@@ -102,14 +104,15 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'
-          memory: 1536M
+          cpus: '3'
+          memory: 3536M
 
   kibana:
     image: kibana:7.16.2
     container_name: kibana
     ports:
       - '5602:5601'
+      restart: always
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     depends_on:
