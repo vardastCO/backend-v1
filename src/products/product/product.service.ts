@@ -75,9 +75,9 @@ export class ProductService {
    getOrderClause(orderBy: ProductSortablesEnum) {
     switch (orderBy) {
       case ProductSortablesEnum.NEWEST:
-        return { createdAt: 'DESC' };
+        return { rank : 'DESC' };
       case ProductSortablesEnum.OLDEST:
-        return { createdAt: 'ASC' };
+        return { rank : 'DESC' };
       case ProductSortablesEnum.MOST_EXPENSIVE:
         return {
           rank: 'DESC'
