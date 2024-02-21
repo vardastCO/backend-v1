@@ -24,6 +24,23 @@ export class CronJobService {
     // Fetch product views and log to Elasticsearch
     await this.fetchAndLogSellerViewsToElasticsearch();
   }
+
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  async logTrackerViewsToElasticsearch() {
+    const allKeys: string[] = await this.cacheManager.store.keys();
+    const productKeys: string[] = allKeys.filter(key =>
+      key.startsWith("eventTracker:"),
+    );
+
+    const views: any[] = await Promise.all(
+      productKeys.map(async key => {
+        const value = await this.cacheManager.get(key);
+
+        return { key, value };
+      }),
+    );
+    await this.logTrackerToElasticsearch(views)
+  }
   @Cron(CronExpression.EVERY_5_SECONDS)
   async logBrandViewsToElasticsearch() {
     // Fetch product views and log to Elasticsearch
@@ -136,6 +153,26 @@ export class CronJobService {
   private async logBrandToElasticsearch(views: any[]): Promise<void> {
     const elasticsearchUrl = "http://elasticsearch:9200";
     const indexName = "brand_views";
+    if (views.length == 0) {
+      return;
+    }
+    for (const view of views) {
+      try {
+        this.cacheManager.del(view.key);
+        await axios
+          .post(`${elasticsearchUrl}/${indexName}/_doc`, view)
+          .then(e => {})
+          .catch(e => {});
+      } catch (error) {
+        // Handle error appropriately
+        console.error("Error logging view to Elasticsearch:", error.message);
+      }
+    }
+  }
+
+  private async logTrackerToElasticsearch(views: any[]): Promise<void> {
+    const elasticsearchUrl = "http://elasticsearch:9200";
+    const indexName = "track_contact";
     if (views.length == 0) {
       return;
     }
