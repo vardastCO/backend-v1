@@ -63,54 +63,54 @@ services:
         limits:
           cpus: '3.0'  # 1.0 * 3
           memory: 3G  # 1G * 3
-    depends_on:
-      - elasticsearch
-      - logstash_image
-      - kibana
+    # depends_on:
+    #   - elasticsearch
+    #   - logstash_image
+    #   - kibana
 
-  elasticsearch:
-    image: elasticsearch:7.16.2
-    container_name: elasticsearch
-    restart: always
-    volumes:
-      - elastic_data:/usr/share/elasticsearch/data/
-    environment:
-      - discovery.type=single-node
-      - ELASTIC_PASSWORD=farbod
-      - server.publicBaseUrl=https://search.vardast.com
-      - xpack.security.enabled=true
-    ports:
-      - '9200:9200'
-      - '9300:9300'
-    networks:
-      - myNet
-    deploy:
-      resources:
-        limits:
-          cpus: '3.0'
-          memory: 6G  # 2G * 3
+  # elasticsearch:
+  #   image: elasticsearch:7.16.2
+  #   container_name: elasticsearch
+  #   restart: always
+  #   volumes:
+  #     - elastic_data:/usr/share/elasticsearch/data/
+  #   environment:
+  #     - discovery.type=single-node
+  #     - ELASTIC_PASSWORD=farbod
+  #     - server.publicBaseUrl=https://search.vardast.com
+  #     - xpack.security.enabled=true
+  #   ports:
+  #     - '9200:9200'
+  #     - '9300:9300'
+  #   networks:
+  #     - myNet
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '3.0'
+  #         memory: 6G  # 2G * 3
 
-  logstash_image:
-    image: logstash:7.16.2
-    volumes:
-      - ./logstash/:/logstash_dir
-    command: logstash -f /logstash_dir/logstash.conf
-    restart: always
-    depends_on:
-      - elasticsearch
-    ports:
-      - '9600:9600'
-    environment:
-      - LS_JAVA_OPTS=-Xmx256m -Xms256m
-    networks:
-      - myNet
-    deploy:
-      resources:
-        limits:
-          cpus: '3'
-          memory: 3536M
+  # logstash_image:
+  #   image: logstash:7.16.2
+  #   volumes:
+  #     - ./logstash/:/logstash_dir
+  #   command: logstash -f /logstash_dir/logstash.conf
+  #   restart: always
+  #   depends_on:
+  #     - elasticsearch
+  #   ports:
+  #     - '9600:9600'
+  #   environment:
+  #     - LS_JAVA_OPTS=-Xmx256m -Xms256m
+  #   networks:
+  #     - myNet
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '3'
+  #         memory: 3536M
 
-  kibana:
+  # kibana:
     image: kibana:7.16.2
     container_name: kibana
     ports:
@@ -132,7 +132,7 @@ services:
 
 volumes:
   pg_data:
-  elastic_data: {}
+  # elastic_data: {}
 
 networks:
   myNet:
