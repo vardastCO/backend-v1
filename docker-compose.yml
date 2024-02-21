@@ -77,6 +77,11 @@ services:
     environment:
       - discovery.type=single-node
       - ELASTIC_PASSWORD=farbod
+      - xpack.monitoring.enabled=true
+      - xpack.monitoring.collection.enabled=true
+      - server.publicBaseUrl=https://search.vardast.com
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
     ports:
       - '9200:9200'
       - '9300:9300'
