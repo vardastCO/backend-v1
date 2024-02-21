@@ -116,7 +116,7 @@ services:
       - '5602:5601'
     restart: always
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=https://search.vardast.com
       - ELASTICSEARCH_USERNAME=elastic
       - ELASTICSEARCH_PASSWORD=farbod
     depends_on:
