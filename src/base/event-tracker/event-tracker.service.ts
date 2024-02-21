@@ -9,17 +9,19 @@ export class EventTrackerService {
     createEventTrackerInput: CreateEventTrackerInput,
     user: User,
     request,
-  ) {
+  ) : Promise<EventTracker> {
     if (user) {
       createEventTrackerInput.userId = user.id;
     }
 
     createEventTrackerInput.ipAddress = request.ip ?? "0.0.0.0";
     createEventTrackerInput.agent = request.headers["user-agent"] ?? "Unknown";
+    const event: EventTracker = EventTracker.create<EventTracker>(createEventTrackerInput);
 
-    const event = EventTracker.create<EventTracker>(createEventTrackerInput);
-    await event.save();
-
+    // Save the event in the cache
+    // cache.set(`event:${event.id}`, event);
+  
+  
     return event;
   }
 
