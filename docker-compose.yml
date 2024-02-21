@@ -71,14 +71,10 @@ services:
   # elasticsearch:
   #   image: elasticsearch:7.16.2
   #   container_name: elasticsearch
-  #   restart: always
   #   volumes:
   #     - elastic_data:/usr/share/elasticsearch/data/
   #   environment:
   #     - discovery.type=single-node
-  #     - ELASTIC_PASSWORD=farbod
-  #     - server.publicBaseUrl=https://search.vardast.com
-  #     - xpack.security.enabled=true
   #   ports:
   #     - '9200:9200'
   #     - '9300:9300'
@@ -95,7 +91,6 @@ services:
   #   volumes:
   #     - ./logstash/:/logstash_dir
   #   command: logstash -f /logstash_dir/logstash.conf
-  #   restart: always
   #   depends_on:
   #     - elasticsearch
   #   ports:
@@ -107,28 +102,25 @@ services:
   #   deploy:
   #     resources:
   #       limits:
-  #         cpus: '3'
-  #         memory: 3536M
+  #         cpus: '1.5'
+  #         memory: 1536M
 
   # kibana:
-    image: kibana:7.16.2
-    container_name: kibana
-    ports:
-      - '5602:5601'
-    restart: always
-    environment:
-      - ELASTICSEARCH_URL=https://search.vardast.com
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=farbod
-    depends_on:
-      - elasticsearch
-    networks:
-      - myNet
-    deploy:
-      resources:
-        limits:
-          cpus: '1.5'
-          memory: 1536M
+  #   image: kibana:7.16.2
+  #   container_name: kibana
+  #   ports:
+  #     - '5602:5601'
+  #   environment:
+  #     - ELASTICSEARCH_URL=http://elasticsearch:9200
+  #   depends_on:
+  #     - elasticsearch
+  #   networks:
+  #     - myNet
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '1.5'
+  #         memory: 1536M
 
 volumes:
   pg_data:
