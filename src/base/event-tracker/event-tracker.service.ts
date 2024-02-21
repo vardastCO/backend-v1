@@ -11,7 +11,7 @@ export class EventTrackerService {
     createEventTrackerInput: CreateEventTrackerInput,
     user: User,
     request,
-  ) : Promise<Boolean> {
+  ) : Promise<boolean> {
     if (user) {
       createEventTrackerInput.userId = user.id;
     }
