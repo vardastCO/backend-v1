@@ -112,7 +112,7 @@ services:
     container_name: kibana
     ports:
       - '5602:5601'
-      restart: always
+    restart: always
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     depends_on:
