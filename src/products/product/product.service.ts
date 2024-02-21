@@ -77,7 +77,15 @@ export class ProductService {
       case ProductSortablesEnum.NEWEST:
         return { createdAt: 'DESC' };
       case ProductSortablesEnum.OLDEST:
-        return { createdAt: 'ASC' };  // Assuming 'prices.amount' is the correct path
+        return { createdAt: 'ASC' };
+      case ProductSortablesEnum.MOST_EXPENSIVE:
+        return {
+          rank: 'DESC'
+        }; // Assuming 'prices.amount' is the correct path
+      case ProductSortablesEnum.MOST_AFFORDABLE:
+        return {
+          rank : 'DESC'
+        };  // Assuming 'prices.amount' is the correct path
       default:
         return { createdAt: 'DESC' }; // Default sorting by rank in descending order
     }
