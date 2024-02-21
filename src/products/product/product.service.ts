@@ -80,20 +80,14 @@ export class ProductService {
         return { createdAt: 'ASC' };
       case ProductSortablesEnum.MOST_EXPENSIVE:
         return {
-          prices: {
-            id: 'DESC',
-            amount : 'DESC'
-          }
+          highestPrice: 'DESC'
         }; // Assuming 'prices.amount' is the correct path
       case ProductSortablesEnum.MOST_AFFORDABLE:
         return {
-          prices: {
-            id: 'DESC',
-            amount : 'DESC'
-        }
+          lowestPrice : 'DESC'
         };  // Assuming 'prices.amount' is the correct path
       default:
-        return { rank: 'DESC' }; // Default sorting by rank in descending order
+        return { createdAt: 'DESC' }; // Default sorting by rank in descending order
     }
   }
   async findAll(indexProductInput?: IndexProductInput): Promise<Product[]> {
