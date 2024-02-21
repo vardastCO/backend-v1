@@ -76,6 +76,7 @@ services:
       - elastic_data:/usr/share/elasticsearch/data/
     environment:
       - discovery.type=single-node
+      - xpack.security.enabled=true
     ports:
       - '9200:9200'
       - '9300:9300'
