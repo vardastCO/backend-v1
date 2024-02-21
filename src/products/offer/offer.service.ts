@@ -12,6 +12,7 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import { User } from "src/users/user/entities/user.entity";
 import { UserService } from "src/users/user/user.service";
 import { DataSource, EntityManager, In } from "typeorm";
+import { File } from "../../base/storage/file/entities/file.entity";
 import { AuthorizationService } from "../../users/authorization/authorization.service";
 import { LastPrice } from "../price/entities/last-price.entity";
 import { Price } from "../price/entities/price.entity";
@@ -24,7 +25,6 @@ import { IndexOfferInput } from "./dto/index-offer.input";
 import { PaginationOfferResponse } from "./dto/pagination-offer.response";
 import { UpdateOfferInput } from "./dto/update-offer.input";
 import { Offer } from "./entities/offer.entity";
-
 
 @Injectable()
 export class OfferService {
@@ -347,43 +347,44 @@ export class OfferService {
           LIMIT $2
           OFFSET $3;
       `
-      
       let sellers = await this.dataSource.query(query, [brandId, take, skip]);
+
       let total = 0
-      sellers = sellers.map((seller: any) => {
+      const modifiedSellers = sellers.map((seller: any) => {
         total = seller['total'];
         delete seller['total']
         const s: Seller = Seller.create(seller);
         return s;
       })
-      console.log("\n=======================sellers: \n",sellers);
-
-      // const uniqueProductsIds = await this.brandIdToProductsIds(
-      //   indexBrandToSeller,
-      // );
-
-      // const uniqueSellerIds = await this.productIdsToSellerIds(
-      //   uniqueProductsIds,
-      //   indexBrandToSeller,
-      // );
-
-      // const { modifiedData, total } = await this.getModifiedSellers(
-      //   uniqueSellerIds,
-      //   indexBrandToSeller,
-      // );
-
-
-      // console.log("\n=======================modifiedData: \n",modifiedData);
-      // console.log("modifiedData.length:", modifiedData.length);
+     
+      // add logoFole and bannerfile
+      for (let i = 0; i < modifiedSellers.length; i++){
+        const seller = sellers[i];
+        const s = modifiedSellers[i];
+        if (seller.logoFileId) {
+            const cacheKey = `seller_logofile_${JSON.stringify(seller.logoFileId)}`;
+            const cacheData = await this.cacheManager.get<PaginationSellerResponse>(
+              cacheKey
+            );
+            if (cacheData) {
+              s.logoFile = cacheData;
+            } else {
+              const file = await File.findOneBy({ id: seller.logoFileId })
+              s.logoFile = file;
+              await this.cacheManager.set(cacheKey, file, CacheTTL.ONE_WEEK);
+            }
+        }
+        else {
+            s.logoFile = null;
+        }
+      }
 
 
       const response = PaginationSellerResponse.make(
         indexBrandToSeller,
         total,
-        sellers,
+        modifiedSellers,
       );
-
-      // console.log('res',modifiedData.length)
 
       const jsonString = JSON.stringify(response).replace(/__bannerFile__/g, 'bannerFile')
       .replace(/__logoFile__/g, 'logoFile');
