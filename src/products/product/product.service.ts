@@ -80,13 +80,13 @@ export class ProductService {
         return { createdAt: 'ASC' };
       case ProductSortablesEnum.MOST_EXPENSIVE:
         return {
-          price: {
+          prices: {
           amount : 'DESC'
           }
         }; // Assuming 'prices.amount' is the correct path
       case ProductSortablesEnum.MOST_AFFORDABLE:
         return {
-        price: {
+        prices: {
           amount : 'DESC'
         }
         };  // Assuming 'prices.amount' is the correct path
