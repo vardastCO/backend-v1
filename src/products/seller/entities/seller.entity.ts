@@ -54,7 +54,7 @@ export class Seller extends BaseEntity {
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
   @JoinColumn()
   logoFile: Promise<File>;
-  // logoFileId: number;
+  logoFileId: number;
 
   @Field(() => File, { nullable: true })
   @OneToOne(() => File, file => null, { eager: true, nullable: true })

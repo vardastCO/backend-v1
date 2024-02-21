@@ -5,12 +5,14 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { InjectDataSource } from "@nestjs/typeorm";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { User } from "src/users/user/entities/user.entity";
 import { UserService } from "src/users/user/user.service";
-import { EntityManager, In } from "typeorm";
+import { DataSource, EntityManager, In } from "typeorm";
+import { File } from "../../base/storage/file/entities/file.entity";
 import { AuthorizationService } from "../../users/authorization/authorization.service";
 import { LastPrice } from "../price/entities/last-price.entity";
 import { Price } from "../price/entities/price.entity";
@@ -31,6 +33,7 @@ export class OfferService {
     private userService: UserService,
     private readonly entityManager: EntityManager,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectDataSource() private readonly dataSource: DataSource
   ) {}
   async create(createOfferInput: CreateOfferInput, user: User): Promise<Offer> {
     const hasMasterPermission = await this.authorizationService
@@ -269,7 +272,6 @@ export class OfferService {
       }
 
       // Find seller
-
       const [data, total] = await Seller.findAndCount({
         skip:indexBrandToSeller.skip,
         take:indexBrandToSeller.take,
@@ -288,8 +290,9 @@ export class OfferService {
         total,
       };
 
+      
       // cache result
-      await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
+      // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
 
       return result;
     } catch (error) {
@@ -303,6 +306,8 @@ export class OfferService {
     try {
       indexBrandToSeller.boot();
     
+      const { brandId, take, skip } = indexBrandToSeller;
+
       const cacheKey = `indexTakeBrandToSeller_sellers_brand_${JSON.stringify(indexBrandToSeller)}`;
       const cacheData = await this.cacheManager.get<PaginationSellerResponse>(
         cacheKey
@@ -315,29 +320,71 @@ export class OfferService {
         return cacheData;
       }
 
-      const uniqueProductsIds = await this.brandIdToProductsIds(
-        indexBrandToSeller,
-      );
+      const query = `
+          SELECT *,
+                (SELECT COUNT(*) 
+                  FROM product_sellers ps 
+                  WHERE ps.id IN (
+                      SELECT DISTINCT "sellerId"
+                      FROM product_offers po 
+                      WHERE po."productId" IN (
+                          SELECT DISTINCT id  
+                          FROM products p 
+                          WHERE p."brandId" = $1
+                      )	
+                  )) AS total
+          FROM product_sellers ps 
+          WHERE ps.id IN (
+              SELECT DISTINCT "sellerId"
+              FROM product_offers po 
+              WHERE po."productId" IN (
+                  SELECT DISTINCT id  
+                  FROM products p 
+                  WHERE p."brandId" = $1
+              )	
+          )
+          ORDER BY ps."sum" desc, ps."rating" desc 
+          LIMIT $2
+          OFFSET $3;
+      `
+      let sellers = await this.dataSource.query(query, [brandId, take, skip]);
 
-      const uniqueSellerIds = await this.productIdsToSellerIds(
-        uniqueProductsIds,
-        indexBrandToSeller,
-      );
+      let total = 0
+      const modifiedSellers = sellers.map((seller: any) => {
+        total = seller['total'];
+        delete seller['total']
+        const s: Seller = Seller.create(seller);
+        return s;
+      })
+     
+      // add logoFole and bannerfile
+      for (let i = 0; i < modifiedSellers.length; i++){
+        const seller = sellers[i];
+        const s = modifiedSellers[i];
+        if (seller.logoFileId) {
+            const cacheKey = `seller_logofile_${JSON.stringify(seller.logoFileId)}`;
+            const cacheData = await this.cacheManager.get<PaginationSellerResponse>(
+              cacheKey
+            );
+            if (cacheData) {
+              s.logoFile = cacheData;
+            } else {
+              const file = await File.findOneBy({ id: seller.logoFileId })
+              s.logoFile = file;
+              await this.cacheManager.set(cacheKey, file, CacheTTL.ONE_WEEK);
+            }
+        }
+        else {
+            s.logoFile = null;
+        }
+      }
 
-      const { modifiedData, total } = await this.getModifiedSellers(
-        uniqueSellerIds,
-        indexBrandToSeller,
-      );
-
-      // console.log('index',indexBrandToSeller,total)
 
       const response = PaginationSellerResponse.make(
         indexBrandToSeller,
         total,
-        modifiedData,
+        modifiedSellers,
       );
-
-      // console.log('res',modifiedData.length)
 
       const jsonString = JSON.stringify(response).replace(/__bannerFile__/g, 'bannerFile')
       .replace(/__logoFile__/g, 'logoFile');
@@ -351,6 +398,7 @@ export class OfferService {
       console.log(e);
     }
   }
+
 
   async getSellerOf(offer: Offer) {
     return await offer.seller;
