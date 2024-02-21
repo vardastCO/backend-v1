@@ -25,7 +25,12 @@ export class EventTrackerService {
     createEventTrackerInput.ipAddress = request.ip ?? "0.0.0.0";
     createEventTrackerInput.agent = request.headers["user-agent"] ?? "Unknown";
     const event: EventTracker = EventTracker.create<EventTracker>(createEventTrackerInput);
-    await this.cacheManager.set(cacheKey, event, CacheTTL.FIFTEEN_MINUTES);
+    try {
+      await this.cacheManager.set(cacheKey, event, CacheTTL.FIFTEEN_MINUTES);
+      console.log('trueeeee')
+    } catch (e) {
+      console.log('event',e)
+    }
 
     return true
   }
