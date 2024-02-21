@@ -76,7 +76,7 @@ services:
       - elastic_data:/usr/share/elasticsearch/data/
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=farbod
     ports:
       - '9200:9200'
       - '9300:9300'
@@ -116,6 +116,8 @@ services:
     restart: always
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=farbod
     depends_on:
       - elasticsearch
     networks:
