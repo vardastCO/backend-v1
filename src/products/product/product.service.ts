@@ -209,7 +209,7 @@ export class ProductService {
     const [products, totalCount] = await Product.findAndCount({
       where: whereConditions,
       relations: ["images", "prices","uom","category"],
-      order: this.getOrderClause(indexProductInput.orderBy),
+      order: this.getOrderClause(indexProductInput.orderBy) as any,
       skip: skip,
       take: take,
     });
