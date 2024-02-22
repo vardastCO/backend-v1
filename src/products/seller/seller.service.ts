@@ -194,7 +194,7 @@ export class SellerService {
       const modifiedData = await Promise.all(
         data.map(async seller => {
           // seller.offers =  []
-          seller.brands = await this.getOfferBrand(seller.id)
+          seller.brands = []
           // seller.sum = await this.getOfferLength(seller.id);
           return seller;
         }),
