@@ -166,6 +166,12 @@ export class OfferService {
     try {
       const sellerId = (await this.userService.getSellerRecordOf(user))?.id;
       let offer: Offer;
+
+      const cacheKey = `product_${JSON.stringify(productId)}`;
+      const keyExists = await this.cacheManager.get(cacheKey);
+      if (keyExists) {
+        await this.cacheManager.del(cacheKey);
+      }
   
       if (offerId) {
         offer = await Offer.findOneBy({ id: offerId });

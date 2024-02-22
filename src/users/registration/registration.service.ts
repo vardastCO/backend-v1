@@ -41,6 +41,8 @@ export class RegistrationService {
     const userExists = await User.createQueryBuilder()
       .where({ cellphone: validateCellphoneInput.cellphone })
       .getExists();
+    
+    console.log('biiiiiiiiiiiiiiii')
 
     if (
       validateCellphoneInput.validationType == ValidationTypes.SIGNUP &&
@@ -76,6 +78,8 @@ export class RegistrationService {
       })
       .orderBy({ '"createdAt"': "DESC" })
       .getOne();
+    
+      console.log('ggggiiiiiiiiiiiiiiii')
 
     let isNewTokenSend: boolean;
     if ((isNewTokenSend = !lastUnexpiredOtp)) {
