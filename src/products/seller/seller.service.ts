@@ -186,6 +186,7 @@ export class SellerService {
       order: {
         rating: "DESC",
       },
+      relations: ['offers', 'brands'], 
     });
 
 
