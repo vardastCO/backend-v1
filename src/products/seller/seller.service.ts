@@ -191,16 +191,16 @@ export class SellerService {
 
 
     try {
-      const modifiedData = await Promise.all(
-        data.map(async seller => {
-          seller.offers = []
-          seller.brands = null
-          // seller.sum = await this.getOfferLength(seller.id);
-          return seller;
-        }),
-      );
+      // const modifiedData = await Promise.all(
+      //   data.map(async seller => {
+      //     seller.offers = []
+      //     seller.brands = null
+      //     // seller.sum = await this.getOfferLength(seller.id);
+      //     return seller;
+      //   }),
+      // );
 
-      const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
+      const jsonString = JSON.stringify(data).replace(/__bannerFile__/g, 'bannerFile')
         .replace(/__logoFile__/g, 'logoFile')
         .replace(/__offers__/g, 'offers')
         .replace(/__has_offers__/g, 'has_offers');

@@ -27,8 +27,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'
-          memory: 1536M
+          cpus: '2.0'    # Adjust based on available CPU resources
+          memory: 2048M  # Adjust based on available RAM resources
+        reservations:
+          cpus: '1.0'
+          memory: 1024M
 
   storage:
     image: minio/minio
