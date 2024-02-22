@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { OneTimePasswordStates } from "../enums/one-time-password-states.enum";
@@ -27,6 +28,7 @@ export class OneTimePassword extends BaseEntity {
 
   @Field()
   @Column()
+  @Index()
   receiver: string;
 
   @Column()

@@ -11,6 +11,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   Generated,
   JoinColumn,
   JoinTable,
@@ -52,6 +53,7 @@ export class User extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
+  @Index()
   cellphone: string;
 
   @Field(type => Int, { nullable: true })
