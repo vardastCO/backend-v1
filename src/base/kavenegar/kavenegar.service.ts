@@ -98,7 +98,7 @@ export class KavenegarService {
           }),
         ),
     );
-    console.log('res kavenegar',response)
+    // console.log('res kavenegar',response)
     // if (response?.data?.return?.status !== 200) {
     //   this.logger.error(url, body, response);
     //   throw "Unsuccessful call of sms provider API!";
