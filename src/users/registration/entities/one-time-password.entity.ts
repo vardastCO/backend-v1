@@ -64,7 +64,6 @@ export class OneTimePassword extends BaseEntity {
   }
 
   async doesTokenMatches(rawToken: string): Promise<boolean> {
-    console.log('doesTokenMatches',await argon2.verify(this.token, rawToken))
     return await argon2.verify(this.token, rawToken);
   }
 }

@@ -88,7 +88,9 @@ export class RegistrationService {
         type: validationTypeToOtpTypeMap[validateCellphoneInput.validationType],
         receiver: validateCellphoneInput.cellphone,
       }).generateNewToken();
-      // console.log('aaa',lastUnexpiredOtp.receiver,lastUnexpiredOtp.token)
+
+      console.log('=============================')
+      console.log('kavenegar',validateCellphoneInput.cellphone,lastUnexpiredOtp.token)
       await this.kavenegarService.lookup(
         validateCellphoneInput.cellphone,
         "verify",
