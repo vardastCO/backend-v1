@@ -17,6 +17,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CronJobService } from "./cron-job.service";
 import { ThrottlerModule } from '@nestjs/throttler';
 import { KavenegarService } from "./base/kavenegar/kavenegar.service";
+import { KavenegarModule } from "./base/kavenegar/kavenegar.module";
 // import { RabbitMQModule } from "./rabitmq/rabbitmq.module";
 // import { ElasticsearchModule } from '@nestjs/elasticsearch';
 // import { ElasticsearchServices } from "./elastic/elastic-service";
@@ -36,6 +37,7 @@ import { KavenegarService } from "./base/kavenegar/kavenegar.service";
     BaseModule,
     UsersModule,
     ProductsModule,
+    KavenegarModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
