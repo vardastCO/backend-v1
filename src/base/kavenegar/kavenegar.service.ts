@@ -55,17 +55,22 @@ export class KavenegarService {
     token3?: string,
     type?: "sms" | "voice",
   ) {
-    return await this.request(
-      "verify/lookup.json",
-      filterObject({
-        receptor,
-        template,
-        token,
-        token2,
-        token3,
-        type,
-      }),
-    );
+    try {
+      await this.request(
+        "verify/lookup.json",
+        filterObject({
+          receptor,
+          template,
+          token,
+          token2,
+          token3,
+          type,
+        }),
+      );
+    } catch (e) {
+      console.log('look up kavenegar ',e )
+    } 
+    
   }
 
   async request(
@@ -93,11 +98,11 @@ export class KavenegarService {
           }),
         ),
     );
-
-    if (response?.data?.return?.status !== 200) {
-      this.logger.error(url, body, response);
-      throw "Unsuccessful call of sms provider API!";
-    }
+    console.log('res kavenegar',response)
+    // if (response?.data?.return?.status !== 200) {
+    //   this.logger.error(url, body, response);
+    //   throw "Unsuccessful call of sms provider API!";
+    // }
 
     return response;
   }
