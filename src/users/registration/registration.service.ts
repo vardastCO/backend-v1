@@ -94,7 +94,7 @@ export class RegistrationService {
 
     //   console.log('=============================')
       const key = `kavenegar:${validateCellphoneInput.cellphone}:${lastUnexpiredOtp.token}`;
-      await this.cacheManager.set(key, 'OTP', CacheTTL.FIFTEEN_SECONDS);
+      await this.cacheManager.set(key, 'OTP', CacheTTL.TEN_SECONDS);
     //   console.log('kavenegar',validateCellphoneInput.cellphone,lastUnexpiredOtp.token)
     //   // await this.kavenegarService.lookup(
     //   //   validateCellphoneInput.cellphone,
