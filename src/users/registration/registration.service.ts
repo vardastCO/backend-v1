@@ -38,29 +38,29 @@ export class RegistrationService {
       validateCellphoneInput.validationType ?? ValidationTypes.SIGNUP;
 
     // check to see if user exists:
-    const userExists = await User.createQueryBuilder()
-      .where({ cellphone: validateCellphoneInput.cellphone })
-      .getExists();
+    // const userExists = await User.createQueryBuilder()
+    //   .where({ cellphone: validateCellphoneInput.cellphone })
+    //   .getExists();
     
     console.log('biiiiiiiiiiiiiiii')
 
-    if (
-      validateCellphoneInput.validationType == ValidationTypes.SIGNUP &&
-      userExists
-    ) {
-      return {
-        nextState: AuthStates.LOGIN,
-        message: "لطفا وارد حساب کاربری خود شوید.",
-      };
-    } else if (
-      validateCellphoneInput.validationType == ValidationTypes.PASSWORD_RESET &&
-      !userExists
-    ) {
-      return {
-        nextState: AuthStates.VALIDATE_CELLPHONE,
-        message: "کاربری با این مشخصات یافت نشد.",
-      };
-    }
+    // if (
+    //   validateCellphoneInput.validationType == ValidationTypes.SIGNUP &&
+    //   userExists
+    // ) {
+    //   return {
+    //     nextState: AuthStates.LOGIN,
+    //     message: "لطفا وارد حساب کاربری خود شوید.",
+    //   };
+    // } else if (
+    //   validateCellphoneInput.validationType == ValidationTypes.PASSWORD_RESET &&
+    //   !userExists
+    // ) {
+    //   return {
+    //     nextState: AuthStates.VALIDATE_CELLPHONE,
+    //     message: "کاربری با این مشخصات یافت نشد.",
+    //   };
+    // }
 
     // check to see if any valid otp exists
     const now = new Date();
@@ -88,9 +88,9 @@ export class RegistrationService {
         type: validationTypeToOtpTypeMap[validateCellphoneInput.validationType],
         receiver: validateCellphoneInput.cellphone,
       }).generateNewToken();
-      console.log('aaa',lastUnexpiredOtp.receiver,lastUnexpiredOtp.token)
+      // console.log('aaa',lastUnexpiredOtp.receiver,lastUnexpiredOtp.token)
       await this.kavenegarService.lookup(
-        lastUnexpiredOtp.receiver,
+        validateCellphoneInput.cellphone,
         "verify",
         lastUnexpiredOtp.token,
       );
