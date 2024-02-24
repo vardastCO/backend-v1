@@ -16,6 +16,7 @@ import { UsersModule } from "./users/users.module";
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronJobService } from "./cron-job.service";
 import { ThrottlerModule } from '@nestjs/throttler';
+import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 // import { RabbitMQModule } from "./rabitmq/rabbitmq.module";
 // import { ElasticsearchModule } from '@nestjs/elasticsearch';
 // import { ElasticsearchServices } from "./elastic/elastic-service";
@@ -61,6 +62,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
   ],
   controllers: [AppController],
   // providers: [AppService, ElasticsearchServices],
-  providers: [AppService,CronJobService],
+  providers: [AppService,CronJobService,KavenegarService],
 })
 export class AppModule  {}
