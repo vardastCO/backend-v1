@@ -94,7 +94,6 @@ services:
   logstash_image:
     image: logstash:7.16.2
     volumes:
-      - ./logstash/config:/usr/share/logstash/config
       - ./logstash/:/logstash_dir
     command: logstash -f /logstash_dir/logstash.conf
     restart: always
