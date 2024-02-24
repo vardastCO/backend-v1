@@ -111,7 +111,7 @@ services:
           cpus: '3'
           memory: 3536M
   fleet-server:
-    image: fleet-server:latest
+    image: rancher/fleet-agent
     environment:
       - FLEET_SERVER_ENABLE=1
     ports:
