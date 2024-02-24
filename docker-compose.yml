@@ -109,16 +109,6 @@ services:
       resources:
         limits:
           cpus: '3'
-          memory: 3536M
-  fleet-server:
-    image: rancher/fleet-agent:v0.9.1-rc.5
-    ports:
-      - "8220:8220"
-    deploy:
-      resources:
-        limits:
-          cpus: '3'
-          memory: 3536M
   kibana:
     image: kibana:7.16.2
     container_name: kibana
