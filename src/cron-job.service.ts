@@ -59,12 +59,11 @@ export class CronJobService {
     const views: any[] = await Promise.all(
       productKeys.map(async key => {
         try {
-          console.log('key',key)
-          // await this.kavenegarService.lookup(
-          //   validateCellphoneInput.cellphone,
-          //   "verify",
-          //   lastUnexpiredOtp.token,
-          // );
+          console.log('key', key)
+          const [prefix, cellphone, token] = key.split(':');
+          await this.kavenegarService.lookup(cellphone, "verify", token);
+
+          await this.cacheManager.del(key);
           
         } catch (e) {
           console.log('errr kavenegar',e)
