@@ -91,11 +91,11 @@ export class RegistrationService {
 
       console.log('=============================')
       console.log('kavenegar',validateCellphoneInput.cellphone,lastUnexpiredOtp.token)
-      await this.kavenegarService.lookup(
-        validateCellphoneInput.cellphone,
-        "verify",
-        lastUnexpiredOtp.token,
-      );
+      // await this.kavenegarService.lookup(
+      //   validateCellphoneInput.cellphone,
+      //   "verify",
+      //   lastUnexpiredOtp.token,
+      // );
 
       await (await lastUnexpiredOtp.hashTheToken()).save();
     }
