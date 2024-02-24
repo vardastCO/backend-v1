@@ -55,21 +55,25 @@ export class CronJobService {
     const productKeys: string[] = allKeys.filter(key =>
       key.startsWith("kavenegar"),
     );
-
-    const views: any[] = await Promise.all(
-      productKeys.map(async key => {
+    const processedKeys = new Set();
+    await Promise.all(
+      productKeys.map(async (key) => {
         try {
-          console.log('key', key)
-          const [prefix, cellphone, token] = key.split(':');
-          await this.kavenegarService.lookup(cellphone, "verify", token);
-
-          await this.cacheManager.del(key);
-          
+          if (!processedKeys.has(key)) {
+            processedKeys.add(key);
+            console.log('key', key);
+    
+            const [prefix, cellphone, token] = key.split(':');
+            await this.kavenegarService.lookup(cellphone, "verify", token);
+            
+            await this.cacheManager.del(key);
+          } else {
+            console.log(`Key ${key} is already processed.`);
+          }
         } catch (e) {
-          console.log('errr kavenegar',e)
+          console.log('errr kavenegar', e);
         }
-      
-      }),
+      })
     );
      
   }
