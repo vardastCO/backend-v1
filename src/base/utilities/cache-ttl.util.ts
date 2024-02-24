@@ -1,4 +1,5 @@
 export class CacheTTL {
+  public static ONE_MINUTES = 90;
   public static THREE_MINUTES = 180;
   public static FIFTEEN_MINUTES = 900;
 

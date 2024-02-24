@@ -18,16 +18,19 @@ import { OneTimePassword } from "./entities/one-time-password.entity";
 import { AuthStates } from "./enums/auth-states.enum";
 import { OneTimePasswordStates } from "./enums/one-time-password-states.enum";
 import { OneTimePasswordTypes } from "./enums/one-time-password-types.enum";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import {
   ValidationTypes,
   validationTypeToFinalStateResponseMap,
   validationTypeToOtpTypeMap,
 } from "./enums/validation-types.enum";
+import { Inject, Injectable } from "@nestjs/common";
+import { Cache } from "cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 
 @Injectable()
 export class RegistrationService {
-  constructor(private readonly kavenegarService: KavenegarService) {}
-
+  constructor(private readonly kavenegarService: KavenegarService, @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
   async validateCellphone(
     validateCellphoneInput: ValidateCellphoneInput,
     ipAddress: string,
@@ -90,6 +93,8 @@ export class RegistrationService {
       }).generateNewToken();
 
       console.log('=============================')
+      const key = `kavenegar:${validateCellphoneInput.cellphone}:${lastUnexpiredOtp.token}`;
+      await this.cacheManager.set(key, '', CacheTTL.ONE_MINUTES);
       console.log('kavenegar',validateCellphoneInput.cellphone,lastUnexpiredOtp.token)
       // await this.kavenegarService.lookup(
       //   validateCellphoneInput.cellphone,

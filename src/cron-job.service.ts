@@ -5,10 +5,12 @@ import { Cache } from "cache-manager";
 import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import axios from "axios";
+import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 
 @Injectable()
 export class CronJobService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(private readonly kavenegarService: KavenegarService, @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+ 
   @Cron(CronExpression.EVERY_5_SECONDS)
   async logProductViewsToElasticsearch() {
     // Fetch product views and log to Elasticsearch
@@ -45,6 +47,32 @@ export class CronJobService {
   async logBrandViewsToElasticsearch() {
     // Fetch product views and log to Elasticsearch
     await this.fetchAndLogBrandViewsToElasticsearch();
+  }
+
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  async sendOTPWithKavenegar() {
+    const allKeys: string[] = await this.cacheManager.store.keys();
+    const productKeys: string[] = allKeys.filter(key =>
+      key.startsWith("kavenegar"),
+    );
+
+    const views: any[] = await Promise.all(
+      productKeys.map(async key => {
+        try {
+          console.log('key',key)
+          // await this.kavenegarService.lookup(
+          //   validateCellphoneInput.cellphone,
+          //   "verify",
+          //   lastUnexpiredOtp.token,
+          // );
+          
+        } catch (e) {
+          console.log('errr kavenegar',e)
+        }
+      
+      }),
+    );
+     
   }
   private async fetchAndLogBrandViewsToElasticsearch(): Promise<void> {
     const allKeys: string[] = await this.cacheManager.store.keys();
