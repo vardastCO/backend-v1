@@ -95,7 +95,35 @@ services:
     image: logstash:7.16.2
     volumes:
       - ./logstash/:/logstash_dir
-    command: logstash -f /logstash_dir/logstash.conf
+    command: >
+      logstash -e '
+        input {
+          file {
+            path => "/var/log/nginx/*.log"
+            start_position => "beginning"
+            sincedb_path => "/dev/null"
+          }
+        }
+
+        filter {
+          grok {
+            match => { "message" => "%{COMBINEDAPACHELOG}" }
+          }
+          date {
+            match => [ "@timestamp", "dd/MMM/yyyy:HH:mm:ss Z" ]
+          }
+        }
+
+        output {
+          elasticsearch {
+            hosts => ["elasticsearch:9200"]
+            index => "nginx_logs"
+            user => "elastic"
+            password => "farbod"
+          }
+          stdout {}
+        }
+      '
     restart: always
     depends_on:
       - elasticsearch
