@@ -24,7 +24,7 @@ import {
   validationTypeToFinalStateResponseMap,
   validationTypeToOtpTypeMap,
 } from "./enums/validation-types.enum";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 
