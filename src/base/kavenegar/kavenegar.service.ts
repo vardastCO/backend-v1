@@ -93,7 +93,7 @@ export class KavenegarService {
         })
         .pipe(
           catchError((error: AxiosError) => {
-            // this.logger.error(url, body, error.response.data);
+           console.log(url, body, error);
             throw "An error happened while calling sms provider api!";
           }),
         ),
