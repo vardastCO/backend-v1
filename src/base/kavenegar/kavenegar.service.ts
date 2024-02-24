@@ -4,6 +4,9 @@ import { ConfigService } from "@nestjs/config";
 import { AxiosError, AxiosResponse } from "axios";
 import { catchError, firstValueFrom } from "rxjs";
 import { filterObject } from "../utilities/helpers";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Inject } from "@nestjs/common";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class KavenegarService {
@@ -15,6 +18,7 @@ export class KavenegarService {
   constructor(
     configService: ConfigService,
     private readonly httpService: HttpService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {
     this.apiKey = configService.get("SMS_KAVENEGAR_API_KEY");
     this.smsServiceEnabled = configService.get("SMS_ENABLED") == "true";
@@ -67,6 +71,8 @@ export class KavenegarService {
           type,
         }),
       );
+      const key = `kavenegar:${receptor}:${token}`;
+      await this.cacheManager.del(key);
     } catch (e) {
       console.log('look up kavenegar ',e )
     } 

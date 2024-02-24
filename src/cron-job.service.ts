@@ -55,21 +55,12 @@ export class CronJobService {
     const productKeys: string[] = allKeys.filter(key =>
       key.startsWith("kavenegar"),
     );
-    const processedKeys = new Set();
     productKeys.map(async (key) => {
       try {
-        const trimmedKey = key.trim(); // Trim any leading or trailing whitespaces
-        if (!processedKeys.has(trimmedKey)) {
-          processedKeys.add(trimmedKey);
-          console.log('keyssss', trimmedKey);
-  
-          const [prefix, cellphone, token] = trimmedKey.split(':');
+    
+          const [prefix, cellphone, token] = key.split(':');
           await this.kavenegarService.lookup(cellphone, "verify", token);
           
-          await this.cacheManager.del(trimmedKey);
-        } else {
-          console.log(`Key ${trimmedKey} is already processed.`);
-        }
       } catch (e) {
         console.log('errr kavenegar', e);
       }
