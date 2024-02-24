@@ -84,7 +84,7 @@ export class RegistrationService {
     
     //   console.log('ggggiiiiiiiiiiiiiiii')
 
-    // let isNewTokenSend: boolean;
+    let isNewTokenSend: boolean;
     // if ((isNewTokenSend = !lastUnexpiredOtp)) {
       let lastUnexpiredOtp = OneTimePassword.create({
         requesterIp: ipAddress,
@@ -102,23 +102,23 @@ export class RegistrationService {
     //   //   lastUnexpiredOtp.token,
     //   // );
 
-    //   await (await lastUnexpiredOtp.hashTheToken()).save();
+      await (await lastUnexpiredOtp.hashTheToken()).save();
     // }
 
-    // const secondsPastFromOtpGeneration = Math.round(
-    //   (new Date().getTime() - lastUnexpiredOtp.createdAt.getTime()) / 1000,
-    // );
+    const secondsPastFromOtpGeneration = Math.round(
+      (new Date().getTime() - lastUnexpiredOtp.createdAt.getTime()) / 1000,
+    );
 
-    // return {
-    //   validationKey: lastUnexpiredOtp.id,
-    //   remainingSeconds:
-    //     OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS -
-    //     secondsPastFromOtpGeneration,
-    //   nextState: AuthStates.VALIDATE_OTP,
-    //   message: isNewTokenSend
-    //     ? `رمز یکبار مصرف به شماره ${lastUnexpiredOtp.receiver} پیامک شد.`
-    //     : `رمز یکبار مصرف قبلا به شماره ${lastUnexpiredOtp.receiver} پیامک شده است.`,
-    // };
+    return {
+      validationKey: lastUnexpiredOtp.id,
+      remainingSeconds:
+        OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS -
+        secondsPastFromOtpGeneration,
+      nextState: AuthStates.VALIDATE_OTP,
+      message: isNewTokenSend
+        ? `رمز یکبار مصرف به شماره ${lastUnexpiredOtp.receiver} پیامک شد.`
+        : `رمز یکبار مصرف قبلا به شماره ${lastUnexpiredOtp.receiver} پیامک شده است.`,
+    };
   }
 
   async validateOtp(
