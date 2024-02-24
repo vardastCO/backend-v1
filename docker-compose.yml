@@ -112,8 +112,6 @@ services:
           memory: 3536M
   fleet-server:
     image: rancher/fleet-agent:v0.9.1-rc.5
-    environment:
-      - FLEET_SERVER_ENABLE=1
     ports:
       - "8220:8220"
     deploy:
