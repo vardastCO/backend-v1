@@ -30,6 +30,7 @@ import { KavenegarModule } from "./base/kavenegar/kavenegar.module";
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    KavenegarModule,
     I18nModule.forRoot(i18nConfig),
     CacheModule.registerAsync(cacheAsyncConfig),
     TypeOrmModule.forRootAsync(typeOrmAsyncConfig),
@@ -37,7 +38,6 @@ import { KavenegarModule } from "./base/kavenegar/kavenegar.module";
     BaseModule,
     UsersModule,
     ProductsModule,
-    KavenegarModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
@@ -64,6 +64,6 @@ import { KavenegarModule } from "./base/kavenegar/kavenegar.module";
   ],
   controllers: [AppController],
   // providers: [AppService, ElasticsearchServices],
-  providers: [AppService,CronJobService,KavenegarService],
+  providers: [AppService,CronJobService],
 })
 export class AppModule  {}
