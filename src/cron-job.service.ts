@@ -49,7 +49,7 @@ export class CronJobService {
     await this.fetchAndLogBrandViewsToElasticsearch();
   }
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async sendOTPWithKavenegar() {
     const allKeys: string[] = await this.cacheManager.store.keys();
     const productKeys: string[] = allKeys.filter(key =>
