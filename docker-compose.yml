@@ -111,21 +111,21 @@ services:
           memory: 1536M
 
   kibana:
-  #   image: kibana:7.16.2
-  #   container_name: kibana
-  #   ports:
-  #     - '5602:5601'
-  #   environment:
-  #     - ELASTICSEARCH_URL=http://elasticsearch:9200
-  #   depends_on:
-  #     - elasticsearch
-  #   networks:
-  #     - myNet
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '1.5'
-  #         memory: 1536M
+    image: kibana:7.16.2
+    container_name: kibana
+    ports:
+      - '5602:5601'
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - myNet
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1536M
 
 volumes:
   pg_data:
