@@ -11,43 +11,43 @@ import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 export class CronJobService {
   constructor(private readonly kavenegarService: KavenegarService, @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
  
-  @Cron(CronExpression.EVERY_5_SECONDS)
-  async logProductViewsToElasticsearch() {
-    // Fetch product views and log to Elasticsearch
-    await this.fetchAndLogProductViewsToElasticsearch();
-  }
-  @Cron(CronExpression.EVERY_5_SECONDS)
-  async logRequestToElasticsearch() {
-    // Fetch product views and log to Elasticsearch
-    await this.fetchRequestViewsToElasticsearch();
-  }
-  @Cron(CronExpression.EVERY_5_SECONDS)
-  async logSellerViewsToElasticsearch() {
-    // Fetch product views and log to Elasticsearch
-    await this.fetchAndLogSellerViewsToElasticsearch();
-  }
+  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // async logProductViewsToElasticsearch() {
+  //   // Fetch product views and log to Elasticsearch
+  //   await this.fetchAndLogProductViewsToElasticsearch();
+  // }
+  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // async logRequestToElasticsearch() {
+  //   // Fetch product views and log to Elasticsearch
+  //   await this.fetchRequestViewsToElasticsearch();
+  // }
+  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // async logSellerViewsToElasticsearch() {
+  //   // Fetch product views and log to Elasticsearch
+  //   await this.fetchAndLogSellerViewsToElasticsearch();
+  // }
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
-  async logTrackerViewsToElasticsearch() {
-    const allKeys: string[] = await this.cacheManager.store.keys();
-    const productKeys: string[] = allKeys.filter(key =>
-      key.startsWith("eventTracker:"),
-    );
+  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // async logTrackerViewsToElasticsearch() {
+  //   const allKeys: string[] = await this.cacheManager.store.keys();
+  //   const productKeys: string[] = allKeys.filter(key =>
+  //     key.startsWith("eventTracker:"),
+  //   );
 
-    const views: any[] = await Promise.all(
-      productKeys.map(async key => {
-        const value = await this.cacheManager.get(key);
+  //   const views: any[] = await Promise.all(
+  //     productKeys.map(async key => {
+  //       const value = await this.cacheManager.get(key);
 
-        return { key, value };
-      }),
-    );
-    await this.logTrackerToElasticsearch(views)
-  }
-  @Cron(CronExpression.EVERY_5_SECONDS)
-  async logBrandViewsToElasticsearch() {
-    // Fetch product views and log to Elasticsearch
-    await this.fetchAndLogBrandViewsToElasticsearch();
-  }
+  //       return { key, value };
+  //     }),
+  //   );
+  //   await this.logTrackerToElasticsearch(views)
+  // }
+  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // async logBrandViewsToElasticsearch() {
+  //   // Fetch product views and log to Elasticsearch
+  //   await this.fetchAndLogBrandViewsToElasticsearch();
+  // }
 
   @Cron(CronExpression.EVERY_5_SECONDS)
   async sendOTPWithKavenegar() {
