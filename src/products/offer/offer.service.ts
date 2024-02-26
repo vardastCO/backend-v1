@@ -181,12 +181,6 @@ export class OfferService {
   
       if (offer) {
         await offer.remove();
-        try {
-          await Price.deleteMany({ productId: productId, sellerId: sellerId });
-          console.log('Prices removed successfully.');
-        } catch (error) {
-          console.error('Error removing prices:', error);
-        }
         return true;
       } else {
         // Handle the case where the offer is not found

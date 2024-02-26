@@ -403,9 +403,9 @@ export class ProductService {
             .where('"Offer"."productId" = :productId', {
               productId: product.id,
             })
-            .andWhere(
-              `("Offer"."sellerId" = 1 OR exists (select 0 from product_prices where "sellerId" = "Offer"."sellerId" and "productId" = "Offer"."productId"))`,
-            )
+            // .andWhere(
+            //   `("Offer"."sellerId" = 1 OR exists (select 0 from product_prices where "sellerId" = "Offer"."sellerId" and "productId" = "Offer"."productId"))`,
+            // )
             .groupBy('"Offer"."sellerId"'),
         "maxIds",
         '"Offer"."id" = "maxIds"."maxId"',
