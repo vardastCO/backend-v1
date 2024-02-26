@@ -181,7 +181,7 @@ export class OfferService {
   
       if (offer) {
         await offer.remove();
-        await Price.findOneBy({ productId: productId, sellerId: sellerId }).remove()
+        await Price.findBy({ productId: productId, sellerId: sellerId }).remove()
         return true;
       } else {
         // Handle the case where the offer is not found
