@@ -232,14 +232,14 @@ export class SellerService {
   
   async findOne(id: number): Promise<Seller> {
     try {
-      this.logSellerView(id);
-      const cacheKey = `seller_${JSON.stringify(id)}`;
+      // this.logSellerView(id);
+      // const cacheKey = `seller_${JSON.stringify(id)}`;
   
-      const cachedData = await this.cacheManager.get<Seller>(cacheKey);
+      // const cachedData = await this.cacheManager.get<Seller>(cacheKey);
     
-      if (cachedData) {
-        return cachedData;
-      }
+      // if (cachedData) {
+      //   return cachedData;
+      // }
       const seller = await Seller.findOne({
         where: { id: id },
         relations: ['representatives'],
@@ -255,15 +255,15 @@ export class SellerService {
         // if (previousTotla != seller.total) {
         //   await seller.save();
         // }
-        const jsonString = JSON.stringify(seller).replace(/__logoFile__/g, 'logoFile')
-          .replace(/__bannerFile__/g, 'bannerFile')
-          .replace(/__representatives__/g, 'representatives')
+        // const jsonString = JSON.stringify(seller).replace(/__logoFile__/g, 'logoFile')
+        //   .replace(/__bannerFile__/g, 'bannerFile')
+        //   .replace(/__representatives__/g, 'representatives')
 
       ;
   
       // Parse the modified JSON back to objects
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-        await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK);
+      // const modifiedDataWithOutText = JSON.parse(jsonString);
+        // await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK);
       
 
       } catch (e) {
