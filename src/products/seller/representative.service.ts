@@ -85,7 +85,8 @@ export class RepresentativeService {
         .leftJoinAndSelect(`${querybuilder.alias}.product`, 'product')
         .where(`${querybuilder.alias}.sellerId = :sellerId`, { sellerId: sellerRepresentative.sellerId })
         .andWhere('LOWER(product.name) LIKE LOWER(:name)', { name: `%${name}%` })
-        .orderBy(`${querybuilder.alias}.createdAt`, 'DESC')
+      .orderBy(`${querybuilder.alias}.createdAt`, 'DESC')
+      .limit(15)
       .getMany();
     
     
