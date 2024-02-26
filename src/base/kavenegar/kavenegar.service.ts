@@ -60,7 +60,7 @@ export class KavenegarService {
     type?: "sms" | "voice",
   ) {
     try {
-      console.log('sendotp',receptor,template,token)
+      // console.log('sendotp',receptor,template,token)
       await this.request(
         "verify/lookup.json",
         filterObject({
@@ -72,8 +72,6 @@ export class KavenegarService {
           type,
         }),
       );
-      const key = `kavenegar:${receptor}:${token}`;
-      await this.cacheManager.del(key);
     } catch (e) {
       console.log('look up kavenegar ',e )
     } 
