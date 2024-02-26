@@ -86,7 +86,7 @@ export class RepresentativeResolver {
     @CurrentUser() user: User,
   ) {
     return this.sellerRepresentativeService.myProfileSeller(
-      user.id,searchSellerRepresentativeInput.name
+      user.id,searchSellerRepresentativeInput.name,searchSellerRepresentativeInput
     );
   }
   @Permission("gql.products.seller_representative.update")

@@ -9,6 +9,7 @@ import { UpdateSellerRepresentativeInput } from "./dto/update-seller-representat
 import { SellerRepresentative } from "./entities/seller-representative.entity";
 import { Seller } from "./entities/seller.entity";
 import { Offer } from "../offer/entities/offer.entity";
+import { SearchSellerRepresentativeInput } from "./dto/search-seller-representative.input";
 
 @Injectable()
 export class RepresentativeService {
@@ -72,7 +73,7 @@ export class RepresentativeService {
     return sellerRepresentative;
   }
 
-  async myProfileSeller(id: number,name:string): Promise<Seller> {
+  async myProfileSeller(id: number,name:string, searchSellerRepresentativeInput:SearchSellerRepresentativeInput): Promise<Seller> {
     const sellerRepresentative = await SellerRepresentative.findOneBy({userId : id });
     if (!sellerRepresentative) {
       throw new NotFoundException();
@@ -82,11 +83,12 @@ export class RepresentativeService {
     const querybuilder = Offer.createQueryBuilder()
   
     const result = await querybuilder
-        .leftJoinAndSelect(`${querybuilder.alias}.product`, 'product')
-        .where(`${querybuilder.alias}.sellerId = :sellerId`, { sellerId: sellerRepresentative.sellerId })
-        .andWhere('LOWER(product.name) LIKE LOWER(:name)', { name: `%${name}%` })
+      .leftJoinAndSelect(`${querybuilder.alias}.product`, 'product')
+      .where(`${querybuilder.alias}.sellerId = :sellerId`, { sellerId: sellerRepresentative.sellerId })
+      .andWhere('LOWER(product.name) LIKE LOWER(:name)', { name: `%${name}%` })
       .orderBy(`${querybuilder.alias}.createdAt`, 'DESC')
-      .limit(15)
+      .take(searchSellerRepresentativeInput.perPage)
+      .skip(searchSellerRepresentativeInput.skip)
       .getMany();
     
     
