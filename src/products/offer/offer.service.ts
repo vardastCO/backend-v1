@@ -174,13 +174,20 @@ export class OfferService {
       }
   
       if (offerId) {
+        console.log('offerId',offerId)
         offer = await Offer.findOneBy({ id: offerId });
       } else {
+        console.log('no have offer')
         offer = await Offer.findOneBy({ productId: productId, sellerId: sellerId });
       }
   
       if (offer) {
-        await offer.remove();
+        try {
+          await offer.remove();
+        } catch (e){
+         console.log('reeemove offer',e)
+        }
+ 
         return true;
       } else {
         // Handle the case where the offer is not found
