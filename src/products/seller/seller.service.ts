@@ -109,7 +109,8 @@ export class SellerService {
       
       const result = await queryBuilder
       .select([`${queryBuilder.alias}.id`, `${queryBuilder.alias}.name`])
-        .limit(10)
+      .skip(indexSellerInput.skip)
+      .take(indexSellerInput.take)
       .getMany();
       await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
 
