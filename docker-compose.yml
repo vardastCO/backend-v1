@@ -58,7 +58,6 @@ services:
       - .:/app
     networks:
       - myNet
-    command: sh -c "while :; do wget -qO- http://web:3080/health; sleep 300; done"
     deploy:
       resources:
         limits:
