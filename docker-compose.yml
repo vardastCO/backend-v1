@@ -58,6 +58,7 @@ services:
       - .:/app
     networks:
       - myNet
+    command: sh -c "while :; do curl -s localhost:3080/health; sleep 300; done"
     deploy:
       resources:
         limits:
