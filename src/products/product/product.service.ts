@@ -147,30 +147,15 @@ export class ProductService {
   async paginate(
     indexProductInput?: IndexProductInput,
   ): Promise<PaginationProductResponse> {
-    
-
-    const beforeBoot = Date.now();
-
     indexProductInput.boot();
-  
-    // Measure time after calling boot
-    const afterBoot = Date.now();
-    const bootTime = afterBoot - beforeBoot;
-    console.log(`Time taken in boot method: ${bootTime} ms`);
-  
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
-  
-    // Measure time before getting data from the cache
-    const beforeCacheGet = Date.now();
-    // const cachedData = await this.cacheManager.get<PaginationProductResponse>(cacheKey);
-    // // Measure time after getting data from the cache
-    // const afterCacheGet = Date.now();
-    // const cacheGetTime = afterCacheGet - beforeCacheGet;
-    // console.log(`Time taken in cache get method: ${cacheGetTime} ms`);
-  
-    // if (cachedData) {
-    //   return cachedData;
-    // }
+    const cachedData = await this.cacheManager.get<PaginationProductResponse>(
+      cacheKey,
+    );
+    
+    if (cachedData) {
+      return cachedData;
+    }
    
     const {
       take,
@@ -241,22 +226,22 @@ export class ProductService {
       skip: skip,
       take: take,
     });
-    // const jsonString = JSON.stringify(products).replace(/__imageCategory__/g, 'imageCategory')
-    //   .replace(/__uom__/g, 'uom')
-    //   .replace(/__has_uom__/g, 'has_uom')
-    //   .replace(/__has_category__/g, 'has_category')
-    //   .replace(/__category__/g, 'category')
-    //   .replace(/__file__/g, 'file')
-    //   .replace(/__images__/g, 'images')
-    //   ;
+    const jsonString = JSON.stringify(products).replace(/__imageCategory__/g, 'imageCategory')
+      .replace(/__uom__/g, 'uom')
+      .replace(/__has_uom__/g, 'has_uom')
+      .replace(/__has_category__/g, 'has_category')
+      .replace(/__category__/g, 'category')
+      .replace(/__file__/g, 'file')
+      .replace(/__images__/g, 'images')
+      ;
 
       // Parse the modified JSON back to objects
-      // const modifiedDataWithOutText = JSON.parse(jsonString);
-// 
+      const modifiedDataWithOutText = JSON.parse(jsonString);
+
     // console.log(totalCount,indexProductInput)
     
-    const result = PaginationProductResponse.make(indexProductInput,totalCount, products);
-    // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
+    const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
 
     // await this.productClient.emit('product.paginated', result);
     
@@ -437,11 +422,21 @@ export class ProductService {
   }
 
   async getLowestPriceOf(product: Product): Promise<Price> {
-    return await LastPrice.createQueryBuilder()
+    const cacheKey = `lowestPrice_${product.id}`;
+
+  // Check if the result is already in the cache
+    const cachedResult = this.cacheManager.get(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
+    const result =  await LastPrice.createQueryBuilder()
       .where({ productId: product.id })
       .orderBy({ amount: "ASC" })
       .limit(1)
       .getOne();
+    
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
+    return result
   }
 
   async getMyPriceOf(product: Product, userId: number): Promise<Price | null> {
