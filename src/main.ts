@@ -48,7 +48,7 @@ async function bootstrap() {
   // app.useLogger(logger);
 
   // try {
-  await app.listen(3080);
+  await app.listen(3080, '0.0.0.0');
   //   logger.info('Nest.js application started successfully.');
   // } catch (error) {
   //   logger.error(`Error starting Nest.js application: ${error.message}`);
