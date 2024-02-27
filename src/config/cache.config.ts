@@ -19,5 +19,7 @@ export const cacheAsyncConfig: CacheModuleAsyncOptions = {
       "REDIS_PORT",
     )}`,
     ttl: CacheTTL.ONE_WEEK,
+    max: 10, // Adjust the connection pool size as needed
+    min: 1,  // Minimum number of connections in the pool
   }),
 };
