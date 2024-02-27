@@ -44,9 +44,8 @@ async function bootstrap() {
 
   app.enableCors();
   app.use(compression());
-  // app.use(new TimeoutMiddleware().use);
+  app.use(new TimingMiddleware().use);
   // app.useLogger(logger);
-  app.use(TimingMiddleware);
   // try {
   await app.listen(3080, '::');
   //   logger.info('Nest.js application started successfully.');
