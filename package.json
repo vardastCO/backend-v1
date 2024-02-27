@@ -77,6 +77,7 @@
     "winston-elasticsearch": "*",
     "@nestjs/schedule" : "*",
     "@types/compression" : "*",
+    "@nestjs/terminus" : "*",
     "@nestjs/platform-fastify" : "*"
   },
   "devDependencies": {
