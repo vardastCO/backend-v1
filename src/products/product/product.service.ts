@@ -162,15 +162,15 @@ export class ProductService {
   
     // Measure time before getting data from the cache
     const beforeCacheGet = Date.now();
-    const cachedData = await this.cacheManager.get<PaginationProductResponse>(cacheKey);
-    // Measure time after getting data from the cache
-    const afterCacheGet = Date.now();
-    const cacheGetTime = afterCacheGet - beforeCacheGet;
-    console.log(`Time taken in cache get method: ${cacheGetTime} ms`);
+    // const cachedData = await this.cacheManager.get<PaginationProductResponse>(cacheKey);
+    // // Measure time after getting data from the cache
+    // const afterCacheGet = Date.now();
+    // const cacheGetTime = afterCacheGet - beforeCacheGet;
+    // console.log(`Time taken in cache get method: ${cacheGetTime} ms`);
   
-    if (cachedData) {
-      return cachedData;
-    }
+    // if (cachedData) {
+    //   return cachedData;
+    // }
    
     const {
       take,
@@ -241,22 +241,22 @@ export class ProductService {
       skip: skip,
       take: take,
     });
-    const jsonString = JSON.stringify(products).replace(/__imageCategory__/g, 'imageCategory')
-      .replace(/__uom__/g, 'uom')
-      .replace(/__has_uom__/g, 'has_uom')
-      .replace(/__has_category__/g, 'has_category')
-      .replace(/__category__/g, 'category')
-      .replace(/__file__/g, 'file')
-      .replace(/__images__/g, 'images')
-      ;
+    // const jsonString = JSON.stringify(products).replace(/__imageCategory__/g, 'imageCategory')
+    //   .replace(/__uom__/g, 'uom')
+    //   .replace(/__has_uom__/g, 'has_uom')
+    //   .replace(/__has_category__/g, 'has_category')
+    //   .replace(/__category__/g, 'category')
+    //   .replace(/__file__/g, 'file')
+    //   .replace(/__images__/g, 'images')
+    //   ;
 
       // Parse the modified JSON back to objects
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-
+      // const modifiedDataWithOutText = JSON.parse(jsonString);
+// 
     // console.log(totalCount,indexProductInput)
     
-    const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
+    const result = PaginationProductResponse.make(indexProductInput,totalCount, products);
+    // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
 
     // await this.productClient.emit('product.paginated', result);
     
