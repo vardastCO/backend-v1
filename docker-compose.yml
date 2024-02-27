@@ -14,8 +14,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'  # 0.5 * 3
-          memory: 1536M  # 512M * 3
+          cpus: '3'  # 0.5 * 3
+          memory: 3G 
 
   cache:
     image: redis
@@ -27,8 +27,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.5'
-          memory: 1536M
+          cpus: '2'
+          memory: 2G
 
   storage:
     image: minio/minio
@@ -39,7 +39,8 @@ services:
       MINIO_ROOT_USER: farbod
       MINIO_ROOT_PASSWORD: g90pM89O
       MINIO_CACHE: on                 # Enable caching
-      MINIO_CACHE_EXPIRY: 600   
+      MINIO_CACHE_EXPIRY: 6000   
+      MINIO_SELECT_THRESHOLD: 40 
     volumes:
       - ./storage:/data
     command: server /data --console-address ":9090"
@@ -47,9 +48,9 @@ services:
       - myNet
     deploy:
       resources:
-        limits:
-          cpus: '1.5'
-          memory: 1536M
+       limits:
+         cpus: '6'  # Adjust based on available cores
+         memory: 6G 
 
   web:
     build: .
@@ -63,8 +64,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '3.0'  # 1.0 * 3
-          memory: 3G  # 1G * 3
+          cpus: '6'  # 1.0 * 3
+          memory: 6G  # 1G * 3
     # depends_on:
     #   - elasticsearch
     #   - logstash_image
