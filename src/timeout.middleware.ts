@@ -1,23 +1,19 @@
-// timeout.middleware.ts
-
+// timing.middleware.ts
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { throwError, timer, Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 @Injectable()
-export class TimeoutMiddleware implements NestMiddleware {
+export class TimingMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
-    const timeoutDuration = 10000; // Set a timeout of 10 seconds
+    const startTime = Date.now();
 
-    // Using throwError with delay to create a delayed error observable
-    const timeout$ = throwError(new Error('Request timeout')).pipe(
-      takeUntil(timer(timeoutDuration))
-    );
+    res.on('finish', () => {
+      const endTime = Date.now();
+      const elapsedTime = endTime - startTime;
 
-    timeout$.subscribe({
-      error: (error) => next(error),
-      complete: () => next(),
+      console.log(`Request duration: ${elapsedTime} ms`);
     });
+
+    next();
   }
 }
