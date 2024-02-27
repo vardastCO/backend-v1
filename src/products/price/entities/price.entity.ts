@@ -41,6 +41,7 @@ export class Price extends BaseEntity {
 
   @Field(() => Int)
   @Column()
+  @Index()
   amount: number;
 
   @Field(() => Seller)
@@ -67,6 +68,7 @@ export class Price extends BaseEntity {
   createdById: number;
 
   @Field()
+  @Index()
   @CreateDateColumn()
   createdAt: Date;
 }
