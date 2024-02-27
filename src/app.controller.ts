@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { Public } from "src/users/auth/decorators/public.decorator";
 // import { ElasticService } from './elastic/elastic-service';
 import { HealthCheckService, HttpHealthIndicator, HealthCheck } from '@nestjs/terminus';
+@Public()
 @Controller('health')
 export class AppController {
   constructor(
