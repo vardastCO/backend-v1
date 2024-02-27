@@ -90,7 +90,7 @@ export class ProductResolver {
   @Public()
   // @Permission("gql.products.product.index")
   @Query(() => PaginationProductResponse, { name: "products" })
-  findAll(
+  async findAll(
     @Args(
       "indexProductInput",
       { nullable: true },
@@ -98,7 +98,16 @@ export class ProductResolver {
     )
     indexProductInput?: IndexProductInput,
   ) {
-    return this.productService.paginate(indexProductInput);
+    const beforePaginate = Date.now();
+
+    const result = await this.productService.paginate(indexProductInput);
+
+    // Measure time after calling paginate
+    const afterPaginate = Date.now();
+    const paginateTime = afterPaginate - beforePaginate;
+    console.log(`Time taken in paginate method: ${paginateTime} ms`);
+
+    return result;
   }
 
   @Public()

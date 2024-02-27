@@ -147,12 +147,27 @@ export class ProductService {
   async paginate(
     indexProductInput?: IndexProductInput,
   ): Promise<PaginationProductResponse> {
-    indexProductInput.boot();
-    const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
-    const cachedData = await this.cacheManager.get<PaginationProductResponse>(
-      cacheKey,
-    );
+    
 
+    const beforeBoot = Date.now();
+
+    indexProductInput.boot();
+  
+    // Measure time after calling boot
+    const afterBoot = Date.now();
+    const bootTime = afterBoot - beforeBoot;
+    console.log(`Time taken in boot method: ${bootTime} ms`);
+  
+    const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
+  
+    // Measure time before getting data from the cache
+    const beforeCacheGet = Date.now();
+    const cachedData = await this.cacheManager.get<PaginationProductResponse>(cacheKey);
+    // Measure time after getting data from the cache
+    const afterCacheGet = Date.now();
+    const cacheGetTime = afterCacheGet - beforeCacheGet;
+    console.log(`Time taken in cache get method: ${cacheGetTime} ms`);
+  
     if (cachedData) {
       return cachedData;
     }
