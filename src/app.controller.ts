@@ -98,7 +98,7 @@ export class AppController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
+      async () => this.http.pingCheck('vardast-version', 'https://dev.vardast.com/app/version'),
     ]);
   }
   
