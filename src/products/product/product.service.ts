@@ -425,7 +425,7 @@ export class ProductService {
     const cacheKey = `lowestPrice_${product.id}`;
 
   // Check if the result is already in the cache
-    const cachedResult = this.cacheManager.get(cacheKey);
+    const cachedResult = this.cacheManager.get<Price>(cacheKey);
     if (cachedResult) {
       return cachedResult;
     }
