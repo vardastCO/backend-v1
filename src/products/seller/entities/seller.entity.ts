@@ -114,7 +114,10 @@ export class Seller extends BaseEntity {
   async brands(): Promise<Brand[]> {
     const offers = await this.offers;
     const products = offers.flatMap(offer => offer.product);
-    const brands = products.map(product => product.brand);
+    const brands = await Promise.all(products.map(async product => {
+      const actualProduct = await product; // Await the Promise<Product>
+      return actualProduct.brand;
+    }));
     return brands;
   }
 
