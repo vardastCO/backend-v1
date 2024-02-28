@@ -434,7 +434,7 @@ export class ProductService {
       .orderBy({ amount: "ASC" })
       .limit(1)
       .getOne();
-    this.cacheManager.set(cacheKey,cachedResult,CacheTTL.ONE_DAY)
+    this.cacheManager.set(cacheKey,result,CacheTTL.ONE_DAY)
     
     return result
   }
