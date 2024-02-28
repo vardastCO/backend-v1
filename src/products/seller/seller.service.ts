@@ -216,7 +216,7 @@ export class SellerService {
       modifiedData,
     );
 
-    await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
+    // await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
 
     return response;
      
