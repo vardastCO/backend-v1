@@ -197,7 +197,7 @@ export class SellerService {
     
     const modifiedData = await Promise.all(
       data.map(async seller => {
-        seller.brands = indexSellerInput.perPage == 1 ? await this.getOfferBrand(seller.id) : []
+        seller.brands = indexSellerInput.page == 1 ? await this.getOfferBrand(seller.id) : []
         return seller;
       }),
     );
