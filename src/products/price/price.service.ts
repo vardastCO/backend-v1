@@ -144,6 +144,9 @@ export class PriceService {
   }
 
   async priceChart(chartInput: ChartInput): Promise<ChartOutput> {
+    if (chartInput.type == ChartEnum.DAILY) {
+      return { data: [], labels: [] };  
+    }
     const { productId, type } = chartInput;
     const toDate = this.getDateFromEnum(type);
     const query = `
@@ -168,7 +171,6 @@ export class PriceService {
   
     return data.reduce(
        (carry, current) => {
-         console.log('carry',carry,'curent',current)
         carry.data.push(current.amount.toString());
         carry.labels.push(new Date(current.date).toISOString());
         return carry;

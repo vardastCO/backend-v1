@@ -4,7 +4,7 @@ import {
   CacheStore,
 } from "@nestjs/cache-manager";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { redisStore } from "cache-manager-redis-store";
+import * as memoryStore from "cache-manager-memory-store"; 
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 
 export const cacheAsyncConfig: CacheModuleAsyncOptions = {
@@ -14,7 +14,7 @@ export const cacheAsyncConfig: CacheModuleAsyncOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<CacheModuleOptions> => ({
-    store: redisStore as unknown as CacheStore,
+    store: memoryStore as unknown as CacheStore,
     url: `redis://${configService.get("REDIS_HOST")}:${configService.get(
       "REDIS_PORT",
     )}`,
