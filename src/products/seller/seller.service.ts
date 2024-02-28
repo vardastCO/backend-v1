@@ -165,29 +165,32 @@ export class SellerService {
       whereConditions['name'] = Like(`%${name}%`);
     }
   
-    const queryBuilder = Seller.createQueryBuilder()
+    const queryBuilder = Seller.createQueryBuilder();
     queryBuilder
-        .leftJoin(
-          `(SELECT DISTINCT ON (o."sellerId") o."sellerId"
-            FROM product_offers o
-            JOIN products p ON o."productId" = p.id
-            ORDER BY o."sellerId", o."createdAt" DESC
-          )`,
-          `${queryBuilder.alias}.id = b."sellerId"`,
-         )
-        .where(whereConditions)
-        .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
-        .limit(take)
-        .offset(skip);
-  
-      const [data, total] = await queryBuilder.getManyAndCount();
-      
-      const modifiedData = data.map((seller) => {
-        seller.brands = [];
-        return seller;
-      });
-  
-      return PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
+      .leftJoin(
+        `(SELECT DISTINCT ON (o."sellerId") o."sellerId"
+          FROM product_offers o
+          JOIN products p ON o."productId" = p.id
+          ORDER BY o."sellerId", o."createdAt" DESC
+        )`,
+        'b',
+        `${queryBuilder.alias}.id = b."sellerId"`,
+      )
+      // .addSelect(['b.*']) // Remove this line to exclude product_brands columns
+      .where(whereConditions)
+      .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
+      .limit(take)
+      .offset(skip);
+    
+    const [data, total] = await queryBuilder.getManyAndCount();
+    
+    const modifiedData = data.map((seller) => {
+      seller.brands = []; // Assuming you still want to set brands to an empty array
+      return seller;
+    });
+    
+    return PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
+    
 
   }
 
