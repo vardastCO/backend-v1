@@ -202,18 +202,18 @@ export class SellerService {
       }),
     );
 
-    const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
-      .replace(/__logoFile__/g, 'logoFile')
-      .replace(/__offers__/g, 'offers')
-      .replace(/__has_offers__/g, 'has_offers');
+    // const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
+    //   .replace(/__logoFile__/g, 'logoFile')
+    //   .replace(/__offers__/g, 'offers')
+    //   .replace(/__has_offers__/g, 'has_offers');
 
     
     // Parse the modified JSON back to objects
-    const result = JSON.parse(jsonString);
+    // const result = JSON.parse(jsonString);
     const response = PaginationSellerResponse.make(
       indexSellerInput,
       total,
-      result,
+      modifiedData,
     );
 
     await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
