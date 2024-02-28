@@ -427,8 +427,9 @@ export class ProductService {
 
     // Try to get the result from cache
     const cachedResult = await this.cacheManager.get<Price>(cacheKey);
-    if (cachedResult) {
-      return cachedResult;
+      if (cachedResult) {
+      console.log('cached' ,cachedResult)
+      // return cachedResult;
     }
     const result =  await LastPrice.createQueryBuilder()
       .where({ productId: product.id })
