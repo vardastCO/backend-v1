@@ -418,9 +418,23 @@ export class OfferService {
   }
 
   async getLastPublicConsumerPriceOf(offer: Offer): Promise<Price> {
-    return await LastPrice.createQueryBuilder()
-      .where('"productId" = :productId and "sellerId" = :sellerId', offer)
-      .getOne();
+
+    try {
+      const cacheKey = `consumer_lowestPrice_${offer.id}`;
+      const cachedResult = await this.cacheManager.get<Price>(cacheKey);
+      if (cachedResult) {
+        cachedResult.createdAt = new Date(cachedResult.createdAt);
+        return cachedResult;
+      }
+      const result =  await LastPrice.createQueryBuilder()
+        .where('"productId" = :productId and "sellerId" = :sellerId', offer)
+        .getOne();
+      await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY)
+      
+      return result
+    } catch (e) {
+      console.log('eeeeeeeeeeee',e)
+    }
   }
   async getOfferLength(id): Promise<number> {
     const seller = await Seller.findOneBy({ id: id });
