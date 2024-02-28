@@ -168,16 +168,13 @@ export class SellerService {
     const queryBuilder = Seller.createQueryBuilder()
     queryBuilder
         .leftJoin(
-          `(SELECT DISTINCT ON (o."sellerId") o."sellerId", b.*
+          `(SELECT DISTINCT ON (o."sellerId") o."sellerId"
             FROM product_offers o
             JOIN products p ON o."productId" = p.id
-            JOIN product_brands b ON p."brandId" = b.id
             ORDER BY o."sellerId", o."createdAt" DESC
           )`,
-          'b',
           `${queryBuilder.alias}.id = b."sellerId"`,
          )
-        .addSelect(['b.*'])
         .where(whereConditions)
         .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
         .limit(take)
@@ -185,12 +182,12 @@ export class SellerService {
   
       const [data, total] = await queryBuilder.getManyAndCount();
       
-      const modifiedData = data.map((seller) => {
-        seller.brands = [];
-        return seller;
-      });
+      // const modifiedData = data.map((seller) => {
+      //   seller.brands = [];
+      //   return seller;
+      // });
   
-      return PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
+      return PaginationSellerResponse.make(indexSellerInput, total, data);
 
   }
 
