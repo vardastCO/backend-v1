@@ -184,10 +184,10 @@ export class SellerService {
           JOIN products p ON o."productId" = p.id
           ORDER BY o."sellerId", o."createdAt" DESC
         )`,
-        // 'b',
-        // `${queryBuilder.alias}.id = b."sellerId"`,
+        'b',
+        `${queryBuilder.alias}.id = b."sellerId"`,
       )
-      // .addSelect(['b.*']) // Remove this line to exclude product_brands columns
+      .addSelect(['b.*']) // Remove this line to exclude product_brands columns
       .where(whereConditions)
       .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
       .limit(take)
