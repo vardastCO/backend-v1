@@ -52,7 +52,7 @@ export class FileResolver {
   async getBannerHomePage(
     @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
   ): Promise<File[]> {
-    const cacheKey = `bannert_${JSON.stringify(IndexBannerInput)}`;
+    const cacheKey = `banners_${JSON.stringify(IndexBannerInput)}`;
     const cachedData = await this.cacheManager.get<File[]>(cacheKey);
   
     if (cachedData) {

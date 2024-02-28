@@ -393,6 +393,15 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
+
+    const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
+    const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
+  
+    if (cachedData) {
+      cachedData.createdAt = new Date(cachedData.createdAt);
+      return cachedData;
+    }
+
     const offers = await Offer.createQueryBuilder()
       .innerJoin(
         subQuery =>
@@ -417,6 +426,8 @@ export class ProductService {
       //   } 
       // )
       .getMany();
+    
+    await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
 
     return offers;
   }
