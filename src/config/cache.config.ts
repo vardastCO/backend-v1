@@ -1,10 +1,9 @@
 import {
   CacheModuleAsyncOptions,
   CacheModuleOptions,
-  CacheStore,
 } from "@nestjs/cache-manager";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { MemoryStore } from "cache-manager";
+import { MemoryStore } from "@nestjs/cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 
 export const cacheAsyncConfig: CacheModuleAsyncOptions = {
