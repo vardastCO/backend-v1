@@ -195,9 +195,8 @@ export class SellerService {
     
     const [data, total] = await queryBuilder.getManyAndCount();
     
-    const modifiedData = data.map((seller) => {
-      console.log('seller',seller)
-      seller.brands = []; 
+    const modifiedData = data.map(async (seller) => {
+      seller.brands = indexSellerInput.perPage == 1 ? await this.getBrandsOfSeller(seller.id) : []; 
       return seller;
     });
     
