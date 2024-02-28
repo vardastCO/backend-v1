@@ -167,7 +167,7 @@ export class SellerService {
   
     if (cachedResult) {
       // Return the cached result if available
-      return cachedResult;
+      // return cachedResult;
     }
 
 
@@ -187,7 +187,7 @@ export class SellerService {
         'b',
         `${queryBuilder.alias}.id = b."sellerId"`,
       )
-      // .addSelect(['b.*']) // Remove this line to exclude product_brands columns
+      .addSelect(['b.*']) // Remove this line to exclude product_brands columns
       .where(whereConditions)
       .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
       .limit(take)
@@ -196,7 +196,8 @@ export class SellerService {
     const [data, total] = await queryBuilder.getManyAndCount();
     
     const modifiedData = data.map((seller) => {
-      seller.brands = []; // Assuming you still want to set brands to an empty array
+      console.log('seller',seller)
+      seller.brands = []; 
       return seller;
     });
     
