@@ -4,7 +4,7 @@ import {
   CacheStore,
 } from "@nestjs/cache-manager";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import * as memoryStore from "cache-manager-memory-store"; 
+import { MemoryStore } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 
 export const cacheAsyncConfig: CacheModuleAsyncOptions = {
@@ -14,12 +14,12 @@ export const cacheAsyncConfig: CacheModuleAsyncOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<CacheModuleOptions> => ({
-    store: memoryStore as unknown as CacheStore,
+    store: MemoryStore ,
     url: `redis://${configService.get("REDIS_HOST")}:${configService.get(
       "REDIS_PORT",
     )}`,
     ttl: CacheTTL.ONE_WEEK,
-    max: 20, // Adjust the connection pool size as needed
-    min: 1,  // Minimum number of connections in the pool
+    max: 30, // Adjust based on performance testing
+    min: 5,  // Minimum number of connections in the pool
   }),
 };
