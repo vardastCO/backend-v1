@@ -59,7 +59,7 @@ export class AuthService {
       .orderBy({ '"createdAt"': "DESC" })
       .getOne();
     
-    console.log('last',lastRecentValidatedOtp)
+    // console.log('last',lastRecentValidatedOtp)
   
     if (!lastRecentValidatedOtp) {
       throw new BadRequestException(

@@ -49,26 +49,26 @@ export class CronJobService {
   //   await this.fetchAndLogBrandViewsToElasticsearch();
   // }
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
-  async sendOTPWithKavenegar() {
-    const allKeys: string[] = await this.cacheManager.store.keys();
-    const productKeys: string[] = allKeys.filter(key =>
-      key.startsWith("kavenegar"),
-    );
-    productKeys.map(async (key) => {
-      try {
+  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // async sendOTPWithKavenegar() {
+  //   const allKeys: string[] = await this.cacheManager.store.keys();
+  //   const productKeys: string[] = allKeys.filter(key =>
+  //     key.startsWith("kavenegar"),
+  //   );
+  //   productKeys.map(async (key) => {
+  //     try {
         
-        const [prefix, cellphone, token] = key.split(':');
-        await this.cacheManager.del(key);
-        await this.kavenegarService.lookup(cellphone, "verify", token);
+  //       const [prefix, cellphone, token] = key.split(':');
+  //       await this.cacheManager.del(key);
+  //       await this.kavenegarService.lookup(cellphone, "verify", token);
           
-      } catch (e) {
-        console.log('errr kavenegar', e);
-      }
-    })
+  //     } catch (e) {
+  //       console.log('errr kavenegar', e);
+  //     }
+  //   })
 
      
-  }
+  // }
   private async fetchAndLogBrandViewsToElasticsearch(): Promise<void> {
     const allKeys: string[] = await this.cacheManager.store.keys();
     const productKeys: string[] = allKeys.filter(key =>

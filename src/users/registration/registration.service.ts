@@ -45,7 +45,7 @@ export class RegistrationService {
     //   .where({ cellphone: validateCellphoneInput.cellphone })
     //   .getExists();
     
-    console.log('biiiiiiiiiiiiiiii')
+    // console.log('biiiiiiiiiiiiiiii')
 
     // if (
     //   validateCellphoneInput.validationType == ValidationTypes.SIGNUP &&
@@ -93,14 +93,14 @@ export class RegistrationService {
       }).generateNewToken();
 
     //   console.log('=============================')
-      const key = `kavenegar:${validateCellphoneInput.cellphone}:${lastUnexpiredOtp.token}`;
-      await this.cacheManager.set(key, 'OTP', CacheTTL.TEN_SECONDS);
-    //   console.log('kavenegar',validateCellphoneInput.cellphone,lastUnexpiredOtp.token)
-    //   // await this.kavenegarService.lookup(
-    //   //   validateCellphoneInput.cellphone,
-    //   //   "verify",
-    //   //   lastUnexpiredOtp.token,
-    //   // );
+      // const key = `kavenegar:${validateCellphoneInput.cellphone}:${lastUnexpiredOtp.token}`;
+      // await this.cacheManager.set(key, 'OTP', CacheTTL.TEN_SECONDS);
+      // console.log('kavenegar',validateCellphoneInput.cellphone,lastUnexpiredOtp.token)
+      await this.kavenegarService.lookup(
+        validateCellphoneInput.cellphone,
+        "verify",
+        lastUnexpiredOtp.token,
+      );
 
       await (await lastUnexpiredOtp.hashTheToken()).save();
     // }
