@@ -52,4 +52,4 @@ USER node
 EXPOSE 3080
 
 # Use PM2 to start the application in production
-CMD ["pm2-runtime", "npm", "--", "start:prod"]
+CMD ["pm2-runtime", "start", "pnpm", "--", "start:prod", "-i", "10"]
