@@ -167,7 +167,6 @@ export class SellerService {
   
     const queryBuilder = Seller.createQueryBuilder()
     queryBuilder
-       .leftJoinAndSelect(`${queryBuilder.alias}.brands`, 'brands')
         .leftJoin(
           `(SELECT DISTINCT ON (o."sellerId") o."sellerId", b.*
             FROM product_offers o
@@ -186,12 +185,12 @@ export class SellerService {
   
       const [data, total] = await queryBuilder.getManyAndCount();
       
-      // const modifiedData = data.map((seller) => {
-      //   seller.brands = seller.brands && seller.brands.length > 0 ? seller.brands[0].brand : null;
-      //   return seller;
-      // });
+      const modifiedData = data.map((seller) => {
+        seller.brands = [];
+        return seller;
+      });
   
-      return PaginationSellerResponse.make(indexSellerInput, total, data);
+      return PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
 
   }
 
