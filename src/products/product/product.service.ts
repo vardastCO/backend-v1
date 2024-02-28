@@ -300,7 +300,7 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException();
     }
-    this.logProductView(id);
+    // this.logProductView(id);
 
     return product;
   }
