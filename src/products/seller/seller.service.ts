@@ -157,68 +157,34 @@ export class SellerService {
     indexSellerInput?: IndexSellerInput,
   ): Promise<PaginationSellerResponse> {
     indexSellerInput.boot();
-    const { take, skip, isPublic, status, createdById, name } =
-      indexSellerInput || {};
 
-    const cacheKey = `sellers_${JSON.stringify(indexSellerInput)}`;
-    const cachedData = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
-    if (cachedData) {
-      return cachedData;
-    }
+    const { take, skip, name } = indexSellerInput || {};
 
-    // const where = (await this.authorizationModule
-    //   .setUser(user)
-    //   .hasPermission("gql.products.seller.index"))
-    //   ? { isPublic, status, createdById }
-    //   : {
-    //       status: ThreeStateSupervisionStatuses.CONFIRMED,
-    //       isPublic: true,
-    //     } 
     const whereConditions: any = {};
     if (name) {
-      whereConditions[`name`] = Like(`%${name}%`);
+      whereConditions['name'] = Like(`%${name}%`);
     }
-    
-
-    const [data, total] = await Seller.findAndCount({
-      skip,
-      take,
-      where : whereConditions,
-      order: {
-        rating: "DESC",
-      },
-      // relations: [ 'brands'], 
-    });
-
-
-    try {
-      const modifiedData = await Promise.all(
-        data.map(async seller => {
-          // seller.offers =  []
-          seller.brands = indexSellerInput.page == 1 ?  await this.getOfferBrand(seller.id) : []
-          // seller.sum = await this.getOfferLength(seller.id);
-          return seller;
-        }),
-      );
-
-      const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
-        .replace(/__logoFile__/g, 'logoFile')
-        .replace(/__offers__/g, 'offers')
-        .replace(/__has_offers__/g, 'has_offers');
-
-      
-      // Parse the modified JSON back to objects
-      const result = JSON.parse(jsonString);
-      const response = PaginationSellerResponse.make(
-        indexSellerInput,
-        total,
-        result,
-      );
-
-      await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
-
-      return response;
-    } catch (e) {}
+  
+    const queryBuilder = Seller.createQueryBuilder()
+    queryBuilder
+        .leftJoin(
+          `(SELECT DISTINCT ON (o."sellerId") o."sellerId", b.*
+            FROM product_offers o
+            JOIN products p ON o."productId" = p.id
+            JOIN product_brands b ON p."brandId" = b.id
+            ORDER BY o."sellerId", o."createdAt" DESC
+          )`,
+          'b',
+          `${queryBuilder.alias}.id = b."sellerId"`,
+        )
+        .where(whereConditions)
+        .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
+        .limit(take)
+        .offset(skip);
+  
+      const [data, total] = await queryBuilder.getManyAndCount();
+  
+      return PaginationSellerResponse.make(indexSellerInput, total, data);
 
   }
 
