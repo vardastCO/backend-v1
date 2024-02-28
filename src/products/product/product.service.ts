@@ -422,11 +422,19 @@ export class ProductService {
   }
 
   async getLowestPriceOf(product: Product): Promise<Price> {
+    const cacheKey = `lowestPrice_${product.id}`;
+
+    // Try to get the result from cache
+    const cachedResult = await this.cacheManager.get<Price>(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
     const result =  await LastPrice.createQueryBuilder()
       .where({ productId: product.id })
       .orderBy({ amount: "ASC" })
       .limit(1)
       .getOne();
+    this.cacheManager.set(cacheKey,cachedResult,CacheTTL.ONE_DAY)
     
     return result
   }
