@@ -398,7 +398,6 @@ export class ProductService {
     const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
   
     if (cachedData) {
-      cachedData.createdAt = new Date(cachedData.createdAt);
       return cachedData;
     }
 
