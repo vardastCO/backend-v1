@@ -152,7 +152,7 @@ export class ProductService {
     const cachedData = await this.cacheManager.get<PaginationProductResponse>(
       cacheKey,
     );
-
+    
     if (cachedData) {
       return cachedData;
     }
@@ -422,11 +422,13 @@ export class ProductService {
   }
 
   async getLowestPriceOf(product: Product): Promise<Price> {
-    return await LastPrice.createQueryBuilder()
+    const result =  await LastPrice.createQueryBuilder()
       .where({ productId: product.id })
       .orderBy({ amount: "ASC" })
       .limit(1)
       .getOne();
+    
+    return result
   }
 
   async getMyPriceOf(product: Product, userId: number): Promise<Price | null> {
