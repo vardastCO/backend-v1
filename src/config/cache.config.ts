@@ -20,6 +20,6 @@ export const cacheAsyncConfig: CacheModuleAsyncOptions = {
     )}`,
     ttl: CacheTTL.ONE_WEEK,
     max: 30, // Adjust based on performance testing
-    min: 5,  // Minimum number of connections in the pool
+    min: 10,  // Minimum number of connections in the pool
   }),
 };
