@@ -186,7 +186,7 @@ export class SellerService {
       const [data, total] = await queryBuilder.getManyAndCount();
       
       const modifiedData = data.map((seller) => {
-        seller.brand = seller.brands && seller.brands.length > 0 ? seller.brands[0].brand : null;
+        seller.brands = seller.brands && seller.brands.length > 0 ? seller.brands[0].brand : null;
         return seller;
       });
   

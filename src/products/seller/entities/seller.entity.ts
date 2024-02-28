@@ -110,9 +110,13 @@ export class Seller extends BaseEntity {
   @OneToMany(() => Offer, offer => offer.seller)
   myProduct: Promise<Offer[]>;
 
-  @Field(() => [Brand], { nullable: "items" })
-  @OneToMany(() => Brand, brand => null, { nullable: true } )
-  brands: Brand[];
+  @Field(() => [Brand], { nullable: 'items' })
+  async brands(): Promise<Brand[]> {
+    const offers = await this.offers;
+    const products = offers.flatMap(offer => offer.product);
+    const brands = products.map(product => product.brand);
+    return brands;
+  }
 
   @Field(() => [ContactInfo])
   @OneToMany(() => ContactInfo, contactInfo => null, { nullable: true })
