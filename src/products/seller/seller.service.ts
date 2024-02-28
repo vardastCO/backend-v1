@@ -186,12 +186,10 @@ export class SellerService {
 
     try {
       const modifiedData = await Promise.all(
-        data.map(async seller => {
-          // seller.offers =  []
-          seller.brands = indexSellerInput.page == 1 ?  await this.getOfferBrand(seller.id) : []
-          // seller.sum = await this.getOfferLength(seller.id);
+        data.map(async (seller, index) => {
+          seller.brands = index < 9 ? await this.getOfferBrand(seller.id) : [];
           return seller;
-        }),
+      })
       );
 
       const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
