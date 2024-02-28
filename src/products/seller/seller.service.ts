@@ -160,15 +160,15 @@ export class SellerService {
 
     const { take, skip, name } = indexSellerInput || {};
 
-    const cacheKey = `pagiantions_sellers_${JSON.stringify(indexSellerInput)}`;
+    // const cacheKey = `pagiantions_sellers_${JSON.stringify(indexSellerInput)}`;
 
-    // Try to get the result from the cache
-    const cachedResult = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
+    // // Try to get the result from the cache
+    // const cachedResult = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
   
-    if (cachedResult) {
-      // Return the cached result if available
-      return cachedResult;
-    }
+    // if (cachedResult) {
+    //   // Return the cached result if available
+    //   // return cachedResult;
+    // }
 
 
     const whereConditions: any = {};
@@ -197,23 +197,23 @@ export class SellerService {
     
     const modifiedData = await Promise.all(
       data.map(async seller => {
-        seller.brands = await this.getOfferBrand(seller.id)
+        seller.brands = indexSellerInput.perPage == 1 ? await this.getOfferBrand(seller.id) : []
         return seller;
       }),
     );
 
-    const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
-      .replace(/__logoFile__/g, 'logoFile')
-      .replace(/__offers__/g, 'offers')
-      .replace(/__has_offers__/g, 'has_offers');
+    // const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
+    //   .replace(/__logoFile__/g, 'logoFile')
+    //   .replace(/__offers__/g, 'offers')
+    //   .replace(/__has_offers__/g, 'has_offers');
 
     
-    // Parse the modified JSON back to objects
-    const result = JSON.parse(jsonString);
+    // // Parse the modified JSON back to objects
+    // const result = JSON.parse(jsonString);
     const response = PaginationSellerResponse.make(
       indexSellerInput,
       total,
-      result,
+      modifiedData,
     );
 
     await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
