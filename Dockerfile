@@ -37,16 +37,16 @@ WORKDIR /usr/src/app
 # Copy only package.json and pnpm lock for installation
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN pnpm install 
+# Install pnpm and PM2 globally
+RUN npm install -g pnpm pm2
+
+RUN pnpm install
 
 # Copy the compiled application files
 COPY --chown=node:node --from=development /usr/src/app/dist /usr/src/app/dist
 
 # Use the node user from the image (instead of the root user)
 USER node
-
-# Install PM2 globally
-RUN pnpm install -g pm2
 
 # Expose the port your app will run on
 EXPOSE 3080
