@@ -160,6 +160,17 @@ export class SellerService {
 
     const { take, skip, name } = indexSellerInput || {};
 
+    const cacheKey = `pagiantions_sellers_${JSON.stringify(indexSellerInput)}`;
+
+    // Try to get the result from the cache
+    const cachedResult = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
+  
+    if (cachedResult) {
+      // Return the cached result if available
+      return cachedResult;
+    }
+
+
     const whereConditions: any = {};
     if (name) {
       whereConditions['name'] = Like(`%${name}%`);
@@ -189,7 +200,11 @@ export class SellerService {
       return seller;
     });
     
-    return PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
+    const result =  PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
+
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
+
+    return result;
     
 
   }
