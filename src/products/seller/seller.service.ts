@@ -184,10 +184,10 @@ export class SellerService {
           JOIN products p ON o."productId" = p.id
           ORDER BY o."sellerId", o."createdAt" DESC
         )`,
-        'b',
-        `${queryBuilder.alias}.id = b."sellerId"`,
+        // 'b',
+        // `${queryBuilder.alias}.id = b."sellerId"`,
       )
-      .addSelect(['b.*']) // Remove this line to exclude product_brands columns
+      // .addSelect(['b.*']) // Remove this line to exclude product_brands columns
       .where(whereConditions)
       .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
       .limit(take)
@@ -195,17 +195,31 @@ export class SellerService {
     
     const [data, total] = await queryBuilder.getManyAndCount();
     
-    const modifiedData = data.map(async (seller) => {
-      seller.brands = indexSellerInput.perPage == 1 ? await this.getOfferBrand(seller.id) : []; 
-      return seller;
-    });
-    
-    const result =  PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
+    const modifiedData = await Promise.all(
+      data.map(async seller => {
+        seller.brands = await this.getOfferBrand(seller.id)
+        return seller;
+      }),
+    );
 
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
+    const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
+      .replace(/__logoFile__/g, 'logoFile')
+      .replace(/__offers__/g, 'offers')
+      .replace(/__has_offers__/g, 'has_offers');
 
-    return result;
     
+    // Parse the modified JSON back to objects
+    const result = JSON.parse(jsonString);
+    const response = PaginationSellerResponse.make(
+      indexSellerInput,
+      total,
+      result,
+    );
+
+    await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
+
+    return response;
+     
 
   }
 
