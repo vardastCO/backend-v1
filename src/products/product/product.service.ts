@@ -394,12 +394,12 @@ export class ProductService {
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
 
-    const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
-    const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
+    // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
+    // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
   
-    if (cachedData) {
-      // return cachedData;
-    }
+    // if (cachedData) {
+    //   // return cachedData;
+    // }
 
     const offers = await Offer.createQueryBuilder()
       .innerJoin(
