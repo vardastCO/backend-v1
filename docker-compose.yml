@@ -47,7 +47,6 @@ services:
     networks:
       - myNet
     deploy:
-      replicas: 3
       resources:
        limits:
          cpus: '6'  # Adjust based on available cores

@@ -1,6 +1,4 @@
-###################
 # BUILD FOR PRODUCTION
-###################
 FROM node:18-alpine AS base
 
 RUN npm i -g pnpm ts-node
@@ -28,4 +26,30 @@ RUN pnpm build
 # Use the node user from the image (instead of the root user)
 USER node
 
-CMD ["pnpm", "start:prod"]
+###################
+# PRODUCTION IMAGE
+###################
+
+FROM base AS production
+
+WORKDIR /usr/src/app
+
+# Copy only package.json and pnpm lock for installation
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+RUN pnpm install --production
+
+# Copy the compiled application files
+COPY --chown=node:node --from=development /usr/src/app/dist /usr/src/app/dist
+
+# Use the node user from the image (instead of the root user)
+USER node
+
+# Install PM2 globally
+RUN pnpm install -g pm2
+
+# Expose the port your app will run on
+EXPOSE 3080
+
+# Use PM2 to start the application in production
+CMD ["pm2-runtime", "npm", "--", "start:prod"]
