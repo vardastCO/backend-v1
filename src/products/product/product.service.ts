@@ -398,7 +398,7 @@ export class ProductService {
     const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
   
     if (cachedData) {
-      return cachedData;
+      // return cachedData;
     }
 
     const offers = await Offer.createQueryBuilder()
@@ -426,7 +426,7 @@ export class ProductService {
       // )
       .getMany();
     
-    await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
+    // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
 
     return offers;
   }
