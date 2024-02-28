@@ -167,6 +167,7 @@ export class SellerService {
   
     const queryBuilder = Seller.createQueryBuilder()
     queryBuilder
+       .leftJoinAndSelect(`${queryBuilder.alias}.brands`, 'brands')
         .leftJoin(
           `(SELECT DISTINCT ON (o."sellerId") o."sellerId", b.*
             FROM product_offers o
