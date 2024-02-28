@@ -1,57 +1,44 @@
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-// import { useContainer } from "class-validator";
 import { AppModule } from "./app.module";
-// import { IpWhitelistMiddleware } from "./middleware/ip-whitelist.middleware";
-// import { ElasticsearchTransport } from 'winston-elasticsearch';
-// import * as winston from 'winston';
-// import 'winston-elasticsearch';
-// import { initializeApm } from './initapm';
 import * as compression from 'compression';
-import {  TimingMiddleware } from "./timeout.middleware";
-
-
+import { TimingMiddleware } from "./timeout.middleware";
+import * as cluster from 'cluster';
+import * as os from 'os';
 
 async function bootstrap() {
-  // const logger = winston.createLogger({
-  //   transports: [
-  //     new winston.transports.Console(),
-  //     new ElasticsearchTransport({
-  //       level: 'silly', // Log all levels
-  //       indexPrefix: 'vardast',
-  //       clientOpts: { node: 'http://elasticsearch:9200' },
-  //     }),
-  //   ],
-  // });
-  const app = await NestFactory.create(AppModule, {
-    cors: {
-      // BUG: cors not working with options below
-      // origin: "http://localhost:3000",
-      // methods: ["POST"],
-      // allowedHeaders: "Content-Type, Accept",
-      // credentials: true,
-    },
-  });
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      // forbidNonWhitelisted: true,
-      // transform: true,
-    }),
-  );
-  // app.use(new IpWhitelistMiddleware().use);
-  // await initializeApm()
+  if (cluster.isMaster) {
+    // If the current process is the master, fork workers
+    const numCPUs = os.cpus().length;
 
-  app.enableCors();
-  app.use(compression());
-  app.use(new TimingMiddleware().use);
-  // app.useLogger(logger);
-  // try {
-  await app.listen(3080, '::');
-  //   logger.info('Nest.js application started successfully.');
-  // } catch (error) {
-  //   logger.error(`Error starting Nest.js application: ${error.message}`);
-  //   throw error;
-  // }
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
+
+    cluster.on('exit', (worker, code, signal) => {
+      console.log(`Worker ${worker.process.pid} died`);
+      // You can restart the worker here if needed
+    });
+  } else {
+    // If the current process is a worker, create the NestJS app
+    const app = await NestFactory.create(AppModule, {
+      cors: {},
+    });
+
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+      }),
+    );
+
+    app.enableCors();
+    app.use(compression());
+    app.use(new TimingMiddleware().use);
+
+    await app.listen(3080, '::');
+
+    console.log(`Worker ${process.pid} started`);
+  }
 }
+
 bootstrap();

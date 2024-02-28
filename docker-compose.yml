@@ -64,8 +64,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '6'  # 1.0 * 3
-          memory: 6G  # 1G * 3
+          cpus: '10'  # Set the CPU limit to 10 cores
+          memory: 10G
     # depends_on:
     #   - elasticsearch
     #   - logstash_image
