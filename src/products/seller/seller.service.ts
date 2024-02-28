@@ -182,12 +182,12 @@ export class SellerService {
   
       const [data, total] = await queryBuilder.getManyAndCount();
       
-      // const modifiedData = data.map((seller) => {
-      //   seller.brands = [];
-      //   return seller;
-      // });
+      const modifiedData = data.map((seller) => {
+        seller.brands = [];
+        return seller;
+      });
   
-      return PaginationSellerResponse.make(indexSellerInput, total, data);
+      return PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
 
   }
 
