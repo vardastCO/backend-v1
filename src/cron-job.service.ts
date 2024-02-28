@@ -83,7 +83,7 @@ export class CronJobService {
       }),
     );
 
-    await this.logBrandToElasticsearch(views);
+    // await this.logBrandToElasticsearch(views);
   }
   private async fetchAndLogSellerViewsToElasticsearch(): Promise<void> {
     const allKeys: string[] = await this.cacheManager.store.keys();

@@ -155,7 +155,7 @@ export class BrandService {
   
   async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
     try {
-      this.logBrandView(id,payload);
+      // this.logBrandView(id,payload);
       const cacheKey = `brand_${JSON.stringify(id)}`;
   
       const cachedData = await this.cacheManager.get<Brand>(cacheKey);
