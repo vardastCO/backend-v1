@@ -167,7 +167,7 @@ export class SellerService {
   
     if (cachedResult) {
       // Return the cached result if available
-      // return cachedResult;
+      return cachedResult;
     }
 
 
@@ -196,7 +196,7 @@ export class SellerService {
     const [data, total] = await queryBuilder.getManyAndCount();
     
     const modifiedData = data.map(async (seller) => {
-      seller.brands = indexSellerInput.perPage == 1 ? await this.getBrandsOfSeller(seller.id) : []; 
+      seller.brands = indexSellerInput.perPage == 1 ? await this.getOfferBrand(seller.id) : []; 
       return seller;
     });
     
