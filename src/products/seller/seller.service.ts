@@ -176,15 +176,21 @@ export class SellerService {
           )`,
           'b',
           `${queryBuilder.alias}.id = b."sellerId"`,
-        )
+         )
+        .addSelect(['b.*'])
         .where(whereConditions)
         .orderBy(`${queryBuilder.alias}.rating`, 'DESC')
         .limit(take)
         .offset(skip);
   
       const [data, total] = await queryBuilder.getManyAndCount();
+      
+      const modifiedData = data.map((seller) => {
+        seller.brand = seller.brands && seller.brands.length > 0 ? seller.brands[0].brand : null;
+        return seller;
+      });
   
-      return PaginationSellerResponse.make(indexSellerInput, total, data);
+      return PaginationSellerResponse.make(indexSellerInput, total, modifiedData);
 
   }
 
