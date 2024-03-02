@@ -34,7 +34,7 @@ export class DiscountPrice extends BaseEntity {
   type: DiscountTypesEnum;
 
   @Field(() => Price)
-  @ManyToOne(() => Price, price => price.discountPrice)
+  @ManyToOne(() => Price, price => price.discount)
   price: Promise<Price>;
   @Index()
   @Column()
