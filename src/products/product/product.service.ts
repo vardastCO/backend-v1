@@ -216,11 +216,10 @@ export class ProductService {
       order: {
         // rank: "DESC",
         prices: {
-          amount: indexProductInput.orderBy == ProductSortablesEnum.MOST_EXPENSIVE ?
-          'DESC': 'ASC'  
+          createdAt : 'DESC'  
         },
-        createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
-          'DESC' : 'ASC'
+        // createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
+        //   'DESC' : 'ASC'
       },
       // order: this.getOrderClause(indexProductInput.orderBy) as any,
       skip: skip,
