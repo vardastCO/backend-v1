@@ -37,7 +37,6 @@ export class MessagePrice extends BaseEntity {
 
   @Field(() => [Price])  // Add this field to represent the many-to-many relationship
   @ManyToMany(() => Price, { eager: true })
-  @JoinTable({ name: "message_product_prices" })
   prices: Promise<Price[]>;
 
 }
