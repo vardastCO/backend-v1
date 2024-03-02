@@ -216,9 +216,11 @@ export class ProductService {
       order: {
         // rank: "DESC",
         prices: {
-          amount : 'ASC',
           createdAt : 'DESC'  
         },
+        image: {
+          id : 'DESC'
+        }
         // createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
         //   'DESC' : 'ASC'
       },
