@@ -214,7 +214,7 @@ export class ProductService {
       where: whereConditions,
       relations: ["images", "prices", "uom", "category"],
       order: {
-        rank: "DESC",
+        rating: "DESC",
         // prices: {
         //   id: 'DESC' ,
         //   createdAt: 'DESC'
