@@ -30,13 +30,12 @@ export class MessagePrice extends BaseEntity {
   @Column("enum", { enum: MessagePriceTypesEnum , default : PriceTypesEnum.CONSUMER})
   type: PriceTypesEnum;
 
-  @Field(() => Int, { nullable: true })  // Set nullable to true
-  @Index()
-  @Column({ nullable: true })
-  priceId: number;
 
-  @Field(() => [Price])  
-  @ManyToMany(() => Price, { eager: true })
-  prices: Promise<Price[]>;
+  @Field(() => Price)
+  @ManyToOne(() => Price, prices => prices.messagePrices)
+  prices: Promise<Price>;
+  @Index()
+  @Column()
+  priceId: number;
 
 }
