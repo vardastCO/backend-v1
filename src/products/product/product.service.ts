@@ -240,7 +240,7 @@ export class ProductService {
     // console.log(totalCount,indexProductInput)
     
     const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
 
     // await this.productClient.emit('product.paginated', result);
     
