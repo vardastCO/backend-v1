@@ -1,0 +1,44 @@
+import { Field, Int, ObjectType } from "@nestjs/graphql";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  Index,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { PriceTypesEnum } from "../enums/price-types.enum";
+import { MessagePriceTypesEnum } from "../enums/message-price-types.enum";
+import { Price } from "./price.entity";
+import { DiscountTypesEnum } from "../enums/price-discount-types.enum";
+
+@ObjectType()
+@Entity("product_prices_discount")
+export class DiscountPrice extends BaseEntity {
+  @Field(() => Int)
+  @PrimaryGeneratedColumn({ primaryKeyConstraintName: "product_prices_discount_id" })
+  id: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  value?: string;
+
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  calculated_price?: string;
+
+  @Field(() => DiscountTypesEnum)
+  @Column("enum", { enum: DiscountTypesEnum , default : DiscountTypesEnum.PERCENT})
+  type: DiscountTypesEnum;
+
+  @Field(() => Price)
+  @ManyToOne(() => Price)
+  price: Promise<Price>;
+  @Index()
+  @Column()
+  priceId: number;
+
+}

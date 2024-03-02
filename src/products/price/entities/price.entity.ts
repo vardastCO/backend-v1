@@ -15,6 +15,8 @@ import {
 } from "typeorm";
 import { PriceTypesEnum } from "../enums/price-types.enum";
 import { ProductEntity } from "src/products/product/entities/product-service.entity";
+import { MessagePrice } from "./price-message.entity";
+import { DiscountPrice } from "./price-discount.entity";
 
 @ObjectType()
 @Entity("product_prices")
@@ -50,6 +52,20 @@ export class Price extends BaseEntity {
   @Index()
   @Column()
   sellerId: number;
+
+  @Field(() => DiscountPrice)
+  @ManyToOne(() => DiscountPrice, discountPrice => discountPrice.price)
+  discountPrice: Promise<DiscountPrice>;
+  @Index()
+  @Column()
+  discountPriceId: number;
+
+  @Field(() => MessagePrice)
+  @ManyToOne(() => MessagePrice, MessagePrice => MessagePrice.message)
+  message: Promise<MessagePrice>;
+  @Index()
+  @Column()
+  meesageId: number;
 
   @Field(() => AttributeValue, { nullable: true })
   @ManyToOne(() => AttributeValue, attributeValue => attributeValue.prices)
