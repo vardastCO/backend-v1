@@ -214,11 +214,11 @@ export class ProductService {
       where: whereConditions,
       relations: ["images", "prices", "uom", "category"],
       order: {
-        rank: "DESC",
-        // prices: {
-        //   amount: indexProductInput.orderBy == ProductSortablesEnum.MOST_EXPENSIVE ?
-        //   'DESC': 'ASC'  
-        // },
+        // rank: "DESC",
+        prices: {
+          amount: indexProductInput.orderBy == ProductSortablesEnum.MOST_EXPENSIVE ?
+          'DESC': 'ASC'  
+        },
         createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
           'DESC' : 'ASC'
       },
