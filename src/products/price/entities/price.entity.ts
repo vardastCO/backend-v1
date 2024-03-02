@@ -66,6 +66,11 @@ export class Price extends BaseEntity {
   @OneToMany(() => MessagePrice, messagePrice => messagePrice.price)
   messagePrices: Promise<MessagePrice[]>;
 
+
+  @Field(() => [DiscountPrice], { nullable: "items" })
+  @OneToMany(() => DiscountPrice, discountPrice => discountPrice.price)
+  discount: Promise<DiscountPrice[]>;
+
   @Field()
   @Column()
   isPublic: boolean;

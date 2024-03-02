@@ -33,8 +33,11 @@ export class DiscountPrice extends BaseEntity {
   @Column("enum", { enum: DiscountTypesEnum , default : DiscountTypesEnum.PERCENT})
   type: DiscountTypesEnum;
 
-  // @Field(() => [Price], { nullable: "items" })
-  // @OneToMany(() => Price)
-  // prices: Promise<Price[]>;
+  @Field(() => Price)
+  @ManyToOne(() => Price, price => price.discountPrice)
+  price: Promise<Price>;
+  @Index()
+  @Column()
+  priceId: number;
 
 }
