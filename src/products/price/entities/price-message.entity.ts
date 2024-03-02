@@ -36,6 +36,6 @@ export class MessagePrice extends BaseEntity {
   prices: Promise<Price>;
   @Index()
   @Column()
-  priceId: number;
+  pricesId: number;
 
 }
