@@ -9,8 +9,6 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { PriceTypesEnum } from "../enums/price-types.enum";
-import { MessagePriceTypesEnum } from "../enums/message-price-types.enum";
 import { Price } from "./price.entity";
 import { DiscountTypesEnum } from "../enums/price-discount-types.enum";
 
