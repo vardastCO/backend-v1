@@ -12,8 +12,6 @@ import { Price } from "./price.entity";
       product_prices."productId",
       product_prices."sellerId",
       product_prices.amount,
-      product_prices."discountPriceId",
-      product_prices."meesageId",
       product_prices."attributeValueId"
     FROM product_prices
     WHERE (product_prices.id IN ( SELECT max(product_prices_1.id) AS "lastId"
