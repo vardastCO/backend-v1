@@ -6,7 +6,9 @@ import {
   Entity,
   ManyToOne,
   Index,
+  ManyToMany,
   JoinColumn,
+  JoinTable,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PriceTypesEnum } from "../enums/price-types.enum";
@@ -28,11 +30,14 @@ export class MessagePrice extends BaseEntity {
   @Column("enum", { enum: MessagePriceTypesEnum , default : PriceTypesEnum.CONSUMER})
   type: PriceTypesEnum;
 
-  // @Field(() => Price)
-  // @ManyToOne(() => Price)
-  // price: Promise<Price>;
-  // @Index()
-  // @Column()
-  // priceId: number;
+  @Field(() => Int, { nullable: true })  // Set nullable to true
+  @Index()
+  @Column({ nullable: true })
+  priceId: number;
+
+  @Field(() => [Price])  // Add this field to represent the many-to-many relationship
+  @ManyToMany(() => Price, { eager: true })
+  @JoinTable({ name: "message_product_prices" })
+  prices: Promise<Price[]>;
 
 }

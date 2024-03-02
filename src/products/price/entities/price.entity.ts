@@ -11,6 +11,7 @@ import {
   ManyToOne,
   Index,
   JoinColumn,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PriceTypesEnum } from "../enums/price-types.enum";
@@ -53,25 +54,16 @@ export class Price extends BaseEntity {
   @Column()
   sellerId: number;
 
-  // @Field(() => DiscountPrice)
-  // @ManyToOne(() => DiscountPrice, discountPrice => discountPrice.prices)
-  // discountPrice: Promise<DiscountPrice>;
-  // @Index()
-  // @Column({ nullable: true })
-  // discountPriceId: number;
-
-  // @Field(() => MessagePrice)
-  // @ManyToOne(() => MessagePrice, MessagePrice => MessagePrice.message)
-  // message: Promise<MessagePrice>;
-  // @Index()
-  // @Column({ nullable: true })
-  // meesageId: number;
-
   @Field(() => AttributeValue, { nullable: true })
   @ManyToOne(() => AttributeValue, attributeValue => attributeValue.prices)
   attributeValue: Promise<AttributeValue>;
   @Column({ nullable: true })
   attributeValueId: number;
+
+
+  @Field(() => [MessagePrice])  // Add this field to represent the many-to-many relationship
+  @ManyToMany(() => MessagePrice, messagePrice => messagePrice.prices)
+  messagePrices: Promise<MessagePrice[]>;
 
   @Field()
   @Column()
