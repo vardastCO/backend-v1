@@ -57,14 +57,14 @@ export class Price extends BaseEntity {
   @ManyToOne(() => DiscountPrice, discountPrice => discountPrice.prices)
   discountPrice: Promise<DiscountPrice>;
   @Index()
-  @Column()
+  @Column({ nullable: true })
   discountPriceId: number;
 
   @Field(() => MessagePrice)
   @ManyToOne(() => MessagePrice, MessagePrice => MessagePrice.message)
   message: Promise<MessagePrice>;
   @Index()
-  @Column()
+  @Column({ nullable: true })
   meesageId: number;
 
   @Field(() => AttributeValue, { nullable: true })
