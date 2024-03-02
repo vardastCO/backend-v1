@@ -32,10 +32,10 @@ export class MessagePrice extends BaseEntity {
 
 
   @Field(() => Price)
-  @ManyToOne(() => Price, prices => prices.messagePrices)
-  prices: Promise<Price>;
+  @ManyToOne(() => Price, price => price.messagePrices)
+  price: Promise<Price>;
   @Index()
   @Column()
-  pricesId: number;
+  priceId: number;
 
 }
