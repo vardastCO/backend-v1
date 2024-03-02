@@ -6,6 +6,7 @@ import {
   Entity,
   ManyToOne,
   Index,
+  OneToMany,
   JoinColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -32,11 +33,8 @@ export class DiscountPrice extends BaseEntity {
   @Column("enum", { enum: DiscountTypesEnum , default : DiscountTypesEnum.PERCENT})
   type: DiscountTypesEnum;
 
-  @Field(() => Price)
-  @ManyToOne(() => Price)
-  price: Promise<Price>;
-  @Index()
-  @Column()
-  priceId: number;
+  @Field(() => [Price], { nullable: "items" })
+  @OneToMany(() => Price, price => price.discountPrice)
+  prices: Promise<Price[]>;
 
 }

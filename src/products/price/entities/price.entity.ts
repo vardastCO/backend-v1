@@ -54,7 +54,7 @@ export class Price extends BaseEntity {
   sellerId: number;
 
   @Field(() => DiscountPrice)
-  @ManyToOne(() => DiscountPrice, discountPrice => discountPrice.price)
+  @ManyToOne(() => DiscountPrice, discountPrice => discountPrice.prices)
   discountPrice: Promise<DiscountPrice>;
   @Index()
   @Column()
