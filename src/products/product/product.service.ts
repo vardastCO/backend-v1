@@ -216,6 +216,7 @@ export class ProductService {
       order: {
         // rank: "DESC",
         prices: {
+          id : 'DESC',
           createdAt : 'DESC'  
         },
         image: {
