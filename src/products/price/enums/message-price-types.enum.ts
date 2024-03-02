@@ -1,9 +1,9 @@
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum MessagePriceTypesEnum {
-  INFO = 'INFO',
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR',
+  INFO = 1,
+  SUCCESS = 2,
+  ERROR = 3,
 }
 
 registerEnumType(MessagePriceTypesEnum, { name: "MessagePriceTypesEnum" });
