@@ -216,7 +216,7 @@ export class ProductService {
       order: {
         // rank: "DESC",
         prices: {
-          createdAt : 'DESC'  
+          id : 'DESC'  
         },
         // createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
         //   'DESC' : 'ASC'
