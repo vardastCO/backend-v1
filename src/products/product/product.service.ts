@@ -220,7 +220,7 @@ export class ProductService {
           createdAt : 'DESC'  
         },
         image: {
-          id : 'DESC'
+          fileId: 'DESC'
         }
         // createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
         //   'DESC' : 'ASC'
