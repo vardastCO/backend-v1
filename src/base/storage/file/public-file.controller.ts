@@ -23,6 +23,8 @@ import { User } from "src/users/user/entities/user.entity";
 import { CreateFilePublicDto } from "./dto/create-file.public.dto";
 import { UpdateFilePublicDto } from "./dto/update-file.public.dto";
 import { PublicFileService } from "./public-file.service";
+import * as zlib from 'zlib';
+
 @Controller("base/storage/file")
 export class PublicFileController {
   constructor(private readonly fileService: PublicFileService,
@@ -128,7 +130,17 @@ export class PublicFileController {
       const fileStream = await this.fileService.getFileStream(uuid);
 
       res.setHeader('Content-Type', 'application/pdf');
-      fileStream.pipe(res);
+      res.setHeader('Transfer-Encoding', 'chunked');
+      res.setHeader('Content-Encoding', 'gzip'); // Set the content encoding to gzip
+  
+      const gzip = zlib.createGzip(); // Create a gzip stream
+  
+      fileStream.on('error', (error) => {
+        console.error('Error streaming file:', error);
+        res.status(500).send('Internal Server Error');
+      });
+  
+      fileStream.pipe(gzip).pipe(res);
     } catch (error) {
       // Handle errors, e.g., file not found
       res.status(404).send('File not found');
