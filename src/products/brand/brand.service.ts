@@ -90,7 +90,10 @@ export class BrandService {
       //   category.createdAt = new Date(category.createdAt);
       //   category.updatedAt = new Date(category.updatedAt);
       // })
-      return cachedData;
+      const decompressedData = zlib.gunzipSync(cachedData).toString();
+      const parsedData = JSON.parse(decompressedData);
+  
+      return parsedData;
     }
 
     const whereConditions: any = {};
