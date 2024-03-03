@@ -47,8 +47,6 @@ async function bootstrap() {
     compression({
       level: 9,       // Maximum compression level
       memLevel: 9,    // Maximum memory usage for compression
-      strategy: compression.constants.Z_HUFFMAN_ONLY, // Use Huffman coding only for maximum compression
-      // Add more compression options as needed
     })
   );
   app.use(new TimingMiddleware().use);
