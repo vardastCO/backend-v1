@@ -26,16 +26,16 @@ export class MessagePrice extends BaseEntity {
   @Column({ nullable: true })
   message?: string;
 
-  // @Field(() => PriceTypesEnum)
-  // @Column("enum", { enum: MessagePriceTypesEnum , default : MessagePriceTypesEnum.ERROR})
-  // type: PriceTypesEnum;
+  @Field(() => PriceTypesEnum)
+  @Column("enum", { enum: MessagePriceTypesEnum , default : MessagePriceTypesEnum.ERROR})
+  type: PriceTypesEnum;
 
 
-  // @Field(() => Price)
-  // @ManyToOne(() => Price, price => price.discount)
-  // price: Promise<Price>;
-  // @Index()
-  // @Column()
-  // priceId: number;
+  @Field(() => Price)
+  @ManyToOne(() => Price, price => price.discount)
+  price: Promise<Price>;
+  @Index()
+  @Column()
+  priceId: number;
 
 }

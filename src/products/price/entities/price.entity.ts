@@ -62,14 +62,14 @@ export class Price extends BaseEntity {
   attributeValueId: number;
 
 
-  // @Field(() => [MessagePrice], { nullable: "items" })
-  // @OneToMany(() => MessagePrice, messagePrice => messagePrice.price)
-  // messagePrices: Promise<MessagePrice[]>;
+  @Field(() => [MessagePrice], { nullable: "items" })
+  @OneToMany(() => MessagePrice, messagePrice => messagePrice.price)
+  messagePrices: Promise<MessagePrice[]>;
 
 
-  // @Field(() => [DiscountPrice], { nullable: "items" })
-  // @OneToMany(() => DiscountPrice, discountPrice => discountPrice.price)
-  // discount: Promise<DiscountPrice[]>;
+  @Field(() => [DiscountPrice], { nullable: "items" })
+  @OneToMany(() => DiscountPrice, discountPrice => discountPrice.price)
+  discount: Promise<DiscountPrice[]>;
 
   @Field()
   @Column()
