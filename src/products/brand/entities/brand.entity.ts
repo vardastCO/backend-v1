@@ -3,8 +3,6 @@ import { File } from "src/base/storage/file/entities/file.entity";
 import { Category } from "src/base/taxonomy/category/entities/category.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { Product } from "src/products/product/entities/product.entity";
-import { SellerHasBrand } from "src/products/seller/entities/seller-has-brnads.entity";
-import { Seller } from "src/products/seller/entities/seller.entity";
 import {
   BaseEntity,
   Column,
@@ -89,10 +87,7 @@ export class Brand extends BaseEntity {
   @Field(type => [Product], { nullable: "items" })
   @OneToMany(type => Product, product => product.brand)
   products: Promise<Product[]>;
-
-  @Field(() => [Seller], { nullable: "items" })
-  @OneToMany(() => SellerHasBrand, sellerHasBrand => sellerHasBrand.brand)
-  sellers: Seller[];
+  
 
   @Field(() => File, { nullable: true })
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
