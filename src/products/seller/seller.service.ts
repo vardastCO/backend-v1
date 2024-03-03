@@ -180,7 +180,7 @@ export class SellerService {
       order: {
         rating: "DESC",
       },
-      // relations: [ 'brands'], 
+      relations: [ 'brands'], 
     });
 
 
