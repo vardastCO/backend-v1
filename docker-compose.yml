@@ -51,7 +51,17 @@ services:
        limits:
          cpus: '6'  # Adjust based on available cores
          memory: 6G 
-
+  graphql-studio:
+    image: graphql/studio
+    ports:
+      - "4000:4000"
+    networks:
+      - myNet
+    deploy:
+      resources:
+        limits:
+          cpus: '2'  # Adjust based on available cores
+          memory: 2G
   web:
     build: .
     restart: always
