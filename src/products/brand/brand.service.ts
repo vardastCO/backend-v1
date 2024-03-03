@@ -19,6 +19,7 @@ import { PayloadDto } from "./dto/payload-brand";
 import { UpdateBrandInput } from "./dto/update-brand.input";
 import { Brand } from "./entities/brand.entity";
 import { SortBrandEnum } from "./enum/sort-types.enum";
+import * as zlib from 'zlib';
 
 
 @Injectable()
@@ -144,7 +145,9 @@ export class BrandService {
 
       const response = PaginationBrandResponse.make(indexBrandInput, total, modifiedDataWithOutText);
       
-      await this.cacheManager.set(cacheKey, response,  CacheTTL.ONE_WEEK);
+      // await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
     
       return response;
     } catch (e) {
