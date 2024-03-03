@@ -20,6 +20,7 @@ import {
 } from "typeorm";
 import { SellerRepresentative } from "./seller-representative.entity";
 import { Brand } from "src/products/brand/entities/brand.entity";
+import { SellerHasBrand } from "./seller-has-brnads.entity";
 
 @ObjectType()
 @Entity("product_sellers")
@@ -111,7 +112,7 @@ export class Seller extends BaseEntity {
   myProduct: Promise<Offer[]>;
 
   @Field(() => [Brand], { nullable: "items" })
-  @OneToMany(() => Brand, brand => null, { nullable: true } )
+  @OneToMany(() => SellerHasBrand, sellerHasBrand => sellerHasBrand.seller)
   brands: Brand[];
 
   @Field(() => [ContactInfo])
