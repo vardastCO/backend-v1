@@ -31,11 +31,11 @@ export class MessagePrice extends BaseEntity {
   type: PriceTypesEnum;
 
 
-  @Field(() => Price)
+  @Field(() => Price,{ nullable: true })
   @ManyToOne(() => Price, price => price.discount)
   price: Promise<Price>;
   @Index()
-  @Column()
+  @Column({ nullable: true })
   priceId: number;
 
 }
