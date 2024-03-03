@@ -86,10 +86,10 @@ export class BrandService {
     const cachedData = await this.cacheManager.get<PaginationBrandResponse>(cacheKey);
   
     if (cachedData) {
-      cachedData.data.forEach(category => {
-        category.createdAt = new Date(category.createdAt);
-        category.updatedAt = new Date(category.updatedAt);
-      })
+      // cachedData.data.forEach(category => {
+      //   category.createdAt = new Date(category.createdAt);
+      //   category.updatedAt = new Date(category.updatedAt);
+      // })
       return cachedData;
     }
 
