@@ -83,17 +83,18 @@ export class BrandService {
   
     const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
   
-    const cachedData = await this.cacheManager.get<PaginationBrandResponse>(cacheKey);
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
   
     if (cachedData) {
       // cachedData.data.forEach(category => {
       //   category.createdAt = new Date(category.createdAt);
       //   category.updatedAt = new Date(category.updatedAt);
       // })
-      const decompressedData = zlib.gunzipSync(cachedData).toString();
-      const parsedData = JSON.parse(decompressedData);
-  
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const parsedData: PaginationBrandResponse = JSON.parse(decompressedData);
+
       return parsedData;
+
     }
 
     const whereConditions: any = {};
