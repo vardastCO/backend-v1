@@ -26,9 +26,9 @@ export class MessagePrice extends BaseEntity {
   @Column({ nullable: true })
   message?: string;
 
-  @Field(() => PriceTypesEnum)
+  @Field(() => MessagePriceTypesEnum)
   @Column("enum", { enum: MessagePriceTypesEnum , default : MessagePriceTypesEnum.ERROR})
-  types: PriceTypesEnum;
+  type: MessagePriceTypesEnum;
 
 
   @Field(() => Price,{ nullable: true })
