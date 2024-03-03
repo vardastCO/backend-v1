@@ -29,9 +29,9 @@ export class DiscountPrice extends BaseEntity {
   @Column({ nullable: true })
   calculated_price?: string;
 
-  @Field(() => DiscountTypesEnum)
-  @Column("enum", { enum: DiscountTypesEnum , default : DiscountTypesEnum.PERCENT})
-  type: DiscountTypesEnum;
+  // @Field(() => DiscountTypesEnum)
+  // @Column("enum", { enum: DiscountTypesEnum , default : DiscountTypesEnum.PERCENT})
+  // type: DiscountTypesEnum;
 
   @Field(() => Price)
   @ManyToOne(() => Price, price => price.discount)
