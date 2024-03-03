@@ -164,7 +164,7 @@ export class SellerService {
     const cacheKey = `sellers_${JSON.stringify(indexSellerInput)}`;
     const cachedData = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
     if (cachedData) {
-      // return cachedData;
+      return cachedData;
     }
   
     const whereConditions: any = {};
@@ -180,30 +180,30 @@ export class SellerService {
       order: {
         rating: "DESC",
       },
-      relations: [ 'brands'], 
+      // relations: [ 'brands'], 
     });
 
 
     try {
-      // const modifiedData = await Promise.all(
-      //   data.map(async (seller, index) => {
-      //     // seller.brands = index < 9 ? await this.getOfferBrand(seller.id) : [];
-      //     return seller;
-      // })
-      // );
+      const modifiedData = await Promise.all(
+        data.map(async (seller, index) => {
+          seller.brands = index < 5 ? await this.getOfferBrand(seller.id) : [];
+          return seller;
+      })
+      );
 
-      // const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
-      //   .replace(/__logoFile__/g, 'logoFile')
-      //   .replace(/__offers__/g, 'offers')
-      //   .replace(/__has_offers__/g, 'has_offers');
+      const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
+        .replace(/__logoFile__/g, 'logoFile')
+        .replace(/__offers__/g, 'offers')
+        .replace(/__has_offers__/g, 'has_offers');
 
       
       // Parse the modified JSON back to objects
-      // const result = JSON.parse(data);
+      const result = JSON.parse(jsonString);
       const response = PaginationSellerResponse.make(
         indexSellerInput,
         total,
-        data,
+        result,
       );
 
       await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
