@@ -441,9 +441,15 @@ export class ProductService {
       cachedResult.createdAt = new Date(cachedResult.createdAt);
       return cachedResult;
     }
-    const result =  await LastPrice.createQueryBuilder()
+    // const result =  await LastPrice.createQueryBuilder()
+    //   .where({ productId: product.id })
+    //   .orderBy({ amount: "ASC" })
+    //   .limit(1)
+      //   .getOne();
+      
+      const result =  await Price.createQueryBuilder()
       .where({ productId: product.id })
-      .orderBy({ amount: "ASC" })
+      .orderBy({ createdAt: "DESC" })
       .limit(1)
       .getOne();
     await this.cacheManager.set(cacheKey,result,CacheTTL.ONE_DAY)
