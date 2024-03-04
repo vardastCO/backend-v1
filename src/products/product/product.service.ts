@@ -419,10 +419,10 @@ export class ProductService {
         '"Offer"."id" = "maxIds"."maxId"',
     )
       // .take(5)
-      .orderBy(
-        { createdAt: 'DESC' }
+      // .orderBy(
+      //   { createdAt: 'DESC' }
          
-      )
+      // )
       .getMany();
     
     // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
