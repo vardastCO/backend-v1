@@ -445,12 +445,19 @@ export class ProductService {
     //   .orderBy({ amount: "ASC" })
     //   .limit(1)
       //   .getOne();
+      const IDS = product.id;
+      const result = Price.findOneBy({
+        where: { productId: IDS }, // Corrected the syntax here
+        order: {
+          createdAt: "DESC"
+        },
+      }); 
       
-      const result =  await Price.createQueryBuilder()
-      .where({ productId: product.id })
-      .orderBy({ createdAt: "DESC" })
-      .limit(1)
-      .getOne();
+      // const result =  await Price.
+      // .where({ productId: product.id })
+      // .orderBy({ createdAt: "DESC" })
+      // .limit(1)
+      // .getOne();
     // await this.cacheManager.set(cacheKey,result,CacheTTL.ONE_DAY)
     
     return result
