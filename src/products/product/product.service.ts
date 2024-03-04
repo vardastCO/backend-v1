@@ -459,7 +459,7 @@ export class ProductService {
       // .orderBy({ createdAt: "DESC" })
       // .limit(1)
       // .getOne();
-    // await this.cacheManager.set(cacheKey,result,CacheTTL.ONE_DAY)
+    await this.cacheManager.set(cacheKey,result,CacheTTL.ONE_DAY)
     
     return result
       
