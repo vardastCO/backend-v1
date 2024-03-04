@@ -115,12 +115,10 @@ export class SellerPriceUpdateCommand extends CommandRunner {
         for (let i = 0; i < sellerIds.length; i++) {
           const sellerInfo = sellerIds[i];
 
-          console.log("ffff", sellerInfo, "gggg", sellerInfo.sellerId);
 
           for (let j = 0; j < sellerInfo.sellerId.length; j++) {
             const singleSellerId = sellerInfo.sellerId[j];
 
-            console.log("yyyyy", singleSellerId);
             try {
               const offer = Offer.create();
               offer.productId = (await product).id;
@@ -138,23 +136,20 @@ export class SellerPriceUpdateCommand extends CommandRunner {
               console.log(
                 "amount",
                 price,
-                "jjj",
-                price / 10,
-                "daaa",
-                sellerInfo.isCurrencyTrue,'dddddddddddddddd', sellerInfo.isCurrencyTrue
-                ? price / 10
-                : price
               );
-              const priceModel = Price.create();
-              priceModel.sellerId = singleSellerId; // Set a single seller ID
-              priceModel.productId = (await product).id; // Assuming productId is a string
-              priceModel.isPublic = true;
-              priceModel.createdById = 1;
-              priceModel.amount = sellerInfo.isCurrencyTrue
-                ?  parseInt(price) / 10
-                :  parseInt(price);
-              priceModel.type = PriceTypesEnum.CONSUMER;
-              priceModel.save();
+              if (price) {
+                const priceModel = Price.create();
+                priceModel.sellerId = singleSellerId; // Set a single seller ID
+                priceModel.productId = (await product).id; // Assuming productId is a string
+                priceModel.isPublic = true;
+                priceModel.createdById = 1;
+                priceModel.amount = sellerInfo.isCurrencyTrue
+                  ?  parseInt(price) / 10
+                  :  parseInt(price);
+                priceModel.type = PriceTypesEnum.CONSUMER;
+                priceModel.save();
+              }
+          
             } catch (e) {
               console.log("Error processing product:", e);
             }
