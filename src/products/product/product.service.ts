@@ -446,12 +446,13 @@ export class ProductService {
     //   .limit(1)
       //   .getOne();
       const IDS = product.id;
-      const result = Price.findOneBy({
-        where: { productId: IDS }, // Corrected the syntax here
+      const result = Price.findOne({
+        where: { productId: IDS },
         order: {
           createdAt: "DESC"
         },
-      }); 
+      });
+      
       
       // const result =  await Price.
       // .where({ productId: product.id })
