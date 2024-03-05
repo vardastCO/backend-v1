@@ -358,10 +358,19 @@ export class CategoryService {
   }
 
   async findOne(id: number, slug?: string): Promise<Category> {
+    const cacheKey = `category:${id}:${slug || ''}`;
+
+    const cachedCategory = await this.cacheManager.get<Category>(cacheKey);
+
+    if (cachedCategory) {
+      // If the category is found in the cache, return it
+      return cachedCategory;
+    }
     const category = await this.categoryRepository.findOneBy({ id, slug });
     if (!category) {
       throw new NotFoundException();
     }
+    await this.cacheManager.set(cacheKey, category, CacheTTL.ONE_WEEK);
     return category;
   }
 
