@@ -14,7 +14,7 @@ import { PaginationCategoryResponse } from "./dto/pagination-category.response";
 import { UpdateCategoryInput } from "./dto/update-category.input";
 import { ImageCategory } from "./entities/category-image.entity";
 import { Category } from "./entities/category.entity";
-
+import * as zlib from 'zlib';
 @Injectable()
 export class CategoryService {
   constructor(
@@ -360,17 +360,19 @@ export class CategoryService {
   async findOne(id: number, slug?: string): Promise<Category> {
     const cacheKey = `category:${id}:${slug || ''}`;
 
-    const cachedCategory = await this.cacheManager.get<Category>(cacheKey);
+    const cachedCategory = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedCategory) {
-      // If the category is found in the cache, return it
-      return cachedCategory;
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
+      const parsedData: Category = JSON.parse(decompressedData);
+      return parsedData;
     }
     const category = await this.categoryRepository.findOneBy({ id, slug });
     if (!category) {
       throw new NotFoundException();
     }
-    await this.cacheManager.set(cacheKey, category, CacheTTL.ONE_WEEK);
+    const compressedData = zlib.gzipSync(JSON.stringify(category));
+    await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
     return category;
   }
 
