@@ -7,7 +7,7 @@ import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { IndexBlogInput } from "./dto/IndexBlogInput";
 import { PaginationBlogResponse } from "./dto/PaginationBlogResponse";
 import { Blog } from "./entities/blog.entity";
-
+import * as zlib from 'zlib';
 @Injectable()
 export class BlogService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
@@ -22,12 +22,14 @@ export class BlogService {
   ): Promise<PaginationBlogResponse> {
     try {
       const cacheKey = `blogs_${JSON.stringify(indexBlogInput)}`;
-      const cachedData = await this.cacheManager.get<PaginationBlogResponse>(
+      const cachedData = await this.cacheManager.get<string>(
         cacheKey,
       );
 
       if (cachedData) {
-        return cachedData;
+        const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+        const parsedData: PaginationBlogResponse = JSON.parse(decompressedData);
+        return parsedData;
       }
 
       const response_1 = await axios.get(
@@ -78,8 +80,8 @@ export class BlogService {
         paginatedBlogs,
       );
       
-      // Save the data in the cache
-      await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
+      const compressedData = zlib.gzipSync(JSON.stringify(result));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
 
       return result;
     } catch (e) {
