@@ -19,7 +19,7 @@ import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { User } from "src/users/user/entities/user.entity";
 import { UserService } from "src/users/user/user.service";
-import { EntityManager, In, Like } from "typeorm";
+import { EntityManager, In, Like,Not,IsNull } from "typeorm";
 import { PaginationBrandResponse } from "../brand/dto/pagination-brand.response";
 import { Brand } from "../brand/entities/brand.entity";
 import { Offer } from "../offer/entities/offer.entity";
@@ -158,7 +158,7 @@ export class SellerService {
   ): Promise<PaginationSellerResponse> {
 
     indexSellerInput.boot();
-    const { take, skip, isPublic, status, createdById, name } =
+    const { take, skip, isPublic, status, createdById, name,hasLogoFile } =
       indexSellerInput || {};
 
     const cacheKey = `sellers_${JSON.stringify(indexSellerInput)}`;
@@ -171,6 +171,11 @@ export class SellerService {
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
+
+    if (hasLogoFile) {
+      whereConditions[`logofileId`] =  hasLogoFile ? Not(IsNull()) : IsNull();;
+    }
+    
     
 
     const [data, total] = await Seller.findAndCount({

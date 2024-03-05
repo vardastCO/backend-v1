@@ -18,6 +18,10 @@ export class IndexSellerInput extends IndexInput {
   @IsBoolean()
   isPublic: boolean;
 
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  hasLogoFile?: boolean ;
+
 
   @Field({ nullable: true })
   @IsOptional()
