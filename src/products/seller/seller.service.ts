@@ -172,10 +172,9 @@ export class SellerService {
       whereConditions[`name`] = Like(`%${name}%`);
     }
 
-    if (hasLogoFile) {
-      whereConditions[`logofileId`] =  hasLogoFile ? Not(IsNull()) : IsNull();;
+    if (indexSellerInput.hasLogoFile !== undefined) {
+      whereConditions[`logoFile`] = indexSellerInput.hasLogoFile ? Not(IsNull()) : IsNull();
     }
-    
     
 
     const [data, total] = await Seller.findAndCount({
