@@ -118,7 +118,7 @@ export class VocabularyResolver {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: Category[] = JSON.parse(decompressedData);
   
-      const createdCategories: Category[] = parsedData.map((categoryData) => {
+      const createdCategoriesPromises = parsedData.map(async (categoryData) => {
         const parentCategoryData = categoryData.parentCategory || null;
         const createdCategory: Category = Category.create({
           ...categoryData,
@@ -127,7 +127,9 @@ export class VocabularyResolver {
       
         return createdCategory;
       });
-      return createdCategories;
+      
+      const createdCategories = await Promise.all(createdCategoriesPromises);
+      return createdCategories
     }
     const response : Category[] = await this.categoryService.findAll({
       vocabularyId: vocabulary.id,
