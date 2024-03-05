@@ -118,7 +118,7 @@ export class VocabularyResolver {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: Category[] = JSON.parse(decompressedData);
   
-      const createdCategories: Category[] = cachedData.map((categoryData) => {
+      const createdCategories: Category[] = parsedData.map((categoryData) => {
         const parentCategoryData = categoryData.parentCategory || null;
         const createdCategory: Category = Category.create({
           ...categoryData,
