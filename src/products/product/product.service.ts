@@ -28,6 +28,7 @@ import { ProductSortablesEnum } from "./enums/product-sortables.enum";
 import { CreateProductSellerInput } from "./dto/create-product-seller.input";
 import { v4 as uuidv4 } from 'uuid';
 import { Seller } from "../seller/entities/seller.entity";
+import * as zlib from 'zlib';
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 interface MainQueryResult {
   totalCount: number;
@@ -149,12 +150,14 @@ export class ProductService {
   ): Promise<PaginationProductResponse> {
     indexProductInput.boot();
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
-    const cachedData = await this.cacheManager.get<PaginationProductResponse>(
+    const cachedData = await this.cacheManager.get<String>(
       cacheKey,
     );
     
     if (cachedData) {
-      return cachedData;
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
+      return parsedData;
     }
    
     const {
@@ -241,7 +244,10 @@ export class ProductService {
     // console.log(totalCount,indexProductInput)
     
     const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
+    // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
+
+    const compressedData = zlib.gzipSync(JSON.stringify(result));
+    await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
 
     // await this.productClient.emit('product.paginated', result);
     
