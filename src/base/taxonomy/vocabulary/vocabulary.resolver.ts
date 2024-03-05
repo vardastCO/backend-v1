@@ -8,6 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import * as zlib from 'zlib';
 import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import { Permission } from "src/users/authorization/permission.decorator";
@@ -110,20 +111,25 @@ export class VocabularyResolver {
   async categories(@Parent() vocabulary: Vocabulary): Promise<Category[]> {
 
     const cacheKey = `categories_home_${JSON.stringify(vocabulary)}`;
-    const cachedData = await this.cacheManager.get<Category[]>(cacheKey);
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
   
     if (cachedData) {
+
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const parsedData: Category[] = JSON.parse(decompressedData);
+
+      return parsedData;
   
-      const createdCategories: Category[] = cachedData.map((categoryData) => {
-        const parentCategoryData = categoryData.parentCategory || null;
-        const createdCategory: Category = Category.create({
-          ...categoryData,
-          parentCategory: parentCategoryData,
-        });
+      // const createdCategories: Category[] = cachedData.map((categoryData) => {
+      //   const parentCategoryData = categoryData.parentCategory || null;
+      //   const createdCategory: Category = Category.create({
+      //     ...categoryData,
+      //     parentCategory: parentCategoryData,
+      //   });
       
-        return createdCategory;
-      });
-      return createdCategories;
+      //   return createdCategory;
+      // });
+      // return createdCategories;
     }
     const response : Category[] = await this.categoryService.findAll({
       vocabularyId: vocabulary.id,
@@ -134,8 +140,8 @@ export class VocabularyResolver {
 
       // Parse the modified JSON back to objects
     const modifiedData = JSON.parse(jsonString);
-      
-    await this.cacheManager.set(cacheKey, modifiedData, 604_800);//one week ?
+    const compressedData = zlib.gzipSync(JSON.stringify(modifiedData));
+    await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
 
     return response;
   }
