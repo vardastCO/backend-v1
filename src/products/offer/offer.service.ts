@@ -107,7 +107,7 @@ export class OfferService {
       indexOfferInput || {};
     let { sellerId } = indexOfferInput || {};
 
-    if (!hasMasterPermission) {
+    if (!hasMasterPermission && !sellerId) {
       sellerId = (await this.userService.getSellerRecordOf(user))?.id;
     }
     const [data, total] = await Offer.findAndCount({
