@@ -7,6 +7,7 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import axios from "axios";
 import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 import { EventTracker } from "./base/event-tracker/entities/event-tracker.entity";
+import { CreateEventTrackerInput } from "./base/event-tracker/dto/create-event-tracker.input";
 
 @Injectable()
 export class CronJobService {
@@ -45,8 +46,9 @@ export class CronJobService {
     for (const view of views) {
       try {
         this.cacheManager.del(view.key);
-        console.log('vies',view)
-        const event: EventTracker = EventTracker.create<EventTracker>(JSON.parse(view.value));
+        console.log('vies', view)
+        const data : CreateEventTrackerInput = JSON.parse(view.value)
+        const event: EventTracker = EventTracker.create<EventTracker>(data);
         await event.save()
 
       } catch (error) {
