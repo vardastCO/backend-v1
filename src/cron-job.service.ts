@@ -27,22 +27,22 @@ export class CronJobService {
   //   await this.fetchAndLogSellerViewsToElasticsearch();
   // }
 
-  // @Cron(CronExpression.EVERY_5_SECONDS)
-  // async logTrackerViewsToElasticsearch() {
-  //   const allKeys: string[] = await this.cacheManager.store.keys();
-  //   const productKeys: string[] = allKeys.filter(key =>
-  //     key.startsWith("eventTracker:"),
-  //   );
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  async logTrackerViewsToElasticsearch() {
+    const allKeys: string[] = await this.cacheManager.store.keys();
+    const productKeys: string[] = allKeys.filter(key =>
+      key.startsWith("eventTracker:"),
+    );
 
-  //   const views: any[] = await Promise.all(
-  //     productKeys.map(async key => {
-  //       const value = await this.cacheManager.get(key);
+    const views: any[] = await Promise.all(
+      productKeys.map(async key => {
+        const value = await this.cacheManager.get(key);
 
-  //       return { key, value };
-  //     }),
-  //   );
-  //   await this.logTrackerToElasticsearch(views)
-  // }
+        return { key, value };
+      }),
+    );
+    console.log('views',views)
+  }
   // @Cron(CronExpression.EVERY_5_SECONDS)
   // async logBrandViewsToElasticsearch() {
   //   // Fetch product views and log to Elasticsearch
