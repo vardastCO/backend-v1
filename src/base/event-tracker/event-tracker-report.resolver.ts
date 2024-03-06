@@ -23,7 +23,7 @@ export class EventTrackerReportResolver {
     return this.eventTrackerReportService.pastDurationTotalEventsCount(user);
   }
 
-  // @Permission("gql.base.event_tracker.report.events_chart")
+  @Permission("gql.base.event_tracker.report.events_chart")
   @Query(() => ReportEventsCountChart, { name: "pastDurationEventsChart" })
   pastDurationEventsChart(@CurrentUser() user: User) {
     return this.eventTrackerReportService.pastDurationEventsChart(user);
