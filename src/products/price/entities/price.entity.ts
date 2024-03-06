@@ -68,7 +68,7 @@ export class Price extends BaseEntity {
 
 
   @Field(() => [DiscountPrice], { nullable: true })
-  @OneToMany(() => DiscountPrice, discountPrice => discountPrice?.price)
+  @OneToMany(() => DiscountPrice, discountPrice => discountPrice.price)
   discount?: Promise<DiscountPrice[]>;
 
   @Field()
