@@ -46,7 +46,7 @@ export class CronJobService {
       try {
         this.cacheManager.del(view.key);
         console.log(JSON.parse(view.data))
-        const event: EventTracker = EventTracker.create<EventTracker>(JSON.parse(view.data));
+        // const event: EventTracker = EventTracker.create<EventTracker>(JSON.parse(view.data));
         // await event.save()
 
       } catch (error) {
