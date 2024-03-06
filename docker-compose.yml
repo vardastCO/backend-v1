@@ -24,6 +24,8 @@ services:
       - 6379:6379
     networks:
       - myNet
+    environment:
+      - REDIS_PASSWORD=g90pM89O  
     deploy:
       resources:
         limits:
