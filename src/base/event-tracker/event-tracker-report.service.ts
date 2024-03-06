@@ -65,11 +65,12 @@ export class EventTrackerReportService {
     ORDER BY
       events. "createdAt"::date ASC;`;
 
-      if (await this.authorizationService.setUser(user).hasRole("admin")) {
-        params = [];
-        filterString = "";
-      }
-
+    if (await this.authorizationService.setUser(user).hasRole("admin")) {
+      console.log('adminnnnnnn')
+      params = [];
+      filterString = "";
+    }
+    console.log('adminnnnnnn',await this.authorizationService.setUser(user).hasRole("admin"))
     const data = await this.dataSource.query(
       rawSql.replace(":filterString", filterString),
       params,
