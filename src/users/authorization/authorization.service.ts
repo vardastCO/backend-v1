@@ -39,17 +39,24 @@ export class AuthorizationService {
 
   async hasRole(roleName: string): Promise<boolean> {
     if (!this.user) return false;
-
+  
     const roleIdToCheck = 2;
-
+  
     const query = `
-    SELECT * 
-    FROM users_authorization_user_roles 
-    WHERE userId = ? 
-      AND roleId = ?
-  `;
-    const userRoles = await this.entityManager.query(query, [this.user.id, roleIdToCheck]);
-    console.log(userRoles.length > 0,'userRoles.length > 0')
-    return userRoles.length > 0;
+      SELECT * 
+      FROM users_authorization_user_roles 
+      WHERE "userId" = $1 
+        AND "roleId" = $2
+    `;
+  
+    try {
+      const userRoles = await this.entityManager.query(query, [this.user.id, roleIdToCheck]);
+      console.log(userRoles.length > 0, 'userRoles.length > 0');
+      return userRoles.length > 0;
+    } catch (error) {
+      console.error('Error executing SQL query:', error);
+      return false;
+    }
   }
+  
 }
