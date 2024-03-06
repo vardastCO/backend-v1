@@ -46,7 +46,7 @@ export class EventTrackerReportService {
   async pastDurationEventsChart(user: User): Promise<ReportEventsCountChart> {
     let params = [user.id];
     let filterString =
-      'AND contacts. "relatedId" in(SELECT "sellerId" FROM product_seller_representatives WHERE "sellerId" = $1)';
+      'AND contacts. "relatedId" in(SELECT "sellerId" FROM product_seller_representatives WHERE "userId" = $1)';
     const rawSql = `
     SELECT
       count(*)
