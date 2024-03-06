@@ -39,7 +39,7 @@ export class CategoryCsvUpdateFilterCommand extends CommandRunner {
   };
   constructor(
 
-    entityManager
+    private readonly entityManager: EntityManager ,
     private readonly csvParser: CsvParser,
     @InjectMinio() private readonly minioClient: Client,
     private readonly configService: ConfigService,

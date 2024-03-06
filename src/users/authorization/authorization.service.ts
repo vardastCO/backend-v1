@@ -7,7 +7,7 @@ import { EntityManager } from "typeorm";
 export class AuthorizationService {
   private user: User;
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,
-  private readonly entityManager: EntityManager,
+  private readonly entityManager: EntityManager
   ) {
     // this.user = GqlExecutionContext.create(context).getContext().req.user;
   }
