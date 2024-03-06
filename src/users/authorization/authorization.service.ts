@@ -2,11 +2,13 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { User } from "../user/entities/user.entity";
-
+import { EntityManager } from "typeorm";
 @Injectable()
 export class AuthorizationService {
   private user: User;
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,
+  private readonly entityManager: EntityManager,
+  ) {
     // this.user = GqlExecutionContext.create(context).getContext().req.user;
   }
 
@@ -37,11 +39,16 @@ export class AuthorizationService {
   async hasRole(roleName: string): Promise<boolean> {
     if (!this.user) return false;
 
-    console.log('ffff')
+    const roleIdToCheck = 2;
 
-    const userRoles: string[] =
-      (await this.cacheManager.get(this.user.getRoleCacheKey())) ?? [];
-    console.log('yyyyyyyy',userRoles)
-    return userRoles.includes(roleName);
+    const query = `
+    SELECT * 
+    FROM users_authorization_user_roles 
+    WHERE userId = ? 
+      AND roleId = ?
+  `;
+    const userRoles = await this.entityManager.query(query, [this.user.id, roleIdToCheck]);
+
+    return userRoles.length > 0;
   }
 }
