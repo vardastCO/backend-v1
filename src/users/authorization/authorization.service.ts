@@ -37,9 +37,11 @@ export class AuthorizationService {
   async hasRole(roleName: string): Promise<boolean> {
     if (!this.user) return false;
 
+    console.log('ffff')
+
     const userRoles: string[] =
       (await this.cacheManager.get(this.user.getRoleCacheKey())) ?? [];
-
+    console.log('yyyyyyyy',userRoles)
     return userRoles.includes(roleName);
   }
 }
