@@ -6,9 +6,10 @@ import { EntityManager } from "typeorm";
 @Injectable()
 export class AuthorizationService {
   private user: User;
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,
-  private readonly entityManager: EntityManager
-  ) {
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly entityManager: EntityManager
+  ) { 
     // this.user = GqlExecutionContext.create(context).getContext().req.user;
   }
 
@@ -48,7 +49,7 @@ export class AuthorizationService {
       AND roleId = ?
   `;
     const userRoles = await this.entityManager.query(query, [this.user.id, roleIdToCheck]);
-
+    console.log(userRoles.length > 0,'userRoles.length > 0')
     return userRoles.length > 0;
   }
 }
