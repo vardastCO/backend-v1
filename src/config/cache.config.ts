@@ -17,7 +17,8 @@ export const cacheAsyncConfig: CacheModuleAsyncOptions = {
     store: redisStore as unknown as CacheStore,
     url: `redis://${configService.get("REDIS_HOST")}:${configService.get("REDIS_PORT")}`,
     ttl: CacheTTL.ONE_WEEK,
-    password : "g90pM89O",
+    password: "g90pM89O",
+    no_ready_check: true,
     max: 30, // Adjust based on performance testing
     min: 10,  // Minimum number of connections in the pool
   }),
