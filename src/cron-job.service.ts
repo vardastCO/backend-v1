@@ -45,9 +45,10 @@ export class CronJobService {
     for (const view of views) {
       try {
         this.cacheManager.del(view.key);
-        const event: EventTracker = EventTracker.create<EventTracker>(view.data);
-        await event.save()
-        
+        console.log(JSON.parse(view.data))
+        const event: EventTracker = EventTracker.create<EventTracker>(JSON.parse(view.data));
+        // await event.save()
+
       } catch (error) {
         // Handle error appropriately
         console.error("Error logging view to Elasticsearch:", error.message);
