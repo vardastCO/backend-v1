@@ -45,7 +45,6 @@ export class EventTrackerReportService {
 
   async pastDurationEventsChart(user: User): Promise<ReportEventsCountChart> {
     let params = [user.id];
-    console.log('userrrrrrrrrrrr',user.id)
     let filterString =
       'AND contacts. "relatedId" in(SELECT "sellerId" FROM product_seller_representatives WHERE "userId" = $1)';
     const rawSql = `
@@ -67,11 +66,10 @@ export class EventTrackerReportService {
       events. "createdAt"::date ASC;`;
 
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
-      console.log('adminnnnnnn')
       params = [];
       filterString = "";
     }
-    console.log('adminnnnnnn',await this.authorizationService.setUser(user))
+
     const data = await this.dataSource.query(
       rawSql.replace(":filterString", filterString),
       params,

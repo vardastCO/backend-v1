@@ -50,9 +50,9 @@ export class AuthorizationService {
     `;
   
     try {
-      console.log(this.user.id, roleIdToCheck)
+
       const userRoles = await this.entityManager.query(query, [this.user.id, roleIdToCheck]);
-      console.log(userRoles.length > 0, 'userRoles.length > 0');
+
       return userRoles.length > 0;
     } catch (error) {
       console.error('Error executing SQL query:', error);
