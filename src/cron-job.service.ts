@@ -6,6 +6,7 @@ import { Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import axios from "axios";
 import { KavenegarService } from "./base/kavenegar/kavenegar.service";
+import { EventTracker } from "./base/event-tracker/entities/event-tracker.entity";
 
 @Injectable()
 export class CronJobService {
@@ -41,7 +42,17 @@ export class CronJobService {
         return { key, value };
       }),
     );
-    console.log('views',views)
+    for (const view of views) {
+      try {
+        this.cacheManager.del(view.key);
+        const event: EventTracker = EventTracker.create<EventTracker>(view.data);
+        await event.save()
+        
+      } catch (error) {
+        // Handle error appropriately
+        console.error("Error logging view to Elasticsearch:", error.message);
+      }
+    }
   }
   // @Cron(CronExpression.EVERY_5_SECONDS)
   // async logBrandViewsToElasticsearch() {
