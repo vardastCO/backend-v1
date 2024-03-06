@@ -15,7 +15,7 @@ export const cacheAsyncConfig: CacheModuleAsyncOptions = {
     configService: ConfigService,
   ): Promise<CacheModuleOptions> => ({
     store: redisStore as unknown as CacheStore,
-    url: `redis://${configService.get("REDIS_HOST")}:${configService.get("REDIS_PORT")}?password=${configService.get("REDIS_PASSWORD")}`,
+    url: `redis://${configService.get("REDIS_HOST")}:${configService.get("REDIS_PORT")}?password=g90pM89O}`,
     ttl: CacheTTL.ONE_WEEK,
     max: 30, // Adjust based on performance testing
     min: 10,  // Minimum number of connections in the pool
