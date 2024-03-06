@@ -47,6 +47,8 @@ export class EventTrackerReportService {
     let params = [user.id];
     let filterString =
       'AND contacts. "relatedId" in(SELECT "sellerId" FROM product_seller_representatives WHERE "userId" = $1)';
+    
+    console.log('filterString',filterString)
     const rawSql = `
     SELECT
       count(*)
