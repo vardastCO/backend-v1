@@ -25,6 +25,7 @@ RUN cp .env.example .env
 
 RUN pnpm build
 
+RUN chmod -R 777 /usr/src/app/
 # Use the node user from the image (instead of the root user)
 USER node
 
