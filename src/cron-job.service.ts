@@ -84,7 +84,9 @@ export class CronJobService {
 
         console.log('views',view)
         
-        const files = File.findOneBy({ id:view.value  })
+        const valueObject = JSON.parse(view.value);
+        const sellerId = `02-${valueObject.sellerId}`;
+        const files = File.findOneBy({ id:valueObject.file  })
         if (!files) {
           throw 'not found';
         }
@@ -92,7 +94,7 @@ export class CronJobService {
         const fileStream = await this.minioClient.getObject('vardast', name);
 
         const folderPath = '/usr/src/app';  // Replace with the actual folder path
-        const savedFilePath = await this.saveFileToLocalFolder(fileStream, name, folderPath);
+        const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
 
   
         await this.executePnpmCommand(savedFilePath);
@@ -134,8 +136,8 @@ export class CronJobService {
      
   // }
 
-  private async saveFileToLocalFolder(fileStream, fileName2, baseFolderPath2) {
-    const fileName = "1.csv";
+  private async saveFileToLocalFolder(fileStream, fileName, baseFolderPath2) {
+
     const baseFolderPath = "/usr/src/app";
     const filePath = path.join(baseFolderPath, fileName);
 
