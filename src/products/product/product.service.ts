@@ -429,9 +429,9 @@ export class ProductService {
       //   { createdAt: 'DESC' }
          
       // )
-      .innerJoinAndSelect('Offer."lastPublicConsumerPrice"', 'lastPublicConsumerPrice') // Removed double quotes around "Offer"
-      .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
-      // .orderBy('"Offer"."createdAt"', 'DESC') 
+      // .innerJoinAndSelect('Offer."lastPublicConsumerPrice"', 'lastPublicConsumerPrice') // Removed double quotes around "Offer"
+      // .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
+      .orderBy('"Offer"."createdAt"', 'DESC') 
       .getMany();
     
     // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
