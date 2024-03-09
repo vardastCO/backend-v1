@@ -91,9 +91,11 @@ export class CronJobService {
         const name  =  (await files).name
         const fileStream = await this.minioClient.getObject('vardast', name);
 
+        console.log('fileStream',fileStream)
+
   
         // Execute the pnpm command with the downloaded file
-        await this.executePnpmCommand(fileStream, name);
+      //  await this.executePnpmCommand(fileStream, name);
   
 
       } catch (error) {
