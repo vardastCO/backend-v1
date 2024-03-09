@@ -11,7 +11,7 @@ import { CreateEventTrackerInput } from "./base/event-tracker/dto/create-event-t
 import { File } from "./base/storage/file/entities/file.entity";
 import { Client } from "minio";
 import { InjectMinio } from "nestjs-minio";
-
+import * as fs from 'fs';
 
 @Injectable()
 export class CronJobService {
@@ -84,17 +84,40 @@ export class CronJobService {
 
         console.log('views',view)
         
-        // const files = File.findOneBy({  })
-        // if (!files) {
-        //   throw 'not found';
-        // }
-        // const fileStream = this.minioClient.getObject('vardast', (await files).name);
+        const files = File.findOneBy({ id:view.value  })
+        if (!files) {
+          throw 'not found';
+        }
+        const fileStream = this.minioClient.getObject('vardast', (await files).name);
+        const localFilePath = `/csv/${files.name}`;
+        const writeStream = fs.createWriteStream(localFilePath);
+        fileStream.pipe(writeStream);
+
+        // Execute the command with the file stream
+        await this.executePnpmCommand(localFilePath);
+
       } catch (error) {
         // Handle error appropriately
         console.error("Error logging view to command:", error.message);
       }
     }
   }
+
+  async executePnpmCommand(filePath: string): Promise<void> {
+    // Run the pnpm command with the file path
+    const { exec } = require('child_process');
+    return new Promise((resolve, reject) => {
+      exec(`pnpm a seller:price ${filePath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error executing pnpm command: ${error.message}`);
+          reject(error);
+        } else {
+          console.log(`pnpm command output: ${stdout}`);
+          resolve();
+        }
+      });
+    });
+  
   // @Cron(CronExpression.EVERY_5_SECONDS)
   // async logBrandViewsToElasticsearch() {
   //   // Fetch product views and log to Elasticsearch
