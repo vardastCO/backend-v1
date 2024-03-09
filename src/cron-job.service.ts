@@ -108,20 +108,7 @@ export class CronJobService {
     }
   }
 
-   executePnpmCommand(filePath: string): Promise<void> {
-    // Run the pnpm command with the file path
-    const { exec } = require('child_process');
-    return new Promise((resolve, reject) => {
-      exec(`pnpm a seller:price ${filePath}`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error executing pnpm command: ${error.message}`);
-          reject(error);
-        } else {
-          console.log(`pnpm command output: ${stdout}`);
-          resolve();
-        }
-      });
-    });
+
   
   // @Cron(CronExpression.EVERY_5_SECONDS)
   // async logBrandViewsToElasticsearch() {
@@ -164,6 +151,22 @@ export class CronJobService {
     );
 
     // await this.logBrandToElasticsearch(views);
+  }
+
+  private async executePnpmCommand(filePath: string): Promise<void> {
+    // Run the pnpm command with the file path
+    const { exec } = require('child_process');
+    return new Promise((resolve, reject) => {
+      exec(`pnpm a seller:price ${filePath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error executing pnpm command: ${error.message}`);
+          reject(error);
+        } else {
+          console.log(`pnpm command output: ${stdout}`);
+          resolve();
+        }
+      });
+    });
   }
   private async fetchAndLogSellerViewsToElasticsearch(): Promise<void> {
     const allKeys: string[] = await this.cacheManager.store.keys();
