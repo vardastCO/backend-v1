@@ -429,7 +429,8 @@ export class ProductService {
       //   { createdAt: 'DESC' }
          
       // )
-      .orderBy('"Offer"."lastPublicConsumerPrice".createdAt', 'DESC')
+      .innerJoinAndSelect('"Offer".lastPublicConsumerPrice', 'lastPublicConsumerPrice') // Add this line
+      .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
       // .orderBy('"Offer"."createdAt"', 'DESC') 
       .getMany();
     
