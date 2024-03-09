@@ -429,7 +429,9 @@ export class ProductService {
       //   { createdAt: 'DESC' }
          
       // )
-      .orderBy('"Offer"."createdAt"', 'DESC') 
+      .leftJoinAndSelect('"Offer".lastPublicConsumerPrice', 'lastPublicConsumerPrice')
+      .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
+      // .orderBy('"Offer"."createdAt"', 'DESC') 
       .getMany();
     
     // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
