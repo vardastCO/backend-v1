@@ -64,48 +64,109 @@ export class CronJobService {
     }
   }
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
-  async logCommand() {
-    const allKeys: string[] = await this.cacheManager.store.keys();
-    const productKeys: string[] = allKeys.filter(key =>
-      key.startsWith("pnpm"),
-    );
+  // @Cron(CronExpression.EVERY_2_MINUTES)
+  // async logCommand() {
+  //   const allKeys: string[] = await this.cacheManager.store.keys();
+  //   const productKeys: string[] = allKeys.filter(key =>
+  //     key.startsWith("pnpm"),
+  //   );
 
-    const views: any[] = await Promise.all(
-      productKeys.map(async key => {
-        const value = await this.cacheManager.get(key);
+  //   const views: any[] = await Promise.all(
+  //     productKeys.map(async key => {
+  //       const value = await this.cacheManager.get(key);
 
-        return { key, value };
-      }),
-    );
-    for (const view of views) {
-      try {
-        this.cacheManager.del(view.key);
+  //       return { key, value };
+  //     }),
+  //   );
+  //   for (const view of views) {
+  //     try {
+  //       this.cacheManager.del(view.key);
 
-        console.log('views',view)
+  //       console.log('views',view)
         
-        const valueObject = JSON.parse(view.value);
-        const sellerId = `02-${valueObject.sellerId}`;
-        const files = File.findOneBy({ id:valueObject.file  })
-        if (!files) {
-          throw 'not found';
-        }
-        const name  =  (await files).name
-        const fileStream = await this.minioClient.getObject('vardast', name);
+  //       const valueObject = JSON.parse(view.value);
+  //       const sellerId = `02-${valueObject.sellerId}`;
+  //       const files = File.findOneBy({ id:valueObject.file  })
+  //       if (!files) {
+  //         throw 'not found';
+  //       }
+  //       const name  =  (await files).name
+  //       const fileStream = await this.minioClient.getObject('vardast', name);
 
-        const folderPath = '/usr/src/app';  // Replace with the actual folder path
-        const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
+  //       const folderPath = '/usr/src/app';  // Replace with the actual folder path
+  //       const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
 
   
-        await this.executePnpmCommand(sellerId);
+  //       await this.executePnpmCommand(sellerId);
   
 
-      } catch (error) {
-        // Handle error appropriately
-        console.error("Error logging view to command:", error.message);
-      }
+  //     } catch (error) {
+  //       // Handle error appropriately
+  //       console.error("Error logging view to command:", error.message);
+  //     }
+  //   }
+  // }
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+async logCommand() {
+  const allKeys: string[] = await this.cacheManager.store.keys();
+  const productKeys: string[] = allKeys.filter(key =>
+    key.startsWith("pnpm"),
+  );
+
+  const views: any[] = await Promise.all(
+    productKeys.map(async key => {
+      const value = await this.cacheManager.get(key);
+      return { key, value };
+    }),
+  );
+
+  await this.processViewsSequentially(views);
+}
+
+private async processViewsSequentially(views: any[], index: number = 0) {
+  // Remove duplicates based on the 'key' property
+  const uniqueViews = views.filter((view, currentIndex) => {
+    const firstIndex = views.findIndex((v) => v.key === view.key);
+    return currentIndex === firstIndex;
+  });
+
+  if (index < uniqueViews.length) {
+    const view = uniqueViews[index];
+
+    try {
+      await this.processView(view);
+    } catch (error) {
+      // Handle error appropriately
+      console.error("Error logging view to command:", error.message);
     }
+
+    // Process the next view recursively
+    await this.processViewsSequentially(uniqueViews, index + 1);
   }
+}
+
+private async processView(view: any) {
+  this.cacheManager.del(view.key);
+
+  console.log('views', view);
+
+  const valueObject = JSON.parse(view.value);
+  const sellerId = `02-${valueObject.sellerId}`;
+  const files = File.findOneBy({ id: valueObject.file });
+  
+  if (!files) {
+    throw 'not found';
+  }
+
+  const name = (await files).name;
+  const fileStream = await this.minioClient.getObject('vardast', name);
+
+  const folderPath = '/usr/src/app';  // Replace with the actual folder path
+  const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
+
+  await this.executePnpmCommand(sellerId);
+}
 
 
   
