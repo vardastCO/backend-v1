@@ -90,8 +90,13 @@ export class CronJobService {
         }
         const fileStream = this.minioClient.getObject('vardast', (await files).name);
         const localFilePath = `/csv/${files.name}`;
+
         const writeStream = fs.createWriteStream(localFilePath);
-        fileStream.pipe(writeStream);
+        await new Promise<void>((resolve, reject) => {
+          fileStream.pipe(writeStream);
+          fileStream.on('end', resolve);
+          fileStream.on('error', reject);
+        });
 
         // Execute the command with the file stream
         await this.executePnpmCommand(localFilePath);
