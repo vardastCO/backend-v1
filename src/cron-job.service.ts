@@ -12,7 +12,7 @@ import { File } from "./base/storage/file/entities/file.entity";
 import { Client } from "minio";
 import { InjectMinio } from "nestjs-minio";
 import * as fs from 'fs';
-
+import * as path from 'path';
 @Injectable()
 export class CronJobService {
   constructor(
@@ -90,20 +90,28 @@ export class CronJobService {
         }
         const name  =  (await files).name
         const fileStream = await this.minioClient.getObject('vardast', name);
-        const localFilePath = `/csv/${name}`;
+
+        const localFilePath = path.join(__dirname, 'downloaded_files', name);
+
+        // Create directories if they don't exist
+        fs.mkdirSync(path.dirname(localFilePath), { recursive: true });
   
         const writeStream = fs.createWriteStream(localFilePath);
   
-        // Since we have awaited the getObject, we can directly use pipe and on
+        // Pipe the file stream to the local file
         fileStream.pipe(writeStream);
-        await new Promise<void>((resolve, reject) => {
-          fileStream.on('end', resolve);
-          fileStream.on('error', reject);
+  
+        // Wait for the file to be fully written
+        await new Promise((resolve, reject) => {
+          writeStream.on('finish', resolve);
+          writeStream.on('error', reject);
         });
   
-
-        // Execute the command with the file stream
+        // Execute the pnpm command with the downloaded file
         await this.executePnpmCommand(localFilePath);
+  
+        // Optionally, you can remove the downloaded file after executing the pnpm command
+        fs.unlinkSync(localFilePath);
 
       } catch (error) {
         // Handle error appropriately
