@@ -25,6 +25,7 @@ import { UpdateFilePublicDto } from "./dto/update-file.public.dto";
 import { PublicFileService } from "./public-file.service";
 import * as zlib from 'zlib';
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 @Controller("base/storage/file")
 export class PublicFileController {
   constructor(private readonly fileService: PublicFileService,
