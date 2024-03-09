@@ -5,6 +5,7 @@ import { User } from "src/users/user/entities/user.entity";
 import { DataSource } from "typeorm";
 import { ReportEventsCountChart } from "./dto/report-events-count-chart.response";
 import { ReportTotalEventsCount } from "./dto/report-total-events-count.response";
+import { SellerRepresentative } from "src/products/seller/entities/seller-representative.entity";
 
 @Injectable()
 export class EventTrackerReportService {
@@ -43,12 +44,25 @@ export class EventTrackerReportService {
     return data[0];
   }
 
-  async pastDurationEventsChart(user: User): Promise<ReportEventsCountChart> {
-    let params = [user.id];
+  async pastDurationEventsChart(user: User,sellerId:number): Promise<ReportEventsCountChart> {
+    let params: number[];
+    if (sellerId) {
+      // If sellerId is provided, find the corresponding userId from SellerRepresentative entity
+      const sellerRepresentative = await SellerRepresentative.findOne({ where: { sellerId } });
+  
+      if (sellerRepresentative) {
+        params = [sellerRepresentative.userId];
+      } else {
+        // Handle the case when sellerId is provided but no corresponding SellerRepresentative is found
+        throw new Error('No corresponding SellerRepresentative found for the given sellerId');
+      }
+    } else {
+      // If sellerId is not provided, use the user's id from the passed parameter
+      params = [user.id];
+    }
     let filterString =
       'AND contacts. "relatedId" in(SELECT "sellerId" FROM product_seller_representatives WHERE "userId" = $1)';
     
-    console.log('filterString',filterString)
     const rawSql = `
     SELECT
       count(*)
