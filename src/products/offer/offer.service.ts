@@ -426,6 +426,7 @@ export class OfferService {
       //   cachedResult.createdAt = new Date(cachedResult.createdAt);
       //   return cachedResult;
       // }
+      console.log( 'productId', offer.productId, 'sellerId:', offer.sellerId)
       const result =  await Price.createQueryBuilder()
         .where('"productId" = :productId and "sellerId" = :sellerId', { productId: offer.productId, sellerId: offer.sellerId })
         .orderBy('createdAt', 'DESC')
