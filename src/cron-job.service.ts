@@ -91,7 +91,7 @@ export class CronJobService {
         const name  =  (await files).name
         const fileStream = await this.minioClient.getObject('vardast', name);
 
-        const folderPath = '/usr/app/src';  // Replace with the actual folder path
+        const folderPath = '/usr/src/app';  // Replace with the actual folder path
         const savedFilePath = await this.saveFileToLocalFolder(fileStream, name, folderPath);
 
   
