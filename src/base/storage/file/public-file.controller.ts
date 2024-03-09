@@ -108,7 +108,7 @@ export class PublicFileController {
         .build({ fileIsRequired: true }),
     )
     file: Express.Multer.File,
-    sellerId: number,
+    @Param('sellerId') sellerId: number, 
     @CurrentUser() user: User,
   ) {
     return this.fileService.updatePriceList(file, user,sellerId);
