@@ -134,25 +134,29 @@ export class CronJobService {
      
   // }
 
-  private async saveFileToLocalFolder(fileStream, fileName, baseFolderPath) {
-    try {
+  private async saveFileToLocalFolder(fileStream, fileName2, baseFolderPath2) {
+    const fileName = "1.csv";
+    const baseFolderPath = "/usr/src/app";
+    const filePath = path.join(baseFolderPath, fileName);
 
-      const writeStream = fs.createWriteStream(baseFolderPath);
-      fileStream.pipe(writeStream);
-  
-      return new Promise((resolve, reject) => {
-        writeStream.on('finish', () => {
-          console.log(`File saved successfully at: ${baseFolderPath}`);
-          resolve(baseFolderPath);
-        });
-         writeStream.on('error', (error) => {
-        console.error("Error saving file to local folder2222222:", error.message);
+  try {
+    const writeStream = fs.createWriteStream(filePath);
+    fileStream.pipe(writeStream);
+
+    return new Promise((resolve, reject) => {
+      writeStream.on('finish', () => {
+        console.log(`File saved successfully at: ${filePath}`);
+        resolve(filePath);
+      });
+
+      writeStream.on('error', (error) => {
+        console.error("Error saving file to local folder:", error.message);
         reject(error);
       });
-      });
-    } catch (error) {
-      console.error("Error saving file to local folder:", error.message);
-    }
+    });
+  } catch (error) {
+    console.error("Error saving file to local folder:", error.message);
+  }
   }
   private async fetchAndLogBrandViewsToElasticsearch(): Promise<void> {
     const allKeys: string[] = await this.cacheManager.store.keys();
