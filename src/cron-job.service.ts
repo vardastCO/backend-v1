@@ -134,13 +134,16 @@ export class CronJobService {
      
   // }
 
-  private async saveFileToLocalFolder(fileStream, fileName, folderPath) {
+  private async saveFileToLocalFolder(fileStream, fileName, baseFolderPath) {
     try {
-      console.log(fileName, folderPath)
+      const folderPath = path.join(baseFolderPath, path.dirname(fileName));
       await fs.promises.mkdir(folderPath, { recursive: true });
-      const filePath = path.join(folderPath, fileName);
+
+      const filePath = path.join(folderPath, path.basename(fileName));
       const writeStream = fs.createWriteStream(filePath);
       fileStream.pipe(writeStream);
+      await fs.promises.mkdir(folderPath, { recursive: true });
+
   
       return new Promise((resolve, reject) => {
         writeStream.on('finish', () => {
