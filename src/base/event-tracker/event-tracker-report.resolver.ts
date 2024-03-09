@@ -1,4 +1,4 @@
-import { Query, Resolver,Args } from "@nestjs/graphql";
+import { Query, Resolver,Args,Int } from "@nestjs/graphql";
 import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
 import { Permission } from "src/users/authorization/permission.decorator";
 import { User } from "src/users/user/entities/user.entity";
@@ -26,7 +26,7 @@ export class EventTrackerReportResolver {
   @Permission("gql.base.event_tracker.report.events_chart")
   @Query(() => ReportEventsCountChart, { name: "pastDurationEventsChart" })
   pastDurationEventsChart(@CurrentUser() user: User,
-     @Args("sellerId", { type: () => String, nullable: true }) sellerId?: number,
+     @Args("sellerId", { type: () => Int, nullable: true }) sellerId?: number,
   ) {
     return this.eventTrackerReportService.pastDurationEventsChart(user,sellerId);
   }
