@@ -97,7 +97,7 @@ export class CronJobService {
         const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
 
   
-        await this.executePnpmCommand(savedFilePath);
+        await this.executePnpmCommand(sellerId);
   
 
       } catch (error) {
