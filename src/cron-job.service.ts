@@ -91,11 +91,12 @@ export class CronJobService {
         const name  =  (await files).name
         const fileStream = await this.minioClient.getObject('vardast', name);
 
-        console.log('fileStream',fileStream)
+        console.log('fileStream', fileStream)
+        const folderPath = '/update/tmp';  // Replace with the actual folder path
+        const savedFilePath = await this.saveFileToLocalFolder(fileStream, name, folderPath);
 
   
-        // Execute the pnpm command with the downloaded file
-      //  await this.executePnpmCommand(fileStream, name);
+        await this.executePnpmCommand(savedFilePath);
   
 
       } catch (error) {
@@ -133,6 +134,21 @@ export class CronJobService {
 
      
   // }
+
+  private async saveFileToLocalFolder(fileStream, fileName, folderPath) {
+    try {
+      const filePath = path.join(folderPath, fileName);
+      const writeStream = fs.createWriteStream(filePath);
+      fileStream.pipe(writeStream);
+  
+      return new Promise((resolve, reject) => {
+        writeStream.on('finish', () => resolve(filePath));
+        writeStream.on('error', (error) => reject(error));
+      });
+    } catch (error) {
+      console.error("Error saving file to local folder:", error.message);
+    }
+  }
   private async fetchAndLogBrandViewsToElasticsearch(): Promise<void> {
     const allKeys: string[] = await this.cacheManager.store.keys();
     const productKeys: string[] = allKeys.filter(key =>
@@ -150,14 +166,13 @@ export class CronJobService {
     // await this.logBrandToElasticsearch(views);
   }
 
-  private async executePnpmCommand(fileStream, fileName) {
+  private async executePnpmCommand(filePath) {
     // Implement your pnpm command execution logic here
     // Example:
     const { exec } = require('child_process');
-  
-    // Use the Minio stream as input for the pnpm command
-    const command = `pnpm a seller:price ${fileName}`;
-    const child = exec(command, { stdio: [fileStream, 'pipe', 'pipe'] });
+    const command = `pnpm a seller:price "${filePath}"`;
+    const child = exec(command);
+
   
     child.stdout.on('data', (data) => {
       console.log(`pnpm command output: ${data}`);
