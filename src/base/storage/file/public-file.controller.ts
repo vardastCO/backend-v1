@@ -94,7 +94,7 @@ export class PublicFileController {
     return this.fileService.uploadBrandPriceList(file, user, brandId);
   }
 
-  @Post("/priceList/update")
+  @Post("/priceList/update/:id")
   @UseInterceptors(FileInterceptor("file"))
   @Permission("rest.base.storage.file.store")
   updatePriceList(
@@ -108,7 +108,7 @@ export class PublicFileController {
         .build({ fileIsRequired: true }),
     )
     file: Express.Multer.File,
-    @Param('sellerId') sellerId: number, 
+    @Param('id') sellerId: number, 
     @CurrentUser() user: User,
   ) {
     return this.fileService.updatePriceList(file, user,sellerId);
