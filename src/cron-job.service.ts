@@ -108,7 +108,7 @@ export class CronJobService {
     }
   }
 
-  async executePnpmCommand(filePath: string): Promise<void> {
+   executePnpmCommand(filePath: string): Promise<void> {
     // Run the pnpm command with the file path
     const { exec } = require('child_process');
     return new Promise((resolve, reject) => {
