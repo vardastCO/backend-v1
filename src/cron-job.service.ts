@@ -91,7 +91,6 @@ export class CronJobService {
         const name  =  (await files).name
         const fileStream = await this.minioClient.getObject('vardast', name);
 
-        console.log('fileStream', fileStream)
         const folderPath = '/update/tmp';  // Replace with the actual folder path
         const savedFilePath = await this.saveFileToLocalFolder(fileStream, name, folderPath);
 
@@ -146,7 +145,10 @@ export class CronJobService {
           console.log(`File saved successfully at: ${filePath}`);
           resolve(filePath);
         });
-        writeStream.on('error', (error) => reject(error));
+         writeStream.on('error', (error) => {
+        console.error("Error saving file to local folder2222222:", error.message);
+        reject(error);
+      });
       });
     } catch (error) {
       console.error("Error saving file to local folder:", error.message);
