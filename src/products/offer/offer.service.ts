@@ -427,9 +427,11 @@ export class OfferService {
       //   return cachedResult;
       // }
       console.log( 'productId', offer.productId, 'sellerId:', offer.sellerId)
-      const result =  await Price.createQueryBuilder()
+
+      const queryBuilder = Price.createQueryBuilder()
+        queryBuilder
         .where('"productId" = :productId and "sellerId" = :sellerId', { productId: offer.productId, sellerId: offer.sellerId })
-        .orderBy('createdAt', 'DESC')
+        .orderBy(`${queryBuilder.alias}createdAt`, 'DESC')  
         .getOne();
       // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY)
       
