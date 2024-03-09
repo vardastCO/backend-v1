@@ -435,7 +435,7 @@ export class OfferService {
         .getOne();
       // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY)
       
-      return result
+      return queryBuilder
     } catch (e) {
       console.log('eeeeeeeeeeee',e)
     }
