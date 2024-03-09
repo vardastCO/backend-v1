@@ -426,16 +426,14 @@ export class OfferService {
       //   cachedResult.createdAt = new Date(cachedResult.createdAt);
       //   return cachedResult;
       // }
-      console.log( 'productId', offer.productId, 'sellerId:', offer.sellerId)
+      const result = await Price.createQueryBuilder()
+      .where('"productId" = :productId and "sellerId" = :sellerId', { productId: offer.productId, sellerId: offer.sellerId })
+      .orderBy('"Price".createdAt', 'DESC')
+      .getOne();
 
-      const queryBuilder = Price.createQueryBuilder()
-        queryBuilder
-        .where('"productId" = :productId and "sellerId" = :sellerId', { productId: offer.productId, sellerId: offer.sellerId })
-        .orderBy(`${queryBuilder.alias}createdAt`, 'DESC')  
-        .getOne();
-      // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY)
-      
-      return queryBuilder
+    // Optionally, you can add caching logic here
+
+    return result;
     } catch (e) {
       console.log('eeeeeeeeeeee',e)
     }
