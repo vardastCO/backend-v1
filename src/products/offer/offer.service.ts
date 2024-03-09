@@ -420,16 +420,17 @@ export class OfferService {
   async getLastPublicConsumerPriceOf(offer: Offer): Promise<Price> {
 
     try {
-      const cacheKey = `consumer_lowestPrice_${offer.id}`;
-      const cachedResult = await this.cacheManager.get<Price>(cacheKey);
-      if (cachedResult) {
-        cachedResult.createdAt = new Date(cachedResult.createdAt);
-        return cachedResult;
-      }
-      const result =  await LastPrice.createQueryBuilder()
-        .where('"productId" = :productId and "sellerId" = :sellerId', offer)
+      // const cacheKey = `consumer_lowestPrice_${offer.id}`;
+      // const cachedResult = await this.cacheManager.get<Price>(cacheKey);
+      // if (cachedResult) {
+      //   cachedResult.createdAt = new Date(cachedResult.createdAt);
+      //   return cachedResult;
+      // }
+      const result =  await Price.createQueryBuilder()
+        .where('"productId" = :productId and "sellerId" = :sellerId', offer.productId)
+        .orderBy('createdAt', 'DESC')
         .getOne();
-      await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY)
+      // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY)
       
       return result
     } catch (e) {
