@@ -91,27 +91,10 @@ export class CronJobService {
         const name  =  (await files).name
         const fileStream = await this.minioClient.getObject('vardast', name);
 
-        const localFilePath = path.join(__dirname, 'downloaded_files', name);
-
-        // Create directories if they don't exist
-        fs.mkdirSync(path.dirname(localFilePath), { recursive: true });
-  
-        const writeStream = fs.createWriteStream(localFilePath);
-  
-        // Pipe the file stream to the local file
-        fileStream.pipe(writeStream);
-  
-        // Wait for the file to be fully written
-        await new Promise((resolve, reject) => {
-          writeStream.on('finish', resolve);
-          writeStream.on('error', reject);
-        });
   
         // Execute the pnpm command with the downloaded file
-        await this.executePnpmCommand(localFilePath);
+        await this.executePnpmCommand(fileStream, name);
   
-        // Optionally, you can remove the downloaded file after executing the pnpm command
-        fs.unlinkSync(localFilePath);
 
       } catch (error) {
         // Handle error appropriately
@@ -165,19 +148,25 @@ export class CronJobService {
     // await this.logBrandToElasticsearch(views);
   }
 
-  private async executePnpmCommand(filePath: string): Promise<void> {
-    // Run the pnpm command with the file path
+  private async executePnpmCommand(fileStream, fileName) {
+    // Implement your pnpm command execution logic here
+    // Example:
     const { exec } = require('child_process');
-    return new Promise((resolve, reject) => {
-      exec(`pnpm a seller:price ${filePath}`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error executing pnpm command: ${error.message}`);
-          reject(error);
-        } else {
-          console.log(`pnpm command output: ${stdout}`);
-          resolve();
-        }
-      });
+  
+    // Use the Minio stream as input for the pnpm command
+    const command = `pnpm a seller:price ${fileName}`;
+    const child = exec(command, { stdio: [fileStream, 'pipe', 'pipe'] });
+  
+    child.stdout.on('data', (data) => {
+      console.log(`pnpm command output: ${data}`);
+    });
+  
+    child.stderr.on('data', (data) => {
+      console.error(`pnpm command errors: ${data}`);
+    });
+  
+    await new Promise((resolve) => {
+      child.on('exit', resolve);
     });
   }
   private async fetchAndLogSellerViewsToElasticsearch(): Promise<void> {
