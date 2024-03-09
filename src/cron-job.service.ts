@@ -64,7 +64,7 @@ export class CronJobService {
     }
   }
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async logCommand() {
     const allKeys: string[] = await this.cacheManager.store.keys();
     const productKeys: string[] = allKeys.filter(key =>
