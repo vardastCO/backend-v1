@@ -88,8 +88,9 @@ export class CronJobService {
         if (!files) {
           throw 'not found';
         }
-               const fileStream = await this.minioClient.getObject('vardast', (await files).name);
-        const localFilePath = `/csv/${files.name}`;
+        const name  =  (await files).name
+        const fileStream = await this.minioClient.getObject('vardast', name);
+        const localFilePath = `/csv/${name}`;
   
         const writeStream = fs.createWriteStream(localFilePath);
   
