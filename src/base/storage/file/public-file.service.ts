@@ -351,7 +351,8 @@ export class PublicFileService {
 
   async updatePriceList(
     file: Express.Multer.File,
-    user: User
+    user: User,
+    sellerId: number
   ) {
 
     const directory: Directory = await Directory.findOneBy({
@@ -397,7 +398,7 @@ export class PublicFileService {
     const oneHourLater = new Date();
     oneHourLater.setSeconds(oneHourLater.getSeconds() + fileTTL);
 
-    await this.cacheManager.set('pnpm a seller:price', fileRecord.id, CacheTTL.THREE_MINUTES);
+    await this.cacheManager.set('pnpm a seller:price', JSON.stringify({'sellerId':sellerId,'file':fileRecord.id}), CacheTTL.THREE_MINUTES);
     
     // await this.minioClient.putObjectRetention(
     //   this.bucketName,

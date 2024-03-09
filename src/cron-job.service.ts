@@ -82,7 +82,7 @@ export class CronJobService {
       try {
         this.cacheManager.del(view.key);
 
-        console.log('views',view)
+        console.log('views',JSON.parse(view))
         
         const files = File.findOneBy({ id:view.value  })
         if (!files) {
