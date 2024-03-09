@@ -8,10 +8,16 @@ import axios from "axios";
 import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 import { EventTracker } from "./base/event-tracker/entities/event-tracker.entity";
 import { CreateEventTrackerInput } from "./base/event-tracker/dto/create-event-tracker.input";
+import { File } from "./base/storage/file/entities/file.entity";
+import { Client } from "minio";
+import { InjectMinio } from "nestjs-minio";
+
 
 @Injectable()
 export class CronJobService {
-  constructor(private readonly kavenegarService: KavenegarService, @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(
+    @InjectMinio() protected readonly minioClient: Client,
+    private readonly kavenegarService: KavenegarService, @Inject(CACHE_MANAGER) private cacheManager: Cache) { }
  
   // @Cron(CronExpression.EVERY_5_SECONDS)
   // async logProductViewsToElasticsearch() {
@@ -46,7 +52,7 @@ export class CronJobService {
     for (const view of views) {
       try {
         this.cacheManager.del(view.key);
-        console.log('vies', view)
+      
         const data : CreateEventTrackerInput = JSON.parse(view.value)
         const event: EventTracker = EventTracker.create<EventTracker>(data);
         await event.save()
@@ -54,6 +60,38 @@ export class CronJobService {
       } catch (error) {
         // Handle error appropriately
         console.error("Error logging view to Elasticsearch:", error.message);
+      }
+    }
+  }
+
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  async logCommand() {
+    const allKeys: string[] = await this.cacheManager.store.keys();
+    const productKeys: string[] = allKeys.filter(key =>
+      key.startsWith("pnpm"),
+    );
+
+    const views: any[] = await Promise.all(
+      productKeys.map(async key => {
+        const value = await this.cacheManager.get(key);
+
+        return { key, value };
+      }),
+    );
+    for (const view of views) {
+      try {
+        this.cacheManager.del(view.key);
+
+        console.log('views',view)
+        
+        // const files = File.findOneBy({  })
+        // if (!files) {
+        //   throw 'not found';
+        // }
+        // const fileStream = this.minioClient.getObject('vardast', (await files).name);
+      } catch (error) {
+        // Handle error appropriately
+        console.error("Error logging view to command:", error.message);
       }
     }
   }

@@ -12,7 +12,7 @@ import {
   UploadedFile,
   UseInterceptors
 } from "@nestjs/common";
-
+import { Inject } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Response } from 'express';
 import { Client } from "minio";
@@ -24,11 +24,13 @@ import { CreateFilePublicDto } from "./dto/create-file.public.dto";
 import { UpdateFilePublicDto } from "./dto/update-file.public.dto";
 import { PublicFileService } from "./public-file.service";
 import * as zlib from 'zlib';
-
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 @Controller("base/storage/file")
 export class PublicFileController {
   constructor(private readonly fileService: PublicFileService,
-    @InjectMinio() protected readonly minioClient: Client) {}
+    @InjectMinio() protected readonly minioClient: Client,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) { }
 
   @Post()
   @UseInterceptors(FileInterceptor("file"))
@@ -89,6 +91,25 @@ export class PublicFileController {
     @CurrentUser() user: User,
   ) {
     return this.fileService.uploadBrandPriceList(file, user, brandId);
+  }
+
+  @Post("/priceList/update")
+  @UseInterceptors(FileInterceptor("file"))
+  @Permission("rest.base.storage.file.store")
+  updatePriceList(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType:
+            /csv/,
+        })
+        .addMaxSizeValidator({ maxSize: 50 * 1_000_000 }) // 50MB
+        .build({ fileIsRequired: true }),
+    )
+    file: Express.Multer.File,
+    @CurrentUser() user: User,
+  ) {
+    return this.fileService.updatePriceList(file, user);
   }
 
 

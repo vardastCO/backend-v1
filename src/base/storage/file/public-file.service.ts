@@ -17,6 +17,7 @@ import { Directory } from "../directory/entities/directory.entity";
 import { CreateFilePublicDto } from "./dto/create-file.public.dto";
 import { UpdateFilePublicDto } from "./dto/update-file.public.dto";
 import { File } from "./entities/file.entity";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 
 @Injectable()
 export class PublicFileService {
@@ -347,6 +348,72 @@ export class PublicFileService {
     };
   }
 
+
+  async updatePriceList(
+    file: Express.Multer.File,
+    user: User
+  ) {
+
+    const directory: Directory = await Directory.findOneBy({
+      path: 'price/update',
+    });
+
+    // TODO: check for directory upload permission
+    if (!directory) {
+      throw new BadRequestException("Specified directory path is invalid!");
+    }
+
+    const filename = File.generateNewFileName(file);
+
+    const fileRecord: File = File.create<File>({
+      name: `${directory.path}/${filename}`,
+      originalName: file.originalname,
+      size: file.size,
+      mimeType: file.mimetype,
+      disk: "minio",
+      bucketName: this.bucketName,
+      orderColumn : 1 ,
+      modelType: directory.relatedModel
+    });
+    fileRecord.directory = Promise.resolve(directory);
+    fileRecord.createdBy = Promise.resolve(user);
+   
+    await this.dataSource.transaction(async () => {
+      await fileRecord.save({ transaction: false });
+      const uploadedFileInfo = await this.minioClient.putObject(
+        this.bucketName,
+        fileRecord.name,
+        file.buffer,
+        {
+          "Content-Type": file.mimetype,
+          "File-Uuid": fileRecord.uuid,
+          "File-Id": fileRecord.id,
+        },
+      );
+    });
+
+    // TODO: add retention for files
+    const fileTTL = 3600;
+    const oneHourLater = new Date();
+    oneHourLater.setSeconds(oneHourLater.getSeconds() + fileTTL);
+
+    await this.cacheManager.set('pnpm a seller:price', fileRecord.id, CacheTTL.THREE_MINUTES);
+    
+    // await this.minioClient.putObjectRetention(
+    //   this.bucketName,
+    //   fileRecord.name,
+    //   {
+    //     versionId: uploadedFileInfo.versionId,
+    //     retainUntilDate: oneHourLater.toISOString(),
+    //     mode: RETENTION_MODES.COMPLIANCE,
+    //   },
+    // );
+
+    return {
+      uuid: fileRecord.uuid,
+      expiresAt: oneHourLater,
+    };
+  }
 
   async findOne(uuid: string, user: User): Promise<File> {
     const file = await File.findOneBy({
