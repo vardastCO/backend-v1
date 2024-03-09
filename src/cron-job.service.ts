@@ -137,14 +137,13 @@ export class CronJobService {
   private async saveFileToLocalFolder(fileStream, fileName, baseFolderPath) {
     try {
 
-      const filePath = path.join(baseFolderPath, fileName);
-      const writeStream = fs.createWriteStream(filePath);
+      const writeStream = fs.createWriteStream(baseFolderPath);
       fileStream.pipe(writeStream);
   
       return new Promise((resolve, reject) => {
         writeStream.on('finish', () => {
-          console.log(`File saved successfully at: ${filePath}`);
-          resolve(filePath);
+          console.log(`File saved successfully at: ${baseFolderPath}`);
+          resolve(baseFolderPath);
         });
          writeStream.on('error', (error) => {
         console.error("Error saving file to local folder2222222:", error.message);
