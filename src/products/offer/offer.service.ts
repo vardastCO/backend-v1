@@ -426,10 +426,14 @@ export class OfferService {
       //   cachedResult.createdAt = new Date(cachedResult.createdAt);
       //   return cachedResult;
       // }
-      const result = await Price.createQueryBuilder()
-      .where('"productId" = :productId and "sellerId" = :sellerId', { productId: offer.productId, sellerId: offer.sellerId })
-      .orderBy('"Price".createdAt', 'DESC')
-      .getOne();
+      // const result = await Price.createQueryBuilder()
+      // .where('"productId" = :productId and "sellerId" = :sellerId', { productId: offer.productId, sellerId: offer.sellerId })
+      // .orderBy('"Price".createdAt', 'DESC')
+      // .getOne();
+      const result = await Price.findOne({
+        where: { productId: offer.productId , sellerId: offer.sellerId },
+        order: { createdAt: 'DESC' },
+      });
 
     // Optionally, you can add caching logic here
 
