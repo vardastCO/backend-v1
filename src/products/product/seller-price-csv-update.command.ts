@@ -121,8 +121,10 @@ export class SellerPriceUpdateCommand extends CommandRunner {
 
             try {
               const existingOffer = await Offer.findOne({
-                sellerId: singleSellerId,
-                productId: (await product).id,
+                where: {
+                  sellerId: singleSellerId,
+                  productId: (await product).id,
+                },
               });
             
               if (!existingOffer) {
