@@ -120,7 +120,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
             const singleSellerId = sellerInfo.sellerId[j];
 
             try {
-              const existingOffer = await Offer.findOneBy({
+              const existingOffer = await Offer.findOne({
                 sellerId: singleSellerId,
                 productId: (await product).id,
               });
@@ -135,6 +135,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
             
                 await offer.save();
               }
+            
             } catch (e) {
               console.log("Error processing product:", e);
             }
