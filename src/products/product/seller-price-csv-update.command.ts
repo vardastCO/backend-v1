@@ -104,9 +104,9 @@ export class SellerPriceUpdateCommand extends CommandRunner {
     for (const csvProduct of csvProducts.list) {
       try {
         const { name, sku, price } = csvProduct;
-        let product = Product.findOneBy({ name });
+        let product = Product.findOneBy({ sku });
         if (!product) {
-          product = Product.findOneBy({ sku });
+          product = Product.findOneBy({ name });
         }
         if (!product) {
           throw "d";
@@ -120,17 +120,28 @@ export class SellerPriceUpdateCommand extends CommandRunner {
             const singleSellerId = sellerInfo.sellerId[j];
 
             try {
-              const offer = Offer.create();
-              offer.productId = (await product).id;
-              offer.sellerId = singleSellerId; //
-              offer.status = ThreeStateSupervisionStatuses.CONFIRMED;
-              offer.isPublic = true;
-              offer.isAvailable = true;
-
-              await offer.save();
+              const existingOffer = await Offer.findOne({
+                sellerId: singleSellerId,
+                productId: (await product).id,
+              });
+            
+              if (!existingOffer) {
+                const offer = Offer.create();
+                offer.productId = (await product).id;
+                offer.sellerId = singleSellerId;
+                offer.status = ThreeStateSupervisionStatuses.CONFIRMED;
+                offer.isPublic = true;
+                offer.isAvailable = true;
+            
+                await offer.save();
+              } else {
+                console.log("Offer already exists for the specified sellerId and productId.");
+                // You can choose to do something else here if needed
+              }
             } catch (e) {
               console.log("Error processing product:", e);
             }
+            
 
             try {
               console.log(

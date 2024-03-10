@@ -66,7 +66,7 @@ services:
       resources:
         limits:
           cpus: '10'  # Set the CPU limit to 10 cores
-          memory: 10G
+          memory: 3G
     # depends_on:
     #   - elasticsearch
     #   - logstash_image
