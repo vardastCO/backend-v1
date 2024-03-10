@@ -107,8 +107,12 @@ export class CronJobService {
   //   }
   // }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+@Cron(CronExpression.EVERY_5_MINUTES)
 async logCommand() {
+  const randomTimeout = Math.floor(Math.random() * (15000 - 5000 + 1) + 5000);
+
+  await new Promise(resolve => setTimeout(resolve, randomTimeout));
+  
   const allKeys: string[] = await this.cacheManager.store.keys();
   const productKeys: string[] = allKeys.filter(key =>
     key.startsWith("pnpm"),
