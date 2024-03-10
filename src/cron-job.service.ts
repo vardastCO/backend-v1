@@ -45,13 +45,14 @@ export class CronJobService {
     const views: any[] = await Promise.all(
       productKeys.map(async key => {
         const value = await this.cacheManager.get(key);
+        this.cacheManager.del(key);
 
         return { key, value };
       }),
     );
     for (const view of views) {
       try {
-        this.cacheManager.del(view.key);
+       
       
         const data : CreateEventTrackerInput = JSON.parse(view.value)
         const event: EventTracker = EventTracker.create<EventTracker>(data);
@@ -112,7 +113,7 @@ async logCommand() {
   const randomTimeout = Math.floor(Math.random() * (15000 - 5000 + 1) + 5000);
 
   await new Promise(resolve => setTimeout(resolve, randomTimeout));
-  
+
   const allKeys: string[] = await this.cacheManager.store.keys();
   const productKeys: string[] = allKeys.filter(key =>
     key.startsWith("pnpm"),
@@ -121,6 +122,7 @@ async logCommand() {
   const views: any[] = await Promise.all(
     productKeys.map(async key => {
       const value = await this.cacheManager.get(key);
+      this.cacheManager.del(key);
       return { key, value };
     }),
   );
