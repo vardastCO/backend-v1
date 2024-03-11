@@ -46,7 +46,7 @@ export class CreatePriceInput {
   @Field(() => String, { nullable: true })
   @IsInt()
   @IsOptional()
-  valueDiscount?: String;
+  valueDiscount?: string;
 
 
   @Field(() => DiscountTypesEnum, { nullable: true})
