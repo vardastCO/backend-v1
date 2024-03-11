@@ -18,9 +18,8 @@ export class CreatePriceInput {
   productId: number;
 
   @Field(() => PriceTypesEnum)
-  @IsNotEmpty()
   @IsEnum(PriceTypesEnum)
-  type: PriceTypesEnum = PriceTypesEnum.CONSUMER ;
+  type: PriceTypesEnum  ;
 
   @Field(() => Int,{ nullable: true })
   @IsInt()
