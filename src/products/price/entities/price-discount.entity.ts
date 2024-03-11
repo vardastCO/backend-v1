@@ -16,9 +16,9 @@ import { DiscountTypesEnum } from "../enums/price-discount-types.enum";
 @ObjectType()
 @Entity("product_prices_discount")
 export class DiscountPrice extends BaseEntity {
-  @Field(() => Int)
-  @PrimaryGeneratedColumn({ primaryKeyConstraintName: "product_prices_discount_id" })
-  id: number;
+  // @Field(() => Int)
+  // @PrimaryGeneratedColumn({ primaryKeyConstraintName: "product_prices_discount_id" })
+  // id: number;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
