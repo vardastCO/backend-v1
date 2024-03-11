@@ -8,6 +8,7 @@ import {
   IsEnum
 } from "class-validator";
 import { PriceTypesEnum } from "../enums/price-types.enum";
+import { DiscountTypesEnum } from "../enums/price-discount-types.enum";
 
 @InputType()
 export class CreatePriceInput {
@@ -40,4 +41,15 @@ export class CreatePriceInput {
   @IsInt()
   @IsPositive()
   amount: number;
+
+  @Field(() => String, { nullable: true })
+  @IsInt()
+  @IsOptional()
+  valueDiscount?: String;
+
+
+  @Field(() => DiscountTypesEnum, { nullable: true})
+  @IsEnum()
+  @IsOptional()
+  typeDiscount?: number;
 }

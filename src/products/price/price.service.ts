@@ -17,6 +17,7 @@ import { PaginationPriceResponse } from "./dto/pagination-price.response";
 import { UpdatePriceInput } from "./dto/update-price.input";
 import { Price } from "./entities/price.entity";
 import { ChartEnum } from "./enums/chart.enum";
+import { DiscountPrice } from "./entities/price-discount.entity";
 
 @Injectable()
 export class PriceService {
@@ -37,14 +38,6 @@ export class PriceService {
         );
       }
     }
-    // try {
-    //   const offer = Offer.create()
-    //   offer.sellerId = createPriceInput.sellerId
-    //   offer.productId = createPriceInput.productId
-    //   offer.save()
-    // }catch(e) {
-      
-    // }
    
     const price: Price = Price.create<Price>(createPriceInput);
     if (!createPriceInput.sellerId) {
@@ -57,6 +50,16 @@ export class PriceService {
     }
     price.createdBy = Promise.resolve(client);
     await price.save();
+
+    if (createPriceInput.valueDiscount) {
+      const discount = DiscountPrice.create()
+      discount.proceId = price.id
+      discount.value = createPriceInput.valueDiscount
+      discount.type = createPriceInput.type;
+      discount.calculated_price =
+        (Number(price.amount) * (1 - Number(createPriceInput.valueDiscount))).toString();
+  
+    }
     return price;
   }
 
