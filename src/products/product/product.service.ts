@@ -310,6 +310,7 @@ export class ProductService {
 
     return product;
   }
+
   async logProductView(productId: number): Promise<void> {
     const viewsKey = `product_views_${productId}`;
     const views: any[] = (await this.cacheManager.get(viewsKey)) || [];

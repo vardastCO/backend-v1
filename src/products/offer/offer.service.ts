@@ -74,23 +74,24 @@ export class OfferService {
     user: User,
     indexOfferInput?: IndexOfferInput,
   ): Promise<Offer[]> {
-    const hasMasterPermission = await this.authorizationService
-      .setUser(user)
-      .hasPermission("gql.products.offer.index");
+    // const hasMasterPermission = await this.authorizationService
+    //   .setUser(user)
+    //   .hasPermission("gql.products.offer.index");
 
     const { take, skip, productId, isPublic, isAvailable, status } =
       indexOfferInput || {};
     let { sellerId } = indexOfferInput || {};
 
-    if (!hasMasterPermission) {
+    if (!sellerId) {
       sellerId = (await this.userService.getSellerRecordOf(user))?.id;
     }
+    
 
     return await Offer.find({
       skip,
       take,
       where: { sellerId, productId, isPublic, isAvailable, status },
-      order: { id: "DESC" },
+      order: { lastPublicConsumerPrice: {createdAt : "DESC"} },
     });
   }
 
@@ -114,7 +115,7 @@ export class OfferService {
       skip,
       take,
       where: { sellerId, productId, isPublic, isAvailable, status },
-      order: { id: "DESC" },
+      order: { price},
     });
 
     return PaginationOfferResponse.make(indexOfferInput, total, data);
