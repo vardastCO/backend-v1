@@ -376,7 +376,28 @@ export class ProductService {
   }
 
   async getPricesOf(product: Product): Promise<Price[]> {
-    return await product.prices;
+
+    const cacheKey = `getPricesOf_${product.id}`;
+
+    const cachedData = await this.cacheManager.get<Price[]>(cacheKey);
+  
+    if (cachedData) {
+      cachedData.createdAt = new Date(cachedData.createdAt);
+      return cachedData;
+    }
+
+    const latestPrices = await Price.find({
+      where: {
+        productId: product.id,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 5,
+    });
+
+    await this.cacheManager.set(cacheKey,latestPrices,CacheTTL.ONE_DAY)
+    return latestPrices;
   }
 
   async getAttributeValuesOf(product: Product): Promise<AttributeValue[]> {
