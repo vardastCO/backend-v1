@@ -29,8 +29,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '4'
-          memory: 8G
+          cpus: '6'
+          memory: 2G
 
   storage:
     image: minio/minio
