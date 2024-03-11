@@ -61,10 +61,13 @@ export class PriceService {
       discount.calculated_price =
         (Number(price.amount) * (100 - Number(createPriceInput.valueDiscount))).toString();
       await discount.save()
-
-      console.log('price.amount', price.amount, 'Number(createPriceInput.valueDiscount', Number(createPriceInput.valueDiscount
-
-        ))
+      console.log(
+        'price.amount', price.amount,
+        'Number(createPriceInput.valueDiscount)', Number(createPriceInput.valueDiscount),
+        'fff',
+        (Number(price.amount) * (100 - Number(createPriceInput.valueDiscount)))
+      );
+      
     }
     return price;
   }
