@@ -372,6 +372,7 @@ export class CategoryService {
     if (cachedCategory) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
       const parsedData: Category = JSON.parse(decompressedData);
+      console.log('category',parsedData)
       return parsedData;
     }
     const category = await this.categoryRepository.findOneBy({ id, slug });
