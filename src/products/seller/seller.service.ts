@@ -90,7 +90,7 @@ export class SellerService {
     indexSellerInput?: IndexSellerInput,
   ): Promise<Seller[]> {
 
-
+    indexSellerInput.boot();
     const cacheKey = `all_sellers_admin_${JSON.stringify(indexSellerInput)}`;
 
     // Try to get the result from the cache
