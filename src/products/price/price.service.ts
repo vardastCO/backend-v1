@@ -25,19 +25,19 @@ export class PriceService {
     @InjectDataSource() private readonly dataSource: DataSource
   ){}
   async create(createPriceInput: CreatePriceInput, client: User): Promise<Price> {
-    if (createPriceInput.attributeValueId > 0) {
-      const attributeIsValid = AttributeValue.createQueryBuilder()
-        .where({
-          id: createPriceInput.attributeValueId,
-        })
-        .getExists();
+    // if (createPriceInput.attributeValueId > 0) {
+    //   const attributeIsValid = AttributeValue.createQueryBuilder()
+    //     .where({
+    //       id: createPriceInput.attributeValueId,
+    //     })
+    //     .getExists();
 
-      if (!attributeIsValid) {
-        throw new BadRequestException(
-          "مشخصه انتخاب شده معتبر نیست یا فاقد sku است.",
-        );
-      }
-    }
+    //   if (!attributeIsValid) {
+    //     throw new BadRequestException(
+    //       "مشخصه انتخاب شده معتبر نیست یا فاقد sku است.",
+    //     );
+    //   }
+    // }
    
     const price: Price = Price.create<Price>(createPriceInput);
     if (!createPriceInput.sellerId) {
@@ -54,7 +54,7 @@ export class PriceService {
     if (createPriceInput.valueDiscount) {
       const discount = DiscountPrice.create()
       discount.priceId = price.id
-      discount.value = createPriceInput.valueDiscount.toString()
+      discount.value = createPriceInput.valueDiscount
       discount.type = createPriceInput.typeDiscount;
       discount.calculated_price =
         (Number(price.amount) * (1 - Number(createPriceInput.valueDiscount))).toString();
