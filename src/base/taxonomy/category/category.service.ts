@@ -372,7 +372,7 @@ export class CategoryService {
     if (cachedCategory) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
       const parsedData: Category = JSON.parse(decompressedData);
-      console.log('category',parsedData)
+
       return parsedData;
     }
     const category = await this.categoryRepository.findOneBy({ id, slug });
@@ -381,6 +381,14 @@ export class CategoryService {
     }
     const compressedData = zlib.gzipSync(JSON.stringify(category));
     await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+    return category;
+  }
+
+  async findOneAttribuite(id: number, slug?: string): Promise<Category> {
+    const category = await this.categoryRepository.findOneBy({ id, slug });
+    if (!category) {
+      throw new NotFoundException();
+    }
     return category;
   }
 

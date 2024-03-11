@@ -72,6 +72,16 @@ export class CategoryResolver {
   }
 
   @Public()
+  // @Permission("gql.base.taxonomy.category.show")
+  @Query(() => Category, { name: "categoryAttribuite" })
+  findOneAttribuite(
+    @Args("id", { type: () => Int, nullable: true }) id: number,
+    @Args("slug", { type: () => String, nullable: true }) slug: string,
+  ) {
+    return this.categoryService.findOneAttribuite(id, slug);
+  }
+
+  @Public()
   @Query(() => Category, { name: "admincategory" })
   adminCategory() {
     return this.categoryService.findAdmin();
