@@ -13,7 +13,7 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import { IsUnique } from "src/base/utilities/validations/is-unique.validation";
 import { Product } from "../entities/product.entity";
 import { ProductTypesEnum } from "../enums/product-types.enum";
-
+import { v4 as uuidv4 } from 'uuid'; 
 @InputType()
 export class CreateProductInput {
   @Field()
@@ -30,8 +30,8 @@ export class CreateProductInput {
   @Validate(IsUnique, [Product])
   name: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field(() => String, { defaultValue: uuidv4() }) // Set default value using uuidv4()
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   @Validate(IsUnique, [Product])
