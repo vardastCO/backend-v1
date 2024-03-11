@@ -55,7 +55,7 @@ export class PriceService {
       const discount = DiscountPrice.create()
       discount.proceId = price.id
       discount.value = createPriceInput.valueDiscount
-      discount.type = createPriceInput.type;
+      discount.type = createPriceInput.typeDiscount;
       discount.calculated_price =
         (Number(price.amount) * (1 - Number(createPriceInput.valueDiscount))).toString();
   
