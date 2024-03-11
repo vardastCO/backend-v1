@@ -57,9 +57,14 @@ export class PriceService {
       discount.id = price.id
       discount.value = createPriceInput.valueDiscount
       discount.type = createPriceInput.typeDiscount;
+     
       discount.calculated_price =
         (Number(price.amount) * (100 - Number(createPriceInput.valueDiscount))).toString();
       await discount.save()
+
+      console.log('price.amount', price.amount, 'Number(createPriceInput.valueDiscount', Number(createPriceInput.valueDiscount
+
+        ))
     }
     return price;
   }
