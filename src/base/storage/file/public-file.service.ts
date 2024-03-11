@@ -438,7 +438,7 @@ export class PublicFileService {
     const image = await Image.findOneBy({ fileId: file.id })
     console.log(image)
     if (image) {
-      await Image.delete({ id: file.id });
+      await Image.delete({ fileId: file.id });
     }
 
     await this.dataSource.transaction(async () => {
