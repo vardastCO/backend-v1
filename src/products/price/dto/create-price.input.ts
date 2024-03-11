@@ -51,5 +51,5 @@ export class CreatePriceInput {
   @Field(() => DiscountTypesEnum, { nullable: true})
   @IsEnum()
   @IsOptional()
-  typeDiscount?: number;
+  typeDiscount?: DiscountTypesEnum;
 }
