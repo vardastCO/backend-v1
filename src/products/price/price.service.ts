@@ -54,6 +54,7 @@ export class PriceService {
     if (createPriceInput.valueDiscount) {
       const discount = DiscountPrice.create()
       discount.priceId = price.id
+      discount.id = price.id
       discount.value = createPriceInput.valueDiscount
       discount.type = createPriceInput.typeDiscount;
       discount.calculated_price =
