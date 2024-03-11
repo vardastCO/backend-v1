@@ -174,7 +174,14 @@ export class CategoryService {
     return category;
   }
   async countCategories(): Promise<number> {
+    const cacheKey = `countCategories`;
+    const cachedCategories = await this.cacheManager.get<number>(cacheKey);
+    if (cachedCategories) {
+      return cachedCategories;
+    }
     const category: number = await this.categoryRepository.count();
+    await this.cacheManager.set(cacheKey, category, CacheTTL.ONE_WEEK); 
+
     return category;
   }
 
