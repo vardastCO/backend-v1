@@ -91,14 +91,14 @@ export class SellerService {
   ): Promise<Seller[]> {
 
 
-    const cacheKey = `find_all_seller_${JSON.stringify(indexSellerInput)}`;
+    const cacheKey = `all_sellers_admin_${JSON.stringify(indexSellerInput)}`;
 
     // Try to get the result from the cache
     const cachedResult = await this.cacheManager.get<Seller[]>(cacheKey);
   
     if (cachedResult) {
       // Return the cached result if available
-      // return cachedResult;
+      return cachedResult;
     }
 
     try {
@@ -108,16 +108,15 @@ export class SellerService {
       }
       
       const result = await queryBuilder
-      .select([`${queryBuilder.alias}.id`, `${queryBuilder.alias}.name`])
       .skip(indexSellerInput.skip)
       .take(indexSellerInput.take)
       .getMany();
       await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
-
+      
       return result;
     } catch (error) {
       // Handle error appropriately (e.g., log it, throw a custom error)
-      console.error("Error fetching categories:", error);
+      console.error("Error fetching sellers:", error);
     }
     // const { take, skip, isPublic, status, createdById } =
     //   indexSellerInput || {};
@@ -140,16 +139,16 @@ export class SellerService {
 
     // // Apply additional conditions and order
     // // queryBuilder.andWhere(where);
-    // queryBuilder.take(25).orderBy("seller.id", indexSellerInput.sort ?? "ASC");
+    // queryBuilder.take(indexSellerInput.take).orderBy("seller.id", indexSellerInput.sort ?? "ASC");
 
     // // Execute the query and return the result
     // return await queryBuilder.getMany();
-    // // return await Seller.find({
-    // //   skip,
-    // //   take,
-    // //   order: { id: "DESC" },
-    // //   where,
-    // // });
+    // return await Seller.find({
+    //   skip,
+    //   take,
+    //   order: { id: "DESC" },
+    //   where,
+    // });
   }
 
   async paginate(
