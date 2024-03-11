@@ -184,6 +184,8 @@ export class OfferService {
       if (offer) {
         try {
           await offer.remove();
+          const prices = await Price.findOneBy({ sellerId, productId })
+          await prices.remove();
         } catch (e){
          console.log('reeemove offer',e)
         }
