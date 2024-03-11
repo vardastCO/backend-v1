@@ -18,6 +18,7 @@ import { CreateFilePublicDto } from "./dto/create-file.public.dto";
 import { UpdateFilePublicDto } from "./dto/update-file.public.dto";
 import { File } from "./entities/file.entity";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { Image } from "src/products/images/entities/image.entity";
 
 @Injectable()
 export class PublicFileService {
@@ -434,6 +435,10 @@ export class PublicFileService {
 
   async remove(uuid: string, user: User) {
     const file = await this.findOne(uuid, user);
+    const image = Image.findOneBy({ fileId: file.id })
+    if (image) {
+      await Image.delete({ id: file.id });
+    }
 
     await this.dataSource.transaction(async () => {
       await this.minioClient.removeObject(this.bucketName, file.name);
