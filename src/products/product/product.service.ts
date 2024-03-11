@@ -377,14 +377,6 @@ export class ProductService {
 
   async getPricesOf(product: Product): Promise<Price[]> {
 
-    const cacheKey = `getPricesOf_${product.id}`;
-
-    const cachedData = await this.cacheManager.get<Price[]>(cacheKey);
-  
-    if (cachedData) {
-     
-      return cachedData;
-    }
 
     const latestPrices = await Price.find({
       where: {
@@ -396,7 +388,6 @@ export class ProductService {
       take: 5,
     });
 
-    await this.cacheManager.set(cacheKey,latestPrices,CacheTTL.ONE_DAY)
     return latestPrices;
   }
 
