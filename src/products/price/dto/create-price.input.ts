@@ -2,6 +2,7 @@ import { Field, InputType, Int } from "@nestjs/graphql";
 import {
   IsBoolean,
   IsInt,
+  IsString,
   IsNotEmpty,
   IsOptional,
   IsPositive,
@@ -44,7 +45,7 @@ export class CreatePriceInput {
   amount: number;
 
   @Field(() => String, { nullable: true })
-  @IsInt()
+  @IsString()
   @IsOptional()
   valueDiscount?: string;
 
