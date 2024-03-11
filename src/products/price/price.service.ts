@@ -58,7 +58,7 @@ export class PriceService {
       discount.value = createPriceInput.valueDiscount
       discount.type = createPriceInput.typeDiscount;
       discount.calculated_price =
-        (Number(price.amount) * (1 - Number(createPriceInput.valueDiscount))).toString();
+        (Number(price.amount) * (100 - Number(createPriceInput.valueDiscount))).toString();
       await discount.save()
     }
     return price;
