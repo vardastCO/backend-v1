@@ -435,7 +435,8 @@ export class PublicFileService {
 
   async remove(uuid: string, user: User) {
     const file = await this.findOne(uuid, user);
-    const image = Image.findOneBy({ fileId: file.id })
+    const image = await Image.findOneBy({ fileId: file.id })
+    console.log(image)
     if (image) {
       await Image.delete({ id: file.id });
     }
