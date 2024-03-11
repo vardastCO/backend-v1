@@ -420,7 +420,7 @@ export class PublicFileService {
     const file = await File.findOneBy({
       uuid,
       modelId: IsNull(),
-      createdById: user.id,
+      // createdById: user.id,
     });
     if (!file) {
       throw new NotFoundException();
