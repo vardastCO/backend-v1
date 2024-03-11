@@ -87,4 +87,10 @@ export class PriceResolver {
   priceChart(@Args("chartInput") chartInput: ChartInput) {
     return this.priceService.priceChart(chartInput)
   }
+
+  @Public()
+  @Query(() => String, { name: "calculatePrice" })
+  calculatePrice(@Args("amount") amount: string,@Args("valueDiscount") valueDiscount: string) {
+    return (Number(amount) * ((100 - Number(valueDiscount))/100)).toString();
+  }
 }
