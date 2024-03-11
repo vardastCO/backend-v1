@@ -118,6 +118,8 @@ export class AuthService {
       timezone: "Asia/Terhan",
       status: UserStatusesEnum.ACTIVE,
       countryId: iran.id,
+      lastLoginAt: new Date(),
+      lastLoginIP: requestIP,
       displayRoleId: userRole.id,
     });
     newUser.roles = Promise.resolve([userRole]);
