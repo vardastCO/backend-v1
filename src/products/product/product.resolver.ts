@@ -33,6 +33,8 @@ import { CreateProductSellerInput } from "./dto/create-product-seller.input";
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { Seller } from "../seller/entities/seller.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
+import { PaginationPriceResponse } from "../price/dto/pagination-price.response";
+import { IndexOfferPrice } from "./dto/index-offer-price.input";
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -173,6 +175,21 @@ export class ProductResolver {
   @Query(() => Int, { name: "countViewProduct" })
   CountOne(@Args("id", { type: () => Int }) id: number) {
     return this.productService.getProductViewCount(id);
+  }
+
+
+  @Public()
+  @Query(() => PaginationPriceResponse, { name: "offerPrice" })
+  OfferPrice(
+
+    @Args(
+      "indexOfferPrice",
+      { nullable: true },
+      new ValidationPipe({ transform: true }),
+    )
+    indexOfferPrice?: IndexOfferPrice,
+  ) {
+    return this.productService.OfferPrice(indexOfferPrice);
   }
 
   @Permission("gql.products.product.update")
