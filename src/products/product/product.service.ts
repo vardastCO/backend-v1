@@ -413,6 +413,7 @@ export class ProductService {
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
 
+    return []
     // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
     // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
   
