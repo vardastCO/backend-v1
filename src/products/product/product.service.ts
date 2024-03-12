@@ -420,7 +420,9 @@ export class ProductService {
       },
       relations: ['seller', 'product', 'lastPublicConsumerPrice'],
       order: {
-        'lastPublicConsumerPrice.createdAt': 'DESC',
+        lastPublicConsumerPrice: {
+          createdAt : 'DESC'
+        }
       },
       take: 5,
     });
