@@ -437,7 +437,7 @@ export class ProductService {
         "maxIds",
         '"Offer"."id" = "maxIds"."maxId"',
     )
-      .take(5)
+      // .take(5)
       // .orderBy(
       //   { createdAt: 'DESC' }
          
