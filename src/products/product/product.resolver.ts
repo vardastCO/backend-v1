@@ -33,6 +33,8 @@ import { CreateProductSellerInput } from "./dto/create-product-seller.input";
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { Seller } from "../seller/entities/seller.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
+import { IndexOffersPrice } from "./dto/index-price-offers.input";
+import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -169,6 +171,19 @@ export class ProductResolver {
     return this.productService.getProductViewCount(id);
   }
 
+  @Public()
+  @Query(() => PaginationOfferResponse, { name: "offersPrice" })
+  OffersPrice(
+    @Args(
+      "indexOffersPrice",
+      { nullable: true },
+      new ValidationPipe({ transform: true }),
+    )
+    indexOffersPrice?: IndexOffersPrice,
+ ) {
+    return this.productService.getOffersPrice(indexOffersPrice);
+  }
+
   @Permission("gql.products.product.update")
   @Mutation(() => Product)
   updateProduct(
@@ -228,6 +243,8 @@ export class ProductResolver {
   publicOffers(@Parent() product: Product): Promise<Offer[]> {
     return this.productService.getPublicOffersOf(product);
   }
+
+  
 
   @ResolveField(() => Price)
   lowestPrice(@Parent() product: Product): Promise<Price> {

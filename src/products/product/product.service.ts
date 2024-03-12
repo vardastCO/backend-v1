@@ -30,6 +30,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Seller } from "../seller/entities/seller.entity";
 import * as zlib from 'zlib';
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
+import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
+import { IndexOffersPrice } from "./dto/index-price-offers.input";
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -318,6 +320,23 @@ export class ProductService {
     views.push({ timestamp: new Date().toISOString() });
 
     await this.cacheManager.set(viewsKey, views);
+  }
+
+  async getOffersPrice(indexOffersPrice: IndexOffersPrice): Promise<PaginationOfferResponse> {
+
+    indexOffersPrice.boot()
+    const { take, skip, productId } =
+      indexOffersPrice || {};
+    
+    const [data, total] = await Offer.findAndCount({
+      skip,
+      take,
+      where: {  productId },
+      order: { id: "DESC" },
+    });
+
+    return PaginationOfferResponse.make(indexOffersPrice, total, data);
+   
   }
 
   async getProductViewCount(productId: number): Promise<number> {
