@@ -413,7 +413,7 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-    const take = product.takeoffers ?? 1
+    const take = product.takeoffers ?? 5
     const offers = await Offer.createQueryBuilder("Offer")
       .innerJoin(
         subQuery =>
