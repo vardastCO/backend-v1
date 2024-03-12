@@ -30,9 +30,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { Seller } from "../seller/entities/seller.entity";
 import * as zlib from 'zlib';
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
-import { PaginationPriceResponse } from "../price/dto/pagination-price.response";
-import { IndexOfferPrice } from "./dto/index-offer-price.input";
-import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -323,20 +320,6 @@ export class ProductService {
     await this.cacheManager.set(viewsKey, views);
   }
 
-  async OfferPrice(indexPriceInput:IndexOfferPrice): Promise<PaginationOfferResponse> {
-    const { take, skip,  productId } =
-    indexPriceInput || {};
-    const [data, total] = await Offer.findAndCount({
-      skip,
-      take,
-      where: {  productId },
-      order: { id: "DESC" },
-    });
-
-    return PaginationPriceResponse.make(indexPriceInput, total, data);
-
-  }
-
   async getProductViewCount(productId: number): Promise<number> {
     const index = "product_views";
 
@@ -418,7 +401,6 @@ export class ProductService {
   }
 
   async getOffersOf(product: Product, currentUser: User): Promise<Offer[]> {
-    return []
     // TODO: filter based on role
     if (!currentUser) {
       return (await product.offers).filter(
@@ -430,30 +412,44 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-    return []
-  //   const take = product.takeoffers ?? 5;
+
+    // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
+    // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
+  
+    // if (cachedData) {
+    //   // return cachedData;
+    // }
+
+    const offers = await Offer.createQueryBuilder()
+      .innerJoin(
+        subQuery =>
+          subQuery
+            .select('MAX("Offer"."id")', "maxId")
+            .addSelect('"Offer"."sellerId"')
+            .from(Offer, "Offer")
+            .where('"Offer"."productId" = :productId', {
+              productId: product.id,
+            })
+            // .andWhere(
+            //   `("Offer"."sellerId" = 1 OR exists (select 0 from product_prices where "sellerId" = "Offer"."sellerId" and "productId" = "Offer"."productId"))`,
+            // )
+            .groupBy('"Offer"."sellerId"'),
+        "maxIds",
+        '"Offer"."id" = "maxIds"."maxId"',
+    )
+      // .take(5)
+      // .orderBy(
+      //   { createdAt: 'DESC' }
+         
+      // )
+      // .innerJoinAndSelect('Offer."lastPublicConsumerPrice"', 'lastPublicConsumerPrice') // Removed double quotes around "Offer"
+      // .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
+      .orderBy('"Offer"."createdAt"', 'DESC') 
+      .getMany();
     
-  //   const latestPrices = await Price.createQueryBuilder("Price")
-  //   .select("DISTINCT ON (\"sellerId\") *")
-  //   .where('"Price"."productId" = :productId', {
-  //     productId: product.id,
-  //   })
-  //   .orderBy({createdAt: 'DESC' })
-  //   .getRawMany();
+    // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
 
-  // // Extract unique seller IDs from the latest prices
-  // const uniqueSellerIds = latestPrices.map(price => price.sellerId);
-
-  // // Retrieve offers from the unique seller IDs
-  // const offers = await Offer.createQueryBuilder("Offer")
-  //   .where('"Offer"."productId" = :productId', {
-  //     productId: product.id,
-  //   })
-  //   .andWhere('"Offer"."sellerId" IN (:...sellerIds)', { sellerIds: uniqueSellerIds })
-  //   .take(take)
-  //   .getMany();
-
-  // return offers;
+    return offers;
   }
 
   async getLowestPriceOf(product: Product): Promise<Price> {

@@ -33,9 +33,6 @@ import { CreateProductSellerInput } from "./dto/create-product-seller.input";
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { Seller } from "../seller/entities/seller.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
-import { PaginationPriceResponse } from "../price/dto/pagination-price.response";
-import { IndexOfferPrice } from "./dto/index-offer-price.input";
-import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -130,11 +127,8 @@ export class ProductResolver {
   @Public()
   // @Permission("gql.products.product.show")
   @Query(() => Product, { name: "product" })
-  async findOne(@Args("id", { type: () => Int }) id: number,
-  ) {
-    const product = await this.productService.findOne(id);
-
-    return product;
+  findOne(@Args("id", { type: () => Int }) id: number) {
+    return this.productService.findOne(id);
   }
 
   @Public()
@@ -173,21 +167,6 @@ export class ProductResolver {
   @Query(() => Int, { name: "countViewProduct" })
   CountOne(@Args("id", { type: () => Int }) id: number) {
     return this.productService.getProductViewCount(id);
-  }
-
-
-  @Public()
-  @Query(() => PaginationOfferResponse, { name: "offerPrice" })
-  OfferPrice(
-
-    @Args(
-      "indexOfferPrice",
-      { nullable: true },
-      new ValidationPipe({ transform: true }),
-    )
-    indexOfferPrice?: IndexOfferPrice,
-  ) {
-    return this.productService.OfferPrice(indexOfferPrice);
   }
 
   @Permission("gql.products.product.update")
@@ -242,14 +221,11 @@ export class ProductResolver {
     @Parent() product: Product,
     @CurrentUser() user: User,
   ): Promise<Offer[]> {
-    
     return this.productService.getOffersOf(product, user);
   }
 
   @ResolveField(() => [Offer])
-  publicOffers(@Parent() product: Product,
-  ): Promise<Offer[]> {
-  
+  publicOffers(@Parent() product: Product): Promise<Offer[]> {
     return this.productService.getPublicOffersOf(product);
   }
 
