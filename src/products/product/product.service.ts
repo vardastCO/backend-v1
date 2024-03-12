@@ -412,42 +412,30 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-
-    // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
-    // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
-  
-    // if (cachedData) {
-    //   // return cachedData;
-    // }
-
-    const offers = await Offer.createQueryBuilder()
-      .innerJoin(
-        subQuery =>
-          subQuery
-            .select('MAX("Offer"."id")', "maxId")
-            .addSelect('"Offer"."sellerId"')
-            .from(Offer, "Offer")
-            .where('"Offer"."productId" = :productId', {
-              productId: product.id,
-            })
-            // .andWhere(
-            //   `("Offer"."sellerId" = 1 OR exists (select 0 from product_prices where "sellerId" = "Offer"."sellerId" and "productId" = "Offer"."productId"))`,
-            // )
-            .groupBy('"Offer"."sellerId"'),
-        "maxIds",
-        '"Offer"."id" = "maxIds"."maxId"',
-    )
-      // .take(5)
-      // .orderBy(
-      //   { createdAt: 'DESC' }
-         
-      // )
-      // .innerJoinAndSelect('Offer."lastPublicConsumerPrice"', 'lastPublicConsumerPrice') // Removed double quotes around "Offer"
-      // .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
-      .orderBy('"Offer"."createdAt"', 'DESC') 
-      .getMany();
     
-    // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
+    const offers = await Offer.createQueryBuilder('offer')
+    .innerJoin(
+      subQuery =>
+        subQuery
+          .select('MAX(offer.id)', 'maxId')
+          .addSelect('offer.sellerId')
+          .from(Offer, 'offer')
+          .where('offer.productId = :productId', {
+            productId: product.id,
+          })
+          .andWhere(
+            'EXISTS (SELECT 0 FROM product_prices WHERE "sellerId" = offer.sellerId AND "productId" = offer.productId)',
+          )
+          .groupBy('offer.sellerId'),
+      'maxIds',
+      'offer.id = maxIds.maxId',
+    )
+    .leftJoinAndSelect('offer.lastPublicConsumerPrice', 'price')
+    .take(5)
+    .orderBy('price.createdAt', 'DESC')
+    .getMany();
+  
+  
 
     return offers;
   }
