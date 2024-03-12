@@ -413,6 +413,7 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
+    return []
     const take = product.takeoffers ?? 5;
     
     const latestPrices = await Price.createQueryBuilder("Price")
@@ -420,7 +421,7 @@ export class ProductService {
     .where('"Price"."productId" = :productId', {
       productId: product.id,
     })
-    .orderBy({ sellerId: 'ASC', createdAt: 'DESC' })
+    .orderBy({createdAt: 'DESC' })
     .getRawMany();
 
   // Extract unique seller IDs from the latest prices
