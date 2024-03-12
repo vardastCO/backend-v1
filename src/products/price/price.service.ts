@@ -38,10 +38,6 @@ export class PriceService {
     //     );
     //   }
     // }
-
-    if (createPriceInput.valueDiscount) {
-      createPriceInput.amount = Math.floor((Number(createPriceInput.amount) * ((100 + Number(createPriceInput.valueDiscount))/100)));
-    }
    
     const price: Price = Price.create<Price>(createPriceInput);
     if (!createPriceInput.sellerId) {
@@ -63,7 +59,7 @@ export class PriceService {
       discount.type = createPriceInput.typeDiscount;
      
       discount.calculated_price =
-         createPriceInput.amount.toString();
+         Math.floor((Number(price.amount) * ((100 - Number(createPriceInput.valueDiscount))/100))).toString();
       await discount.save()
 
       
