@@ -516,6 +516,7 @@ export class ProductService {
   }
 
   async getSameCategory(product: Product): Promise<Product[]> {
+    return []
     const queryBuilder = Product.createQueryBuilder();
     const result = queryBuilder
       .leftJoin(Image, "images", `images.productId = ${queryBuilder.alias}.id`)
