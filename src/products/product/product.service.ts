@@ -32,6 +32,7 @@ import * as zlib from 'zlib';
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { PaginationPriceResponse } from "../price/dto/pagination-price.response";
 import { IndexOfferPrice } from "./dto/index-offer-price.input";
+import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -322,22 +323,15 @@ export class ProductService {
     await this.cacheManager.set(viewsKey, views);
   }
 
-  async OfferPrice(indexPriceInput:IndexOfferPrice): Promise<PaginationPriceResponse> {
+  async OfferPrice(indexPriceInput:IndexOfferPrice): Promise<PaginationOfferResponse> {
     const { take, skip,  productId } =
     indexPriceInput || {};
-    const data = await this.entityManager.query(`
-    SELECT "sellerId"
-    FROM (
-      SELECT "sellerId", ROW_NUMBER() OVER (PARTITION BY "sellerId" ORDER BY "id" DESC) as row_num
-      FROM "Price"
-      WHERE "productId" = $1
-    ) AS subquery
-    WHERE row_num = 1
-    ORDER BY "sellerId"
-    LIMIT $2 OFFSET $3
-  `, [productId, take, skip]);
-
-  const total = data.length;
+    const [data, total] = await Offer.findAndCount({
+      skip,
+      take,
+      where: {  productId },
+      order: { id: "DESC" },
+    });
 
     return PaginationPriceResponse.make(indexPriceInput, total, data);
 

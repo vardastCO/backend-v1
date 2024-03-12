@@ -35,6 +35,7 @@ import { Seller } from "../seller/entities/seller.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { PaginationPriceResponse } from "../price/dto/pagination-price.response";
 import { IndexOfferPrice } from "./dto/index-offer-price.input";
+import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -179,7 +180,7 @@ export class ProductResolver {
 
 
   @Public()
-  @Query(() => PaginationPriceResponse, { name: "offerPrice" })
+  @Query(() => PaginationOfferResponse, { name: "offerPrice" })
   OfferPrice(
 
     @Args(
