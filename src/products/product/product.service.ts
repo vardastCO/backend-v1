@@ -413,30 +413,29 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-    const take = product.takeoffers ?? 5
-    const offers = await Offer.createQueryBuilder("Offer")
-      .innerJoin(
-        subQuery =>
-          subQuery
-            .select('MAX("Offer"."id")', "maxId")
-            .addSelect('"Offer"."sellerId"')
-            .from(Offer, "Offer")
-            .where('"Offer"."productId" = :productId', {
-              productId: product.id,
-            })
-            .andWhere(
-              `(exists (select 0 from product_prices where "sellerId" = "Offer"."sellerId" and "productId" = "Offer"."productId"))`,
-            )
-            .groupBy('"Offer"."sellerId"'),
-        "maxIds",
-        '"Offer"."id" = "maxIds"."maxId"',
-    )
-      // .orderBy('"Offer"."createdAt"', 'DESC') 
-      .take(take)
-      .getMany();
-  
+    const take = product.takeoffers ?? 5;
+    
+    const latestPrices = await Price.createQueryBuilder("Price")
+    .select("DISTINCT ON (\"sellerId\") *")
+    .where('"Price"."productId" = :productId', {
+      productId: product.id,
+    })
+    .orderBy({ sellerId: 'ASC', createdAt: 'DESC' })
+    .getRawMany();
 
-    return offers;
+  // Extract unique seller IDs from the latest prices
+  const uniqueSellerIds = latestPrices.map(price => price.sellerId);
+
+  // Retrieve offers from the unique seller IDs
+  const offers = await Offer.createQueryBuilder("Offer")
+    .where('"Offer"."productId" = :productId', {
+      productId: product.id,
+    })
+    .andWhere('"Offer"."sellerId" IN (:...sellerIds)', { sellerIds: uniqueSellerIds })
+    .take(take)
+    .getMany();
+
+  return offers;
   }
 
   async getLowestPriceOf(product: Product): Promise<Price> {
