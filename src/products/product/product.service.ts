@@ -327,7 +327,7 @@ export class ProductService {
   const { take, skip, productId } = indexOffersPrice || {};
 
 
-  const lastPrice = await Price.findOne({
+  const lastPrice = await Price.find({
     
     where: { productId },
     order: { createdAt: 'DESC' },
@@ -337,7 +337,10 @@ export class ProductService {
   // Step 2: Extract the seller IDs from the obtained price.
   const sellerIds: number[] = [];
   if (lastPrice) {
-    sellerIds.push(lastPrice.sellerId);
+    lastPrice.forEach(element => {
+      sellerIds.push(element.sellerId)
+      
+    });
   }
 
   // Step 3: Remove duplicate seller IDs.
