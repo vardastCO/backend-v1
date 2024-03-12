@@ -72,5 +72,7 @@ export class Offer extends BaseEntity {
   updatedAt: Date;
 
   @Field(() => Price, { nullable: true })
-  lastPublicConsumerPrice: Price;
+  @ManyToOne(() => Price)
+  @Index() 
+  lastPublicConsumerPrice: Promise<Price>;
 }
