@@ -323,26 +323,38 @@ export class ProductService {
   }
 
   async getOffersPrice(indexOffersPrice: IndexOffersPrice): Promise<PaginationOfferResponse> {
+  indexOffersPrice.boot();
+  const { take, skip, productId } = indexOffersPrice || {};
 
-    indexOffersPrice.boot()
-    const { take, skip, productId } =
-      indexOffersPrice || {};
+
+  const lastPrice = await Price.findOne({
     
-    const [data, total] = await Offer.findAndCount({
-      skip,
-      take,
-      where: {  productId },
-      order: { 
-        lastPublicConsumerPrice: {
-          createdAt : "DESC"
-        }
+    where: { productId },
+    order: { createdAt: 'DESC' },
+     
+  });
 
-       },
-    });
-
-    return PaginationOfferResponse.make(indexOffersPrice, total, data);
-   
+  // Step 2: Extract the seller IDs from the obtained price.
+  const sellerIds: number[] = [];
+  if (lastPrice) {
+    sellerIds.push(lastPrice.sellerId);
   }
+
+  // Step 3: Remove duplicate seller IDs.
+  const uniqueSellerIds = Array.from(new Set(sellerIds));
+
+  // Step 4: Use the unique seller IDs to filter offers.
+  const [data, total] = await Offer.findAndCount({
+    skip,
+    take,
+    where: {
+      productId,
+      sellerId: In(uniqueSellerIds), // Filter offers by unique seller IDs
+    },
+  });
+
+  return PaginationOfferResponse.make(indexOffersPrice, total, data);
+}
 
   async getProductViewCount(productId: number): Promise<number> {
     const index = "product_views";
