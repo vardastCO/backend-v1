@@ -325,7 +325,7 @@ export class ProductService {
   async OfferPrice(indexPriceInput:IndexOfferPrice): Promise<PaginationPriceResponse> {
     const { take, skip,  productId } =
     indexPriceInput || {};
-    const data = await Price.query(`
+    const data = await this.entityManager.query(`
     SELECT "sellerId"
     FROM (
       SELECT "sellerId", ROW_NUMBER() OVER (PARTITION BY "sellerId" ORDER BY "id" DESC) as row_num
