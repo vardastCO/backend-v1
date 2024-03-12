@@ -413,7 +413,6 @@ export class ProductService {
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
 
-    return []
     // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
     // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
   
@@ -438,7 +437,7 @@ export class ProductService {
         "maxIds",
         '"Offer"."id" = "maxIds"."maxId"',
     )
-      // .take(5)
+      .take(5)
       // .orderBy(
       //   { createdAt: 'DESC' }
          
@@ -516,7 +515,6 @@ export class ProductService {
   }
 
   async getSameCategory(product: Product): Promise<Product[]> {
-    return []
     const queryBuilder = Product.createQueryBuilder();
     const result = queryBuilder
       .leftJoin(Image, "images", `images.productId = ${queryBuilder.alias}.id`)
