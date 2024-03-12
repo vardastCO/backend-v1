@@ -418,7 +418,7 @@ export class ProductService {
         isPublic: true,
         isAvailable: true,
       },
-      relations: ['seller', 'product'],
+      relations: ['seller', 'product','seller.prices'],
       order: {
         seller: {
           prices: { createdAt: "DESC" } 
