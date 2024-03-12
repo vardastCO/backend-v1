@@ -127,7 +127,10 @@ export class ProductResolver {
   @Public()
   // @Permission("gql.products.product.show")
   @Query(() => Product, { name: "product" })
-  findOne(@Args("id", { type: () => Int }) id: number) {
+  findOne(@Args("id", { type: () => Int }) id: number,
+    @Args("takeoffers", { type: () => Int, nullable: true }) takeoffers?: number,
+  ) {
+    console.log('findOne',takeoffers)
     return this.productService.findOne(id);
   }
 
@@ -221,11 +224,15 @@ export class ProductResolver {
     @Parent() product: Product,
     @CurrentUser() user: User,
   ): Promise<Offer[]> {
+    
     return this.productService.getOffersOf(product, user);
   }
 
   @ResolveField(() => [Offer])
-  publicOffers(@Parent() product: Product): Promise<Offer[]> {
+  publicOffers(@Parent() product: Product,
+  @Args("takeoffers", { type: () => Int, nullable: true }) takeoffers?: number,
+  ): Promise<Offer[]> {
+    console.log('publicOffers',takeoffers)
     return this.productService.getPublicOffersOf(product);
   }
 
