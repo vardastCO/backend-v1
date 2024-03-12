@@ -401,6 +401,8 @@ export class ProductService {
   }
 
   async getOffersOf(product: Product, currentUser: User): Promise<Offer[]> {
+
+    return []
     // TODO: filter based on role
     if (!currentUser) {
       return (await product.offers).filter(
@@ -413,6 +415,8 @@ export class ProductService {
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
 
+
+    return []
     // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
     // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
   
