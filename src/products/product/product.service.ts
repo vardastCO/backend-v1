@@ -349,7 +349,7 @@ export class ProductService {
     take,
     where: {
       productId,
-      sellerId: In(uniqueSellerIds), // Filter offers by unique seller IDs
+      sellerId: uniqueSellerIds, // Filter offers by unique seller IDs
     },
   });
 
