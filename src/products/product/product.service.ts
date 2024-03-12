@@ -341,7 +341,9 @@ export class ProductService {
   }
 
   // Step 3: Remove duplicate seller IDs.
-  const uniqueSellerIds = Array.from(new Set(sellerIds));
+    const uniqueSellerIds = Array.from(new Set(sellerIds));
+    
+    console.log('uniqueSellerIds',uniqueSellerIds)
 
   // Step 4: Use the unique seller IDs to filter offers.
   const [data, total] = await Offer.findAndCount({
@@ -349,7 +351,7 @@ export class ProductService {
     take,
     where: {
       productId,
-      sellerId: uniqueSellerIds, // Filter offers by unique seller IDs
+      sellerId: In(uniqueSellerIds), // Filter offers by unique seller IDs
     },
   });
 
