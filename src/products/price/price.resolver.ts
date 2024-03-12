@@ -91,6 +91,6 @@ export class PriceResolver {
   @Public()
   @Query(() => String, { name: "calculatePrice" })
   calculatePrice(@Args("amount") amount: string,@Args("valueDiscount") valueDiscount: string) {
-    return (Number(amount) * ((100 - Number(valueDiscount))/100)).toString();
+    return Math.floor((Number(amount) * ((100 - Number(valueDiscount))/100))).toString();
   }
 }
