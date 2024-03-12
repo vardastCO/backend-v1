@@ -431,8 +431,8 @@ export class ProductService {
         "maxIds",
         '"Offer"."id" = "maxIds"."maxId"',
     )
-      // .take(5)
       .orderBy('"Offer"."createdAt"', 'DESC') 
+      .take(product.takeoffers??1)
       .getMany();
   
 
