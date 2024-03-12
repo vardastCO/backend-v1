@@ -412,24 +412,31 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-    const offers = await Offer.find({
-      where: {
-        productId: product.id,
-        isPublic: true,
-        isAvailable: true,
-      },
-      relations: ['seller', 'product','seller.prices'],
-      order: {
-        seller: {
-          prices: { createdAt: "DESC" } 
-        }
-      },
-      take: 5,
-    });
-  
+
+    const offers = await Offer.createQueryBuilder()
+      .innerJoin(
+        subQuery =>
+          subQuery
+            .select('MAX("Offer"."id")', "maxId")
+            .addSelect('"Offer"."sellerId"')
+            .from(Offer, "Offer")
+            .where('"Offer"."productId" = :productId', {
+              productId: product.id,
+            })
+            .andWhere(
+              `(exists (select 0 from product_prices where "sellerId" = "Offer"."sellerId" and "productId" = "Offer"."productId"))`,
+            )
+            .groupBy('"Offer"."sellerId"'),
+        "maxIds",
+        '"Offer"."id" = "maxIds"."maxId"',
+    )
+      .take(5)
+      .orderBy('"Offer"."createdAt"', 'DESC') 
+      .getMany();
+    
+
     return offers;
   }
-  
 
   async getLowestPriceOf(product: Product): Promise<Price> {
     try {
