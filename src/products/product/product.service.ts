@@ -412,7 +412,7 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-    const offers = await this.find({
+    const offers = await Offer.find({
       where: {
         productId: product.id,
         isPublic: true,
