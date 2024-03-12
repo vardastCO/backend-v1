@@ -418,9 +418,10 @@ export class ProductService {
         isPublic: true,
         isAvailable: true,
       },
+      relations: ['seller', 'product'],
       order: {
-        lastPublicConsumerPrice: {
-          createdAt : 'DESC'
+        seller: {
+          prices: { createdAt: "DESC" } 
         }
       },
       take: 5,
