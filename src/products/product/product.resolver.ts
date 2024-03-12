@@ -127,11 +127,14 @@ export class ProductResolver {
   @Public()
   // @Permission("gql.products.product.show")
   @Query(() => Product, { name: "product" })
-  findOne(@Args("id", { type: () => Int }) id: number,
+  async findOne(@Args("id", { type: () => Int }) id: number,
     @Args("takeoffers", { type: () => Int, nullable: true }) takeoffers?: number,
   ) {
-    console.log('findOne',takeoffers)
-    return this.productService.findOne(id);
+    const product = await this.productService.findOne(id);
+    // Set takeoffers property in the entity
+    product.takeoffers = takeoffers;
+
+    return product;
   }
 
   @Public()
@@ -232,7 +235,7 @@ export class ProductResolver {
   publicOffers(@Parent() product: Product,
   @Args("takeoffers", { type: () => Int, nullable: true }) takeoffers?: number,
   ): Promise<Offer[]> {
-    console.log('publicOffers',takeoffers)
+    console.log('publicOffers', product.takeoffers);
     return this.productService.getPublicOffersOf(product);
   }
 
