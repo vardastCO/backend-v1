@@ -131,11 +131,8 @@ export class ProductResolver {
   // @Permission("gql.products.product.show")
   @Query(() => Product, { name: "product" })
   async findOne(@Args("id", { type: () => Int }) id: number,
-    @Args("takeoffers", { type: () => Int, nullable: true, defaultValue: 5 }) takeoffers?: number,
   ) {
     const product = await this.productService.findOne(id);
-    // Set takeoffers property in the entity
-    product.takeoffers = takeoffers;
 
     return product;
   }

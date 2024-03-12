@@ -152,8 +152,6 @@ export class Product extends InfraEntity {
   @Column({ nullable: true })
   rank?: number = 1;
 
-  takeoffers?: number;
-
   protected searchableFields = [
     "name",
     "description",

@@ -431,29 +431,29 @@ export class ProductService {
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
     return []
-    const take = product.takeoffers ?? 5;
+  //   const take = product.takeoffers ?? 5;
     
-    const latestPrices = await Price.createQueryBuilder("Price")
-    .select("DISTINCT ON (\"sellerId\") *")
-    .where('"Price"."productId" = :productId', {
-      productId: product.id,
-    })
-    .orderBy({createdAt: 'DESC' })
-    .getRawMany();
+  //   const latestPrices = await Price.createQueryBuilder("Price")
+  //   .select("DISTINCT ON (\"sellerId\") *")
+  //   .where('"Price"."productId" = :productId', {
+  //     productId: product.id,
+  //   })
+  //   .orderBy({createdAt: 'DESC' })
+  //   .getRawMany();
 
-  // Extract unique seller IDs from the latest prices
-  const uniqueSellerIds = latestPrices.map(price => price.sellerId);
+  // // Extract unique seller IDs from the latest prices
+  // const uniqueSellerIds = latestPrices.map(price => price.sellerId);
 
-  // Retrieve offers from the unique seller IDs
-  const offers = await Offer.createQueryBuilder("Offer")
-    .where('"Offer"."productId" = :productId', {
-      productId: product.id,
-    })
-    .andWhere('"Offer"."sellerId" IN (:...sellerIds)', { sellerIds: uniqueSellerIds })
-    .take(take)
-    .getMany();
+  // // Retrieve offers from the unique seller IDs
+  // const offers = await Offer.createQueryBuilder("Offer")
+  //   .where('"Offer"."productId" = :productId', {
+  //     productId: product.id,
+  //   })
+  //   .andWhere('"Offer"."sellerId" IN (:...sellerIds)', { sellerIds: uniqueSellerIds })
+  //   .take(take)
+  //   .getMany();
 
-  return offers;
+  // return offers;
   }
 
   async getLowestPriceOf(product: Product): Promise<Price> {
