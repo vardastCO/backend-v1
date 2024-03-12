@@ -332,7 +332,12 @@ export class ProductService {
       skip,
       take,
       where: {  productId },
-      order: { id: "DESC" },
+      order: { 
+        lastPublicConsumerPrice: {
+          createdAt : "DESC"
+        }
+
+       },
     });
 
     return PaginationOfferResponse.make(indexOffersPrice, total, data);
