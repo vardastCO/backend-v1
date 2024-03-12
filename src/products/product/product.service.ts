@@ -413,8 +413,8 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-
-    const offers = await Offer.createQueryBuilder()
+    const take = product.takeoffers ?? 1
+    const offers = await Offer.createQueryBuilder("Offer")
       .innerJoin(
         subQuery =>
           subQuery
@@ -431,8 +431,8 @@ export class ProductService {
         "maxIds",
         '"Offer"."id" = "maxIds"."maxId"',
     )
-      .orderBy('"Offer"."createdAt"', 'DESC') 
-      .take(product.takeoffers??1)
+      // .orderBy('"Offer"."createdAt"', 'DESC') 
+      .take(take)
       .getMany();
   
 
