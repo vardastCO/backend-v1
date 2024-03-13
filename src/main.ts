@@ -9,8 +9,8 @@ import { AppModule } from "./app.module";
 // import { initializeApm } from './initapm';
 import * as compression from 'compression';
 import {  TimingMiddleware } from "./timeout.middleware";
-import * as cluster from 'cluster';
-import * as os from 'os';
+// import * as cluster from 'cluster';
+// import * as os from 'os';
 
 async function bootstrap() {
   // const logger = winston.createLogger({
@@ -49,7 +49,7 @@ async function bootstrap() {
       memLevel: 9,    // Maximum memory usage for compression
     })
   );
-  app.use(new TimingMiddleware().use);
+  // app.use(new TimingMiddleware().use);
   // app.useLogger(logger);
   // try {
   await app.listen(3080, '::');

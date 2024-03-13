@@ -71,6 +71,10 @@ export class Offer extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Field()
+  @Column({ nullable: true })
+  deletedAt: Date; 
+
   @Field(() => Price, { nullable: true })
   @ManyToOne(() => Price)
   @Index() 

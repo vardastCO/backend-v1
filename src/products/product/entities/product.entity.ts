@@ -113,6 +113,10 @@ export class Product extends InfraEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Field()
+  @Column({ nullable: true })
+  deletedAt: Date; 
+
   @Field(() => [Price], { nullable: "items" })
   @OneToMany(() => Price, price => price.product)
   prices: Promise<Price[]>;

@@ -404,8 +404,9 @@ export class ProductService {
 
   async remove(id: number): Promise<Product> {
     const product: Product = await this.findOne(id);
-    await product.remove();
-    product.id = id;
+    product.deletedAt = new Date();
+    // product.id = id;
+    await product.save()
     return product;
   }
 

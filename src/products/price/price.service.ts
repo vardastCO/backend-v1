@@ -51,7 +51,7 @@ export class PriceService {
     price.createdBy = Promise.resolve(client);
     await price.save();
 
-    if (createPriceInput.valueDiscount) {
+    if (createPriceInput.valueDiscount && Number(createPriceInput.valueDiscount) > 0) {
       const discount = DiscountPrice.create()
       discount.priceId = price.id
       discount.id = price.id
