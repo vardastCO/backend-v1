@@ -164,16 +164,16 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                 const priceModelId = await priceModel.id;
                 if (discount && offprice && priceModel) {
 
-                  console.log('await priceModel.id',priceModelId)
+                  console.log('await discount',discount)
 
-                  const discount = DiscountPrice.create()
-                  discount.priceId = priceModelId
-                  discount.id = priceModelId
-                  discount.value = discount.toString()
-                  discount.type = DiscountTypesEnum.PERCENT;
+                  const discounts = DiscountPrice.create()
+                  discounts.priceId = priceModelId
+                  discounts.id = priceModelId
+                  discounts.value = discount
+                  discounts.type = DiscountTypesEnum.PERCENT;
                  
-                  discount.calculated_price = offprice.toString();
-                  await discount.save()
+                  discounts.calculated_price = offprice.toString();
+                  await discounts.save()
                 }
               }
               
