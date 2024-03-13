@@ -190,7 +190,7 @@ export class SellerService {
     try {
       const modifiedData = await Promise.all(
         data.map(async (seller, index) => {
-          seller.brands = index < 5 ? await this.getOfferBrand(seller.id) : [];
+          seller.brands = index < 9 ? await this.getOfferBrand(seller.id) : [];
           return seller;
       })
       );
