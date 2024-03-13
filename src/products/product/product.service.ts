@@ -515,7 +515,7 @@ export class ProductService {
       //   .getOne();
       const IDS = product.id;
       const result = Price.findOne({
-        where: { productId: IDS },
+        where: { productId: IDS,deletedAt:IsNull() },
         order: {
           createdAt: "DESC"
         },

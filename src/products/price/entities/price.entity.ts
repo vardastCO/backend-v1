@@ -85,4 +85,8 @@ export class Price extends BaseEntity {
   @Index()
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field()
+  @Column({ nullable: true })
+  deletedAt: Date; 
 }
