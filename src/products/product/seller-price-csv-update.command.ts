@@ -169,7 +169,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                   const discounts = DiscountPrice.create()
                   discounts.priceId = priceModelId
                   discounts.id = priceModelId
-                  discounts.value = discount
+                  discounts.value = (Number(discount)*100).toString()
                   discounts.type = DiscountTypesEnum.PERCENT;
                  
                   discounts.calculated_price = offprice.toString();
