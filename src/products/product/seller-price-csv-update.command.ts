@@ -167,12 +167,12 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                 priceModel.save();
               }
               console.log('discount,offprice,priceModel.id')
-              console.log(discount, offprice, priceModel.id)
+              console.log(discount, offprice, await priceModel.id)
               console.log('discount,offprice,priceModel.id')
               if (discount && offprice && priceModel) {
 
                 const discount = DiscountPrice.create()
-                discount.priceId = priceModel.id
+                discount.priceId = await priceModel.id
                 discount.id = priceModel.id
                 discount.value = discount.toString()
                 discount.type = DiscountTypesEnum.PERCENT;
