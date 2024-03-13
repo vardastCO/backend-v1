@@ -149,13 +149,9 @@ export class SellerPriceUpdateCommand extends CommandRunner {
             }
 
             try {
-              console.log(
-                "amount",
-                price,
-              );
-              const priceModel = Price.create();
-              if (price) {
               
+              if (price) {
+                const priceModel = Price.create();
                 priceModel.sellerId = singleSellerId; // Set a single seller ID
                 priceModel.productId = (await product).id; // Assuming productId is a string
                 priceModel.isPublic = true;
@@ -165,21 +161,22 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                   :  parseInt(price);
                 priceModel.type = PriceTypesEnum.CONSUMER;
                 priceModel.save();
-              }
-              console.log('discount,offprice,priceModel.id')
-              console.log(discount, offprice, await priceModel.id)
-              console.log('discount,offprice,priceModel.id')
-              if (discount && offprice && priceModel) {
 
-                const discount = DiscountPrice.create()
-                discount.priceId = await priceModel.id
-                discount.id = priceModel.id
-                discount.value = discount.toString()
-                discount.type = DiscountTypesEnum.PERCENT;
-               
-                discount.calculated_price = offprice.toString();
-                await discount.save()
+                if (discount && offprice && priceModel) {
+
+                  console.log('await priceModel.id',await priceModel.id)
+
+                  const discount = DiscountPrice.create()
+                  discount.priceId = await priceModel.id
+                  discount.id = priceModel.id
+                  discount.value = discount.toString()
+                  discount.type = DiscountTypesEnum.PERCENT;
+                 
+                  discount.calculated_price = offprice.toString();
+                  await discount.save()
+                }
               }
+              
           
             } catch (e) {
               console.log("Error processing product:", e);
