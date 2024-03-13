@@ -9,6 +9,7 @@ import { Price } from "./price.entity";
       product_prices."isPublic",
       product_prices."createdById",
       product_prices."createdAt",
+      product_prices."deletedAt",
       product_prices."productId",
       product_prices."sellerId",
       product_prices.amount,
