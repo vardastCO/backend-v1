@@ -8,7 +8,7 @@ import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { filterObject } from "src/base/utilities/helpers";
 import { User } from "src/users/user/entities/user.entity";
-import { Brackets, EntityManager, In, Like } from 'typeorm';
+import { Brackets, EntityManager, In, Like,IsNull } from 'typeorm';
 import { AttributeValue } from "../attribute-value/entities/attribute-value.entity";
 import { Brand } from "../brand/entities/brand.entity";
 import { Image } from "../images/entities/image.entity";
@@ -184,7 +184,7 @@ export class ProductService {
       isActive,
       createdById,
     });
-    
+    whereConditions.deletedAt = IsNull();
 
     if (categoryIds && categoryIds.length > 0) {
       whereConditions.categoryId = In(categoryIds);
