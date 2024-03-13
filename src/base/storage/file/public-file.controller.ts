@@ -97,7 +97,7 @@ export class PublicFileController {
   @Post("/priceList/update/:id")
   @UseInterceptors(FileInterceptor("file"))
   @Permission("rest.base.storage.file.store")
-  updatePriceList(
+  async updatePriceList(
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -111,6 +111,13 @@ export class PublicFileController {
     @Param('id') sellerId: number, 
     @CurrentUser() user: User,
   ) {
+  const allKeys: string[] = await this.cacheManager.store.keys();
+  const productKeys: string[] = allKeys.filter(key =>
+    key.startsWith("pnpm"),
+    );
+  if (productKeys.length) {
+    return  {};
+  }
     return this.fileService.updatePriceList(file, user,sellerId);
   }
 
