@@ -9,6 +9,8 @@ import { Product } from "./entities/product.entity";
 import { Price } from "../price/entities/price.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { PriceTypesEnum } from "../price/enums/price-types.enum";
+import { DiscountPrice } from "../price/entities/price-discount.entity";
+import { DiscountTypesEnum } from "../price/enums/price-discount-types.enum";
 
 // Example array to store seller IDs
 const sellerIds: { isCurrencyTrue: boolean; sellerId: number[] }[] = [];
@@ -47,6 +49,8 @@ export class SellerPriceUpdateCommand extends CommandRunner {
     name: "name",
     sku: "sku",
     price: "price",
+    discount: "discount",
+    offprice : "offprice"
   };
 
   private valueMap = {
@@ -56,11 +60,13 @@ export class SellerPriceUpdateCommand extends CommandRunner {
         .map(attribute => {
           attribute = attribute ?? "";
           // const [ name, category,brand,sku,filter,uom] = attribute;
-          const [name, sku, price] = attribute;
+          const [name, sku, price,discount,offprice] = attribute;
           return {
             name,
             sku,
             price,
+            discount,
+            offprice,
           };
         })
         .filter(a => a)
@@ -103,7 +109,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
 
     for (const csvProduct of csvProducts.list) {
       try {
-        const { name, sku, price } = csvProduct;
+        const { name, sku, price,discount,offprice } = csvProduct;
         let product = Product.findOneBy({ name });
         if (!product) {
           product = Product.findOneBy({ sku });
@@ -147,8 +153,9 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                 "amount",
                 price,
               );
+              const priceModel = Price.create();
               if (price) {
-                const priceModel = Price.create();
+              
                 priceModel.sellerId = singleSellerId; // Set a single seller ID
                 priceModel.productId = (await product).id; // Assuming productId is a string
                 priceModel.isPublic = true;
@@ -158,6 +165,17 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                   :  parseInt(price);
                 priceModel.type = PriceTypesEnum.CONSUMER;
                 priceModel.save();
+              }
+              if (discount && offprice && priceModel) {
+
+                const discount = DiscountPrice.create()
+                discount.priceId = priceModel.id
+                discount.id = priceModel.id
+                discount.value = discount
+                discount.type = DiscountTypesEnum.PERCENT;
+               
+                discount.calculated_price = offprice.toString();
+                await discount.save()
               }
           
             } catch (e) {
@@ -183,4 +201,6 @@ class CsvProduct {
   name: string;
   price: string;
   sku: string;
+  discount: string;
+  offprice: string;
 }
