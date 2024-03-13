@@ -166,6 +166,9 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                 priceModel.type = PriceTypesEnum.CONSUMER;
                 priceModel.save();
               }
+              console.log('discount,offprice,priceModel.id')
+              console.log(discount, offprice, priceModel.id)
+              console.log('discount,offprice,priceModel.id')
               if (discount && offprice && priceModel) {
 
                 const discount = DiscountPrice.create()
