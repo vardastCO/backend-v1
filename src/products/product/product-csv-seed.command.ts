@@ -266,7 +266,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
         for (const index of this.files) {
           try {
             const filename = index;
-            console.log('index',index)
+            console.log('index',{index,productSkus})
             const isRelatedToCurrentProduct = filenameRegex.test(filename);
             if (!isRelatedToCurrentProduct) {
               console.log("dddd", isRelatedToCurrentProduct, filename);
