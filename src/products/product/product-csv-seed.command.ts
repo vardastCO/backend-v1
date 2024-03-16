@@ -316,6 +316,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
       Brand.create({
         name: name,
         slug: name,
+        sum:1
       });
     if (!this.brandNameToObjectMap.hasOwnProperty(name)) {
       await brand.save();
