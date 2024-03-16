@@ -53,9 +53,9 @@ export class ProductCsvSeedCommand extends CommandRunner {
         .map(attribute => {
           attribute = attribute ?? "";
           if (!attribute.match(this.attributeRegex)) {
-            // console.warn(
-            //     `Attribute '${attribute}' is not matching the regex provided, skipping.`
-            // );
+            console.warn(
+                `Attribute '${attribute}' is not matching the regex provided, skipping.`
+            );
             return null;
           }
           const [, name, value, uom, sku] = attribute.match(
@@ -180,7 +180,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
           type: ProductTypesEnum.PHYSICAL,
           name: csvProduct.name,
           sku: csvProduct.sku,
-          description: "",
+          description: csvProduct.description ?? "",
           status: ThreeStateSupervisionStatuses.CONFIRMED,
           createdById: 1,
         });
