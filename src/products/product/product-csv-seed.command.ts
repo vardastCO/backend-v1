@@ -130,168 +130,167 @@ export class ProductCsvSeedCommand extends CommandRunner {
     // await this.setUoms();
     await this.setAttributes();
 
-    const [outputFolder, imageDirectory] = passedParam;
+    const [csvFile, imageDirectory] = passedParam;
 
     // Read all CSV files in the outputFolder
-    const csvFiles = Fs.readdirSync(outputFolder).filter(file =>
-      file.toLowerCase().endsWith(".csv"),
+    // const csvFiles = Fs.readdirSync(outputFolder).filter(file =>
+    //   file.toLowerCase().endsWith(".csv"),
+    // );
+
+    const stream = Fs.createReadStream(csvFile, "utf8");
+
+    await this.setFiles(imageDirectory);
+
+    const csvProducts = await this.csvParser.parse(
+      stream,
+      CsvProduct,
+      null,
+      null,
+      {
+        mapHeaders: ({ header, index }) => this.headerMap[header],
+        mapValues: ({ header, index, value }) =>
+          this.valueMap.hasOwnProperty(header)
+            ? this.valueMap[header](value)
+            : value,
+        separator: ",",
+      },
     );
 
-    for (const csvFile of csvFiles) {
-      const csvFilePath = Path.join(outputFolder, csvFile);
-      const stream = Fs.createReadStream(csvFilePath, "utf8");
-      await this.setFiles(imageDirectory);
-
-      const csvProducts = await this.csvParser.parse(
-        stream,
-        CsvProduct,
-        null,
-        null,
-        {
-          mapHeaders: ({ header, index }) => this.headerMap[header],
-          mapValues: ({ header, index, value }) =>
-            this.valueMap.hasOwnProperty(header)
-              ? this.valueMap[header](value)
-              : value,
-          separator: ",",
-        },
-      );
-
-      let j = 1;
-      for (const csvProduct of csvProducts.list) {
-        try {
-          if (!csvProduct.name) {
-            continue;
-          }
-          const existingProduct: Product = await Product.findOneBy({
-            sku: csvProduct.sku,
-          });
-          if (existingProduct) {
-            // this.logService.warn(
-            //   `(${j++}/${csvProducts.total}) product {sku: ${
-            //     existingProduct.sku
-            //   }} already exists, skipping...`,
-            // );
-            continue;
-          }
-
-          const productSkus = [csvProduct.sku];
-          const product: Product = Product.create({
-            slug: csvProduct.sku,
-            type: ProductTypesEnum.PHYSICAL,
-            name: csvProduct.name,
-            sku: csvProduct.sku,
-            description: "",
-            status: ThreeStateSupervisionStatuses.CONFIRMED,
-            createdById: 1,
-          });
-
-          product.brand = Promise.resolve(
-            await this.firstOrCreateBrand(csvProduct.brand),
-          );
-          const category = await this.firstOrCreateCategory(
-            csvProduct.category,
-          );
-          // const percentage = await this.calculatePercentage(category.title, csvProduct.category );
-
-          // if(percentage < .6)
-          // {
-          //   product.isActive = false ;
-
-          //   this.logService.log('status pending');
-          // }
-          if (!category) {
-            throw "no category";
-            // throw (csvProduct.sku)
-          }
-          product.category = Promise.resolve(category);
-
-          // product.uom = Promise.resolve(
-          //   await this.firstOrCreateUom(csvProduct.uom),
-          // );
-          product.uomId = 1;
-          await product.save();
-
-          const processedAttributes = new Set();
-
-          for (const key in csvProduct.csvAttributes) {
-            const csvAttribute = csvProduct.csvAttributes[key];
-
-            // Check if the attribute has not been processed yet
-            if (!processedAttributes.has(csvAttribute)) {
-              try {
-                await this.firstOrCreateAttribute(
-                  csvAttribute,
-                  product,
-                  category,
-                  productSkus,
-                );
-
-                // Mark the attribute as processed
-                processedAttributes.add(csvAttribute);
-              } catch (error) {}
-            }
-          }
-
-          if (csvProduct.price) {
-            // seller
-            const seller = await this.firstOrCreateSeller(csvProduct.brand);
-
-            const amount =
-              +(csvProduct.price + "").replace(/[^0-9.]/g, "") / 10;
-            const price = Price.create({
-              amount,
-              type: PriceTypesEnum.CONSUMER,
-              isPublic: true,
-              createdById: 1,
-              sellerId: seller.id,
-            });
-            price.product = Promise.resolve(product);
-            await price.save();
-
-            // offer
-            const offer = Offer.create({
-              productId: product.id,
-              sellerId: seller.id,
-              status: ThreeStateSupervisionStatuses.CONFIRMED,
-              isPublic: true,
-              isAvailable: true,
-            });
-            await offer.save();
-          }
-
-          const filenameRegex = new RegExp(
-            `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
-          );
-          let i = 1;
-          for (const index of this.files) {
-            try {
-              const filename = index;
-              const isRelatedToCurrentProduct = filenameRegex.test(filename);
-              if (!isRelatedToCurrentProduct) {
-                console.log("dddd", isRelatedToCurrentProduct, filename);
-                continue;
-              }
-              const [, sku, sort, extention] = filename.match(filenameRegex);
-              await this.addImage(
-                imageDirectory,
-                filename,
-                product,
-                sort ? +sort : i++,
-              );
-              this.files = this.files.filter(filename => filename !== index);
-            } catch (w) {
-              console.log("warning", w, "warning");
-            }
-          }
-
-          // this.logService.log(`(${j++}/${csvProducts.total}) Seeded.`);
-        } catch (e) {
-          console.log(e);
+    let j = 1;
+    for (const csvProduct of csvProducts.list) {
+      try {
+        if (!csvProduct.name) {
+          continue;
         }
-        this.files = this.files.filter(f => f);
+        const existingProduct: Product = await Product.findOneBy({
+          sku: csvProduct.sku,
+        });
+        if (existingProduct) {
+          // this.logService.warn(
+          //   `(${j++}/${csvProducts.total}) product {sku: ${
+          //     existingProduct.sku
+          //   }} already exists, skipping...`,
+          // );
+          continue;
+        }
+
+        const productSkus = [csvProduct.sku];
+        const product: Product = Product.create({
+          slug: csvProduct.sku,
+          type: ProductTypesEnum.PHYSICAL,
+          name: csvProduct.name,
+          sku: csvProduct.sku,
+          description: "",
+          status: ThreeStateSupervisionStatuses.CONFIRMED,
+          createdById: 1,
+        });
+
+        product.brand = Promise.resolve(
+          await this.firstOrCreateBrand(csvProduct.brand),
+        );
+        const category = await this.firstOrCreateCategory(
+          csvProduct.category,
+        );
+        // const percentage = await this.calculatePercentage(category.title, csvProduct.category );
+
+        // if(percentage < .6)
+        // {
+        //   product.isActive = false ;
+
+        //   this.logService.log('status pending');
+        // }
+        if (!category) {
+          throw "no category";
+          // throw (csvProduct.sku)
+        }
+        product.category = Promise.resolve(category);
+
+        // product.uom = Promise.resolve(
+        //   await this.firstOrCreateUom(csvProduct.uom),
+        // );
+        product.uomId = 1;
+        await product.save();
+
+        const processedAttributes = new Set();
+
+        for (const key in csvProduct.csvAttributes) {
+          const csvAttribute = csvProduct.csvAttributes[key];
+
+          // Check if the attribute has not been processed yet
+          if (!processedAttributes.has(csvAttribute)) {
+            try {
+              await this.firstOrCreateAttribute(
+                csvAttribute,
+                product,
+                category,
+                productSkus,
+              );
+
+              // Mark the attribute as processed
+              processedAttributes.add(csvAttribute);
+            } catch (error) {}
+          }
+        }
+
+        if (csvProduct.price) {
+          // seller
+          const seller = await this.firstOrCreateSeller(csvProduct.brand);
+
+          const amount =
+            +(csvProduct.price + "").replace(/[^0-9.]/g, "") / 10;
+          const price = Price.create({
+            amount,
+            type: PriceTypesEnum.CONSUMER,
+            isPublic: true,
+            createdById: 1,
+            sellerId: seller.id,
+          });
+          price.product = Promise.resolve(product);
+          await price.save();
+
+          // offer
+          const offer = Offer.create({
+            productId: product.id,
+            sellerId: seller.id,
+            status: ThreeStateSupervisionStatuses.CONFIRMED,
+            isPublic: true,
+            isAvailable: true,
+          });
+          await offer.save();
+        }
+
+        const filenameRegex = new RegExp(
+          `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
+        );
+        let i = 1;
+        for (const index of this.files) {
+          try {
+            const filename = index;
+            const isRelatedToCurrentProduct = filenameRegex.test(filename);
+            if (!isRelatedToCurrentProduct) {
+              console.log("dddd", isRelatedToCurrentProduct, filename);
+              continue;
+            }
+            const [, sku, sort, extention] = filename.match(filenameRegex);
+            await this.addImage(
+              imageDirectory,
+              filename,
+              product,
+              sort ? +sort : i++,
+            );
+            this.files = this.files.filter(filename => filename !== index);
+          } catch (w) {
+            console.log("warning", w, "warning");
+          }
+        }
+
+        // this.logService.log(`(${j++}/${csvProducts.total}) Seeded.`);
+      } catch (e) {
+        console.log(e);
       }
+      this.files = this.files.filter(f => f);
     }
+    // }
     this.logService.log("finished.", {
       remainingFiles: this.files,
       remainingFilesCount: this.files.length,
