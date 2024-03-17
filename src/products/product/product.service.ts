@@ -503,13 +503,12 @@ export class ProductService {
      const cacheKey = `lowestPrice_${product.id}`;
 
     // Try to get the result from cache
-    const cachedResult = await this.cacheManager.get<string>(cacheKey);
+    const cachedResult = await this.cacheManager.get<Price>(cacheKey);
     if (cachedResult) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-      const parsedData: Price = JSON.parse(decompressedData);
-      parsedData.createdAt = new Date(parsedData.createdAt);
-      parsedData.discount = null
-      return parsedData;
+    
+      cachedResult.createdAt = new Date(cachedResult.createdAt);
+ 
+      return cachedResult;
     }
       const IDS = product.id;
       const result = Price.findOne({
