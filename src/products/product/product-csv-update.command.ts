@@ -97,13 +97,13 @@ export class ProductCsvUpdateCommand extends CommandRunner {
               throw product;
             }
             product.name = name   
-  
+            console.log('input',category)
             const category2: Category = await this.firstOrCreateCategory(category);
     
             if (!category2) {
               throw category;
             }
-            console.log(category2.title)
+            console.log('output',category2.title)
             product.categoryId = category2.id
   
             // product.save()
