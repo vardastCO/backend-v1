@@ -504,16 +504,8 @@ export class ProductService {
 
     // Try to get the result from cache
     const cachedResult = await this.cacheManager.get<Price>(cacheKey);
-    if (cachedResult && cachedResult.createdAt) {
+    if (cachedResult) {
     
-      // const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-
-      //  const parsedData: Price  = JSON.parse(cachedResult);
-            
-      //  // Check if parsedData is not null and has the createdAt property
-      //  if (parsedData && parsedData.createdAt) {
-      //      parsedData.createdAt = new Date(parsedData.createdAt);
-      //  }
       return cachedResult;
      }
       const IDS = product.id;
@@ -524,13 +516,14 @@ export class ProductService {
           createdAt: "DESC"
         },
       });
-      const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller');
 
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-
-      // const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
-
-      await this.cacheManager.set(cacheKey, modifiedDataWithOutText,CacheTTL.ONE_DAY);
+      if (result) {
+        const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller');
+        const modifiedDataWithOutText = JSON.parse(jsonString);
+    
+        // Cache the result only if it's not null
+        await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_DAY);
+      }
     
       return result
       
