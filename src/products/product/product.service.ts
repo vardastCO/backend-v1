@@ -508,12 +508,10 @@ export class ProductService {
     
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
        const parsedData: Price = JSON.parse(decompressedData);
+       console.log('parsed',parsedData)
        if (parsedData) {
-        parsedData.createdAt = new Date(parsedData.createdAt);
-        } else {
-            // Handle case where parsedData is invalid
-            throw new Error("Invalid data: 'parsedData' is empty or 'createdAt' property is missing.");
-        }
+         parsedData.createdAt = new Date(parsedData.createdAt);
+       }
     
       return parsedData;
      }
