@@ -48,7 +48,7 @@ export const graphqlAsyncConfig: ApolloDriverAsyncConfig = {
       // Log the incoming GraphQL request
       console.log(`Received GraphQL request: ${JSON.stringify(req.body)}`);
       console.log(`Request headers: ${JSON.stringify(req.headers)}`);
-      console.log(`Res : ${JSON.stringify(res.body)}`);
+      console.log(`Res : ${JSON.stringify(res)}`);
       // // Return the context object
       const contextObject = { req, res };
     
