@@ -504,11 +504,13 @@ export class ProductService {
 
     // Try to get the result from cache
     const cachedResult = await this.cacheManager.get<Price>(cacheKey);
-    if (cachedResult) {
+     if (cachedResult) {
     
-      cachedResult.createdAt = new Date(cachedResult.createdAt);
-      // return cachedResult;
-    }
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
+      const parsedData: Price = JSON.parse(decompressedData);
+      parsedData.createdAt = new Date(parsedData.createdAt);
+      return cachedResult;
+     }
       const IDS = product.id;
       const result = await Price.findOne({
         where: { productId: IDS, deletedAt: IsNull() },
@@ -517,10 +519,15 @@ export class ProductService {
           createdAt: "DESC"
         },
       });
-      await this.cacheManager.set(cacheKey, await result,CacheTTL.ONE_DAY);
-  
+      const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller');
+
+      const modifiedDataWithOutText = JSON.parse(jsonString);
+
+      const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
     
-    return result
+      return result
       
     } catch (e) {
       console.log('eeeeeeeeeeee',e)
