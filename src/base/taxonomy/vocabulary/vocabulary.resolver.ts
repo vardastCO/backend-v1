@@ -79,7 +79,7 @@ export class VocabularyResolver {
     const cachedData = await this.cacheManager.get<Vocabulary>(cacheKey);
   
     if (cachedData) {
-
+      console.log('cache vocabulary ')
       return cachedData;
     }
     const response = await this.vocabularyService.findOne(id, slug, user);
