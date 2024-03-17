@@ -632,8 +632,11 @@ export class ProductService {
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
       if (cachedResult) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-      const parsedData: Price = JSON.parse(decompressedData);
-      parsedData.createdAt = new Date(parsedData.createdAt);
+        const parsedData: Price = JSON.parse(decompressedData);
+      if (parsedData) {
+        parsedData.createdAt = new Date(parsedData.createdAt);
+      }
+     
       return parsedData;
     }
     const result =  await LastPrice.createQueryBuilder()
@@ -645,7 +648,7 @@ export class ProductService {
     const compressedData = zlib.gzipSync(JSON.stringify(result));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
     
-    return result
+    return result || null
   }
 
   private async executeMainQuery(
