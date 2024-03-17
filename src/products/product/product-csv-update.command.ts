@@ -106,7 +106,7 @@ export class ProductCsvUpdateCommand extends CommandRunner {
   
             product.categoryId = category2.id
   
-            product.save()
+            // product.save()
     
             // let attributesArray = filter.split('-');
   
@@ -190,7 +190,7 @@ export class ProductCsvUpdateCommand extends CommandRunner {
             // }
             
 
-            product.save()
+            await product.save()
 
         }  
       }catch(e){
