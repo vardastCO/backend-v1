@@ -103,7 +103,7 @@ export class ProductCsvUpdateCommand extends CommandRunner {
             if (!category2) {
               throw category;
             }
-  
+            console.log(category2.title)
             product.categoryId = category2.id
   
             // product.save()
