@@ -508,10 +508,7 @@ export class ProductService {
     
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
        const parsedData: Price = JSON.parse(decompressedData);
-       console.log('parsed',parsedData)
-       if (parsedData) {
-        parsedData.createdAt = new Date(parsedData.createdAt);
-       }
+    
       return parsedData;
      }
       const IDS = product.id;
