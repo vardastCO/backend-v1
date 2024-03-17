@@ -502,12 +502,12 @@ export class ProductService {
     try {
     const cacheKey = `product_${product.id}_lowestPrice`;
 
-    // Try to get the result from cache
-    const cachedResult = await this.cacheManager.get<Price>(cacheKey);
-    if (cachedResult) {
+    // // Try to get the result from cache
+    // const cachedResult = await this.cacheManager.get<Price>(cacheKey);
+    // if (cachedResult) {
     
-      return cachedResult;
-     }
+    //   return cachedResult;
+    //  }
       const IDS = product.id;
       const result = await Price.findOne({
         where: { productId: IDS, deletedAt: IsNull() },
@@ -525,7 +525,7 @@ export class ProductService {
         await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_DAY);
       }
     
-      return result || null
+      return result 
       
     } catch (e) {
       console.log('eeeeeeeeeeee',e)
