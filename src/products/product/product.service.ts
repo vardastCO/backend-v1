@@ -498,7 +498,7 @@ export class ProductService {
     return offers;
   }
 
-  async getLowestPriceOf(product: Product): Promise<Price> {
+  async getLowestPriceOf(product: Product): Promise<Price| null> {
     try {
     const cacheKey = `product_${product.id}_lowestPrice`;
 
@@ -507,8 +507,13 @@ export class ProductService {
      if (cachedResult) {
     
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-       const parsedData: Price = JSON.parse(decompressedData);
-    
+
+       const parsedData: Price | null = JSON.parse(decompressedData);
+            
+       // Check if parsedData is not null and has the createdAt property
+       if (parsedData && parsedData.createdAt) {
+           parsedData.createdAt = new Date(parsedData.createdAt);
+       }
       return parsedData;
      }
       const IDS = product.id;
