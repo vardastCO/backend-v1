@@ -6,6 +6,7 @@ import {
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { GraphQLFormattedError } from "graphql";
 import { I18nService } from "nestjs-i18n";
+import { ApolloServerPluginCacheControl } from "apollo-server-core";
 // import { join } from "path";
 export const graphqlAsyncConfig: ApolloDriverAsyncConfig = {
   driver: ApolloDriver,
@@ -18,6 +19,10 @@ export const graphqlAsyncConfig: ApolloDriverAsyncConfig = {
     autoSchemaFile: true,
     introspection: true, 
     nodeEnv: configService.get<string>("APP_ENVIRONMENT"),
+    plugins: [
+      // Add Apollo Server plugin for cache control
+      ApolloServerPluginCacheControl(),
+    ],
     formatError: function (
         formattedError: GraphQLFormattedError,
         error: unknown,
