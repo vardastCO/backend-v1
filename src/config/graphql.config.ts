@@ -42,17 +42,11 @@ export const graphqlAsyncConfig: ApolloDriverAsyncConfig = {
       }
       return formattedError;
     },
-    context: async ({ req, res }: { req: Request; res: Response }) => {
-      // Log the start time
-    
+    context: ({ req, res }: { req: Request; res: Response }) => {
       // Log the incoming GraphQL request
-      console.log(`Received GraphQL request: ${JSON.stringify(req.body)}`);
-      console.log(`Request headers: ${JSON.stringify(req.headers)}`);
-      console.log(`Res : ${JSON.stringify(res)}`);
-      // // Return the context object
-      const contextObject = { req, res };
-    
-      return contextObject;
+      // console.log(`Received GraphQL request: ${JSON.stringify(req.body)}`);
+      // console.log(`Send res: ${JSON.stringify(req.headers)}`);
+      return { req, res };
     },
   }),
 
