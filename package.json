@@ -78,7 +78,8 @@
     "@nestjs/schedule" : "*",
     "@types/compression" : "*",
     "@nestjs/terminus" : "*",
-    "@nestjs/platform-fastify" : "*"
+    "@nestjs/platform-fastify" : "*",
+    "apollo-server-core" : "*"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.4.2",
