@@ -511,7 +511,7 @@ export class ProductService {
       return cachedResult;
     }
       const IDS = product.id;
-      const result = Price.findOne({
+      const result = await Price.findOne({
         where: { productId: IDS,deletedAt:IsNull() },
         order: {
           createdAt: "DESC"
