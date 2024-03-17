@@ -504,17 +504,13 @@ export class ProductService {
 
     // Try to get the result from cache
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
-      if (cachedResult) {
+    if (cachedResult) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
       const parsedData: Price = JSON.parse(decompressedData);
       parsedData.createdAt = new Date(parsedData.createdAt);
+      parsedData.discount = null
       return parsedData;
     }
-    // const result =  await LastPrice.createQueryBuilder()
-    //   .where({ productId: product.id })
-    //   .orderBy({ amount: "ASC" })
-    //   .limit(1)
-      //   .getOne();
       const IDS = product.id;
       const result = Price.findOne({
         where: { productId: IDS,deletedAt:IsNull() },
@@ -524,13 +520,7 @@ export class ProductService {
       });
       const compressedData = zlib.gzipSync(JSON.stringify(result));
       await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
-      
-      // const result =  await Price.
-      // .where({ productId: product.id })
-      // .orderBy({ createdAt: "DESC" })
-      // .limit(1)
-      // .getOne();
-    // await this.cacheManager.set(cacheKey,result,CacheTTL.ONE_DAY)
+  
     
     return result
       
