@@ -23,7 +23,8 @@ import { Cache } from "cache-manager";
 import {
   Inject,
 } from "@nestjs/common"
-
+import * as zlib from 'zlib';
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 @Resolver(() => File)
 export class FileResolver {
   constructor(private readonly fileService: FileService,
@@ -53,10 +54,12 @@ export class FileResolver {
     @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
   ): Promise<File[]> {
     const cacheKey = `banners_${JSON.stringify(IndexBannerInput)}`;
-    const cachedData = await this.cacheManager.get<File[]>(cacheKey);
-  
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      return cachedData;
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const parsedData: File[] = JSON.parse(decompressedData);
+  
+      return parsedData;
     }
     if (IndexBannerInput.type === FileModelTypeEnum.SLIDER) {
       const response = await File.find({
@@ -68,7 +71,8 @@ export class FileResolver {
           orderColumn: "ASC",
         }
       });
-      await this.cacheManager.set(cacheKey, response, 604_800);//one week ? 
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
       return  response
     }
     if (IndexBannerInput.type === FileModelTypeEnum.SHORT_BANNER) {
@@ -78,7 +82,8 @@ export class FileResolver {
           modelType: 'ShortBanner',
         },
       });
-      await this.cacheManager.set(cacheKey, response, 604_800);//one week ? 
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
       return  response 
     }
 
@@ -89,7 +94,8 @@ export class FileResolver {
           modelType: 'LongBanner',
         },
       });
-      await this.cacheManager.set(cacheKey, response, 604_800);//one week ? 
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
       return  response  
     }
 
