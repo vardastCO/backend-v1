@@ -507,8 +507,8 @@ export class ProductService {
     if (cachedResult) {
     
       cachedResult.createdAt = new Date(cachedResult.createdAt);
- 
-      return cachedResult;
+      console.log('cachedResult',cachedResult)
+      // return cachedResult;
     }
       const IDS = product.id;
       const result = await Price.findOne({
@@ -517,7 +517,8 @@ export class ProductService {
           createdAt: "DESC"
         },
       });
-      await this.cacheManager.set(cacheKey, result,CacheTTL.ONE_DAY);
+      console.log('result',result)
+      await this.cacheManager.set(cacheKey, await result,CacheTTL.ONE_DAY);
   
     
     return result
