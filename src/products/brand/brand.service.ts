@@ -168,39 +168,34 @@ export class BrandService {
       const cachedData = await this.cacheManager.get<Brand>(cacheKey);
     
       if (cachedData) {
-        cachedData.createdAt = new Date();
-        cachedData.updatedAt = new Date();
-        const catalogFile = await cachedData.catalog;
+        const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+        const parsedData: Brand = JSON.parse(decompressedData);
+        parsedData.createdAt = new Date();
+        parsedData.updatedAt = new Date();
+        const catalogFile = await parsedData.catalog;
 
         if (catalogFile) {
           // Now you can access the properties of the resolved File object
-          const catalogCreatedAt = await catalogFile.createdAt;
+          const catalogCreatedAt = await parsedData.createdAt;
         
           if (catalogCreatedAt) {
-            (await cachedData.catalog).createdAt = new Date(catalogCreatedAt);
+            (await parsedData.catalog).createdAt = new Date(catalogCreatedAt);
           }
         }
 
-        const priceFile = await cachedData.priceList;
+        const priceFile = await parsedData.priceList;
 
         if (priceFile) {
           // Now you can access the properties of the resolved File object
           const priceCreatedAt = await priceFile.createdAt;
         
           if (priceCreatedAt) {
-            (await cachedData.priceList).createdAt = new Date(priceCreatedAt);
+            (await parsedData.priceList).createdAt = new Date(priceCreatedAt);
           }
         }
-      
-      
         
       
-        // if (cachedData.priceList && cachedData.priceList.createdAt) {
-        //   const priceListCreatedAt = await cachedData.priceList.createdAt;
-        //   cachedData.priceList.createdAt = new Date(priceListCreatedAt);
-        // }
-      
-        return cachedData
+        return parsedData
       }
       const brand = await Brand.findOneBy({ id });
       if (!brand) {
@@ -219,8 +214,9 @@ export class BrandService {
       ;
   
       // Parse the modified JSON back to objects
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-        await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK);
+        const modifiedDataWithOutText = JSON.parse(jsonString);
+        const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
       } catch (e) {
           throw e
       }
