@@ -517,8 +517,7 @@ export class ProductService {
           createdAt: "DESC"
         },
       });
-      const compressedData = zlib.gzipSync(JSON.stringify(result));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
+      await this.cacheManager.set(cacheKey, result,CacheTTL.ONE_DAY);
   
     
     return result
