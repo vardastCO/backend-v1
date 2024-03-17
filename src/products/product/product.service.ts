@@ -525,7 +525,7 @@ export class ProductService {
         await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_DAY);
       }
     
-      return result
+      return result || null
       
     } catch (e) {
       console.log('eeeeeeeeeeee',e)
