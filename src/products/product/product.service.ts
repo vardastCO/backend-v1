@@ -510,7 +510,7 @@ export class ProductService {
       if (parsedData) {
         parsedData.createdAt = new Date(parsedData.createdAt);
       }
-      return cachedResult;
+      return parsedData;
     }
       const IDS = product.id;
       const result = await Price.findOne({
