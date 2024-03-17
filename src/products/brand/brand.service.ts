@@ -165,7 +165,7 @@ export class BrandService {
       // this.logBrandView(id,payload);
       const cacheKey = `brand_${JSON.stringify(id)}`;
   
-      const cachedData = await this.cacheManager.get<Brand>(cacheKey);
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
     
       if (cachedData) {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
