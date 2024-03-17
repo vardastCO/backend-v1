@@ -500,7 +500,7 @@ export class ProductService {
 
   async getLowestPriceOf(product: Product): Promise<Price> {
     try {
-     const cacheKey = `lowestPrice_${product.id}`;
+    const cacheKey = `product_${product.id}_lowestPrice`;
 
     // Try to get the result from cache
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
