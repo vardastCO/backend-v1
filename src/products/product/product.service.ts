@@ -503,7 +503,7 @@ export class ProductService {
      const cacheKey = `lowestPrice_${product.id}`;
 
     // Try to get the result from cache
-    const cachedResult = await this.cacheManager.get<Price>(cacheKey);
+    const cachedResult = await this.cacheManager.get<string>(cacheKey);
      if (cachedResult) {
     
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
