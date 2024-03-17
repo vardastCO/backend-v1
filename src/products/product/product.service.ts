@@ -508,7 +508,7 @@ export class ProductService {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
       const parsedData: Price = JSON.parse(decompressedData);
       parsedData.createdAt = new Date(parsedData.createdAt);
-      return cachedResult;
+      return parsedData;
     }
     // const result =  await LastPrice.createQueryBuilder()
     //   .where({ productId: product.id })
@@ -641,7 +641,7 @@ export class ProductService {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
       const parsedData: Price = JSON.parse(decompressedData);
       parsedData.createdAt = new Date(parsedData.createdAt);
-      return cachedResult;
+      return parsedData;
     }
     const result =  await LastPrice.createQueryBuilder()
       .where({ productId: product.id })
