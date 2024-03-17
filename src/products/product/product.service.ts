@@ -500,26 +500,16 @@ export class ProductService {
 
   async getLowestPriceOf(product: Product): Promise<Price> {
     try {
-     const cacheKey = `lowestPrice_${product.id}`;
+    const IDS = product.id;
+    const result = await Price.findOne({
+      where: { productId: IDS,deletedAt:IsNull() },
+      order: {
+        createdAt: "DESC"
+      },
+    });
 
-    // Try to get the result from cache
-    const cachedResult = await this.cacheManager.get<Price>(cacheKey);
-    if (cachedResult) {
     
-      cachedResult.createdAt = new Date(cachedResult.createdAt);
-      return cachedResult;
-    }
-      const IDS = product.id;
-      const result = await Price.findOne({
-        where: { productId: IDS,deletedAt:IsNull() },
-        order: {
-          createdAt: "DESC"
-        },
-      });
-      await this.cacheManager.set(cacheKey, await result,CacheTTL.ONE_DAY);
-  
-    
-    return result
+     return result
       
     } catch (e) {
       console.log('eeeeeeeeeeee',e)
