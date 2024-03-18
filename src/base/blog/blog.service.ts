@@ -33,13 +33,13 @@ export class BlogService {
       }
 
       const response_1 = await axios.get(
-        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=${indexBlogInput.perPage}&_embed&categories=4`,
+        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=4`,
       );
       const response_2 = await axios.get(
-        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=${indexBlogInput.perPage}&_embed&categories=24`,
+        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=3&_embed&categories=24`,
       );
       const response_3 = await axios.get(
-        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=${indexBlogInput.perPage}&_embed&categories=6`,
+        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=5`,
       );
 
       const data_1 = response_1.data?.slice(0, 1) || [];
