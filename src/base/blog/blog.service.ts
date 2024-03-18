@@ -81,7 +81,7 @@ export class BlogService {
       );
       
       const compressedData = zlib.gzipSync(JSON.stringify(result));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
 
       return result;
     } catch (e) {
