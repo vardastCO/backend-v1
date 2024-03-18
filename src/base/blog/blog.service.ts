@@ -47,9 +47,20 @@ export class BlogService {
       const data_3 = response_3.data?.slice(0, 1) || [];
 
       const posts = [...data_1, ...data_2, ...data_3];
+      const sortedPosts = posts.sort((a, b) => {
+        const modifiedDataA = new Date(a.date);
+        const modifiedDataB = new Date(b.date);
+        if (modifiedDataA > modifiedDataB) {
+          return -1;
+        }
+        if (modifiedDataA < modifiedDataB) {
+          return 1;
+        }
+        return 0;
+      })
 
       const createdBlogs: Blog[] = await Promise.all(
-        posts.map(async post => {
+        sortedPosts.map(async post => {
           const dataUrl = post.guid.rendered;
           const title = post.title.rendered;
           const description = post.excerpt.rendered;
@@ -68,6 +79,7 @@ export class BlogService {
           return newBlog;
         }),
       );
+  
 
       // Use createdBlogs directly for pagination
       const startIndex = (indexBlogInput.page - 1) * indexBlogInput.perPage;
