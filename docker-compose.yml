@@ -35,24 +35,28 @@ services:
           cpus: '6'
           memory: 2G
 
-  storage:
-    image: minio/minio
-    ports:
-      - 81:9000
-      - 9090:9090
-    environment:
-      MINIO_ROOT_USER: farbod
-      MINIO_ROOT_PASSWORD: g90pM89O
-    volumes:
-      - ./storage:/data
-    command: server /data --console-address ":9090"
-    networks:
-      - myNet
-    deploy:
-      resources:
-       limits:
-         cpus: '6'  # Adjust based on available cores
-         memory: 6G 
+ storage:
+  image: minio/minio
+  ports:
+    - "81:9000"
+    - "9090:9090"
+  environment:
+    MINIO_ROOT_USER: farbod
+    MINIO_ROOT_PASSWORD: g90pM89O
+    MINIO_DOMAIN: minio.vatdast.ir
+    MINIO_CERTS_CA_CERTIFICATE: /root/.minio/certs/minio.crt
+    MINIO_CERTS_CA_KEY: /root/.minio/certs/minio.key
+  volumes:
+    - ./storage:/data
+    - ./cert:/root/.minio/certs
+  command: server /data --console-address ":9090"
+  networks:
+    - myNet
+  deploy:
+    resources:
+      limits:
+        cpus: '6'  # Adjust based on available cores
+        memory: 6G
   web:
     build: .
     restart: always
