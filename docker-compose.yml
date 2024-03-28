@@ -43,9 +43,7 @@ services:
    environment:
     MINIO_ROOT_USER: farbod
     MINIO_ROOT_PASSWORD: g90pM89O
-    MINIO_DOMAIN: minio.vatdast.ir
-    MINIO_CERTS_CA_CERTIFICATE: /root/.minio/certs/minio.crt
-    MINIO_CERTS_CA_KEY: /root/.minio/certs/minio.key
+    MINIO_SERVER_URL: "http://minio.vatdast.ir:9000"
    volumes:
     - ./storage:/data
     - ./cert:/root/.minio/certs
