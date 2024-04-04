@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import { AttributesProductService } from "src/products/attribute/entities/attribute_product.entity";
 import { ValuesService } from "./value-service.entity";
-import { ProductEntity } from "src/products/product/entities/product-service.entity";
+
 
 @ObjectType()
 @Entity("attributes_value_product_service")
@@ -20,11 +20,11 @@ export class AttributeValuesProductService extends BaseEntity {
     primaryKeyConstraintName: "attributes_value_product_service_id",
   })
   id: number;
-  @Field(() => ProductEntity)
-  @ManyToOne(() => ProductEntity, {
+  @Field(() => Product)
+  @ManyToOne(() => Product, {
     nullable: false,
   })
-  product: Promise<ProductEntity>;
+  product: Promise<Product>;
   @Index() 
   @Column()
   productId: number;
