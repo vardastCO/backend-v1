@@ -32,6 +32,10 @@ export class Blog extends BaseEntity {
   @Column({ nullable: true })
   image_url: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  date: string;
+
   // @OneToMany(() => BlogFile, blogFile => blogFile.blog)
   // files: BlogFile[];
 

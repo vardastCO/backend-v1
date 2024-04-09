@@ -62,6 +62,7 @@ export class BlogService {
       const createdBlogs: Blog[] = await Promise.all(
         sortedPosts.map(async post => {
           const dataUrl = post.guid.rendered;
+          const date = post.date;
           const title = post.title.rendered;
           const description = post.excerpt.rendered;
           const categoryId = 1;
@@ -74,6 +75,7 @@ export class BlogService {
             image_url,
             description,
             categoryId,
+            date
           );
 
           return newBlog;
@@ -107,6 +109,7 @@ export class BlogService {
     image_url: string,
     description: string,
     categoryId: number,
+    date:string
   ): Promise<Blog> {
     if (title) {
       try {
@@ -114,6 +117,7 @@ export class BlogService {
           url: url,
           title: title,
           image_url: image_url,
+          date:date
         });
 
         if (blog) {
@@ -126,6 +130,7 @@ export class BlogService {
           image_url,
           description,
           categoryId,
+          date:date
         });
 
         await blog.save();
