@@ -61,7 +61,7 @@ export class BlogService {
 
       const createdBlogs: Blog[] = await Promise.all(
         sortedPosts.map(async post => {
-          const dataUrl = post.guid.rendered;
+          const dataUrl = post.link;
           const date = post.date;
           const title = post.title.rendered;
           const description = post.excerpt.rendered;
