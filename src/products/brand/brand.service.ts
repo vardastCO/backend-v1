@@ -173,9 +173,6 @@ export class BrandService {
         parsedData.createdAt = new Date();
         parsedData.updatedAt = new Date();
         const catalogFile = await parsedData.catalog;
-        console.log('catalogFile',catalogFile)
-        console.log('catalogFile.createdAt', catalogFile.createdAt)
-        console.log('time',new Date(catalogFile.createdAt))
         if (catalogFile) {
          
           (await parsedData.catalog).createdAt = new Date(catalogFile.createdAt);
