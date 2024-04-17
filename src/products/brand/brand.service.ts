@@ -174,9 +174,13 @@ export class BrandService {
         parsedData.updatedAt = new Date();
         const catalogFile = await parsedData.catalog;
 
+        console.log('catalogFile',catalogFile)
+
         if (catalogFile) {
           // Now you can access the properties of the resolved File object
           const catalogCreatedAt = await parsedData.createdAt;
+
+          console.log('catalogCreatedAt',catalogCreatedAt)
         
           if (catalogCreatedAt) {
             (await parsedData.catalog).createdAt = new Date(catalogCreatedAt);
