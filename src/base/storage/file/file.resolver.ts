@@ -98,6 +98,50 @@ export class FileResolver {
       await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
       return  response  
     }
+    if (IndexBannerInput.type === FileModelTypeEnum.SMALL) {
+      const response = await File.find({
+        where: {
+          directory: { path: "banner/mobile" }, //it should be dynamic
+          modelType: 'SMALL',
+        },
+      });
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+      return  response  
+    }
+    if (IndexBannerInput.type === FileModelTypeEnum.MEDIUM) {
+      const response = await File.find({
+        where: {
+          directory: { path: "banner/mobile" }, 
+          modelType: 'MEDIUM',
+        },
+      });
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+      return  response  
+    }
+    if (IndexBannerInput.type === FileModelTypeEnum.LARGE) {
+      const response = await File.find({
+        where: {
+          directory: { path: "banner/mobile" },
+          modelType: 'LARGE',
+        },
+      });
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+      return  response  
+    }
+    if (IndexBannerInput.type === FileModelTypeEnum.XLARGE) {
+      const response = await File.find({
+        where: {
+          directory: { path: "banner/mobile" }, 
+          modelType: 'XLARGE',
+        },
+      });
+      const compressedData = zlib.gzipSync(JSON.stringify(response));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+      return  response  
+    }
 
   }
 
