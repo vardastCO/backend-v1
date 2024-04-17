@@ -50,14 +50,14 @@ export class FileResolver {
   async getBannerHomePage(
     @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
   ): Promise<BannerResponse> {
-    const cacheKey = `banners_${JSON.stringify(IndexBannerInput)}`;
-    const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-      const parsedData: BannerResponse = JSON.parse(decompressedData);
+    // const cacheKey = `banners_${JSON.stringify(IndexBannerInput)}`;
+    // const cachedData = await this.cacheManager.get<string>(cacheKey);
+    // if (cachedData) {
+    //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+    //   const parsedData: BannerResponse = JSON.parse(decompressedData);
   
-      return parsedData;
-    }
+    //   return parsedData;
+    // }
     const [small, medium, large, xlarge] = await Promise.all([
       File.find({
         where: {
@@ -93,7 +93,7 @@ export class FileResolver {
     };
   
     const compressedData = zlib.gzipSync(JSON.stringify(response));
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+    // await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
 
   }
