@@ -4,7 +4,5 @@ import { FileModelTypeEnum } from "../enums/file-model-type.enum";
 
 @InputType()
 export class IndexBannerInput {
-  @Field(() => FileModelTypeEnum)
-  @IsNotEmpty()
-  type: FileModelTypeEnum;
+
 }
