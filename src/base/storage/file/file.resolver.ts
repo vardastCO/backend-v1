@@ -21,6 +21,7 @@ import { IndexFileInput } from "./dto/index-file.input";
 import { PresignedUrlObject } from "./dto/presigned-url.response";
 import { File } from "./entities/file.entity";
 import { FileService } from "./file.service";
+import { PaginationFileResponse } from "./dto/pagination-file.response";
 @Resolver(() => File)
 export class FileResolver {
   constructor(private readonly fileService: FileService,
