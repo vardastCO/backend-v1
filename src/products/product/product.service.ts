@@ -572,7 +572,7 @@ export class ProductService {
         "CASE WHEN COUNT(images.id) > 0 AND COUNT(prices.id) > 0 THEN 1 WHEN COUNT(prices.id) > 0 AND COUNT(images.id) = 0 THEN 2 WHEN COUNT(prices.id) = 0 AND COUNT(images.id) > 0 THEN 3 ELSE 4 END",
       )
       .where({ categoryId: product.categoryId })
-      .limit(5)
+      .limit(10)
       .getMany();
     
     return result
