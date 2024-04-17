@@ -1,4 +1,5 @@
-import { ValidationPipe } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Inject, ValidationPipe } from "@nestjs/common";
 import {
   Args,
   Int,
@@ -8,23 +9,18 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import { Cache } from "cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import { Permission } from "src/users/authorization/permission.decorator";
+import * as zlib from 'zlib';
 import { Directory } from "../directory/entities/directory.entity";
+import { BannerResponse } from "./dto/banner.response";
 import { IndexBannerInput } from "./dto/index-banner.input";
 import { IndexFileInput } from "./dto/index-file.input";
-import { PaginationFileResponse } from "./dto/pagination-file.response";
 import { PresignedUrlObject } from "./dto/presigned-url.response";
 import { File } from "./entities/file.entity";
-import { FileModelTypeEnum } from "./enums/file-model-type.enum";
 import { FileService } from "./file.service";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Cache } from "cache-manager";
-import {
-  Inject,
-} from "@nestjs/common"
-import * as zlib from 'zlib';
-import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 @Resolver(() => File)
 export class FileResolver {
   constructor(private readonly fileService: FileService,
@@ -52,96 +48,52 @@ export class FileResolver {
   @Query(() => [File])
   async getBannerHomePage(
     @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
-  ): Promise<File[]> {
+  ): Promise<BannerResponse> {
     const cacheKey = `banners_${JSON.stringify(IndexBannerInput)}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-      const parsedData: File[] = JSON.parse(decompressedData);
+      const parsedData: BannerResponse = JSON.parse(decompressedData);
   
       return parsedData;
     }
-    if (IndexBannerInput.type === FileModelTypeEnum.SLIDER) {
-      const response = await File.find({
-        where: {
-          directory: { path: "banner/mobile" }, //it should be dynamic
-          modelType: 'Slider',
-        },
-        order: {
-          orderColumn: "ASC",
-        }
-      });
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-      return  response
-    }
-    if (IndexBannerInput.type === FileModelTypeEnum.SHORT_BANNER) {
-      const response = await File.find({
-        where: {
-          directory: { path: "banner/mobile" }, //it should be dynamic
-          modelType: 'ShortBanner',
-        },
-      });
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-      return  response 
-    }
-
-    if (IndexBannerInput.type === FileModelTypeEnum.LONG_BANNER) {
-      const response = await File.find({
-        where: {
-          directory: { path: "banner/mobile" }, //it should be dynamic
-          modelType: 'LongBanner',
-        },
-      });
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-      return  response  
-    }
-    if (IndexBannerInput.type === FileModelTypeEnum.SMALL) {
-      const response = await File.find({
+    const [small, medium, large, xlarge] = await Promise.all([
+      File.find({
         where: {
           directory: { path: "banner/mobile" }, //it should be dynamic
           modelType: 'SMALL',
         },
-      });
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-      return  response  
-    }
-    if (IndexBannerInput.type === FileModelTypeEnum.MEDIUM) {
-      const response = await File.find({
+      }),
+      File.find({
         where: {
-          directory: { path: "banner/mobile" }, 
+          directory: { path: "banner/mobile" }, //it should be dynamic
           modelType: 'MEDIUM',
         },
-      });
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-      return  response  
-    }
-    if (IndexBannerInput.type === FileModelTypeEnum.LARGE) {
-      const response = await File.find({
+      }),
+      File.find({
         where: {
-          directory: { path: "banner/mobile" },
+          directory: { path: "banner/mobile" }, //it should be dynamic
           modelType: 'LARGE',
         },
-      });
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-      return  response  
-    }
-    if (IndexBannerInput.type === FileModelTypeEnum.XLARGE) {
-      const response = await File.find({
+      }),
+      File.find({
         where: {
-          directory: { path: "banner/mobile" }, 
+          directory: { path: "banner/mobile" }, //it should be dynamic
           modelType: 'XLARGE',
         },
-      });
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-      return  response  
-    }
+      })
+    ]);
+  
+    const response: BannerResponse = {
+      small,
+      medium,
+      large,
+      xlarge
+    };
+  
+    const compressedData = zlib.gzipSync(JSON.stringify(response));
+    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+    return response;
 
   }
 
