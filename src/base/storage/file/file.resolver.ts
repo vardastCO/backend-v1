@@ -46,7 +46,7 @@ export class FileResolver {
     return this.fileService.findOne(id);
   }
   @Public()
-  @Query(() => [File])
+  @Query(() => BannerResponse)
   async getBannerHomePage(
     @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
   ): Promise<BannerResponse> {
