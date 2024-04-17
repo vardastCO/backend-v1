@@ -22,6 +22,7 @@ import { PresignedUrlObject } from "./dto/presigned-url.response";
 import { File } from "./entities/file.entity";
 import { FileService } from "./file.service";
 import { PaginationFileResponse } from "./dto/pagination-file.response";
+import { Banner } from "./entities/banners.entity";
 @Resolver(() => File)
 export class FileResolver {
   constructor(private readonly fileService: FileService,
@@ -92,6 +93,28 @@ export class FileResolver {
       xlarge
     };
   
+    const compressedData = zlib.gzipSync(JSON.stringify(response));
+    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+    return response;
+
+  }
+  @Public()
+  @Query(() => [Banner])
+  async getBanners(
+    @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
+  ): Promise<Banner[]> {
+    const cacheKey = `banners_v2_${JSON.stringify(IndexBannerInput)}`;
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const parsedData: Banner[] = JSON.parse(decompressedData);
+  
+      return parsedData;
+    }
+    const response = Banner.find({
+      take : 5
+    })
+
     const compressedData = zlib.gzipSync(JSON.stringify(response));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
