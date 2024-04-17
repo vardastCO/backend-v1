@@ -522,7 +522,8 @@ export class ProductService {
       });
 
       if (result) {
-        const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller');
+        const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
+        .replace(/__logoFile__/g, 'logoFile');
         const modifiedDataWithOutText = JSON.parse(jsonString);
         const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
         await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
