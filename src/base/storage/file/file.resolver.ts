@@ -103,20 +103,20 @@ export class FileResolver {
   async getBanners(
     @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
   ): Promise<Banner[]> {
-    const cacheKey = `banners_v2_${JSON.stringify(IndexBannerInput)}`;
-    const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-      const parsedData: Banner[] = JSON.parse(decompressedData);
+    // const cacheKey = `banners_v2_${JSON.stringify(IndexBannerInput)}`;
+    // const cachedData = await this.cacheManager.get<string>(cacheKey);
+    // if (cachedData) {
+    //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+    //   const parsedData: Banner[] = JSON.parse(decompressedData);
   
-      return parsedData;
-    }
+    //   return parsedData;
+    // }
     const response = Banner.find({
       take : 5
     })
 
-    const compressedData = zlib.gzipSync(JSON.stringify(response));
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+    // const compressedData = zlib.gzipSync(JSON.stringify(response));
+    // await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
 
   }
