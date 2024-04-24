@@ -17,6 +17,9 @@ import { AttributesProductService } from "src/products/attribute/entities/attrib
 @ObjectType()
 @Entity("category_filter")
 export class Banner extends BaseEntity {
+  @Field(() => Int)
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Field(() => Category)
   @OneToOne(() => Category, category => null, { eager: true })
