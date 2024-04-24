@@ -21,20 +21,15 @@ export class Filter_Category extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => Category)
-  @OneToOne(() => Category, category => null, { eager: true })
-  @JoinColumn()
-  category: Promise<Category>;
+  @Field(() => Int,{ nullable: true })
   @Index()
-  @Column()
+  @Column({ nullable: true })
   categoryId: number;
 
-  @Field(() => AttributesProductService)
-  @OneToOne(() => AttributesProductService, attribuite => null, { eager: true })
-  @JoinColumn()
-  attribuite: Promise<AttributesProductService>;
+  
+  @Field(() => Int,{ nullable: true })
   @Index()
-  @Column()
+  @Column({ nullable: true })
   attribuiteId: number;
 
 
