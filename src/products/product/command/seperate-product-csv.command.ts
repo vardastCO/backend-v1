@@ -12,17 +12,17 @@ export class SeperateProductCommand extends CommandRunner {
     super();
   }
 
-  async convertPersianToEnglishNumbers(str) {
-    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  // async convertPersianToEnglishNumbers(str) {
+  //   const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  //   const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
-    for (let i = 0; i < persianNumbers.length; i++) {
-        const persianDigit = new RegExp(persianNumbers[i], 'g');
-        str = str.replace(persianDigit, englishNumbers[i]);
-    }
+  //   for (let i = 0; i < persianNumbers.length; i++) {
+  //       const persianDigit = new RegExp(persianNumbers[i], 'g');
+  //       str = str.replace(persianDigit, englishNumbers[i]);
+  //   }
 
-    return str;
-  }
+  //   return str;
+  // }
 
   async run(): Promise<void> {
     console.log('hi');
@@ -46,13 +46,13 @@ export class SeperateProductCommand extends CommandRunner {
        
             
             let prouduct_service = await ProductEntity.create()
-            parent_product_service.name = await this.convertPersianToEnglishNumbers(product.name)
+            parent_product_service.name = product.name
             parent_product_service.brandId = product.brandId
             parent_product_service.uomId = product.uomId
             parent_product_service.categoryId = product.categoryId
             await parent_product_service.save()
 
-            prouduct_service.name = await this.convertPersianToEnglishNumbers(product.name)
+            prouduct_service.name = product.name
             prouduct_service.sku = product.sku
             prouduct_service.parentId = await parent_product_service.id
             prouduct_service.id = product.id
