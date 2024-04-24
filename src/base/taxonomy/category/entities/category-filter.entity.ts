@@ -16,7 +16,7 @@ import { AttributesProductService } from "src/products/attribute/entities/attrib
 
 @ObjectType()
 @Entity("category_filter")
-export class Banner extends BaseEntity {
+export class Filter_Category extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
