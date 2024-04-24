@@ -21,6 +21,7 @@ import {
 } from "typeorm";
 
 import { ProductTypesEnum } from "../enums/product-types.enum";
+import { ParentProductEntity } from "./parent-product.entity";
 
 @Index("idx_product_name", ["name"])
 @ObjectType()
@@ -155,6 +156,11 @@ export class Product extends InfraEntity {
   @Field(() => Int, { nullable: true })
   @Column({ nullable: true })
   rank?: number = 1;
+
+  @Field(() => Int,{ nullable: true })
+  @Index()
+  @Column({ nullable: true })
+  parentId: number;
 
   protected searchableFields = [
     "name",

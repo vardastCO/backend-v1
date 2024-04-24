@@ -60,6 +60,8 @@ export class SeperateProductCommand extends CommandRunner {
 
             await prouduct_service.save()
 
+            product.parentId=parent_product_service.id
+            await product.save()
            
             await new Promise((resolve) => setTimeout(resolve, 10));
           } catch (e) {
