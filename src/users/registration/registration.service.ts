@@ -35,7 +35,7 @@ export class RegistrationService {
     validateCellphoneInput: ValidateCellphoneInput,
     ipAddress: string,
   ): Promise<ValidateCellphoneResponse> {
-    console.log('hiiiiiiiiiiiiiiiiii')
+
     await validateCellphoneInput.validateAndFormatCellphone();
     validateCellphoneInput.validationType =
       validateCellphoneInput.validationType ?? ValidationTypes.SIGNUP;

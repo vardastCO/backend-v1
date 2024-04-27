@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsPositive,
+  Length
 } from "class-validator";
 import { Country } from "src/base/location/country/entities/country.entity";
 import { CellphoneUtil } from "src/base/utilities/cellphone.util";
@@ -20,9 +21,10 @@ export class ValidateCellphoneInput {
   @IsPositive()
   countryId: number;
 
+
   @Field()
   @IsNotEmpty()
-  @IsMobilePhone(null, null, { always: true })
+  @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
   cellphone: string;
 
   @Field(() => ValidationTypes, {
