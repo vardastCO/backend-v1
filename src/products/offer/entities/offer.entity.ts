@@ -50,6 +50,9 @@ export class Offer extends BaseEntity {
   })
   status: ThreeStateSupervisionStatuses;
 
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  url?: string;
 
   @Field({ nullable: true })
   @Column({ default: true })
