@@ -20,6 +20,7 @@ import { UpdateBrandInput } from "./dto/update-brand.input";
 import { Brand } from "./entities/brand.entity";
 import { SortBrandEnum } from "./enum/sort-types.enum";
 import * as zlib from 'zlib';
+import { File } from "src/base/storage/file/entities/file.entity";
 
 
 @Injectable()
@@ -284,19 +285,25 @@ export class BrandService {
     
 
     if (updateBrandInput.logoFileUuid) {
-      const file = await this.fileService.getNewlyUploadedFileOrFail(
-        "product/brand/logos",
-        updateBrandInput.logoFileUuid,
-        Brand.name,
-        user.id,
-        await this.i18n.translate("product.image.file_not_found", {
-          args: { uuid: updateBrandInput.logoFileUuid },
-        }),
-      );
+      // const file = await this.fileService.getNewlyUploadedFileOrFail(
+      //   "product/brand/logos",
+      //   updateBrandInput.logoFileUuid,
+      //   Brand.name,
+      //   user.id,
+      //   await this.i18n.translate("product.image.file_not_found", {
+      //     args: { uuid: updateBrandInput.logoFileUuid },
+      //   }),
+      // );
+      const file = await  File.findOneBy({
+        uuid : updateBrandInput.logoFileUuid
+      })
 
       delete updateBrandInput.logoFileUuid;
+      if (file) {
+        brand.logoFile = Promise.resolve(file);
+      }
 
-      brand.logoFile = Promise.resolve(file);
+   
     }
 
     await brand.save();
@@ -304,7 +311,7 @@ export class BrandService {
   }
 
   async remove(id: number): Promise<Brand> {
-    const brand: Brand = await this.findOne(id);
+    const brand: Brand = await Brand.findOneBy({id});
     await brand.remove();
     brand.id = id;
     return brand;
