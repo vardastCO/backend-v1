@@ -115,8 +115,8 @@ export class SearchService {
   }
 
   async suggest(suggestInput: SuggestInput): Promise<SuggestResponse> {
-    const { query, cityId, SKU } = suggestInput;
-
+    let { query, cityId, SKU } = suggestInput;
+    query = query.replace(/ي/g, 'ی');
     const productsQuery = this.getProductsSearchQuery(query);
     const categoriesQuery = this.getCategoriesSearchQuery(query);
     const sellerQuery = this.getSellerSearchQuery(query, cityId);
