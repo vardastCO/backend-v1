@@ -27,7 +27,7 @@ export class EventTrackerService {
     const event: EventTracker = EventTracker.create<EventTracker>(createEventTrackerInput);
     try {
       await this.cacheManager.set(cacheKey, JSON.stringify(event), CacheTTL.ONE_WEEK);
-      console.log('trueeeee')
+  
     } catch (e) {
       console.log('event',e)
     }
