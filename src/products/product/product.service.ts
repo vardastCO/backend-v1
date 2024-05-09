@@ -29,6 +29,7 @@ import { CreateProductSellerInput } from "./dto/create-product-seller.input";
 import { v4 as uuidv4 } from 'uuid';
 import { Seller } from "../seller/entities/seller.entity";
 import * as zlib from 'zlib';
+const { Op } = require('sequelize');
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { IndexOffersPrice } from "./dto/index-price-offers.input";
@@ -218,15 +219,10 @@ export class ProductService {
     const [products, totalCount] = await Product.findAndCount({
       where: whereConditions,
       relations: ["images", "prices", "uom", "category"],
-      order: {
-        rating: "DESC",
-        // prices: {
-        //   id: 'DESC' ,
-        //   createdAt: 'DESC'
-        // },
-        // createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
-        //   'DESC' : 'ASC'
-      },
+      order: [
+        [Sequelize.literal('rating DESC')],
+        [Sequelize.literal('RANDOM()')]
+      ],
       // order: this.getOrderClause(indexProductInput.orderBy) as any,
       skip: skip,
       take: take,
