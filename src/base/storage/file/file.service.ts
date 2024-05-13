@@ -77,16 +77,9 @@ export class FileService {
   }
 
   async getPresignedUrlOf(file: File): Promise<PresignedUrlObject> {
-    // const ttlSeconds = 3600;
-
-    // const url = await this.minioClient.presignedGetObject(
-    //   file.bucketName,
-    //   file.name,
-    //   ttlSeconds,
-    // );
-
     const now = new Date();
-    const url = `https://storage.vardast.ir/vardast/${file.name}`
+    const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
+    const url = `${baseUrl}{file.name}`
 
     return {
       url: url,
