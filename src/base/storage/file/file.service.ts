@@ -79,7 +79,7 @@ export class FileService {
   async getPresignedUrlOf(file: File): Promise<PresignedUrlObject> {
     const now = new Date();
     const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
-    const url = `${baseUrl}{file.name}`
+    const url = `${baseUrl}${file.name}`
 
     return {
       url: url,
