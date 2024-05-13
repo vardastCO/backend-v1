@@ -24,6 +24,12 @@ export class FavoriteService {
         id: In(favoriteIds),
       }) as Promise<Product[]>;
     }
+
+    if (type === EntityTypeEnum.BASKET) {
+      return Product.findBy({
+        id: In(favoriteIds),
+      }) as Promise<Product[]>;
+    }
   
     if (type === EntityTypeEnum.SELLER) {
       return Seller.findBy({

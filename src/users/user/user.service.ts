@@ -24,6 +24,7 @@ import { PaginationUserResponse } from "./dto/pagination-user.response";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UserStatusesEnum } from "./enums/user-statuses.enum";
+import { UpdateProfileInput } from "./dto/update-profile.input";
 
 @Injectable()
 export class UserService {
@@ -195,6 +196,33 @@ export class UserService {
     } else if (updateUserInput.permissionIds) {
       await this.cachePermissionsOf(user);
     }
+
+    return user;
+  }
+  async updateProfile(
+    updateProfileInput: UpdateProfileInput,
+    currentUser: User,
+  ): Promise<User> {
+    const user: User = await User.findOneBy({ id:currentUser.id });
+
+    if (!user) {
+      throw new NotFoundException();
+    }
+    
+    Object.assign(user, updateProfileInput);
+    if (updateProfileInput.firstName && updateProfileInput.lastName) {
+      user.fullName = `${updateProfileInput.firstName} ${updateProfileInput.lastName}`;
+    } else if (updateProfileInput.firstName) {
+      user.fullName = updateProfileInput.firstName;
+    } else if (updateProfileInput.lastName) {
+      user.fullName = updateProfileInput.lastName;
+    } else {
+      user.fullName = '-'; 
+    }
+
+    this.dataSource.transaction(async () => {
+      await user.save({ transaction: false });
+    });
 
     return user;
   }

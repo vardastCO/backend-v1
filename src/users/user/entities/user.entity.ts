@@ -220,7 +220,7 @@ export class User extends BaseEntity {
     } else if (this.lastName) {
       this.fullName = this.lastName;
     } else {
-      this.fullName = '-'; // Handle the case when both firstName and lastName are null
+      this.fullName = '-'; 
     }
   }
 

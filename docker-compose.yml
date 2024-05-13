@@ -11,11 +11,11 @@ services:
       - ./docker/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
     networks:
       - myNet
-    deploy:
-      resources:
-        limits:
-          cpus: '3'  # 0.5 * 3
-          memory: 3G 
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '3'  # 0.5 * 3
+    #       memory: 3G 
 
   cache:
     image: redis
@@ -29,14 +29,14 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     environment:
       - REDIS_PASSWORD=g90pM89O  
-    deploy:
-      resources:
-        limits:
-          cpus: '6'
-          memory: 2G
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '6'
+    #       memory: 2G
 
   storage:
-    image: minio/minio
+    image: quay.io/minio/minio
     ports:
       - 81:9000
       - 9090:9090
@@ -48,25 +48,25 @@ services:
     command: server /data --console-address ":9090"
     networks:
       - myNet
-    deploy:
-      resources:
-       limits:
-         cpus: '6'  # Adjust based on available cores
-         memory: 6G 
+    # deploy:
+    #   resources:
+    #    limits:
+    #      cpus: '6'  # Adjust based on available cores
+    #      memory: 6G 
   web:
     build: .
     restart: always
     ports:
-      - "3080-3087:3080"
+      - "3080:3080"
     volumes:
       - .:/app
     networks:
       - myNet
-    deploy:
-      resources:
-        limits:
-          cpus: '10'  # Set the CPU limit to 10 cores
-          memory: 3G
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '10'  # Set the CPU limit to 10 cores
+    #       memory: 3G
     # depends_on:
     #   - elasticsearch
     #   - logstash_image

@@ -8,6 +8,7 @@ import { RegistrationModule } from "./registration/registration.module";
 import { SessionsModule } from "./sessions/sessions.module";
 import { UserModule } from "./user/user.module";
 import { FavoriteModule } from './favorite/favorite.module';
+import { ProjectModule } from "./project/project.module";
 @Module({
   imports: [
     AuthModule,
@@ -18,7 +19,8 @@ import { FavoriteModule } from './favorite/favorite.module';
     SessionsModule,
     RegistrationModule,
     PasswordResetModule,
-    FavoriteModule
+    FavoriteModule,
+    ProjectModule
   ],
 })
 export class UsersModule {}

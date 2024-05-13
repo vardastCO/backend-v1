@@ -37,6 +37,8 @@ export class FavoriteResolver {
       responseData = { product: data };
     } else if (favoritesInput.type === EntityTypeEnum.SELLER) {
       responseData = { seller: data };
+    } else if (favoritesInput.type === EntityTypeEnum.BASKET) {
+        responseData = { product: data };
     } else if (favoritesInput.type === EntityTypeEnum.BRAND) {
       responseData = { brand: data };
     }

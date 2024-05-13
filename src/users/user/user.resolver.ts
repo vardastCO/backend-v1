@@ -20,6 +20,7 @@ import { PaginationUserResponse } from "./dto/pagination-user.response";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UserService } from "./user.service";
+import { UpdateProfileInput } from "./dto/update-profile.input";
 
 @Resolver(() => User)
 export class UserResolver {
@@ -66,6 +67,17 @@ export class UserResolver {
     return this.userService.update(
       updateUserInput.id,
       updateUserInput,
+      currentUser,
+    );
+  }
+   @Permission("gql.base.event_tracker.create")
+  @Mutation(() => User)
+  updateProfile(
+    @Args("updateProfileInput") updateProfileInput: UpdateProfileInput,
+    @CurrentUser() currentUser: User,
+  ) {
+    return this.userService.updateProfile(
+      updateProfileInput,
       currentUser,
     );
   }
