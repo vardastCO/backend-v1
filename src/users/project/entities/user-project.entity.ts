@@ -18,6 +18,10 @@ export class UserProject extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  name?: string;
+
   @Field(() => Project)
   @ManyToOne(() => Project)
   project: Promise<Project>;

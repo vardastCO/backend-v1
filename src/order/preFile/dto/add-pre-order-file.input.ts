@@ -13,10 +13,9 @@ import {
 @InputType()
 export class AddFilePreOrderInput {
 
-  @Field(() => Int)
+  @Field(() => String)
   @IsNotEmpty()
-  @IsInt()
-  file_id: number;
+  file_uuid: string;
 
   @Field(() => Int)
   @IsNotEmpty()

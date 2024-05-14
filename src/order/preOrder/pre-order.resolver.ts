@@ -5,6 +5,8 @@ import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
 import { CreatePreOrderInput } from './dto/create-pre-order.input';
 import { PreOrderDTO } from './dto/preOrderDTO';
 import { Permission } from 'src/users/authorization/permission.decorator';
+import { PreOrder } from './entities/pre-order.entity';
+import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 
 
 
@@ -22,9 +24,20 @@ export class PreOrderResolver {
     return this.preOrderService.createPreOrder(createPreOrderInput,user);
   }
 
-  
   @Permission("gql.users.user.update")
-  @Mutation(() => PreOrderDTO)
+  @Mutation(() => PreOrder)
+  updatePreOrder(
+    @Args("updatePreOrderInput") updatePreOrderInput: UpdatePreOrderInput,
+    @CurrentUser() currentUser: User,
+  ) {
+    return this.preOrderService.update(
+      updatePreOrderInput.id,
+      updatePreOrderInput,
+      currentUser,
+    );
+  }
+  @Permission("gql.users.user.update")
+  @Mutation(() => PreOrder)
   findPreOrderById(
     @Args("id") id: number,
     @CurrentUser() user: User

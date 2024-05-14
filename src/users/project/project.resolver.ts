@@ -17,6 +17,7 @@ import { CreateProjectInput } from "./dto/create-project.input";
 import { IndexProjectInput } from "./dto/index-project.input";
 import { PaginationProjectResponse } from "./dto/pagination-project.response";
 import { CreateAddressProjectInput } from "./dto/create-address-project.input";
+import { CreateUserProjectInput } from "./dto/create-user-project.input";
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -38,6 +39,15 @@ export class ProjectResolver {
     @CurrentUser() user: User,
   ) {
     return this.projectService.assignAddressProject(createAddressProjectInput,projectId,user);
+  }
+  @Permission("gql.users.address.store")
+  @Mutation(() => Project)
+  assignUserProject(
+    @Args("createUserProjectInput") createUserProjectInput: CreateUserProjectInput,
+    @Args("projectId") projectId: number,
+    @CurrentUser() user: User,
+  ) {
+    return this.projectService.assignUserProject(createUserProjectInput,projectId,user);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)

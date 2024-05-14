@@ -15,6 +15,7 @@ import { CreateAddressProjectInput } from "./dto/create-address-project.input";
 import { ProjectAddress } from "./entities/addressProject.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { User } from "../user/entities/user.entity";
+import { CreateUserProjectInput } from "./dto/create-user-project.input";
 @Injectable()
 export class ProjectService {
   constructor(
@@ -47,6 +48,32 @@ export class ProjectService {
       await projectHasAddress.save();
       await address.save();
       
+      return await Project.findOne({
+        where: { id: projectId },
+        relations: ['user','address'],
+      });
+    }catch(e){
+      console.log('create project',e)
+    }
+   
+  }
+  async assignUserProject(createUserProjectInput:CreateUserProjectInput,projectId:number,user:User): Promise<Project> {
+    try {
+      const user = await User.findOneBy({
+        cellphone:createUserProjectInput.cellphone
+      })
+      if (user) {
+        delete createUserProjectInput.cellphone
+
+        const things: UserProject = UserProject.create<UserProject>(createUserProjectInput);
+        things.userId= await user.id
+      
+        await things.save()
+      } else {
+        throw 'not found user';
+
+      }
+    
       return await Project.findOne({
         where: { id: projectId },
         relations: ['user','address'],

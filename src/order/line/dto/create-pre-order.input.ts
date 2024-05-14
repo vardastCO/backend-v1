@@ -19,39 +19,39 @@ export class CreateLineInput {
   item_name: string;
 
 
-  @Field(() => String) 
+  @Field(() => String,{nullable:true}) 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  brand: string;
+  brand?: string;
 
-  @Field(() => String) 
+  @Field(() => String,{nullable:true}) 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  qty: string;
+  qty?: string;
 
 
-  @Field(() => String) 
+  @Field(() => String,{nullable:true}) 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  uom: string;
+  uom?: string;
 
-  @Field(() => String) 
+  @Field(() => String,{nullable:true}) 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  attribuite: string;
+  attribuite?: string;
 
-  @Field(() => String) 
+  @Field(() => String,{nullable:true}) 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  descriptions: string;
+  descriptions?: string;
 
   @Field(() => Int)
   @IsNotEmpty()
   @IsInt()
-  pre_order_id: number;
+  preOrderId: number;
 }

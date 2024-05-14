@@ -6,6 +6,9 @@ import { InjectDataSource } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { AddFilePreOrderInput } from './dto/add-pre-order-file.input';
 import { User } from 'src/users/user/entities/user.entity';
+import { PreOrderFile } from './entites/pre-order-file.entity';
+import { PreOrder } from '../preOrder/entities/pre-order.entity';
+import { File } from 'src/base/storage/file/entities/file.entity';
 
 @Injectable()
 export class PreFileService {
@@ -17,39 +20,42 @@ export class PreFileService {
      async removeFilePreOrder( id: number,user:User): Promise<Boolean> {
     
       try {
-        const cacheKey = `file_pre_order_{id:${id}}`;
-        const keyExists = await this.cacheManager.get(cacheKey);
-        if (keyExists) {
-          await this.cacheManager.del(cacheKey);
+       
+        let files = await PreOrderFile.findOneBy({
+           id
+        })
+        if (files) {
+          await files.remove()
         }
-
-  
-
         return true
+        
       } catch (error) {
 
-        console.log('add File Pre Order err',error)
+        console.log('remove File Pre Order err',error)
         return false
         
       }   
     
       }
-     async addFilePreOrder( addFilePreOrderInput: AddFilePreOrderInput,user:User): Promise<Boolean> {
+     async addFilePreOrder( addFilePreOrderInput: AddFilePreOrderInput,user:User): Promise<PreOrder> {
     
       try {
-        const cacheKey = `file_pre_order_{id:${addFilePreOrderInput.pre_order_id}}`;
-        const keyExists = await this.cacheManager.get(cacheKey);
-        if (keyExists) {
-          await this.cacheManager.del(cacheKey);
-        }
+        let files = await File.findOneBy({
+          uuid:addFilePreOrderInput.file_uuid
+        })
+        const newOrder = new PreOrderFile() ;
+        newOrder.fileId = await files.id
+        newOrder.preOrderId = addFilePreOrderInput.pre_order_id
+        await newOrder.save();
 
-  
-
-        return true
+        return await PreOrder.findOne({
+          where: { id: addFilePreOrderInput.pre_order_id},
+          relations: ["files","lines"],
+        })
       } catch (error) {
 
         console.log('addFilePreOrder err',error)
-        return false
+        return 
         
       }   
     

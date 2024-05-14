@@ -7,6 +7,8 @@ import { DataSource } from "typeorm";
 import { CreateLineInput } from './dto/create-pre-order.input';
 import { User } from 'src/users/user/entities/user.entity';
 import { LineDTO } from './dto/lineDTO';
+import { Line } from './entities/order-line.entity';
+import { PreOrder } from '../preOrder/entities/pre-order.entity';
 
 @Injectable()
 export class PreOrderLineService {
@@ -16,19 +18,18 @@ export class PreOrderLineService {
      
      { }
 
-     async creatline(createLineInput: CreateLineInput,user:User): Promise<LineDTO> {
+     async creatline(createLineInput: CreateLineInput,user:User): Promise<PreOrder> {
        
-      try {
-        const cacheKey = `line_pre_order_{id:${createLineInput.pre_order_id}}`;
-        const keyExists = await this.cacheManager.get(cacheKey);
-        if (keyExists) {
-          await this.cacheManager.del(cacheKey);
-        }
-      
-        const pattern = 'create_line_order'
+       try {
+        const line: Line = Line.create<Line>(createLineInput);
+        line.userId = user.id
+        await line.save();
+
+        return await PreOrder.findOne({
+          where: { id: createLineInput.preOrderId},
+          relations: ["files","lines"],
+        })
        
-        
-        return 
       } catch (error) {
 
         console.log('create_line_order err',error)
@@ -36,7 +37,26 @@ export class PreOrderLineService {
       }
     
     }
+    async removeline(id: number,user:User): Promise<Boolean> {
+       
+      try {
+        const line = await Line.findOneBy({
+         id
+        })
+        
+        if (line) {
+          await line.remove()
+        }
+       
+       return true
+      
+     } catch (error) {
 
+       console.log('create_line_order err',error)
+       return false
+     }
+   
+   }
 
     
 }

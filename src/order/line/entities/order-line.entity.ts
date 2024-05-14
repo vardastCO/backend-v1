@@ -25,8 +25,8 @@ export class Line extends BaseEntity {
   preOrder: Promise<PreOrder>;
   @Index()
   @Column()
-  pre_order_id: number;
-
+  preOrderId: number;
+  
   @Field()
   @Index()
   @Column()
@@ -39,28 +39,28 @@ export class Line extends BaseEntity {
   item_name: string;
 
   
-  @Field()
+  @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
   attribuite: string;
   
-  @Field()
+  @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
   uom: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
   brand: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
   qty: string; 
 
 
-  @Field()
+  @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
   descriptions: string; 

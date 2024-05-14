@@ -8,6 +8,7 @@ import { User } from 'src/users/user/entities/user.entity';
 import { CreatePreOrderInput } from './dto/create-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
 import { PreOrderStates } from '../enums/pre-order-states.enum';
+import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 
 @Injectable()
 export class PreOrderService {
@@ -41,12 +42,32 @@ export class PreOrderService {
       }
     
     }
+  async update(
+    id: number,
+    updatePreOrderInput: UpdatePreOrderInput,
+    user: User,
+  ): Promise<PreOrder> {
+    const things: PreOrder = await PreOrder.preload({
+      id,
+      ...updatePreOrderInput,
+    });
+    if (!things) {
+     return
+    }
+    if (things.status = PreOrderStates.CREATED) {
+      things.status = PreOrderStates.ADDEDADRESS
+    }
+    await things.save()
+
+    return things;
+  }
     async findPreOrderById(id : number,user:User): Promise<PreOrder> {
     
       try {
-        let order = await PreOrder.findOneBy({
-          id : id,
-        });
+        let order = await PreOrder.findOne({
+          where: { id: id, },
+          relations: ["files","lines"],
+        })
         if (order) {
           return order
         }

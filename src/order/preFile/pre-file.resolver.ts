@@ -6,6 +6,7 @@ import { User } from 'src/users/user/entities/user.entity';
 import { AddFilePreOrderInput } from './dto/add-pre-order-file.input';
 
 import { ValidationPipe } from "@nestjs/common";
+import { PreOrder } from '../preOrder/entities/pre-order.entity';
 
 
 @Resolver(() => Boolean)
@@ -14,7 +15,7 @@ export class PreFileResolver {
 
 
   @Permission("gql.users.user.update")
-  @Mutation(() => Boolean)
+  @Mutation(() => PreOrder)
   addFilePreOrder(
     @Args('addFilePreOrderInput', { type: () => AddFilePreOrderInput, nullable: true }, new ValidationPipe({ transform: true }))
     addFilePreOrderInput: AddFilePreOrderInput,
