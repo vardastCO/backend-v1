@@ -4,7 +4,6 @@ import { Line } from "src/order/line/entities/order-line.entity";
 import { PreOrderFile } from "src/order/preFile/entites/pre-order-file.entity";
 import { ProjectAddress } from "src/users/project/entities/addressProject.entity";
 import { Project } from "src/users/project/entities/project.entity";
-import { ProjectHasAddress } from "src/users/project/entities/projectHasAddress.entity";
 import { User } from "src/users/user/entities/user.entity";
 
 import {
@@ -39,7 +38,7 @@ export class PreOrder extends BaseEntity {
   @Column({ nullable: true })
   addressId: number;
 
-   @Field(() => User, { nullable: true })
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User, user => null, { nullable: true })
   user: Promise<User>;
   @Column({ nullable: true })
@@ -79,6 +78,10 @@ export class PreOrder extends BaseEntity {
   @OneToMany(() => PreOrderFile, file => file.preOrder) 
   files: Promise<PreOrderFile[]>;
 
+  @Field(() => Boolean, { defaultValue: false })
+  hasFile: Boolean = false;
+
+
   @Field(() => PreOrderStates)
   @Index()
   @Column("enum", {
@@ -100,6 +103,4 @@ export class PreOrder extends BaseEntity {
   @Index()
   @Column({ nullable: true })
   deleted_at: string; 
-
-
 }

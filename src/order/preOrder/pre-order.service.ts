@@ -4,7 +4,7 @@ import { InjectDataSource } from "@nestjs/typeorm";
 import { Cache } from "cache-manager";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from 'src/users/user/entities/user.entity';
-import { DataSource } from "typeorm";
+import { DataSource, Like } from "typeorm";
 import { PreOrderStates } from '../enums/pre-order-states.enum';
 import { CreatePreOrderInput } from './dto/create-pre-order.input';
 import { IndexPreOrderInput } from './dto/index-preOrder.input';
@@ -92,17 +92,43 @@ export class PreOrderService {
    
   async paginate(user: User, indexPreOrderInput: IndexPreOrderInput): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
-    const { take, skip, projectId } = indexPreOrderInput || {};
+    const {
+      take,
+      skip,
+      projectId,
+      customerName,
+      hasFile,
+      projectName,
+      status
+     } = indexPreOrderInput || {};
 
     const whereConditions = {}
+
     if (projectId) {
       whereConditions['projectId'] = projectId;
     }
 
     if (!(await this.authorizationService.setUser(user).hasRole("admin"))) {
       whereConditions['userId'] = user.id;
+    } 
+
+  
+    if (await this.authorizationService.setUser(user).hasRole("admin")) {
+      if (customerName) {
+        whereConditions['user'] = {name: Like(`%${customerName}%`)};
+        whereConditions['user'] = {lastName: Like(`%${customerName}%`)};
+      }
+
+      if (hasFile) {
+        whereConditions['hasFile'] = true
+      }
+
+      if (status) {
+        whereConditions['status'] = status as PreOrderStates;
+      }
     }
-    
+ 
+
     const [data, total] = await PreOrder.findAndCount({
       skip,
       take,
@@ -112,6 +138,7 @@ export class PreOrderService {
       },
     });
 
+    
     return PaginationPreOrderResponse.make(indexPreOrderInput,total,data)
   }
     
