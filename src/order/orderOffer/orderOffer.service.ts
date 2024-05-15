@@ -1,15 +1,14 @@
-import { Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Inject } from "@nestjs/common";
-import { Cache } from "cache-manager";
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
-import { CreateOrderOfferInput } from './dto/create-order-offer.input';
-import { OfferOrder } from './entities/order-offer.entity';
+import { Cache } from "cache-manager";
 import { User } from 'src/users/user/entities/user.entity';
+import { DataSource } from "typeorm";
 import { ThreeStateSupervisionStatuses } from '../enums/three-state-supervision-statuses.enum';
 import { CreateLineOfferInput } from './dto/create-line-offer.input';
+import { CreateOrderOfferInput } from './dto/create-order-offer.input';
 import { OfferLine } from './entities/offer-line.entity';
+import { OfferOrder } from './entities/order-offer.entity';
 
 @Injectable()
 export class OrderOfferService {
@@ -41,7 +40,8 @@ export class OrderOfferService {
         
       }
     
-      }
+  }
+  
     async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
     
         try {
@@ -62,5 +62,13 @@ export class OrderOfferService {
       
     }
 
+  async getOffer(id: number): Promise<OfferOrder> {
+    try {
+      const orderOffer: OfferOrder = await OfferOrder.findOneBy({ id: id });
+      return orderOffer
+    } catch (error) {
+      throw error;
+    }
+  }
     
 }
