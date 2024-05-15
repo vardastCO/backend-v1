@@ -211,22 +211,26 @@ export class ProductCsvUpdateCommand extends CommandRunner {
 
   async firstOrCreateCategory(title: string): Promise<Category> {
 
-     let cat : Category =  await Category.findOneBy({
+    const existingCategories: Category[] = await Category.findBy({
       title: title,
     });
 
-    if(!cat){
-      console.log('title not found' ,title)
-      cat = Category.create({
-                title: title,
-                slug: title,
-                vocabularyId:1,
-                parentCategoryId: 3876,
-              });
-      await cat.save()
-    }
+    if (existingCategories.length > 0) {
+      
+      return existingCategories[0];
+    } else {
+      
+      const newCategory = Category.create({
+        title: title,
+        slug: title,
+        vocabularyId: 1, 
+        parentCategoryId: 3876, 
+      });
 
-    return cat
+      await newCategory.save();
+
+      return newCategory;
+    }
 
    
   }
