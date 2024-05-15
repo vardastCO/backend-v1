@@ -1,13 +1,16 @@
-import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
-import { PreOrderService } from './pre-order.service';
-import { User } from 'src/users/user/entities/user.entity';
+import { ValidationPipe } from "@nestjs/common";
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
-import { CreatePreOrderInput } from './dto/create-pre-order.input';
-import { PreOrderDTO } from './dto/preOrderDTO';
+import { Public } from 'src/users/auth/decorators/public.decorator';
 import { Permission } from 'src/users/authorization/permission.decorator';
-import { PreOrder } from './entities/pre-order.entity';
+import { User } from 'src/users/user/entities/user.entity';
+import { CreatePreOrderInput } from './dto/create-pre-order.input';
+import { IndexPreOrderInput } from './dto/index-preOrder.input';
+import { PaginationPreOrderResponse } from './dto/pagination-preOrder.responde';
+import { PreOrderDTO } from './dto/preOrderDTO';
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
-
+import { PreOrder } from './entities/pre-order.entity';
+import { PreOrderService } from './pre-order.service';
 
 
 @Resolver(() => Boolean)
@@ -46,6 +49,18 @@ export class PreOrderResolver {
     return this.preOrderService.findPreOrderById(id,user);
   }
 
+
+
+  @Public()
+  // @Permission("gql.products.brand.index")
+  @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
+  findAll(
+    @CurrentUser() currentUser: User,
+    @Args("indexPreOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
+    indexPreOrderInput?: IndexPreOrderInput,
+  ) {
+    return this.preOrderService.paginate(currentUser, indexPreOrderInput);
+  }
 
   // @Permission("gql.users.user.update")
   // @Mutation(() => PreOrderDTO)
