@@ -15,7 +15,7 @@ export class PreOrderResolver {
   constructor(private readonly preOrderService : PreOrderService) {}
 
   @Permission("gql.users.user.update")
-  @Mutation(() => PreOrderDTO)
+  @Mutation(() => PreOrder)
   createPreOrder(
     @Args("createPreOrderInput") createPreOrderInput: CreatePreOrderInput,
     @CurrentUser() user: User

@@ -4,7 +4,7 @@ import {
 } from "class-validator";
 @InputType()
 export class CreateOrderOfferInput {
-  @Field(() => String)
+  @Field(() => Int)
   @IsNotEmpty()
-  total: string;
+  preOrderId: number;
 }

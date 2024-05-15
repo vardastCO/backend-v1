@@ -5,11 +5,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  ManyToOne,
   Index,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { OfferHasLine } from "./offerHasLine";
+import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 
 
 @ObjectType()
@@ -24,6 +25,13 @@ export class OfferOrder extends BaseEntity {
   @Index()
   @Column()
   userId: number;
+
+  @Field(() => PreOrder)
+  @ManyToOne(() => PreOrder,{ eager: true })
+  preOrder: Promise<PreOrder>;
+  @Index()
+  @Column()
+  preOrderId: number;
 
 
   @Field({ nullable: true })

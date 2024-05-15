@@ -60,7 +60,7 @@ export class CategoryService {
       
       const result = await queryBuilder
         .select([`${queryBuilder.alias}.id`, `${queryBuilder.alias}.title`])
-        .limit(10)
+        .limit(20)
         .getMany();
       await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
 

@@ -5,6 +5,7 @@ import { PreOrderFile } from "src/order/preFile/entites/pre-order-file.entity";
 import { ProjectAddress } from "src/users/project/entities/addressProject.entity";
 import { Project } from "src/users/project/entities/project.entity";
 import { ProjectHasAddress } from "src/users/project/entities/projectHasAddress.entity";
+import { User } from "src/users/user/entities/user.entity";
 
 import {
   BaseEntity,
@@ -23,23 +24,27 @@ export class PreOrder extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => Project)
-  @ManyToOne(() => Project,{ eager: true })
+  @Field(() => Project, { nullable: true })
+  @ManyToOne(() => Project, { eager: true, nullable: true })
   project: Promise<Project>;
+
   @Index()
-  @Column()
+  @Column({ nullable: true })
   projectId: number;
 
-
-  @Field(() => ProjectAddress)
-  @ManyToOne(() => ProjectAddress)
+  @Field(() => ProjectAddress, { nullable: true })
+  @ManyToOne(() => ProjectAddress, { nullable: true })
   address: Promise<ProjectAddress>;
-  @Column()
+
+  @Column({ nullable: true })
   addressId: number;
 
-  @Index()
-  @Column()
-  userId: number; 
+   @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, user => null, { nullable: true })
+  user: Promise<User>;
+  @Column({ nullable: true })
+  userId: number;
+
 
   @Field({ nullable: true })
   @Index()
