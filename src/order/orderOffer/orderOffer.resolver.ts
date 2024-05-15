@@ -7,6 +7,7 @@ import { OfferOrder } from './entities/order-offer.entity';
 import { CreateOrderOfferInput } from './dto/create-order-offer.input';
 import { User } from 'src/users/user/entities/user.entity';
 import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
+import { CreateLineOfferInput } from './dto/create-line-offer.input';
 
 
 
@@ -21,6 +22,15 @@ export class OrderOfferResolver {
     @CurrentUser() user: User
   ) {
     return this.orderOfferService.createOffer(createOrderOfferInput,user);
+  }
+
+  @Permission("gql.users.user.update")
+  @Mutation(() => OfferOrder)
+  createOrderOfferLine(
+    @Args("createLineOfferInput") createLineOfferInput: CreateLineOfferInput,
+    @CurrentUser() user: User
+  ) {
+    return this.orderOfferService.createOrderOfferLine(createLineOfferInput,user);
   }
 
 }

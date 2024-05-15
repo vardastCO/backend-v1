@@ -39,7 +39,7 @@ export class PreOrder extends BaseEntity {
   @Column({ nullable: true })
   addressId: number;
 
-   @Field(() => User, { nullable: true })
+  @Field(() => User, { nullable: true })
   @ManyToOne(() => User, user => null, { nullable: true })
   user: Promise<User>;
   @Column({ nullable: true })

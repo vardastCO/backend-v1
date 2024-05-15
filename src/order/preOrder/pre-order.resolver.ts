@@ -51,8 +51,8 @@ export class PreOrderResolver {
 
 
 
-  @Public()
-  // @Permission("gql.products.brand.index")
+  // @Public()
+  @Permission("gql.users.user.update")
   @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
   findAll(
     @CurrentUser() currentUser: User,

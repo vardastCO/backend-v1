@@ -3,14 +3,16 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import {
   BaseEntity,
   Column,
-  CreateDateColumn,
+  OneToMany,
   Entity,
   ManyToOne,
   Index,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { OfferHasLine } from "./offerHasLine";
+
 import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
+import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
+import { OfferLine } from "./offer-line.entity";
 
 
 @ObjectType()
@@ -44,7 +46,19 @@ export class OfferOrder extends BaseEntity {
   @Column({ nullable: true })
   total: string;
 
+
+  @Field(() => TypeOrderOffer)
+  @Index()
+  @Column("enum", {
+    enum: TypeOrderOffer,
+    default: TypeOrderOffer.CLIENT,
+  })
+  type: TypeOrderOffer;
   
+  @Field(() => [OfferLine],{nullable:"items"})
+  @OneToMany(() => OfferLine, offerLine => offerLine.offerOrder)
+  offerLine: OfferLine[];
+
 
   @Field(() => ThreeStateSupervisionStatuses)
   @Index()
