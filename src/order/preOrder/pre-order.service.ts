@@ -115,8 +115,10 @@ export class PreOrderService {
   
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
       if (customerName) {
-        whereConditions['user'] = {name: Like(`%${customerName}%`)};
-        whereConditions['user'] = {lastName: Like(`%${customerName}%`)};
+        whereConditions['user'] = whereConditions['user'] = [
+          { firstName: Like(`%${customerName}%`) },
+          { lastName: Like(`%${customerName}%`) }
+        ];;
       }
 
       if (hasFile) {
