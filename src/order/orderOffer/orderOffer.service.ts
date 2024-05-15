@@ -64,6 +64,29 @@ export class OrderOfferService {
       
     }
 
+    async removeOrderOfferLine(id: number): Promise<OfferOrder> {
+    
+      try {
+      
+
+        const OfferOrderLine: OfferLine = await OfferLine.findOne({
+          where: {id: id}
+        })
+        
+        const offerOrderId = OfferOrderLine.offerOrderId;
+        await OfferOrderLine.remove();
+
+        const offerOrder = await OfferOrder.findOne({
+          where: {id: offerOrderId}
+        })
+        return offerOrder
+      } catch (error) {
+
+        console.log('removeOrderOfferLine err',error)
+      }
+    
+  }
+
   async getOffer(id: number): Promise<OfferOrder> {
     try {
       const orderOffer: OfferOrder = await OfferOrder.findOneBy({ id: id });

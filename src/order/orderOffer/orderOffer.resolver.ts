@@ -42,4 +42,13 @@ export class OrderOfferResolver {
     return this.orderOfferService.getOffer(id)
   }
 
+  @Permission("gql.users.user.update")
+  @Mutation(() => OfferOrder)
+  removeOfferPreOrderById(
+    @Args("id") id: number
+  ) {
+  
+    return this.orderOfferService.getOffer(id)
+  }
+
 }
