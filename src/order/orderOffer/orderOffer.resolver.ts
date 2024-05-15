@@ -44,11 +44,11 @@ export class OrderOfferResolver {
 
   @Permission("gql.users.user.update")
   @Mutation(() => OfferOrder)
-  removeOfferPreOrderById(
+  removeOfferPreOrderLine(
     @Args("id") id: number
   ) {
   
-    return this.orderOfferService.getOffer(id)
+    return this.orderOfferService.removeOrderOfferLine(id)
   }
 
 }
