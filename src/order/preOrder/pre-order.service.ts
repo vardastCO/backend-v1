@@ -1,19 +1,21 @@
-import { Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Inject } from "@nestjs/common";
-import { Cache } from "cache-manager";
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
+import { Cache } from "cache-manager";
+import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from 'src/users/user/entities/user.entity';
-import { CreatePreOrderInput } from './dto/create-pre-order.input';
-import { PreOrder } from './entities/pre-order.entity';
+import { DataSource } from "typeorm";
 import { PreOrderStates } from '../enums/pre-order-states.enum';
+import { CreatePreOrderInput } from './dto/create-pre-order.input';
+import { IndexPreOrderInput } from './dto/index-preOrder.input';
+import { PaginationPreOrderResponse } from "./dto/pagination-preOrder.responde";
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
+import { PreOrder } from './entities/pre-order.entity';
 
 @Injectable()
 export class PreOrderService {
   constructor( 
-   
+    private authorizationService: AuthorizationService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
@@ -46,7 +48,8 @@ export class PreOrderService {
         
       }
     
-    }
+  }
+  
   async update(
     id: number,
     updatePreOrderInput: UpdatePreOrderInput,
@@ -57,7 +60,7 @@ export class PreOrderService {
       ...updatePreOrderInput,
     });
     if (!things) {
-     return
+    return
     }
     if (things.status = PreOrderStates.CREATED) {
       things.status = PreOrderStates.ADDEDADRESS
@@ -66,25 +69,50 @@ export class PreOrderService {
 
     return things;
   }
-    async findPreOrderById(id : number,user:User): Promise<PreOrder> {
-    
-      try {
-        let order = await PreOrder.findOne({
-          where: { id: id, },
-          relations: ["files","lines"],
-        })
-        if (order) {
-          return order
-        }
 
-        return 
-      } catch (error) {
-
-        console.log('create_pre_order err',error)
-        
+  async findPreOrderById(id : number,user:User): Promise<PreOrder> {
+  
+    try {
+      let order = await PreOrder.findOne({
+        where: { id: id, },
+        relations: ["files","lines"],
+      })
+      if (order) {
+        return order
       }
-    
+
+      return 
+    } catch (error) {
+
+      console.log('create_pre_order err',error)
+      
     }
+  
+  }
    
+  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput): Promise<PaginationPreOrderResponse> {
+    indexPreOrderInput?.boot();
+    const { take, skip, projectId } = indexPreOrderInput || {};
+
+    const whereConditions = {}
+    if (projectId) {
+      whereConditions['projectId'] = projectId;
+    }
+
+    if (!(await this.authorizationService.setUser(user).hasRole("admin"))) {
+      whereConditions['userId'] = user.id;
+    }
+    
+    const [data, total] = await PreOrder.findAndCount({
+      skip,
+      take,
+      where: whereConditions,
+      order: {
+        id:'DESC'
+      },
+    });
+
+    return PaginationPreOrderResponse.make(indexPreOrderInput,total,data)
+  }
     
 }
