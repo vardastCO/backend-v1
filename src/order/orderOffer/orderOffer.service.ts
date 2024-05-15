@@ -8,6 +8,8 @@ import { CreateOrderOfferInput } from './dto/create-order-offer.input';
 import { OfferOrder } from './entities/order-offer.entity';
 import { User } from 'src/users/user/entities/user.entity';
 import { ThreeStateSupervisionStatuses } from '../enums/three-state-supervision-statuses.enum';
+import { CreateLineOfferInput } from './dto/create-line-offer.input';
+import { OfferLine } from './entities/offer-line.entity';
 
 @Injectable()
 export class OrderOfferService {
@@ -16,7 +18,7 @@ export class OrderOfferService {
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
 
-     async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User): Promise<OfferOrder> {
+    async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User): Promise<OfferOrder> {
     
       try {
         let order = await OfferOrder.findOneBy({
@@ -40,7 +42,25 @@ export class OrderOfferService {
       }
     
       }
-
+    async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
+    
+        try {
+        
+          const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
+          newOrder.userId =  user.id
+        
+          await newOrder.save();
+  
+          return  await OfferOrder.findOneBy({
+            id : createLineOfferInput.offerOrderId
+          });
+        } catch (error) {
+  
+          console.log('createOffer err',error)
+          
+        }
+      
+    }
 
     
 }

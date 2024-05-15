@@ -5,11 +5,10 @@ import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import {
   BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
-  ManyToOne,
   Index,
-  PrimaryGeneratedColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn
 } from "typeorm";
 
 
