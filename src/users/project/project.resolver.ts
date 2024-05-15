@@ -1,23 +1,18 @@
-import { ValidationPipe } from "@nestjs/common";
 import {
   Args,
-  Int,
   Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
+  Resolver
 } from "@nestjs/graphql";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { Permission } from "../authorization/permission.decorator";
 import { User } from "../user/entities/user.entity";
+import { CreateAddressProjectInput } from "./dto/create-address-project.input";
+import { CreateProjectInput } from "./dto/create-project.input";
+import { CreateUserProjectInput } from "./dto/create-user-project.input";
+import { UpdateProjectAddressInput } from "./dto/update-address-input copy";
+import { UpdateProjectInput } from "./dto/update-project-input";
 import { Project } from "./entities/project.entity";
 import { ProjectService } from "./project.service";
-import { CreateProjectInput } from "./dto/create-project.input";
-import { IndexProjectInput } from "./dto/index-project.input";
-import { PaginationProjectResponse } from "./dto/pagination-project.response";
-import { CreateAddressProjectInput } from "./dto/create-address-project.input";
-import { CreateUserProjectInput } from "./dto/create-user-project.input";
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -97,5 +92,24 @@ export class ProjectResolver {
   ) {
   
     return this.projectService.myProjects(user.id);
+  }
+
+  @Permission("gql.users.address.store")
+  @Mutation(() => Project)
+  updateProject(
+    @Args("updateProjectInput") updateProjectInput: UpdateProjectInput
+  ) {
+    return this.projectService.update(updateProjectInput.id,
+      updateProjectInput)
+  }
+
+  @Permission("gql.users.address.store")
+  @Mutation(() => Project)
+  updateProjectAddress(
+    @Args("updateProjectAddressInput") updateProjectAddressInput: UpdateProjectAddressInput
+  ) {
+    return this.projectService.updateAddress(
+      updateProjectAddressInput.id,
+      updateProjectAddressInput)
   }
 }
