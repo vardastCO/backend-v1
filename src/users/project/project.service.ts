@@ -1,21 +1,16 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { CreateProjectInput } from "./dto/create-project.input";
-import { Project } from "./entities/project.entity";
-import { UserProject } from "./entities/user-project.entity";
-import { IndexProjectInput } from "./dto/index-project.input";
-import { PaginationProjectResponse } from "./dto/pagination-project.response";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import {
-  BadRequestException,
-  Inject,
-} from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Cache } from "cache-manager";
-import { CacheTTL } from "src/base/utilities/cache-ttl.util";
-import { CreateAddressProjectInput } from "./dto/create-address-project.input";
-import { ProjectAddress } from "./entities/addressProject.entity";
-import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { User } from "../user/entities/user.entity";
+import { CreateAddressProjectInput } from "./dto/create-address-project.input";
+import { CreateProjectInput } from "./dto/create-project.input";
 import { CreateUserProjectInput } from "./dto/create-user-project.input";
+import { UpdateProjectAddressInput } from "./dto/update-address-input copy";
+import { UpdateProjectInput } from "./dto/update-project-input";
+import { ProjectAddress } from "./entities/addressProject.entity";
+import { Project } from "./entities/project.entity";
+import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
+import { UserProject } from "./entities/user-project.entity";
 @Injectable()
 export class ProjectService {
   constructor(
@@ -154,6 +149,43 @@ export class ProjectService {
     });
   }
 
+  async update(
+    id: number,
+    updateProjectInput: UpdateProjectInput): Promise<Project> {
+  
+
+    const project: Project = await Project.preload({
+      id,
+      ...updateProjectInput
+    });
+
+    await project.save()
+    return project;
+  }
+
+
+  async updateAddress(
+    id: number,
+    updateProjectAddressInput: UpdateProjectAddressInput): Promise<Project> {
+  
+    const projectHasAddress: ProjectHasAddress = await ProjectHasAddress.findOneBy({
+      id
+    })
+    if (!projectHasAddress) throw new NotFoundException();
+
+    const projectAddressId: number = projectHasAddress.addressId;
+    const projectAddress: ProjectAddress = await ProjectAddress.preload({
+      id: projectAddressId,
+      ...updateProjectAddressInput
+    });
+    await projectAddress.save();
+    
+    
+    const projectId: number = projectHasAddress.projectId;
+    const project: Project = await Project.findOneBy({id: projectId})
+    return project;
+  }
+
   async myProjects(
     userId?: number,
   ): Promise<Project[]> {
@@ -166,6 +198,8 @@ export class ProjectService {
       }
     });
   }
+
+
 
 
   async assignUserToProject(projectId: number,userId:number): Promise<boolean> {
