@@ -17,7 +17,11 @@ export class PreOrderService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
-
+    async generateNumericUuid(length: number = 10): Promise<string> {
+      const min = Math.pow(10, length - 1);
+      const max = Math.pow(10, length) - 1;
+      return Math.floor(Math.random() * (max - min + 1) + min).toString();
+    }
     async createPreOrder(createPreOrderInput : CreatePreOrderInput,user:User): Promise<PreOrder> {
     
       try {
@@ -29,6 +33,7 @@ export class PreOrderService {
           return order
         }
         const newOrder: PreOrder = PreOrder.create<PreOrder>(createPreOrderInput);
+        newOrder.uuid = await this.generateNumericUuid()
         newOrder.userId =  user.id
       
 

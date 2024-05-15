@@ -44,10 +44,16 @@ export class ProjectResolver {
   @Mutation(() => Project)
   assignUserProject(
     @Args("createUserProjectInput") createUserProjectInput: CreateUserProjectInput,
-    @Args("projectId") projectId: number,
     @CurrentUser() user: User,
   ) {
-    return this.projectService.assignUserProject(createUserProjectInput,projectId,user);
+    return this.projectService.assignUserProject(createUserProjectInput,user);
+  }
+  @Permission("gql.users.address.store")
+  @Mutation(() => Project)
+  removeUserProject(
+    @Args("id") id: number,
+  ) {
+    return this.projectService.removeUserProject(id);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)

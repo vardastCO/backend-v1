@@ -100,14 +100,14 @@ export class ProductResolver {
     )
     indexProductInput?: IndexProductInput,
   ) {
-    const beforePaginate = Date.now();
+    // const beforePaginate = Date.now();
 
     const result = await this.productService.paginate(indexProductInput);
 
-    // Measure time after calling paginate
-    const afterPaginate = Date.now();
-    const paginateTime = afterPaginate - beforePaginate;
-    console.log(`Time taken in paginate method: ${paginateTime} ms`);
+    // // Measure time after calling paginate
+    // const afterPaginate = Date.now();
+    // const paginateTime = afterPaginate - beforePaginate;
+    // console.log(`Time taken in paginate method: ${paginateTime} ms`);
 
     return result;
   }

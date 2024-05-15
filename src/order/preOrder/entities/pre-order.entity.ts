@@ -2,13 +2,15 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { PreOrderStates } from "src/order/enums/pre-order-states.enum";
 import { Line } from "src/order/line/entities/order-line.entity";
 import { PreOrderFile } from "src/order/preFile/entites/pre-order-file.entity";
+import { Project } from "src/users/project/entities/project.entity";
 
 import {
   BaseEntity,
   Column,
-  OneToMany,
   Entity,
   Index,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -19,11 +21,12 @@ export class PreOrder extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field({ nullable: true })
+  @Field(() => Project)
+  @ManyToOne(() => Project,{ eager: true })
+  project: Promise<Project>;
   @Index()
-  @Column({ nullable: true })
+  @Column()
   projectId: number;
-
 
   @Index()
   @Column()
@@ -69,6 +72,14 @@ export class PreOrder extends BaseEntity {
     default: PreOrderStates.CREATED,
   })
   status: PreOrderStates;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true, default: '0' })
+  offersNum?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true})
+  uuid?: string;
 
 
   @Field({ nullable: true })

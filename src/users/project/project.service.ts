@@ -57,7 +57,7 @@ export class ProjectService {
     }
    
   }
-  async assignUserProject(createUserProjectInput:CreateUserProjectInput,projectId:number,user:User): Promise<Project> {
+  async assignUserProject(createUserProjectInput:CreateUserProjectInput,user:User): Promise<Project> {
     try {
       const user = await User.findOneBy({
         cellphone:createUserProjectInput.cellphone
@@ -75,9 +75,28 @@ export class ProjectService {
       }
     
       return await Project.findOne({
-        where: { id: projectId },
+        where: { id: createUserProjectInput.projectId },
         relations: ['user','address'],
       });
+    }catch(e){
+      console.log('create project',e)
+    }
+   
+  }
+  async removeUserProject(id:number): Promise<Project> {
+    try {
+      const things =  await UserProject.findOne({
+        where: { id },
+      });
+      let projectId = await things.projectId
+      if (things) {
+        await things.remove();
+      }
+
+      return await Project.findOne({
+        where: { id: projectId },
+        relations: ['user','address'],
+      }); 
     }catch(e){
       console.log('create project',e)
     }
