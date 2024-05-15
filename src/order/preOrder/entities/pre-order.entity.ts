@@ -2,7 +2,9 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { PreOrderStates } from "src/order/enums/pre-order-states.enum";
 import { Line } from "src/order/line/entities/order-line.entity";
 import { PreOrderFile } from "src/order/preFile/entites/pre-order-file.entity";
+import { ProjectAddress } from "src/users/project/entities/addressProject.entity";
 import { Project } from "src/users/project/entities/project.entity";
+import { ProjectHasAddress } from "src/users/project/entities/projectHasAddress.entity";
 
 import {
   BaseEntity,
@@ -27,6 +29,13 @@ export class PreOrder extends BaseEntity {
   @Index()
   @Column()
   projectId: number;
+
+
+  @Field(() => ProjectAddress)
+  @ManyToOne(() => ProjectAddress)
+  address: Promise<ProjectAddress>;
+  @Column()
+  addressId: number;
 
   @Index()
   @Column()
