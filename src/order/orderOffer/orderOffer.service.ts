@@ -89,7 +89,14 @@ export class OrderOfferService {
 
   async getOffer(id: number): Promise<OfferOrder> {
     try {
-      const orderOffer: OfferOrder = await OfferOrder.findOneBy({ id: id });
+      
+      const orderOffer: OfferOrder = await OfferOrder.findOne({
+        where: { id },
+        relations: ['offerLine'],
+        order: {
+          id: 'DESC'
+        }
+      });
       return orderOffer
     } catch (error) {
       throw error;
