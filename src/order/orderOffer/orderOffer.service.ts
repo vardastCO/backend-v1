@@ -50,10 +50,12 @@ export class OrderOfferService {
           newOrder.userId =  user.id
         
           await newOrder.save();
-  
-          return  await OfferOrder.findOneBy({
+     
+          const result =   await OfferOrder.findOneBy({
             id : createLineOfferInput.offerOrderId
           });
+   
+          return result
         } catch (error) {
   
           console.log('createOffer err',error)
