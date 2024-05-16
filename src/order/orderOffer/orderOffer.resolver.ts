@@ -8,8 +8,13 @@ import { User } from 'src/users/user/entities/user.entity';
 import { CreateLineOfferInput } from './dto/create-line-offer.input';
 import { CreateOrderOfferInput } from './dto/create-order-offer.input';
 import { OfferOrder } from './entities/order-offer.entity';
+import { PriceOfferDTO } from './dto/priceOfferDTO';
 
-
+interface PriceOfferDto {
+  fi_price: string;
+  tax_price: string;
+  total_price: string;
+}
 
 @Resolver(() => Boolean)
 export class OrderOfferResolver {
@@ -31,6 +36,16 @@ export class OrderOfferResolver {
     @CurrentUser() user: User
   ) {
     return this.orderOfferService.createOrderOfferLine(createLineOfferInput,user);
+  }
+
+  @Permission("gql.users.user.update")
+  @Mutation(() => PriceOfferDTO )
+  calculatePriceOfferLine(
+    @Args("lineId") lineId: number,
+    @Args("fi_price") fi_price: string,
+    @CurrentUser() user: User
+  ) {
+    return this.orderOfferService.calculatePriceOfferLine(lineId,fi_price);
   }
 
   @Permission("gql.users.user.update")

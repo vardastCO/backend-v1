@@ -41,10 +41,10 @@ export class OfferOrder extends BaseEntity {
   @Column({ nullable: true })
   request_name: string;
 
+
   @Field({ nullable: true })
-  @Index()
-  @Column({ nullable: true })
-  total: string;
+  @Column({ nullable: true, default: '0' })
+  total?: string;
 
 
   @Field(() => TypeOrderOffer)

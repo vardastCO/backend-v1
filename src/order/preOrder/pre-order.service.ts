@@ -11,6 +11,10 @@ import { IndexPreOrderInput } from './dto/index-preOrder.input';
 import { PaginationPreOrderResponse } from "./dto/pagination-preOrder.responde";
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
+import { Not, IsNull } from "typeorm"
+import { ExpireTypes } from "./enum/expire-types.enum";
+import { OfferOrder } from "../orderOffer/entities/order-offer.entity";
+import { TypeOrderOffer } from "../enums/type-order-offer.enum";
 
 @Injectable()
 export class PreOrderService {
@@ -49,7 +53,25 @@ export class PreOrderService {
       }
     
   }
-  
+  private calculateExpirationDate(expireTimeEnum: ExpireTypes): Date {
+    const currentDate = new Date();
+    switch (expireTimeEnum) {
+      case ExpireTypes.ONE_DAY:
+        currentDate.setDate(currentDate.getDate() + 1);
+        break;
+      case ExpireTypes.TWO_DAYS:
+        currentDate.setDate(currentDate.getDate() + 2);
+        break;
+      case ExpireTypes.THREE_DAYS:
+        currentDate.setDate(currentDate.getDate() + 3);
+        break;
+      default:
+        // Default to one day if enum value is not recognized
+        currentDate.setDate(currentDate.getDate() + 1);
+        break;
+    }
+    return currentDate;
+  }
   async update(
     id: number,
     updatePreOrderInput: UpdatePreOrderInput,
@@ -65,6 +87,8 @@ export class PreOrderService {
     if (things.status = PreOrderStates.CREATED) {
       things.status = PreOrderStates.ADDEDADRESS
     }
+    things.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
+    things.expire_date = this.calculateExpirationDate(updatePreOrderInput.expire_data).toLocaleString("en-US", { timeZone: "Asia/Tehran" });
     await things.save()
 
     return things;
@@ -78,6 +102,17 @@ export class PreOrderService {
         relations: ["files","lines"],
       })
       if (order) {
+        const offersPromises = Promise.all([
+          OfferOrder.find({ where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT} }),
+          OfferOrder.find({ where: { preOrderId: order.id, type: TypeOrderOffer.SELLER } }),
+          OfferOrder.find({ where: { preOrderId: order.id, type: TypeOrderOffer.VARDAST } }),
+        ]);
+  
+        // Wait for all offers to resolve
+        const [clientOffers, sellerOffers, adminOffers] = await offersPromises;
+  
+        // Push offers into the order's offers array
+        order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
         return order
       }
 
@@ -115,21 +150,28 @@ export class PreOrderService {
   
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
       if (customerName) {
-        whereConditions['user'] = whereConditions['user'] = [
+        whereConditions['user'] =  [
           { firstName: Like(`%${customerName}%`) },
           { lastName: Like(`%${customerName}%`) }
-        ];;
+        ];
       }
-
-      if (hasFile) {
-        whereConditions['hasFile'] = true
+      if (projectName) {
+        whereConditions['project'] =  [
+          { name: Like(`%${projectName}%`) }
+        ];;
       }
 
       if (status) {
         whereConditions['status'] = status as PreOrderStates;
       }
     }
- 
+    if (hasFile) {
+      whereConditions['files'] = {
+        id: Not(IsNull()),
+      };
+    } else {
+      whereConditions['files'] = null;
+    }
 
     const [data, total] = await PreOrder.findAndCount({
       skip,

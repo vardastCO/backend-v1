@@ -9,6 +9,8 @@ import { CreateLineOfferInput } from './dto/create-line-offer.input';
 import { CreateOrderOfferInput } from './dto/create-order-offer.input';
 import { OfferLine } from './entities/offer-line.entity';
 import { OfferOrder } from './entities/order-offer.entity';
+import { PreOrder } from "../preOrder/entities/pre-order.entity";
+import { Line } from "../line/entities/order-line.entity";
 
 @Injectable()
 export class OrderOfferService {
@@ -23,6 +25,9 @@ export class OrderOfferService {
         let order = await OfferOrder.findOne({
           where: {
             userId: user.id,
+            preOrder :  {
+              id : createOrderOfferInput.preOrderId
+            },
             status: ThreeStateSupervisionStatuses.PENDING
           },
           relations: ['offerLine'],
@@ -38,7 +43,7 @@ export class OrderOfferService {
       
 
         await newOrder.save();
-        console.log('ddd',newOrder)
+
         return await OfferOrder.findOne({
           where: { id: newOrder.id },
           relations: ['offerLine'],
@@ -53,16 +58,41 @@ export class OrderOfferService {
       }
     
   }
+  async calculatePriceOfferLine(lineId: number,fi_price:string) {
+    const line = await Line.findOneBy({ id: lineId })
+    if (line) {
+      return {
+        "fi_price": fi_price,
+        "tax_price": ((parseInt(fi_price, 10) * parseInt(line.qty)) * .1).toString(),
+        "total_price" : ((parseInt(fi_price, 10) * parseInt(line.qty)) * 1.1).toString()
+      }
+    }
+  }
   
     async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
     
-        try {
-        
-          const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
-          newOrder.userId =  user.id
-        
-          await newOrder.save();
+      try {
+          
+          const offerline = await OfferLine.findOneBy({
+            offerOrderId: createLineOfferInput.offerOrderId,
+            lineId : createLineOfferInput.lineId
+          })
 
+          if (offerline) {
+            const id = offerline.id
+            const things: OfferLine = await OfferLine.preload({
+              id,
+              ...createLineOfferInput,
+            });
+            await things.save()
+          } else {
+            const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
+            newOrder.userId =  user.id
+          
+            await newOrder.save();
+  
+          }
+          
           const result: OfferOrder = await OfferOrder.findOne({
             where: { id: createLineOfferInput.offerOrderId },
             relations: ['offerLine'],

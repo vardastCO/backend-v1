@@ -1,11 +1,9 @@
 import { Field, InputType, Int} from "@nestjs/graphql";
 import { PaymentMethodEnum } from "../enum/sort-types.enum";
 import { IsNotEmpty, IsEnum, IsString } from "class-validator";
+
 @InputType()
 export class CreatePreOrderInput {
-
-  @Field({ nullable: true })
-  expire_date: string; 
 
   @Field(() => Int,{ nullable: true })
   projectId: number; 

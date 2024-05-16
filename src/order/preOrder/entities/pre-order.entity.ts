@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { PreOrderStates } from "src/order/enums/pre-order-states.enum";
 import { Line } from "src/order/line/entities/order-line.entity";
+import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
 import { PreOrderFile } from "src/order/preFile/entites/pre-order-file.entity";
 import { ProjectAddress } from "src/users/project/entities/addressProject.entity";
 import { Project } from "src/users/project/entities/project.entity";
@@ -91,13 +92,16 @@ export class PreOrder extends BaseEntity {
   status: PreOrderStates;
 
   @Field({ nullable: true })
-  @Column({ nullable: true, default: '0' })
-  offersNum?: string;
+  @Column({ nullable: true, default: 0 })
+  offersNum?: number;
 
   @Field({ nullable: true })
   @Column({ nullable: true})
   uuid?: string;
 
+
+  @Field(() => [OfferOrder], { nullable: true }) 
+  offers?: OfferOrder[];
 
   @Field({ nullable: true })
   @Index()
