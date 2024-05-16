@@ -13,6 +13,7 @@ import {
 import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 import { OfferLine } from "./offer-line.entity";
+import { TempSeller } from "./temp-seller.entity";
 
 
 @ObjectType()
@@ -40,6 +41,13 @@ export class OfferOrder extends BaseEntity {
   @Index()
   @Column({ nullable: true })
   request_name: string;
+
+  @ManyToOne(() => TempSeller, { nullable: true, eager: true })
+  tempSeller: Promise<TempSeller>;
+
+  @Index()
+  @Column({ nullable: true })
+  tempSellerId: number;
 
 
   @Field({ nullable: true })

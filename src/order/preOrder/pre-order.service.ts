@@ -103,9 +103,18 @@ export class PreOrderService {
       })
       if (order) {
         const offersPromises = Promise.all([
-          OfferOrder.find({ where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT} }),
-          OfferOrder.find({ where: { preOrderId: order.id, type: TypeOrderOffer.SELLER } }),
-          OfferOrder.find({ where: { preOrderId: order.id, type: TypeOrderOffer.VARDAST } }),
+          OfferOrder.find({ 
+            where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT },
+            relations: ["offerLine"]
+          }),
+          OfferOrder.find({ 
+            where: { preOrderId: order.id, type: TypeOrderOffer.SELLER },
+            relations: ["offerLine"]
+          }),
+          OfferOrder.find({ 
+            where: { preOrderId: order.id, type: TypeOrderOffer.VARDAST },
+            relations: ["offerLine"]
+          }),
         ]);
   
         // Wait for all offers to resolve
