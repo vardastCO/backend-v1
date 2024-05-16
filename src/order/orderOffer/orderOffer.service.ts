@@ -11,6 +11,8 @@ import { OfferLine } from './entities/offer-line.entity';
 import { OfferOrder } from './entities/order-offer.entity';
 import { PreOrder } from "../preOrder/entities/pre-order.entity";
 import { Line } from "../line/entities/order-line.entity";
+import { AddSellerOrderOffer } from "./dto/add-seller-offer.input";
+import { TempSeller } from "./entities/temp-seller.entity";
 
 @Injectable()
 export class OrderOfferService {
@@ -19,6 +21,28 @@ export class OrderOfferService {
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
 
+  
+  async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer) {
+    
+      const temp: TempSeller = TempSeller.create<TempSeller>(addSellerOrderOffer);
+    
+      await temp.save();
+
+       
+      let  result  =  await OfferOrder.findOne({
+        where: { id: addSellerOrderOffer.orderOfferId },
+        relations: ['offerLine'],
+        order: {
+          id: 'DESC'
+        }
+      });
+    
+      result.tempSellerId = temp.id
+      await result.save()
+
+      return result
+      
+    }
     async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User): Promise<OfferOrder> {
     
       try {
