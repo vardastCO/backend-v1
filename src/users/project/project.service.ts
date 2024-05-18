@@ -215,16 +215,21 @@ export class ProjectService {
     })
     if (!userProject) throw new NotFoundException();
 
-    const projectUserId: number = userProject.userId;
-    const things: ProjectAddress = await ProjectAddress.preload({
+    const projectUserId: number = await userProject.userId;
+
+ 
+    const things: UserProject = await UserProject.preload({
       id: projectUserId,
       ...updateProjectUserInput
     });
+
     await things.save();
     
     
     const projectId: number = userProject.projectId;
-    const project: Project = await Project.findOneBy({id: projectId})
+
+    const project: Project = await Project.findOneBy({ id: projectId })
+
     return project;
   }
 
