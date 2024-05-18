@@ -14,6 +14,7 @@ import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 import { OfferLine } from "./offer-line.entity";
 import { TempSeller } from "./temp-seller.entity";
+import { OrderOfferStatuses } from "../enums/order-offer-statuses";
 
 
 @ObjectType()
@@ -68,13 +69,13 @@ export class OfferOrder extends BaseEntity {
   offerLine: OfferLine[];
 
 
-  @Field(() => ThreeStateSupervisionStatuses)
+  @Field(() => OrderOfferStatuses)
   @Index()
   @Column("enum", {
-    enum: ThreeStateSupervisionStatuses,
-    default: ThreeStateSupervisionStatuses.PENDING,
+    enum: OrderOfferStatuses,
+    default: OrderOfferStatuses.PENDING,
   })
-  status: ThreeStateSupervisionStatuses;
+  status: OrderOfferStatuses;
 
   @Field({ nullable: true })
   @Index()

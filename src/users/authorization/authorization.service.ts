@@ -3,6 +3,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { User } from "../user/entities/user.entity";
 import { EntityManager } from "typeorm";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 @Injectable()
 export class AuthorizationService {
   private user: User;
@@ -38,8 +39,17 @@ export class AuthorizationService {
   // },
 
   async hasRole(roleName: string): Promise<boolean> {
+
+    
     if (!this.user) return false;
-  
+    const cacheKey = `hasRole_admin_{${JSON.stringify(this.user.id)}}`;
+    const cachedData = await this.cacheManager.get<boolean>(
+      cacheKey,
+    );
+    if (cachedData) {
+      return cachedData
+    }
+
     const roleIdToCheck = 2;
   
     const query = `
@@ -52,7 +62,7 @@ export class AuthorizationService {
     try {
 
       const userRoles = await this.entityManager.query(query, [this.user.id, roleIdToCheck]);
-
+      await this.cacheManager.set(cacheKey, userRoles.length > 0, CacheTTL.ONE_WEEK);
       return userRoles.length > 0;
     } catch (error) {
       console.error('Error executing SQL query:', error);

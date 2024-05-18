@@ -80,7 +80,7 @@ export class ProjectResolver {
   //   return this.projectService.assignUserToProject(projectId,userId);
   // }
   @Permission("gql.users.address.store")
-  @Mutation(() => Project)
+  @Query(() => Project, { name: "findOneProject" })
   findOneProject(
     @Args("id") id: number,
   ) {

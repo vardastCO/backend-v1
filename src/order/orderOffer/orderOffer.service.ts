@@ -13,6 +13,8 @@ import { PreOrder } from "../preOrder/entities/pre-order.entity";
 import { Line } from "../line/entities/order-line.entity";
 import { AddSellerOrderOffer } from "./dto/add-seller-offer.input";
 import { TempSeller } from "./entities/temp-seller.entity";
+import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
+import { OrderOfferStatuses } from "./enums/order-offer-statuses";
 
 @Injectable()
 export class OrderOfferService {
@@ -52,7 +54,7 @@ export class OrderOfferService {
             preOrder :  {
               id : createOrderOfferInput.preOrderId
             },
-            status: ThreeStateSupervisionStatuses.PENDING
+            status: OrderOfferStatuses.PENDING
           },
           relations: ['offerLine'],
           order: {
@@ -93,48 +95,60 @@ export class OrderOfferService {
     }
   }
   
-    async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
-    
-      try {
-          
-          const offerline = await OfferLine.findOneBy({
-            offerOrderId: createLineOfferInput.offerOrderId,
-            lineId : createLineOfferInput.lineId
-          })
-
-          if (offerline) {
-            const id = offerline.id
-            const things: OfferLine = await OfferLine.preload({
-              id,
-              ...createLineOfferInput,
-            });
-            await things.save()
-          } else {
-            const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
-            newOrder.userId =  user.id
-          
-            await newOrder.save();
+  async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
   
-          }
-          
-          const result: OfferOrder = await OfferOrder.findOne({
-            where: { id: createLineOfferInput.offerOrderId },
-            relations: ['offerLine'],
-            order: {
-              id: 'DESC'
-            }
-          });
-
-          return result
-        } catch (error) {
-  
-          console.log('createOffer err',error)
-          
+    try {
+      const result: OfferOrder = await OfferOrder.findOne({
+        where: { id: createLineOfferInput.offerOrderId },
+        relations: ['offerLine'],
+        order: {
+          id: 'DESC'
         }
-      
-    }
+      });
+      console.log('result',result)
+        const offerline = await OfferLine.findOneBy({
+          offerOrderId: createLineOfferInput.offerOrderId,
+          lineId : createLineOfferInput.lineId
+        })
+        
+        if (offerline) {
+          const id = offerline.id
+          const amount = offerline.total_price
+          const things: OfferLine = await OfferLine.preload({
+            id,
+            ...createLineOfferInput,
+          });
+          result.total =
+            (parseInt(things.total_price) + parseInt(createLineOfferInput.total_price) - parseInt(amount)).toString()
+          await result.save()
+          
+          await things.save()
+          
+        } else {
+          console.log('no')
+          const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
+          newOrder.userId = user.id
+          newOrder.offerOrderId = createLineOfferInput.offerOrderId
+          result.total =
+            (parseInt(await result.total) + parseInt(createLineOfferInput.total_price)).toString()
+          await result.save()
+          await newOrder.save();
+         
 
-    async removeOrderOfferLine(id: number): Promise<OfferOrder> {
+        }
+        
+     
+
+        return result
+      } catch (error) {
+
+        console.log('createOffer err',error)
+        
+      }
+    
+  }
+
+  async removeOrderOfferLine(id: number): Promise<OfferOrder> {
     
       try {
 
@@ -163,6 +177,27 @@ export class OrderOfferService {
       }
     
   }
+
+  async updateOrderOffer(updateOrderOfferInput : UpdateOrderOfferInput): Promise<OfferOrder> {
+    
+    try {
+      const offerOrder = await OfferOrder.findOne({
+        where: {id: updateOrderOfferInput.id},
+        relations: ['offerLine'],
+        order: {
+          id: 'DESC'
+        }
+      });
+      offerOrder.status =
+        updateOrderOfferInput.status as OrderOfferStatuses ?? OrderOfferStatuses.PENDING
+      await offerOrder.save()
+      return offerOrder
+    } catch (error) {
+
+      console.log('updateOrderOffer err',error)
+    }
+  
+}
 
   async getOffer(id: number): Promise<OfferOrder> {
     try {
