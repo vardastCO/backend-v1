@@ -32,6 +32,7 @@ import * as zlib from 'zlib';
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { IndexOffersPrice } from "./dto/index-price-offers.input";
+import { AuthorizationService } from "src/users/authorization/authorization.service";
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -42,6 +43,7 @@ export class ProductService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly entityManager: EntityManager,
+    private authorizationService: AuthorizationService,
   ) {
     // this.productClient = ClientProxyFactory.create({
     //   transport: Transport.RMQ,
@@ -149,14 +151,19 @@ export class ProductService {
 
   async paginate(
     indexProductInput?: IndexProductInput,
+    user ?: User
   ): Promise<PaginationProductResponse> {
     indexProductInput.boot();
+  
+    let admin = false
+    if (await this.authorizationService.setUser(user).hasRole("admin")) {
+      admin = true
+    }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
     const cachedData = await this.cacheManager.get<String>(
       cacheKey,
     );
-    
-    if (cachedData) {
+    if (cachedData && !admin) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
       return parsedData;
@@ -253,8 +260,11 @@ export class ProductService {
     const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
     // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
 
-    const compressedData = zlib.gzipSync(JSON.stringify(result));
-    await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+    if (!admin) {
+      const compressedData = zlib.gzipSync(JSON.stringify(result));
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+    }
+ 
 
     // await this.productClient.emit('product.paginated', result);
     

@@ -99,15 +99,11 @@ export class ProductResolver {
       new ValidationPipe({ transform: true }),
     )
     indexProductInput?: IndexProductInput,
+    @CurrentUser() user?: User,  
   ) {
-    // const beforePaginate = Date.now();
 
-    const result = await this.productService.paginate(indexProductInput);
 
-    // // Measure time after calling paginate
-    // const afterPaginate = Date.now();
-    // const paginateTime = afterPaginate - beforePaginate;
-    // console.log(`Time taken in paginate method: ${paginateTime} ms`);
+    const result = await this.productService.paginate(indexProductInput,user);
 
     return result;
   }
