@@ -25,6 +25,8 @@ import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UserStatusesEnum } from "./enums/user-statuses.enum";
 import { UpdateProfileInput } from "./dto/update-profile.input";
+import { CompressionService } from "src/compression.service";
+import { DecompressionService } from "src/decompression.service";
 
 @Injectable()
 export class UserService {
@@ -36,6 +38,8 @@ export class UserService {
     @Inject(DataSource) private readonly dataSource: DataSource,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private kavenegarService: KavenegarService,
+    private readonly compressionService: CompressionService,
+    private readonly decompressionService: DecompressionService,
   ) {}
 
   async create(
@@ -254,24 +258,43 @@ export class UserService {
   }
 
   async cacheRolesOf(user: User): Promise<string[]> {
+    const cacheKey = `roles_user_{id:${JSON.stringify(user.id)}}`;
+    const cachedData = await this.cacheManager.get<string>(
+      cacheKey,
+    );
+    if (cachedData) {
+
+      return this.decompressionService.decompressData(cachedData)
+    }
     const roleNames = (await user.roles).map(role => role.name);
-    // this.cacheManager.set(
-    //   user.getRoleCacheKey(),
-    //   roleNames,
-    //   CacheTTL.ONE_MONTH,
-    // );
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(roleNames),
+      CacheTTL.ONE_DAY,
+    );
     return roleNames;
   }
 
   async cachePermissionsOf(user: User): Promise<string[]> {
+    const cacheKey = `permissions_user_{id:${JSON.stringify(user.id)}}`;
+    const cachedData = await this.cacheManager.get<string>(
+      cacheKey,
+    );
+
+    if (cachedData) {
+
+      return this.decompressionService.decompressData(cachedData)
+    }
     const userWholePermissions = await user.wholePermissionNames();
-    // this.cacheManager.set(
-    //   user.getPermissionCacheKey(),
-    //   userWholePermissions,
-    //   CacheTTL.ONE_MONTH,
-    // );
+     await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(userWholePermissions),
+      CacheTTL.ONE_DAY,
+    );
+
     return userWholePermissions;
   }
+
 
   async getSellerRecordOf(user: User): Promise<Seller> {
     return await Seller.createQueryBuilder()

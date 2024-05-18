@@ -7,6 +7,8 @@ import DevUserSeeder from "./dev-user.seed";
 import { User } from "./entities/user.entity";
 import { UserResolver } from "./user.resolver";
 import { UserService } from "./user.service";
+import { DecompressionService } from "src/decompression.service";
+import { CompressionService } from "src/compression.service";
 
 @Module({
   imports: [
@@ -15,7 +17,8 @@ import { UserService } from "./user.service";
     FileModule,
     KavenegarModule,
   ],
-  providers: [UserResolver, UserService, DevUserSeeder],
+  providers: [UserResolver, UserService, DevUserSeeder,CompressionService,
+    DecompressionService,],
   exports: [UserService],
 })
 export class UserModule {}
