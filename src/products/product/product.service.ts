@@ -173,6 +173,7 @@ export class ProductService {
       isActive,
       createdById,
       query,
+      hasPrice,
       techNum,
       attributes,
     } = indexProductInput || {};
@@ -196,6 +197,10 @@ export class ProductService {
       whereConditions.offers = {
         sellerId: sellerId,
       };
+    }
+
+    if (!hasPrice) {
+      whereConditions.rating = 1
     }
 
     if (query) {
