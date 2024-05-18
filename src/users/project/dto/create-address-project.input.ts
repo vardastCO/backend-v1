@@ -43,6 +43,9 @@ export class CreateAddressProjectInput {
   @IsInt()
   province_id: number;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  postalCode?: string;
 
   @Field()
   @IsNotEmpty()

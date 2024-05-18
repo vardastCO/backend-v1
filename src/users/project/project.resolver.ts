@@ -1,6 +1,7 @@
 import {
   Args,
   Mutation,
+  Query,
   Resolver
 } from "@nestjs/graphql";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
@@ -86,7 +87,7 @@ export class ProjectResolver {
     return this.projectService.findOneProject(id);
   }
   @Permission("gql.users.address.store")
-  @Mutation(() => [Project])
+  @Query(() => [Project], { name: "myProjects" })
   myProjects(
     @CurrentUser() user: User,
   ) {
