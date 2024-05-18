@@ -10,10 +10,11 @@ import { User } from "../user/entities/user.entity";
 import { CreateAddressProjectInput } from "./dto/create-address-project.input";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { CreateUserProjectInput } from "./dto/create-user-project.input";
-import { UpdateProjectAddressInput } from "./dto/update-address-input copy";
+import { UpdateProjectAddressInput } from "./dto/update-address-input";
 import { UpdateProjectInput } from "./dto/update-project-input";
 import { Project } from "./entities/project.entity";
 import { ProjectService } from "./project.service";
+import { UpdateProjectUserInput } from "./dto/update-user-input";
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -112,5 +113,14 @@ export class ProjectResolver {
     return this.projectService.updateAddress(
       updateProjectAddressInput.id,
       updateProjectAddressInput)
+  }
+  @Permission("gql.users.address.store")
+  @Mutation(() => Project)
+  updateProjectUser(
+    @Args("updateProjectUserInput") updateProjectUserInput: UpdateProjectUserInput
+  ) {
+    return this.projectService.updateUser(
+      updateProjectUserInput.id,
+      updateProjectUserInput)
   }
 }

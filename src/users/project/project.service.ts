@@ -5,12 +5,13 @@ import { User } from "../user/entities/user.entity";
 import { CreateAddressProjectInput } from "./dto/create-address-project.input";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { CreateUserProjectInput } from "./dto/create-user-project.input";
-import { UpdateProjectAddressInput } from "./dto/update-address-input copy";
+import { UpdateProjectAddressInput } from "./dto/update-address-input";
 import { UpdateProjectInput } from "./dto/update-project-input";
 import { ProjectAddress } from "./entities/addressProject.entity";
 import { Project } from "./entities/project.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
+import { UpdateProjectUserInput } from "./dto/update-user-input";
 @Injectable()
 export class ProjectService {
   constructor(
@@ -201,6 +202,28 @@ export class ProjectService {
     
     
     const projectId: number = projectHasAddress.projectId;
+    const project: Project = await Project.findOneBy({id: projectId})
+    return project;
+  }
+
+  async updateUser(
+    id: number,
+    updateProjectUserInput: UpdateProjectUserInput): Promise<Project> {
+  
+    const userProject: UserProject = await UserProject.findOneBy({
+      id
+    })
+    if (!userProject) throw new NotFoundException();
+
+    const projectUserId: number = userProject.userId;
+    const things: ProjectAddress = await ProjectAddress.preload({
+      id: projectUserId,
+      ...updateProjectUserInput
+    });
+    await things.save();
+    
+    
+    const projectId: number = userProject.projectId;
     const project: Project = await Project.findOneBy({id: projectId})
     return project;
   }
