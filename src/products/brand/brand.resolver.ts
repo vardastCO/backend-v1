@@ -63,7 +63,7 @@ export class BrandResolver {
     indexBrandInput?: IndexBrandInput,
     @CurrentUser() user?: User,  
   ) {
-    return this.brandService.paginate(indexBrandInput.user);
+    return this.brandService.paginate(indexBrandInput,user);
   }
 
   @Public()

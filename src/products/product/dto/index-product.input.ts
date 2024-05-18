@@ -67,7 +67,7 @@ export class IndexProductInput extends IndexInput {
   @IsBoolean()
   isActive?: boolean;
 
-  @Field(() => Boolean, { nullable: true ,default : true})
+  @Field(() => Boolean, { nullable: true })
   @IsOptional()
   @IsBoolean()
   hasPrice?: boolean = true;
