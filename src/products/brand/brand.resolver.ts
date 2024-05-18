@@ -61,8 +61,9 @@ export class BrandResolver {
       new ValidationPipe({ transform: true }),
     )
     indexBrandInput?: IndexBrandInput,
+    @CurrentUser() user?: User,  
   ) {
-    return this.brandService.paginate(indexBrandInput);
+    return this.brandService.paginate(indexBrandInput.user);
   }
 
   @Public()

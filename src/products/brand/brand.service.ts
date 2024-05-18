@@ -21,6 +21,7 @@ import { Brand } from "./entities/brand.entity";
 import { SortBrandEnum } from "./enum/sort-types.enum";
 import * as zlib from 'zlib';
 import { File } from "src/base/storage/file/entities/file.entity";
+import { AuthorizationService } from "src/users/authorization/authorization.service";
 
 
 @Injectable()
@@ -29,6 +30,7 @@ export class BrandService {
     @I18n() protected readonly i18n: I18nService,
     private readonly fileService: FileService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private authorizationService: AuthorizationService,
   ) {}
 
   async create(createBrandInput: CreateBrandInput, user: User): Promise<Brand> {
@@ -78,15 +80,20 @@ export class BrandService {
     return result
   }
 
-  async paginate(indexBrandInput?: IndexBrandInput): Promise<PaginationBrandResponse> {
+  async paginate(indexBrandInput?: IndexBrandInput,user?: User): Promise<PaginationBrandResponse> {
+    
     indexBrandInput?.boot();
-    const { take, skip, name,hasLogoFile,hasBannerFile,hasCatalogeFile,hasPriceList } = indexBrandInput || {};
-  
+    
+    const { take, skip, name, hasLogoFile, hasBannerFile, hasCatalogeFile, hasPriceList } = indexBrandInput || {};
+    let admin = false
+    if (await this.authorizationService.setUser(user).hasRole("admin")) {
+      admin = true
+    }
     const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
   
     const cachedData = await this.cacheManager.get<string>(cacheKey);
   
-    if (cachedData) {
+    if (cachedData && !admin) {
       // cachedData.data.forEach(category => {
       //   category.createdAt = new Date(category.createdAt);
       //   category.updatedAt = new Date(category.updatedAt);
@@ -149,11 +156,11 @@ export class BrandService {
       const modifiedDataWithOutText = JSON.parse(jsonString);
 
       const response = PaginationBrandResponse.make(indexBrandInput, total, modifiedDataWithOutText);
-      
-      // await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);
-      const compressedData = zlib.gzipSync(JSON.stringify(response));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
-    
+      if (!admin) {
+        const compressedData = zlib.gzipSync(JSON.stringify(response));
+        await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+      }
+
       return response;
     } catch (e) {
       
