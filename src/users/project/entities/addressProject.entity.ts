@@ -44,6 +44,12 @@ export class ProjectAddress extends BaseEntity {
   @Column()
   cityId: number;
 
+  @Field(() => Province,{nullable:true})
+  @ManyToOne(() => Province)
+  province: Promise<Province>;
+  @Column({nullable:true})
+  provinceId?: number;
+
   @Field()
   @Column()
   address: string;
