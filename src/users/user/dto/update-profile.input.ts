@@ -3,13 +3,13 @@ import { MaxLength, IsNotEmpty,IsOptional } from "class-validator";
 
 @InputType()
 export class UpdateProfileInput  {
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @MaxLength(255)
   firstName: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @MaxLength(255)
   lastName: string;
 
