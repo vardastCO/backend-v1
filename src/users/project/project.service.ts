@@ -79,14 +79,23 @@ export class ProjectService {
     }
    
   }
-  async removeUserProject(id:number): Promise<Project> {
+  async removeUserProject(id:number,userId:number): Promise<Project> {
     try {
-      const things =  await UserProject.findOne({
-        where: { id },
-      });
-      let projectId = await things.projectId
-      if (things) {
-        await things.remove();
+      let userProject
+      if (userId) {
+        userProject =  await UserProject.findOne({
+          where: { userId },
+        });
+      }
+      if (id) {
+        userProject =  await UserProject.findOne({
+          where: { id },
+        }); 
+      }
+     
+      let projectId = await userProject.projectId
+      if (userProject) {
+        await userProject.remove();
       }
 
       return await Project.findOne({
@@ -98,14 +107,23 @@ export class ProjectService {
     }
    
   }
-  async removeAddressProject(id:number): Promise<Project> {
+  async removeAddressProject(id:number,addressId:number): Promise<Project> {
     try {
-      const things =  await ProjectHasAddress.findOne({
-        where: { id },
-      });
-      let projectId = await things.projectId
-      if (things) {
-        await things.remove();
+      let projecAddress;
+      if (id) {
+        projecAddress =  await ProjectHasAddress.findOne({
+          where: { id },
+        });
+      }
+      if (addressId) {
+        projecAddress =  await ProjectHasAddress.findOne({
+          where: { addressId },
+        });
+      }
+       
+      let projectId = await projecAddress.projectId
+      if (projecAddress) {
+        await projecAddress.remove();
       }
 
       return await Project.findOne({
@@ -187,21 +205,29 @@ export class ProjectService {
   async updateAddress(
     id: number,
     updateProjectAddressInput: UpdateProjectAddressInput): Promise<Project> {
-  
-    const projectHasAddress: ProjectHasAddress = await ProjectHasAddress.findOneBy({
-      id
-    })
-    if (!projectHasAddress) throw new NotFoundException();
+    let projectAddress: ProjectHasAddress
+    if (updateProjectAddressInput.addressId) {
+      projectAddress = await ProjectHasAddress.findOneBy({
+        addressId:updateProjectAddressInput.addressId
+      })
+    }
+    if (updateProjectAddressInput.id) {
+      projectAddress = await ProjectHasAddress.findOneBy({
+        id
+      })
+    }
+    
+    if (!ProjectAddress) throw new NotFoundException();
 
-    const projectAddressId: number = projectHasAddress.addressId;
-    const projectAddress: ProjectAddress = await ProjectAddress.preload({
-      id: projectAddressId,
-      ...updateProjectAddressInput
-    });
-    await projectAddress.save();
+    // const projectAddressId: number = ProjectAddress.addressId;
+    // const projectAddress: ProjectHasAddress = await ProjectHasAddress.preload({
+    //   id: projectAddressId,
+    //   ...updateProjectAddressInput
+    // });
+    // await projectAddress.save();
     
     
-    const projectId: number = projectHasAddress.projectId;
+    const projectId: number = projectAddress.projectId;
     const project: Project = await Project.findOneBy({id: projectId})
     return project;
   }
@@ -209,10 +235,18 @@ export class ProjectService {
   async updateUser(
     id: number,
     updateProjectUserInput: UpdateProjectUserInput): Promise<Project> {
-  
-    const userProject: UserProject = await UserProject.findOneBy({
-      id
-    })
+    let userProject : UserProject
+    if (updateProjectUserInput.userId) {
+      userProject = await UserProject.findOneBy({
+        userId:updateProjectUserInput.userId
+      })
+    }
+    if (id) {
+      userProject = await UserProject.findOneBy({
+        id
+      })
+    }
+   
     if (!userProject) throw new NotFoundException();
 
     const projectUserId: number = await userProject.userId;

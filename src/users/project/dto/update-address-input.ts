@@ -1,7 +1,8 @@
 import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
 import {
     IsInt,
-    IsNotEmpty
+    IsNotEmpty,
+    IsOptional
 } from "class-validator";
 import { CreateAddressProjectInput } from "./create-address-project.input";
 
@@ -13,6 +14,11 @@ export class UpdateProjectAddressInput extends PartialType(CreateAddressProjectI
     @IsNotEmpty()
     @IsInt()
     id: number;
+
+    @Field(() => Int,{nullable:true})
+    @IsOptional()
+    @IsInt()
+    addressId?: number;
 }
 
 
