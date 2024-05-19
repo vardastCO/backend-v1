@@ -122,7 +122,7 @@ export class ProjectResolver {
     @Args("updateProjectUserInput") updateProjectUserInput: UpdateProjectUserInput
   ) {
     return this.projectService.updateUser(
-      updateProjectUserInput.id,
-      updateProjectUserInput)
+      updateProjectUserInput
+    )
   }
 }

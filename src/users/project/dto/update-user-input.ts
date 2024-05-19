@@ -13,12 +13,12 @@ export class UpdateProjectUserInput extends PartialType(CreateUserProjectInput) 
     @Field(() => Int)
     @IsNotEmpty()
     @IsInt()
-    id: number;
+    projectId: number;
 
-    @Field(() => Int,{nullable:true})
-    @IsOptional()
+    @Field(() => Int)
+    @IsNotEmpty()
     @IsInt()
-    userId?: number;
+    userId: number;
 }
 
 
