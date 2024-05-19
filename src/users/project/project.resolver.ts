@@ -48,18 +48,18 @@ export class ProjectResolver {
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   removeUserProject(
-    @Args("id") id?: number,
-    @Args("userId") userId?: number,
+    @Args("projectId") projectId: number,
+    @Args("userId") userId: number,
   ) {
-    return this.projectService.removeUserProject(id,userId);
+    return this.projectService.removeUserProject(projectId,userId);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   removeAddressProject(
-    @Args("id") id?: number,
-    @Args("addressId") addressId?: number,
+    @Args("projectId") projectId: number,
+    @Args("addressId") addressId: number,
   ) {
-    return this.projectService.removeAddressProject(id,addressId);
+    return this.projectService.removeAddressProject(projectId,addressId);
   }
   // @Permission("gql.users.address.store")
   // @Mutation(() => Project)
@@ -113,8 +113,8 @@ export class ProjectResolver {
     @Args("updateProjectAddressInput") updateProjectAddressInput: UpdateProjectAddressInput
   ) {
     return this.projectService.updateAddress(
-      updateProjectAddressInput.id,
-      updateProjectAddressInput)
+      updateProjectAddressInput
+    )
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)

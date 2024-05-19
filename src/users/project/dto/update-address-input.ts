@@ -13,12 +13,12 @@ export class UpdateProjectAddressInput extends PartialType(CreateAddressProjectI
     @Field(() => Int)
     @IsNotEmpty()
     @IsInt()
-    id: number;
+    projectId: number;
 
-    @Field(() => Int,{nullable:true})
-    @IsOptional()
+    @Field(() => Int)
+    @IsNotEmpty()
     @IsInt()
-    addressId?: number;
+    addressId: number;
 }
 
 
