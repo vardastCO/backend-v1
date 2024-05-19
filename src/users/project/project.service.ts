@@ -12,6 +12,7 @@ import { Project } from "./entities/project.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
 import { UpdateProjectUserInput } from "./dto/update-user-input";
+import {  In } from 'typeorm';
 @Injectable()
 export class ProjectService {
   constructor(
@@ -232,14 +233,22 @@ export class ProjectService {
   async myProjects(
     userId?: number,
   ): Promise<Project[]> {
-
-    return  await Project.find({
-      where: { user: { userId: userId } }, 
+    const all = await Project.find({
+      where: { user: { userId: userId } },
       relations: ['user', 'address'],
       order: {
-        id:'DESC'
+        id: 'DESC'
       }
     });
+    const ids = all.map(item => item.id);
+    return await Project.find({
+      where: { id: In(ids) },
+      relations: ['user', 'address'],
+      order: {
+        id: 'DESC'
+      }
+    })
+  
   }
 
 

@@ -70,7 +70,7 @@ export class UserResolver {
       currentUser,
     );
   }
-   @Permission("gql.base.event_tracker.create")
+  @Permission("gql.base.event_tracker.create")
   @Mutation(() => User)
   updateProfile(
     @Args("updateProfileInput") updateProfileInput: UpdateProfileInput,
