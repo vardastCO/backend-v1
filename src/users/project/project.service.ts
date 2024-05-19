@@ -214,10 +214,8 @@ export class ProjectService {
    
     if (!userProject) throw new NotFoundException();
 
-    const projectUserId: number = await userProject.userId;
- 
     const things: UserProject = await UserProject.preload({
-      id: projectUserId,
+      id: userProject.id,
       ...updateProjectUserInput
     });
 
