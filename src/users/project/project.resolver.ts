@@ -48,16 +48,16 @@ export class ProjectResolver {
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   removeUserProject(
-    @Args("id") id: number,
-    @Args("userId") userId: number,
+    @Args("id") id?: number,
+    @Args("userId") userId?: number,
   ) {
     return this.projectService.removeUserProject(id,userId);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   removeAddressProject(
-    @Args("id") id: number,
-    @Args("addressId") addressId: number,
+    @Args("id") id?: number,
+    @Args("addressId") addressId?: number,
   ) {
     return this.projectService.removeAddressProject(id,addressId);
   }
