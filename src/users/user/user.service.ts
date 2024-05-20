@@ -277,24 +277,25 @@ export class UserService {
 
   async cachePermissionsOf(user: User): Promise<string[]> {
     const cacheKey = `permissions_user_{id:${JSON.stringify(user.id)}}`;
-    const cachedData = await this.cacheManager.get<string>(
-      cacheKey,
-    );
-
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+  
     if (cachedData) {
-
-      return this.decompressionService.decompressData(cachedData)
+      const decompressedData = this.decompressionService.decompressData(cachedData);
+      return decompressedData.slice(0, 20); // Limit to 20 items
     }
+  
     const userWholePermissions = await user.wholePermissionNames();
-     await this.cacheManager.set(
+    const limitedPermissions = userWholePermissions.slice(0, 20); // Limit to 20 items
+    
+    await this.cacheManager.set(
       cacheKey,
-      this.compressionService.compressData(userWholePermissions),
+      this.compressionService.compressData(limitedPermissions),
       CacheTTL.ONE_DAY,
     );
-
-    return userWholePermissions;
+  
+    return limitedPermissions;
   }
-
+  
 
   async getSellerRecordOf(user: User): Promise<Seller> {
     return await Seller.createQueryBuilder()
