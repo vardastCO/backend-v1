@@ -253,15 +253,15 @@ export class User extends BaseEntity {
         })
         .getQueryAndParameters();
 
-    return (
-      await User.getRepository().query(
-        `${rolePermissionsQuery} UNION ${userPermissionsQuery.replace(
-          "$1",
-          "$" + (userRoles.length + 1),
-        )}`,
-        [...rolePermissionsParams, ...userPermissionsParams],
-      )
-    ).map(permission => permission.name);
+        const results = await User.getRepository().query(
+          `${rolePermissionsQuery} UNION ${userPermissionsQuery.replace(
+            "$1",
+            "$" + (rolePermissionsParams.length + 1),
+          )}`,
+          [...rolePermissionsParams, ...userPermissionsParams],
+        );
+      
+        return results.slice(0, 20).map(permission => permission.name);
   }
 
   public getPermissionCacheKey(): string | null {
