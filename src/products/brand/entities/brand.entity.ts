@@ -14,6 +14,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
+  AfterLoad,
+  AfterInsert,
+  AfterUpdate,
 } from "typeorm";
 
 
@@ -110,4 +115,17 @@ export class Brand extends BaseEntity {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @AfterLoad()
+  @AfterInsert()
+  @AfterUpdate()
+  @BeforeInsert()
+  @BeforeUpdate()
+  async generateName(): Promise<void> {
+    if (this.name_fa && this.name_en) {
+      this.name = `${this.name_fa} (${this.name_en})`;
+    } else if (this.name_fa) {
+      this.name = this.name_fa;
+    } 
+  }
 }
