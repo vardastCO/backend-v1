@@ -281,11 +281,11 @@ export class UserService {
   
     if (cachedData) {
       const decompressedData = this.decompressionService.decompressData(cachedData);
-      return decompressedData.slice(0, 20); // Limit to 20 items
+      return decompressedData // Limit to 20 items
     }
   
     const userWholePermissions = await user.wholePermissionNames();
-    const limitedPermissions = userWholePermissions.slice(0, 20); // Limit to 20 items
+    const limitedPermissions = userWholePermissions // Limit to 20 items
     
     await this.cacheManager.set(
       cacheKey,
