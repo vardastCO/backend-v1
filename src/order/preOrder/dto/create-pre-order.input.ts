@@ -12,12 +12,12 @@ export class CreatePreOrderInput {
   addressId: number; 
 
   @Field(() => PaymentMethodEnum, {
-    defaultValue: PaymentMethodEnum.CACHE,
+    defaultValue: PaymentMethodEnum.CASH,
     nullable: true,
   })
   @IsNotEmpty()
   @IsEnum(PaymentMethodEnum)
-  payment_methods?: PaymentMethodEnum = PaymentMethodEnum.CACHE;
+  payment_methods?: PaymentMethodEnum = PaymentMethodEnum.CASH;
 
 
   @Field({ nullable: true })
