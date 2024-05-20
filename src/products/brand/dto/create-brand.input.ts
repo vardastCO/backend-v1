@@ -15,16 +15,19 @@ export class CreateBrandInput {
   @Field()
   @IsNotEmpty()
   @IsString()
-  @MaxLength(255)
-  @Validate(IsUnique, [Brand])
-  name: string;
+  // @MaxLength(255)
+  // @Validate(IsUnique, [Brand])
+  name_fa: string;
 
   @Field()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  @MaxLength(255)
-  @Validate(IsUnique, [Brand])
-  slug: string;
+  name_en?: string;
+
+  @Field()
+  @IsOptional()
+  @IsString()
+  slug?: string;
 
   @Field({ nullable: true })
   @IsOptional()

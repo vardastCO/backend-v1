@@ -36,6 +36,12 @@ export class BrandService {
   async create(createBrandInput: CreateBrandInput, user: User): Promise<Brand> {
     const brand: Brand = Brand.create<Brand>(createBrandInput);
 
+    if (createBrandInput.name_fa && createBrandInput.name_en) {
+      brand.name = `${createBrandInput.name_fa} (${createBrandInput.name_en})`;
+    } else if (createBrandInput.name_fa) {
+      brand.name = createBrandInput.name_fa;
+    } 
+
     if (createBrandInput.logoFileUuid) {
       const file = await this.fileService.getNewlyUploadedFileOrFail(
         "product/brand/logos",
@@ -279,6 +285,11 @@ export class BrandService {
       id,
       ...updateBrandInput,
     });
+    if (updateBrandInput.name_fa && updateBrandInput.name_en) {
+      brand.name = `${updateBrandInput.name_fa} (${updateBrandInput.name_en})`;
+    } else if (updateBrandInput.name_fa) {
+      brand.name = updateBrandInput.name_fa;
+    } 
     if (!brand) {
       throw new NotFoundException();
     }

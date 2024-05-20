@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty } from "class-validator";
+import { IsInt, IsNotEmpty,IsOptional } from "class-validator";
 import { CreateBrandInput } from "./create-brand.input";
 import { InputType, Field, Int, PartialType } from "@nestjs/graphql";
 
@@ -8,4 +8,12 @@ export class UpdateBrandInput extends PartialType(CreateBrandInput) {
   @IsNotEmpty()
   @IsInt()
   id: number;
+
+  @Field()
+  @IsOptional()
+  name_fa: string;
+
+  @Field()
+  @IsOptional()
+  name_en?: string;
 }
