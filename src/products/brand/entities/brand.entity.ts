@@ -34,6 +34,10 @@ export class Brand extends BaseEntity {
   @Column({ nullable: true })
   name_en?: string;
 
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  name_fa?: string;
+
   @Field(() => Category, { nullable: true })
   @OneToOne(() => Category, category => null, { eager: true, nullable: true })
   @JoinColumn()
