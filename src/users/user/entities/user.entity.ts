@@ -226,48 +226,43 @@ export class User extends BaseEntity {
 
   async wholePermissionNames(): Promise<string[]> {
     const userRoles = await this.roles;
-    const roleIds = userRoles.length !== 0 ? userRoles.map(role => role.id) : [0];
-    
-    // Create query for role permissions
-    const [rolePermissionsQuery, rolePermissionsParams] = Permission.createQueryBuilder()
-      .select("name")
-      .innerJoin(
-        "users_authorization_role_permissions",
-        "rp",
-        "rp.permissionId = id"
+    const [rolePermissionsQuery, rolePermissionsParams] =
+      Permission.createQueryBuilder()
+        .select("name")
+        .innerJoin(
+          "users_authorization_role_permissions",
+          "rp",
+          "rp.permissionId = id",
+        )
+        .where("rp.roleId IN(:...roleIds)", {
+          roleIds:
+            userRoles.length !== 0 ? userRoles.map(role => role.id) : [0],
+        })
+        .getQueryAndParameters();
+
+    const [userPermissionsQuery, userPermissionsParams] =
+      Permission.createQueryBuilder()
+        .select("name")
+        .innerJoin(
+          "users_authorization_user_permissions",
+          "up",
+          "up.permissionId = id",
+        )
+        .where("up.userId = :userId", {
+          userId: this.id,
+        })
+        .getQueryAndParameters();
+
+    return (
+      await User.getRepository().query(
+        `${rolePermissionsQuery} UNION ${userPermissionsQuery.replace(
+          "$1",
+          "$" + (userRoles.length + 1),
+        )}`,
+        [...rolePermissionsParams, ...userPermissionsParams],
       )
-      .where("rp.roleId IN(:...roleIds)", { roleIds })
-      .getQueryAndParameters();
-  
-    // Create query for user permissions
-    const [userPermissionsQuery, userPermissionsParams] = Permission.createQueryBuilder()
-      .select("name")
-      .innerJoin(
-        "users_authorization_user_permissions",
-        "up",
-        "up.permissionId = id"
-      )
-      .where("up.userId = :userId", { userId: this.id })
-      .getQueryAndParameters();
-  
-    // Combine both queries using UNION
-    const combinedQuery = `
-      (${rolePermissionsQuery})
-      UNION
-      (${userPermissionsQuery})
-      LIMIT 20
-    `;
-  
-    // Execute the combined query
-    const results = await User.getRepository().query(
-      combinedQuery,
-      [...rolePermissionsParams, ...userPermissionsParams]
-    );
-  
-    // Map and return the results
-    return results.map(permission => permission.name);
+    ).map(permission => permission.name);
   }
-  
 
   public getPermissionCacheKey(): string | null {
     if (!this.id) {
