@@ -19,12 +19,12 @@ export class CreateBrandInput {
   // @Validate(IsUnique, [Brand])
   name_fa: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsOptional()
   @IsString()
   name_en?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsOptional()
   @IsString()
   slug?: string;
