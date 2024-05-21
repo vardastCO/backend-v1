@@ -196,7 +196,5 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
 }
 class CsvProduct {
-  name: string;
-  category: string;
-  brand : string;
+  sku: string;
 }

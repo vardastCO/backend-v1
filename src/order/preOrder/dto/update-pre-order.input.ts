@@ -17,5 +17,5 @@ export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
   })
   @IsNotEmpty()
   @IsEnum(ExpireTypes)
-  expire_data?: ExpireTypes = ExpireTypes.ONE_DAY;
+  expire_date?: ExpireTypes = ExpireTypes.ONE_DAY;
 }

@@ -88,7 +88,7 @@ export class PreOrderService {
       things.status = PreOrderStates.ADDEDADRESS
     }
     things.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-    things.expire_date = this.calculateExpirationDate(updatePreOrderInput.expire_data).toLocaleString("en-US", { timeZone: "Asia/Tehran" });
+    things.expire_date = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" });
     await things.save()
 
     return things;
