@@ -17,7 +17,7 @@ import { PreOrderService } from './pre-order.service';
 export class PreOrderResolver {
   constructor(private readonly preOrderService : PreOrderService) {}
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => PreOrder)
   createPreOrder(
     @Args("createPreOrderInput") createPreOrderInput: CreatePreOrderInput,
@@ -27,7 +27,7 @@ export class PreOrderResolver {
     return this.preOrderService.createPreOrder(createPreOrderInput,user);
   }
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => PreOrder)
   updatePreOrder(
     @Args("updatePreOrderInput") updatePreOrderInput: UpdatePreOrderInput,
@@ -39,7 +39,7 @@ export class PreOrderResolver {
       currentUser,
     );
   }
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => PreOrder)
   findPreOrderById(
     @Args("id") id: number,
@@ -52,7 +52,7 @@ export class PreOrderResolver {
 
 
   // @Public()
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
   findAll(
     @CurrentUser() currentUser: User,

@@ -14,7 +14,7 @@ export class PreFileResolver {
   constructor(private readonly preFileService : PreFileService) {}
 
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => PreOrder)
   addFilePreOrder(
     @Args('addFilePreOrderInput', { type: () => AddFilePreOrderInput, nullable: true }, new ValidationPipe({ transform: true }))
@@ -25,7 +25,7 @@ export class PreFileResolver {
     return this.preFileService.addFilePreOrder(addFilePreOrderInput,user);
   }
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => Boolean)
   removeFilePreOrder(
     @Args('id', { type: () => Int, nullable: true }, new ValidationPipe({ transform: true }))

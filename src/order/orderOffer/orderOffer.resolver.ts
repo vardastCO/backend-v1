@@ -24,7 +24,7 @@ interface PriceOfferDto {
 export class OrderOfferResolver {
   constructor(private readonly orderOfferService : OrderOfferService) {}
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
   createOrderOffer(
     @Args("createOrderOfferInput") createOrderOfferInput: CreateOrderOfferInput,
@@ -32,7 +32,7 @@ export class OrderOfferResolver {
   ) {
     return this.orderOfferService.createOffer(createOrderOfferInput,user);
   }
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
   updateOrderOffer(
     @Args("updateOrderOfferInput") updateOrderOfferInput: UpdateOrderOfferInput,
@@ -40,7 +40,7 @@ export class OrderOfferResolver {
   ) {
     return this.orderOfferService.updateOrderOffer(updateOrderOfferInput);
   }
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
   addSellerOrderOffer(
     @Args("addSellerOrderOffer") addSellerOrderOffer: AddSellerOrderOffer,
@@ -49,7 +49,7 @@ export class OrderOfferResolver {
     return this.orderOfferService.addSellerOrderOffer(addSellerOrderOffer);
   }
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
   createOrderOfferLine(
     @Args("createLineOfferInput") createLineOfferInput: CreateLineOfferInput,
@@ -58,7 +58,7 @@ export class OrderOfferResolver {
     return this.orderOfferService.createOrderOfferLine(createLineOfferInput,user);
   }
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => PriceOfferDTO )
   calculatePriceOfferLine(
     @Args("lineId") lineId: number,
@@ -68,7 +68,7 @@ export class OrderOfferResolver {
     return this.orderOfferService.calculatePriceOfferLine(lineId,fi_price);
   }
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
   findOfferPreOrderById(
     @Args("id") id: number
@@ -77,7 +77,7 @@ export class OrderOfferResolver {
     return this.orderOfferService.getOffer(id)
   }
 
-  @Permission("gql.users.user.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
   removeOfferPreOrderLine(
     @Args("id") id: number
