@@ -87,7 +87,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         if (!product) {
           throw product;
         }
-        console.log('ppp',product)
+
         const productImages = await product.images;
       
         // Check if the product already has images
@@ -104,24 +104,25 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         // );
         let i = 1;
 
+        const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+      
+        // Construct the regex pattern to match the SKU followed by a hyphen, then a number, and finally the extension
+        const filenameRegex = new RegExp(`^${sku}-\\d+\\.(${validExtensions.join('|')})$`, 'i');
+    
         for (const filename of this.files) {
           try {
-            // Split the filename into parts
-            const parts = filename.split('-');
-            const fileSku = parts[0];
-            const sortPart = parts[1];
-            const extension = filename.split('.').pop().toLowerCase();
-            // Check if the SKU matches and the extension is valid
-            const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-            if (fileSku == sku) {
-              const sortOrder = parseInt(sortPart, 10) || i++;
-    
+            // Check if the filename matches the regex pattern
+            if (filename.match(filenameRegex)) {
+              console.log('FOUUUUND')
+              const sortOrder = parseInt(filename.split('-')[1], 10) || i++;
+      
               // Log details for debugging
-              console.log(`Processing file: ${filename}, SKU: ${fileSku}, sort order: ${sortOrder}, extension: ${extension}`);
-    
+              console.log(`Processing file: ${filename}, SKU: ${sku}, sort order: ${sortOrder}, extension: ${extension}`);
+      
               // Add the image to the product
               await this.addImage(imageDirectory, filename, product, sortOrder);
-    
+      
               // Remove the processed file from the list
               this.files = this.files.filter((file) => file !== filename);
             }
@@ -133,7 +134,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         console.log('Saved', product.name);
       }
     } catch (e) {
-      console.log('rrrrrr', e);
+      console.log('ERR', e);
     }
   
     console.log("Finished.");
