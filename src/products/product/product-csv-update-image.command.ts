@@ -103,10 +103,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         //   `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
         // );
         let i = 1;
-        console.log('======================')
-        console.log('found ')
-        console.log('=========================')
-        console.log('lengh',this.files.length)
+
         for (const filename of this.files) {
           try {
             // Split the filename into parts
@@ -114,13 +111,9 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
             const fileSku = parts[0];
             const sortPart = parts[1];
             const extension = filename.split('.').pop().toLowerCase();
-
-            console.log('extension',extension)
-            console.log('fileSku', fileSku)
-            console.log('sku',sku)
             // Check if the SKU matches and the extension is valid
             const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-            if (fileSku == sku && validExtensions.includes(extension)) {
+            if (fileSku == sku) {
               const sortOrder = parseInt(sortPart, 10) || i++;
     
               // Log details for debugging
