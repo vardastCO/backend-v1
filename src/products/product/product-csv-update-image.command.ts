@@ -112,7 +112,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
     
             // Check if the SKU matches and the extension is valid
             const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-            if (fileSku === sku && validExtensions.includes(extension)) {
+            if (fileSku == sku && validExtensions.includes(extension)) {
               const sortOrder = parseInt(sortPart, 10) || i++;
     
               // Log details for debugging
