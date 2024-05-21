@@ -17,6 +17,7 @@ import { Image } from "../images/entities/image.entity";
 })
 export class ProductCsvUpdateImageCommand extends CommandRunner {
   private headerMap = {
+    "productid": "productid",
     "sku":'sku'
   };
  
@@ -26,8 +27,9 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
       return attributes
           .map((attribute) => {
             attribute = attribute ?? "";
-            const [ sku] = attribute;
+            const [ productid,sku] = attribute;
             return {
+              productid,
               sku
         
             };
@@ -78,13 +80,14 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
     try {
       for (const csvProduct of csvProducts.list) {
-        const {  sku } = csvProduct;
+        const { productid, sku } = csvProduct;
         let product: Product = await Product.findOneBy({
-          id: sku,
+          sku: sku,
         });
         if (!product) {
           throw product;
         }
+        console.log('ppp',product)
         const productImages = await product.images;
       
         // Check if the product already has images
@@ -92,41 +95,49 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
         // Check if the product already has images
         if (productImages && productImages.length > 0) {
-          // console.log('Skipped adding images for', product.name, 'as it already has images.');
+          console.log('Skipped adding images for', product.name, 'as it already has images.');
           continue; // Continue to the next product if images exist
         }
-        const productSkus = [sku];
-        const filenameRegex = new RegExp(
-          `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
-        );
+        // const productSkus = [sku];
+        // const filenameRegex = new RegExp(
+        //   `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
+        // );
         let i = 1;
-        for (const index of this.files) {
+        console.log('lengh',this.files.length)
+        for (const filename of this.files) {
           try {
-            const filename = index;
-            const isRelatedToCurrentProduct = filenameRegex.test(filename);
-            if (!isRelatedToCurrentProduct) {
-              continue;
+            // Split the filename into parts
+            const parts = filename.split('-');
+            const fileSku = parts[0];
+            const sortPart = parts[1];
+            const extension = filename.split('.').pop().toLowerCase();
+
+            console.log('extension',extension)
+            console.log('fileSku', fileSku)
+            console.log('sku',sku)
+            // Check if the SKU matches and the extension is valid
+            const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+            if (fileSku == sku && validExtensions.includes(extension)) {
+              const sortOrder = parseInt(sortPart, 10) || i++;
+    
+              // Log details for debugging
+              console.log(`Processing file: ${filename}, SKU: ${fileSku}, sort order: ${sortOrder}, extension: ${extension}`);
+    
+              // Add the image to the product
+              await this.addImage(imageDirectory, filename, product, sortOrder);
+    
+              // Remove the processed file from the list
+              this.files = this.files.filter((file) => file !== filename);
             }
-            console.log('filename',filename)
-            const [, sku, sort, extention] = filename.match(filenameRegex);
-            await this.addImage(
-              imageDirectory,
-              filename,
-              product,
-              sort ? +sort : i++,
-            );
-            this.files = this.files.filter(
-              (filename) => filename !== index
-            );
-          } catch (w) {
-            console.log('warning',w)
+          } catch (error) {
+            console.log('Warning:', error);
           }
         }
   
         console.log('Saved', product.name);
       }
     } catch (e) {
-      console.log('err', e);
+      console.log('rrrrrr', e);
     }
   
     console.log("Finished.");
@@ -185,5 +196,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
 }
 class CsvProduct {
-  sku: string;
+  name: string;
+  category: string;
+  brand : string;
 }
