@@ -118,7 +118,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
               const sortOrder = parseInt(filename.split('-')[1], 10) || i++;
       
               // Log details for debugging
-              console.log(`Processing file: ${filename}, SKU: ${sku}, sort order: ${sortOrder}, extension: ${extension}`);
+              console.log(`Processing file: ${filename}, SKU: ${sku}, sort order: ${sortOrder}`);
       
               // Add the image to the product
               await this.addImage(imageDirectory, filename, product, sortOrder);
