@@ -95,7 +95,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
         // Check if the product already has images
         if (productImages && productImages.length > 0) {
-          console.log('Skipped adding images for', product.name, 'as it already has images.');
+          // console.log('Skipped adding images for', product.name, 'as it already has images.');
           continue; // Continue to the next product if images exist
         }
         // const productSkus = [sku];
@@ -106,30 +106,51 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
         for (const filename of this.files) {
           try {
-            // Split the filename into parts
+            // Split the filename into parts using the hyphen
             const parts = filename.split('-');
+            if (parts.length < 2) {
+              console.log(`Skipping invalid filename format: ${filename}`);
+              continue;
+            }
+        
             const fileSku = parts[0];
-            const sortPart = parts[1];
+            const sortPart = parts[1].split('.')[0];  // Ensure we get the number part before the extension
             const extension = filename.split('.').pop().toLowerCase();
+        
+            // Log parts for debugging
+            console.log(`Filename parts:`, parts);
+            console.log(`File SKU: ${fileSku}, Sort Part: ${sortPart}, Extension: ${extension}`);
+        
             // Check if the SKU matches and the extension is valid
             const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-            if (fileSku.includes(`${sku}-`)) {
+            if (fileSku.includes(`${sku}`) && validExtensions.includes(extension)) {
               const sortOrder = parseInt(sortPart, 10) || i++;
-              console.log('fileSku', fileSku)
-              console.log('sku',sku)
+        
               // Log details for debugging
               console.log(`Processing file: ${filename}, SKU: ${fileSku}, sort order: ${sortOrder}, extension: ${extension}`);
-    
+        
               // Add the image to the product
               await this.addImage(imageDirectory, filename, product, sortOrder);
-    
+        
               // Remove the processed file from the list
               this.files = this.files.filter((file) => file !== filename);
+        
+              // // Log the updated files list for debugging
+              // console.log('Remaining files:', this.files);
+            } else {
+              // Log the reason for skipping the file
+              if (!fileSku.includes(`${sku}`)) {
+                // console.log(`File SKU does not match: ${fileSku}`);
+              }
+              if (!validExtensions.includes(extension)) {
+                console.log(`Invalid file extension: ${extension}`);
+              }
             }
           } catch (error) {
             console.log('Warning:', error);
           }
         }
+        
   
         console.log('Saved', product.name);
       }
