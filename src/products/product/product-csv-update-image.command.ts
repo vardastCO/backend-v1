@@ -87,6 +87,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         if (!product) {
           throw product;
         }
+        console.log('ppp',product)
         const productImages = await product.images;
       
         // Check if the product already has images
@@ -102,6 +103,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         //   `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
         // );
         let i = 1;
+        console.log('lengh',this.files.length)
         for (const filename of this.files) {
           try {
             // Split the filename into parts
