@@ -102,25 +102,30 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
           `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
         );
         let i = 1;
-        for (const index of this.files) {
+        for (const filename of this.files) {
           try {
-            const filename = index;
-            const isRelatedToCurrentProduct = filenameRegex.test(filename);
-            if (!isRelatedToCurrentProduct) {
-              continue;
+            // Split the filename into parts
+            const parts = filename.split('-');
+            const fileSku = parts[0];
+            const sortPart = parts[1];
+            const extension = filename.split('.').pop().toLowerCase();
+    
+            // Check if the SKU matches and the extension is valid
+            const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+            if (fileSku === sku && validExtensions.includes(extension)) {
+              const sortOrder = parseInt(sortPart, 10) || i++;
+    
+              // Log details for debugging
+              console.log(`Processing file: ${filename}, SKU: ${fileSku}, sort order: ${sortOrder}, extension: ${extension}`);
+    
+              // Add the image to the product
+              await this.addImage(imageDirectory, filename, product, sortOrder);
+    
+              // Remove the processed file from the list
+              this.files = this.files.filter((file) => file !== filename);
             }
-            const [, sku, sort, extention] = filename.match(filenameRegex);
-            await this.addImage(
-              imageDirectory,
-              filename,
-              product,
-              sort ? +sort : i++,
-            );
-            this.files = this.files.filter(
-              (filename) => filename !== index
-            );
-          } catch (w) {
-            // console.log('warning',w,'warning')
+          } catch (error) {
+            console.log('Warning:', error);
           }
         }
   
