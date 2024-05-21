@@ -172,44 +172,49 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
     product: Product,
     sort: number,
   ) {
-    const filepath = `${imageDirectory}/${filename}`;
-    const file = {
-      buffer: Fs.readFileSync(filepath),
-      mimetype: Mime.lookup(filepath),
-      size: Fs.statSync(filepath).size,
-    };
-
-    const randomizedFilename = File.generateNewFileName(file);
-
-    const fileRecord: File = File.create<File>({
-      modelType: Image.name,
-      name: `${this.directory.path}/${randomizedFilename}`,
-      originalName: filename,
-      size: file.size,
-      mimeType: file.mimetype,
-      disk: "minio",
-      bucketName: this.bucketName,
-    });
-    fileRecord.directory = Promise.resolve(this.directory);
-    await fileRecord.save();
-
-    const image = Image.create({
-      productId: product.id,
-      fileId: fileRecord.id,
-      sort: sort,
-    });
-    await image.save();
-
-    await this.minioClient.putObject(
-      this.bucketName,
-      fileRecord.name,
-      file.buffer,
-      {
-        "Content-Type": file.mimetype,
-        "File-Uuid": fileRecord.uuid,
-        "File-Id": fileRecord.id,
-      },
-    );
+    try {
+      const filepath = `${imageDirectory}/${filename}`;
+      const file = {
+        buffer: Fs.readFileSync(filepath),
+        mimetype: Mime.lookup(filepath),
+        size: Fs.statSync(filepath).size,
+      };
+  
+      const randomizedFilename = File.generateNewFileName(file);
+  
+      const fileRecord: File = File.create<File>({
+        modelType: Image.name,
+        name: `${this.directory.path}/${randomizedFilename}`,
+        originalName: filename,
+        size: file.size,
+        mimeType: file.mimetype,
+        disk: "minio",
+        bucketName: this.bucketName,
+      });
+      fileRecord.directory = Promise.resolve(this.directory);
+      await fileRecord.save();
+  
+      const image = Image.create({
+        productId: product.id,
+        fileId: fileRecord.id,
+        sort: sort,
+      });
+      await image.save();
+  
+      await this.minioClient.putObject(
+        this.bucketName,
+        fileRecord.name,
+        file.buffer,
+        {
+          "Content-Type": file.mimetype,
+          "File-Uuid": fileRecord.uuid,
+          "File-Id": fileRecord.id,
+        },
+      );
+    } catch (e) {
+      console.log('err in add images',e)
+    }
+    
   }
 
 }
