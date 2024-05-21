@@ -40,7 +40,7 @@ export class PreOrderResolver {
     );
   }
   @Permission("gql.users.address.store")
-  @Mutation(() => PreOrder)
+  @Query(() => PreOrder, { name: "findPreOrderById" })
   findPreOrderById(
     @Args("id") id: number,
     @CurrentUser() user: User
