@@ -97,10 +97,10 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
           console.log('Skipped adding images for', product.name, 'as it already has images.');
           continue; // Continue to the next product if images exist
         }
-        const productSkus = [sku];
-        const filenameRegex = new RegExp(
-          `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
-        );
+        // const productSkus = [sku];
+        // const filenameRegex = new RegExp(
+        //   `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
+        // );
         let i = 1;
         for (const filename of this.files) {
           try {
@@ -109,7 +109,10 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
             const fileSku = parts[0];
             const sortPart = parts[1];
             const extension = filename.split('.').pop().toLowerCase();
-    
+
+            console.log('extension',extension)
+            console.log('fileSku', fileSku)
+            console.log('sku',sku)
             // Check if the SKU matches and the extension is valid
             const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
             if (fileSku == sku && validExtensions.includes(extension)) {
