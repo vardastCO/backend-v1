@@ -78,7 +78,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
       },
     );
     console.log('lengh', this.files.length)
-    console.log('csvProducts',csvProducts.lengh,csvProducts)
+    console.log('csvProducts',csvProducts.length,csvProducts)
     try {
       for (const csvProduct of csvProducts.list) {
         const { productid, sku } = csvProduct;
