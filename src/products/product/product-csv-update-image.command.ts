@@ -82,8 +82,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
       for (const csvProduct of csvProducts.list) {
         const { productid, sku } = csvProduct;
         let product: Product = await Product.findOneBy({
-          // sku: sku,
-           sku: 'df8cd20c937f4e3aad5f5c280de7d976',
+          sku: sku,
         });
         if (!product) {
           throw product;
