@@ -17,7 +17,6 @@ import { Image } from "../images/entities/image.entity";
 })
 export class ProductCsvUpdateImageCommand extends CommandRunner {
   private headerMap = {
-    "productid": "productid",
     "sku":'sku'
   };
  
@@ -27,9 +26,8 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
       return attributes
           .map((attribute) => {
             attribute = attribute ?? "";
-            const [ productid,sku] = attribute;
+            const [ sku] = attribute;
             return {
-              productid,
               sku
         
             };
@@ -80,14 +78,13 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
     try {
       for (const csvProduct of csvProducts.list) {
-        const { productid, sku } = csvProduct;
+        const {  sku } = csvProduct;
         let product: Product = await Product.findOneBy({
-          sku: sku,
+          id: sku,
         });
         if (!product) {
           throw product;
         }
-        
         const productImages = await product.images;
       
         // Check if the product already has images
@@ -98,64 +95,38 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
           // console.log('Skipped adding images for', product.name, 'as it already has images.');
           continue; // Continue to the next product if images exist
         }
-        // const productSkus = [sku];
-        // const filenameRegex = new RegExp(
-        //   `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
-        // );
+        const productSkus = [sku];
+        const filenameRegex = new RegExp(
+          `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
+        );
         let i = 1;
-
-        for (const filename of this.files) {
+        for (const index of this.files) {
           try {
-            // Split the filename into parts using the hyphen
-            const parts = filename.split('-');
-            if (parts.length < 2) {
-              console.log(`Skipping invalid filename format: ${filename}`);
+            const filename = index;
+            const isRelatedToCurrentProduct = filenameRegex.test(filename);
+            if (!isRelatedToCurrentProduct) {
               continue;
             }
-        
-            const fileSku = parts[0];
-            const sortPart = parts[1].split('.')[0];  // Ensure we get the number part before the extension
-            const extension = filename.split('.').pop().toLowerCase();
-        
-            // Log parts for debugging
-            // console.log(`Filename parts:`, parts);
-            // console.log(`File SKU: ${fileSku}, Sort Part: ${sortPart}, Extension: ${extension}`);
-        
-            // Check if the SKU matches and the extension is valid
-            const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-            if (fileSku.includes(`${sku}`) && validExtensions.includes(extension)) {
-              const sortOrder = parseInt(sortPart, 10) || i++;
-        
-              // Log details for debugging
-              console.log(`Processing file: ${filename}, SKU: ${fileSku}, sort order: ${sortOrder}, extension: ${extension}`);
-        
-              // Add the image to the product
-              await this.addImage(imageDirectory, filename, product, sortOrder);
-        
-              // Remove the processed file from the list
-              this.files = this.files.filter((file) => file !== filename);
-        
-              // // Log the updated files list for debugging
-              // console.log('Remaining files:', this.files);
-            } else {
-              // Log the reason for skipping the file
-              if (!fileSku.includes(`${sku}`)) {
-                // console.log(`File SKU does not match: ${fileSku}`);
-              }
-              if (!validExtensions.includes(extension)) {
-                console.log(`Invalid file extension: ${extension}`);
-              }
-            }
-          } catch (error) {
-            console.log('Warning:', error);
+            console.log('filename',filename)
+            const [, sku, sort, extention] = filename.match(filenameRegex);
+            await this.addImage(
+              imageDirectory,
+              filename,
+              product,
+              sort ? +sort : i++,
+            );
+            this.files = this.files.filter(
+              (filename) => filename !== index
+            );
+          } catch (w) {
+            console.log('warning',w)
           }
         }
-        
   
         console.log('Saved', product.name);
       }
     } catch (e) {
-      console.log('rrrrrr', e);
+      console.log('err', e);
     }
   
     console.log("Finished.");
@@ -172,49 +143,44 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
     product: Product,
     sort: number,
   ) {
-    try {
-      const filepath = `${imageDirectory}/${filename}`;
-      const file = {
-        buffer: Fs.readFileSync(filepath),
-        mimetype: Mime.lookup(filepath),
-        size: Fs.statSync(filepath).size,
-      };
-  
-      const randomizedFilename = File.generateNewFileName(file);
-  
-      const fileRecord: File = File.create<File>({
-        modelType: Image.name,
-        name: `${this.directory.path}/${randomizedFilename}`,
-        originalName: filename,
-        size: file.size,
-        mimeType: file.mimetype,
-        disk: "minio",
-        bucketName: this.bucketName,
-      });
-      fileRecord.directory = Promise.resolve(this.directory);
-      await fileRecord.save();
-  
-      const image = Image.create({
-        productId: product.id,
-        fileId: fileRecord.id,
-        sort: sort,
-      });
-      await image.save();
-  
-      await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
-    } catch (e) {
-      console.log('err in add images',e)
-    }
-    
+    const filepath = `${imageDirectory}/${filename}`;
+    const file = {
+      buffer: Fs.readFileSync(filepath),
+      mimetype: Mime.lookup(filepath),
+      size: Fs.statSync(filepath).size,
+    };
+
+    const randomizedFilename = File.generateNewFileName(file);
+
+    const fileRecord: File = File.create<File>({
+      modelType: Image.name,
+      name: `${this.directory.path}/${randomizedFilename}`,
+      originalName: filename,
+      size: file.size,
+      mimeType: file.mimetype,
+      disk: "minio",
+      bucketName: this.bucketName,
+    });
+    fileRecord.directory = Promise.resolve(this.directory);
+    await fileRecord.save();
+
+    const image = Image.create({
+      productId: product.id,
+      fileId: fileRecord.id,
+      sort: sort,
+    });
+    await image.save();
+
+    await this.minioClient.putObject(
+      this.bucketName,
+      fileRecord.name,
+      file.buffer,
+      {
+        "Content-Type": file.mimetype,
+        "File-Uuid": fileRecord.uuid,
+        "File-Id": fileRecord.id,
+      },
+    );
   }
 
 }
