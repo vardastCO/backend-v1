@@ -118,8 +118,8 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
             const extension = filename.split('.').pop().toLowerCase();
         
             // Log parts for debugging
-            console.log(`Filename parts:`, parts);
-            console.log(`File SKU: ${fileSku}, Sort Part: ${sortPart}, Extension: ${extension}`);
+            // console.log(`Filename parts:`, parts);
+            // console.log(`File SKU: ${fileSku}, Sort Part: ${sortPart}, Extension: ${extension}`);
         
             // Check if the SKU matches and the extension is valid
             const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
