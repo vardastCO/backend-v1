@@ -77,8 +77,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         separator: ",",
       },
     );
-    console.log('lengh', this.files.length)
-    console.log('csvProducts',csvProducts.list.length,csvProducts)
+
     try {
       for (const csvProduct of csvProducts.list) {
         const { productid, sku } = csvProduct;
@@ -104,6 +103,9 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         //   `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
         // );
         let i = 1;
+        console.log('======================')
+        console.log('found ')
+        console.log('=========================')
         console.log('lengh',this.files.length)
         for (const filename of this.files) {
           try {
