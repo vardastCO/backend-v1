@@ -122,7 +122,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
       
               // Add the image to the product
               await this.addImage(imageDirectory, filename, product, sortOrder);
-      
+              console.log('Saved', product.name);
               // Remove the processed file from the list
               this.files = this.files.filter((file) => file !== filename);
             }
@@ -131,7 +131,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
           }
         }
   
-        console.log('Saved', product.name);
+
       }
     } catch (e) {
       console.log('ERR', e);
