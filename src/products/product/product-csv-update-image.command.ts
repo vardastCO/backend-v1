@@ -118,7 +118,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
                 await this.addImage(imageDirectory, filename, product, sortOrder);
                 await this.delay(100);
               }
-              await this.delay(100);
+              // await this.delay(100);
             }
           } catch (error) {
             console.log('Warning:', error);
