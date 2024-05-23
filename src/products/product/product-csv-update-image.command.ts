@@ -97,7 +97,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         console.log('first ',productImages,productImages.length)
 
         // Check if the product already has images
-        if (productImages && productImages.length > 0) {
+        if (productImages.length != 0) {
           // console.log('Skipped adding images for', product.name, 'as it already has images.');
           continue; // Continue to the next product if images exist
         }
