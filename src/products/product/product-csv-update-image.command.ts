@@ -102,16 +102,22 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
           continue; // Continue to the next product if images exist
         }
          
-        const regex = new RegExp(`^(${sku})-(\\d+)\\.(jpg|jpeg|png|webp)$`, 'i');
+        console.log('iiiiiiii')
         let i = 1;
         for (const filename of this.files) {
           try {
-            const match = filename.match(regex);
-            if (match) {
-              const [fullMatch, fileSku, sortPart, extension] = match;
-              const sortOrder = parseInt(sortPart, 10) || i++;
-              console.log('add',filename)
-              await this.addImage(imageDirectory, filename, product, sortOrder);
+            const parts = filename.split('-');
+            if (parts.length >= 2) {
+              const fileSku = parts[0];
+              const sortPart = parts[1].split('.')[0];
+              const extension = parts[1].split('.').pop().toLowerCase();
+
+              const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+              if (fileSku == sku && validExtensions.includes(extension)) {
+                const sortOrder = parseInt(sortPart, 10) || i++;
+                await this.addImage(imageDirectory, filename, product, sortOrder);
+                await this.delay(100);
+              }
               await this.delay(100);
             }
           } catch (error) {
