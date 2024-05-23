@@ -101,36 +101,18 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
           // console.log('Skipped adding images for', product.name, 'as it already has images.');
           continue; // Continue to the next product if images exist
         }
-        // const productSkus = [sku];
-        // const filenameRegex = new RegExp(
-        //   `^(${productSkus.join("|")})-(\\d+).(jpg|jpeg|png|webp)$`,
-        // );
+         
+        const regex = new RegExp(`^(${sku})-(\\d+)\\.(jpg|jpeg|png|webp)$`, 'i');
         let i = 1;
         for (const filename of this.files) {
           try {
-            // Split the filename into parts
-            const parts = filename.split('-');
-            const fileSku = parts[0].toString();
-            const sortPart = parts[1];
-            const extension = filename.split('.').pop().toLowerCase();
-            let skuString : string = sku.toString() 
-
-            // Check if the SKU matches and the extension is valid
-            const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-            console.log('=========================')
-            console.log(fileSku,fileSku==skuString,skuString)
-            console.log('=========================')
-            if (fileSku == skuString) {
+            const match = filename.match(regex);
+            if (match) {
+              const [fullMatch, fileSku, sortPart, extension] = match;
               const sortOrder = parseInt(sortPart, 10) || i++;
-              
-              // Log details for debugging
-              console.log(`Processing file: ${filename}, SKU: ${fileSku}, sort order: ${sortOrder}, extension: ${extension}`);
-    
-              // Add the image to the product
+              console.log('add',filename)
               await this.addImage(imageDirectory, filename, product, sortOrder);
               await this.delay(100);
-              // Remove the processed file from the list
-              // this.files = this.files.filter((file) => file !== filename);
             }
           } catch (error) {
             console.log('Warning:', error);
