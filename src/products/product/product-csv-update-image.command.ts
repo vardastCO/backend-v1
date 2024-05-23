@@ -83,7 +83,9 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
 
     try {
       for (const csvProduct of csvProducts.list) {
-        const { productid, sku } = csvProduct;
+        try {
+
+          const { productid, sku } = csvProduct;
         let product: Product = await Product.findOneBy({
           sku: sku,
         });
@@ -125,6 +127,11 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
             console.log('Warning:', error);
           }
         }
+          
+        } catch (e) {
+          console.log('eerr',e)
+        }
+        
   
         // console.log('Saved', product.name);
       }
@@ -134,9 +141,6 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
   
     console.log("Finished.");
   
-  
-  
-
   
   }
 
