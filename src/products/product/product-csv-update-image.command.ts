@@ -102,7 +102,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
           continue; // Continue to the next product if images exist
         }
          
-        console.log('iiiiiiii')
+        console.log('iiiiiiii',sku)
         let i = 1;
         for (const filename of this.files) {
           try {
