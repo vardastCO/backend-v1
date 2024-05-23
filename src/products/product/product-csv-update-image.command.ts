@@ -94,7 +94,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         const productImages = await product.images;
       
         // Check if the product already has images
-
+        console.log('first ',productImages,productImages.length)
 
         // Check if the product already has images
         if (productImages && productImages.length > 0) {
