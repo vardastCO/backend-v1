@@ -85,7 +85,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
       for (const csvProduct of csvProducts.list) {
         try {
 
-          const { productid, sku } = csvProduct;
+        const { productid, sku } = csvProduct;
         let product: Product = await Product.findOneBy({
           sku: sku,
         });
@@ -115,7 +115,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
               const extension = parts[1].split('.').pop().toLowerCase();
 
               const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-              if (fileSku == `${sku}-1`) {
+              if (`${fileSku}` == `${sku}`) {
                 console.log('fileSku',fileSku)
                 const sortOrder = parseInt(sortPart, 10) || i++;
                 await this.addImage(imageDirectory, filename, product, sortOrder);
