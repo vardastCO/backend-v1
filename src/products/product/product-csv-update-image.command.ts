@@ -94,7 +94,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
         const productImages = await product.images;
       
         // Check if the product already has images
-        console.log('first ',productImages,productImages.length)
+        // console.log('first ',productImages,productImages.length)
 
         // Check if the product already has images
         if (productImages.length != 0) {
@@ -113,7 +113,8 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
               const extension = parts[1].split('.').pop().toLowerCase();
 
               const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-              if (fileSku == sku && validExtensions.includes(extension)) {
+              if (fileSku == `${sku}-1`) {
+                console.log('fileSku',fileSku)
                 const sortOrder = parseInt(sortPart, 10) || i++;
                 await this.addImage(imageDirectory, filename, product, sortOrder);
                 await this.delay(100);
