@@ -1,23 +1,38 @@
-import { Controller, Get, Res } from "@nestjs/common";
+import { Controller, Get, Res, Param, } from "@nestjs/common";
 import { Response } from "express";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import axios from 'axios';
 import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
+import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 
 @Controller("order/file")
 export class OrderFileController {
   @Public()
-  @Get()
-  async getOrderFiles(@Res() res: Response) {
+  @Get(':uuid')
+  async getOrderFiles(@Param("uuid") uuid: string, @Res() res: Response): Promise<void> {
+  
     const templateURL = 'https://storage.vardast.com/vardast/order/invoice-template.html';
 
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
+      const preResult = await PreOrder.findOneBy({
+        uuid:uuid
+      })
+      if (!preResult) {
+        res.send('not found')
+      }
       const result = await OfferOrder.findOne({
         where: { id: 1},
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
+      const items = await Promise.all((await result.offerLine).map(async (offer) => ({
+        description: (await offer.line).item_name,
+        unitPrice: offer.fi_price,
+        quantity: (await offer.line).qty,
+        totalPrice: offer.total_price,
+    })));
+  
       const data = {
         date: (await result.preOrder).request_date,
         invoiceNumber: (await result.preOrder).uuid,
@@ -26,21 +41,10 @@ export class OrderFileController {
         buyerName: (await (await result.preOrder).address).delivery_name,
         buyerNationalId: (await (await result.preOrder).address).delivery_contact,
         buyerAddress: (await (await result.preOrder).address).address,
-        items: [
-          { description: 'تیرآهن 140IPE', unitPrice: '59,600,000', quantity: '6', totalPrice: '357,600,000' },
-          { description: 'تیرآهن 160IPE', unitPrice: '59,600,000', quantity: '7', totalPrice: '417,200,000' },
-          { description: 'تیرآهن 240IPE', unitPrice: '109,000,000', quantity: '29', totalPrice: '3,161,000,000' },
-          { description: 'تیرآهن 180IPE', unitPrice: '69,000,000', quantity: '10', totalPrice: '690,000,000' },
-          { description: 'تیرآهن 270IPE', unitPrice: '127,000,000', quantity: '31', totalPrice: '3,937,000,000' },
-          { description: 'حمل', unitPrice: '192,600,000', quantity: '1', totalPrice: '192,600,000' }
-        ],
+        items: await items,
         totalAmount: result.total,
-        // additions: '347,200,000',
-        // discount: '49,600,000',
-        // grandTotal: '9,003,000,000',
         instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.'
       };
-
       // Inject dynamic data into the template
       const invoiceHTML = this.injectDataIntoTemplate(template, data);
 

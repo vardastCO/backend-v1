@@ -16,6 +16,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { PaymentMethodEnum } from "../enum/sort-types.enum";
 
 @ObjectType()
 @Entity("pre_order")
@@ -61,11 +62,14 @@ export class PreOrder extends BaseEntity {
   @Column({ nullable: true })
   shipping_address: string;
 
-  @Field({ nullable: true })
+  @Field(() => PaymentMethodEnum)
   @Index()
-  @Column({ nullable: true })
-  payment_methods: string;
-
+  @Column("enum", {
+    enum: PaymentMethodEnum,
+    default: PaymentMethodEnum.CASH,
+  })
+  payment_methods: PaymentMethodEnum;
+  
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
