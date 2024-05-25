@@ -117,7 +117,7 @@ export class PreOrderService {
         relations: ["files", "lines"],
         order: {
           lines: {
-            type : 'DESC'
+            type : 'ASC'
           }
         }
       })
