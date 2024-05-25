@@ -85,16 +85,12 @@ export class PreOrderService {
     return
     }
 
-    let isHaveAdress = false
-    if (await preOrder.address) {
-      isHaveAdress = true
-    }
-    console.log(
-      'isHaveAdress',isHaveAdress
-    )
+    let preOrderAddress = await preOrder.address;
+    let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
+    console.log('isHaveAddress', isHaveAddress);
     const updateCurrentStatusByCommingProps = {
       [PreOrderStates.CREATED]: PreOrderStates.PENDING_INFO,
-      [PreOrderStates.PENDING_INFO]: isHaveAdress ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
+      [PreOrderStates.PENDING_INFO]: isHaveAddress ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
       [PreOrderStates.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
       [PreOrderStates.VERIFIED]: (await preOrder.lines).length > 0 && (await preOrder.address).id ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
     }
