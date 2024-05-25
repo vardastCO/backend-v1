@@ -86,7 +86,7 @@ export class PreOrderService {
     }
 
     let isHaveAdress = false
-    if ((await preOrder.address).address) {
+    if (await preOrder.address) {
       isHaveAdress = true
     }
     console.log(
