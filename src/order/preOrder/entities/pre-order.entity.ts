@@ -17,6 +17,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PaymentMethodEnum } from "../enum/sort-types.enum";
+import { ExpireTypes } from "../enum/expire-types.enum";
 
 @ObjectType()
 @Entity("pre_order")
@@ -55,7 +56,7 @@ export class PreOrder extends BaseEntity {
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  expire_date: string; 
+  expire_time: string; 
 
   @Field({ nullable: true })
   @Index()
@@ -69,7 +70,15 @@ export class PreOrder extends BaseEntity {
     default: PaymentMethodEnum.CASH,
   })
   payment_methods: PaymentMethodEnum;
-  
+
+  @Field(() => ExpireTypes)
+  @Index()
+  @Column("enum", {
+    enum: ExpireTypes,
+    default: ExpireTypes.ONE_DAY,
+  })
+  expire_date: ExpireTypes;
+
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
