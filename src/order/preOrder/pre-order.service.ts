@@ -87,19 +87,14 @@ export class PreOrderService {
     
     const updateCurrentStatusByCommingProps = {
       [PreOrderStates.CREATED]: PreOrderStates.PENDING_INFO,
-      [PreOrderStates.PENDING_INFO]: preOrder.addressId ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
+      [PreOrderStates.PENDING_INFO]: (await preOrder.address).id ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
       [PreOrderStates.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE
     }
 
     preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
     preOrder.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" }); 
-    console.log('updatePreOrderInput.status', updatePreOrderInput.status)
-    console.log('farv.status',updateCurrentStatusByCommingProps[updatePreOrderInput.status])
+
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
-    console.log('==================')
-    console.log('preOrder.status', preOrder.status)
-    console.log('==================')
-    console.log('updateCurrentStatusByCommingProps', updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status])
 
     await preOrder.save()
 
