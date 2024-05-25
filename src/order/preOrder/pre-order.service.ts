@@ -88,7 +88,8 @@ export class PreOrderService {
     const updateCurrentStatusByCommingProps = {
       [PreOrderStates.CREATED]: PreOrderStates.PENDING_INFO,
       [PreOrderStates.PENDING_INFO]: (await preOrder.address).id ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
-      [PreOrderStates.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE
+      [PreOrderStates.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
+      [PreOrderStates.VERIFIED]: (await preOrder.lines).length > 0 && (await preOrder.address).id ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
     }
 
     preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
