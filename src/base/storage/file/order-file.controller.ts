@@ -2,7 +2,6 @@ import { Controller, Get, Res } from "@nestjs/common";
 import { Response } from "express";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import axios from 'axios';
-import * as pdf from 'html-pdf';
 
 @Controller("order/file")
 export class OrderFileController {
@@ -10,11 +9,11 @@ export class OrderFileController {
   @Get()
   async getOrderFiles(@Res() res: Response) {
     const templateURL = 'https://storage.vardast.com/vardast/order/invoice-template.html';
-    console.log('hi booody ')
+
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
-      console.log('resss',response.data)
+
       // Sample data object
       const data = {
         date: '1403/02/02',
@@ -42,13 +41,9 @@ export class OrderFileController {
       // Inject dynamic data into the template
       const invoiceHTML = this.injectDataIntoTemplate(template, data);
 
-      // Generate PDF from the HTML
-      const pdfBuffer = await this.generatePdfFromHtml(invoiceHTML);
-
-      // Set the response headers and send the PDF
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename=invoice.pdf');
-      res.send(pdfBuffer);
+      // Set the response headers and send the HTML
+      res.setHeader('Content-Type', 'text/html');
+      res.send(invoiceHTML);
     } catch (error) {
       console.error('Failed to fetch invoice template:', error);
       throw new Error('Failed to fetch invoice template');
@@ -79,16 +74,5 @@ export class OrderFileController {
                    .replace('{{discount}}', discount)
                    .replace('{{grandTotal}}', grandTotal)
                    .replace('{{instructions}}', instructions);
-  }
-
-  private async generatePdfFromHtml(html: string): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      pdf.create(html, { format: 'A4' }).toBuffer((err, buffer) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(buffer);
-      });
-    });
   }
 }
