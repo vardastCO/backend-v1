@@ -86,8 +86,10 @@ export class PreOrderService {
     }
 
     let preOrderAddress = await preOrder.address;
+    console.log('preOrderAddress', preOrderAddress)
+    console.log('5555',preOrderAddress?.address?.length > 0)
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
-  
+    console.log('isHaveAddress',isHaveAddress)
     const updateCurrentStatusByCommingProps = {
       [PreOrderStates.CREATED]: PreOrderStates.PENDING_INFO,
       [PreOrderStates.PENDING_INFO]: isHaveAddress ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
@@ -112,7 +114,12 @@ export class PreOrderService {
     try {
       let order = await PreOrder.findOne({
         where: { id: id, },
-        relations: ["files","lines"],
+        relations: ["files", "lines"],
+        orderBy: {
+          line: {
+            type : 'DESC'
+          }
+        }
       })
       if (order) {
         const offersPromises = Promise.all([
