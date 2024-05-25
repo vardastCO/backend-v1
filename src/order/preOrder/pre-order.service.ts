@@ -99,7 +99,8 @@ export class PreOrderService {
     console.log('==================')
     console.log('preOrder.status', preOrder.status)
     console.log('==================')
-    console.log('updateCurrentStatusByCommingProps',updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status])
+    console.log('updateCurrentStatusByCommingProps', updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status])
+
     await preOrder.save()
 
     return preOrder;
