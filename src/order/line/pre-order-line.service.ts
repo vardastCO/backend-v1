@@ -9,6 +9,7 @@ import { User } from 'src/users/user/entities/user.entity';
 import { LineDTO } from './dto/lineDTO';
 import { Line } from './entities/order-line.entity';
 import { PreOrder } from '../preOrder/entities/pre-order.entity';
+import { PreOrderStates } from '../enums/pre-order-states.enum';
 
 @Injectable()
 export class PreOrderLineService {
@@ -25,11 +26,16 @@ export class PreOrderLineService {
         line.userId = user.id
         await line.save();
 
-        return await PreOrder.findOne({
+        const result =  await PreOrder.findOne({
           where: { id: createLineInput.preOrderId},
           relations: ["files","lines"],
         })
-       
+        if (result.status = PreOrderStates.VERIFIED) {
+          result.status = PreOrderStates.PENDING_LINE
+          await result.save()
+        }
+        return result
+        
       } catch (error) {
 
         console.log('create_line_order err',error)
