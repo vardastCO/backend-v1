@@ -116,7 +116,7 @@ export class PreOrderService {
         where: { id: id, },
         relations: ["files", "lines"],
         order: {
-          line: {
+          lines: {
             type : 'DESC'
           }
         }
