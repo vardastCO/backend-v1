@@ -2,6 +2,7 @@ import { Controller, Get, Res } from "@nestjs/common";
 import { Response } from "express";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import axios from 'axios';
+import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
 
 @Controller("order/file")
 export class OrderFileController {
@@ -13,16 +14,18 @@ export class OrderFileController {
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
-
-      // Sample data object
+      const result = await OfferOrder.findOne({
+        where: { id: 1},
+        relations: ["preOrder.user","preOrder.address","offerLine"],
+      })
       const data = {
-        date: '1403/02/02',
-        invoiceNumber: '1403003',
+        date: (await result.preOrder).request_date,
+        invoiceNumber: (await result.preOrder).uuid,
         sellerAddress: 'بلوار کاوه، نرسیده به خیابان دولت، نبش کوچه اخلاقی غربی، پلاك 12,1 طبقه 2 واحد 4',
-        sellerNationalId: '14011385876',
-        buyerName: 'پاش کار',
-        buyerNationalId: '10101398090',
-        buyerAddress: 'چیتگر، کوچه مهر، بن بست پاش کار، پلاك 11، طبقه همکف',
+        sellerNationalId: '14011385876',  
+        buyerName: (await (await result.preOrder).address).delivery_name,
+        buyerNationalId: (await (await result.preOrder).address).delivery_contact,
+        buyerAddress: (await (await result.preOrder).address).address,
         items: [
           { description: 'تیرآهن 140IPE', unitPrice: '59,600,000', quantity: '6', totalPrice: '357,600,000' },
           { description: 'تیرآهن 160IPE', unitPrice: '59,600,000', quantity: '7', totalPrice: '417,200,000' },
@@ -31,10 +34,10 @@ export class OrderFileController {
           { description: 'تیرآهن 270IPE', unitPrice: '127,000,000', quantity: '31', totalPrice: '3,937,000,000' },
           { description: 'حمل', unitPrice: '192,600,000', quantity: '1', totalPrice: '192,600,000' }
         ],
-        totalAmount: '8,685,400,000',
-        additions: '347,200,000',
-        discount: '49,600,000',
-        grandTotal: '9,003,000,000',
+        totalAmount: result.total,
+        // additions: '347,200,000',
+        // discount: '49,600,000',
+        // grandTotal: '9,003,000,000',
         instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.'
       };
 

@@ -85,7 +85,10 @@ export class PreOrderService {
     return
     }
     if (things.status = PreOrderStates.CREATED) {
-      things.status = PreOrderStates.ADDEDADRESS
+      things.status = PreOrderStates.PENDING_INFO
+    }
+    if (things.status == PreOrderStates.PENDING_INFO && updatePreOrderInput.expire_date) {
+      things.status = PreOrderStates.PENDING_LINE
     }
     things.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
     things.expire_date = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" });
