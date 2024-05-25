@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { MultiTypeOrder } from "src/order/enums/multu-type-order.enum";
 
 @ObjectType()
 export class LineDTO {
@@ -25,6 +26,9 @@ export class LineDTO {
 
   @Field({ nullable: true })
   descriptions: string;
+
+  @Field(() => MultiTypeOrder)
+  type: MultiTypeOrder;
 
   @Field({ nullable: true })
   created_at: string;

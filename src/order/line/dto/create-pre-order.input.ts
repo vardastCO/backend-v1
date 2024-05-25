@@ -10,6 +10,7 @@ import {
   MaxLength,
   Validate,
 } from "class-validator";
+import { MultiTypeOrder } from "src/order/enums/multu-type-order.enum";
 @InputType()
 export class CreateLineInput {
   @Field()
@@ -54,4 +55,12 @@ export class CreateLineInput {
   @IsNotEmpty()
   @IsInt()
   preOrderId: number;
+
+  @Field(() => MultiTypeOrder, {
+    defaultValue: MultiTypeOrder.PRODUCT,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  @IsEnum(MultiTypeOrder)
+  type?: MultiTypeOrder = MultiTypeOrder.PRODUCT;
 }
