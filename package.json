@@ -49,6 +49,7 @@
     "amqplib": "^0.10.3",
     "argon2": "^0.30.3",
     "axios": "^1.4.0",
+    "html-pdf" : "*",
     "cache-manager": "^5.2.1",
     "cache-manager-redis-store": "^3.0.1",
     "class-transformer": "^0.5.1",
