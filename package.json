@@ -79,6 +79,7 @@
     "@nestjs/schedule" : "*",
     "@types/compression" : "*",
     "@nestjs/terminus" : "*",
+    "@persian-tools/persian-tools":"*",
     "@nestjs/platform-fastify" : "*"
   },
   "devDependencies": {

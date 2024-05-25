@@ -77,24 +77,27 @@ export class PreOrderService {
     updatePreOrderInput: UpdatePreOrderInput,
     user: User,
   ): Promise<PreOrder> {
-    const things: PreOrder = await PreOrder.preload({
+    const preOrder: PreOrder = await PreOrder.preload({
       id,
       ...updatePreOrderInput,
     });
-    if (!things) {
+    if (!preOrder) {
     return
     }
-    if (things.status = PreOrderStates.CREATED) {
-      things.status = PreOrderStates.PENDING_INFO
+    
+    const updateCurrentStatusByCommingProps = {
+      [PreOrderStates.CREATED]: PreOrderStates.PENDING_INFO,
+      [PreOrderStates.PENDING_INFO]: preOrder.addressId ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
+      [PreOrderStates.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE
     }
-    if (things.status == PreOrderStates.PENDING_INFO && updatePreOrderInput.expire_date) {
-      things.status = PreOrderStates.PENDING_LINE
-    }
-    things.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-    things.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" });
-    await things.save()
 
-    return things;
+    preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
+    preOrder.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" });
+    preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
+
+    await preOrder.save()
+
+    return preOrder;
   }
 
   async findPreOrderById(id : number,user:User): Promise<PreOrder> {

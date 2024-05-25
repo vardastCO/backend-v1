@@ -4,7 +4,7 @@ import { Public } from "src/users/auth/decorators/public.decorator";
 import axios from 'axios';
 import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
 import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
-
+import { addCommas,numberToWords } from "@persian-tools/persian-tools";
 @Controller("order/file")
 export class OrderFileController {
   @Public()
@@ -27,9 +27,12 @@ export class OrderFileController {
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
       const items = await Promise.all((await result.offerLine).map(async (offer) => ({
-        description: (await offer.line).item_name,
+        name: (await offer.line).item_name,
+        description: '',
+        uom: (await offer.line).uom,
+        qty: (await offer.line).qty,
         unitPrice: offer.fi_price,
-        quantity: (await offer.line).qty,
+        tax_price: offer.tax_price,
         totalPrice: offer.total_price,
     })));
   
@@ -59,14 +62,17 @@ export class OrderFileController {
 
   private injectDataIntoTemplate(template: string, data: any): string {
     const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions } = data;
-
     const itemsHTML = items.map(item => `
       <tr>
+        <td>${item.name}</td>
         <td>${item.description}</td>
-        <td>${item.unitPrice}</td>
-        <td>${item.quantity}</td>
-        <td>${item.totalPrice}</td>
+        <td>${item.uom}</td>
+        <td>${item.qty}</td>
+        <td>${addCommas(item.unitPrice)}</td>
+        <td>${addCommas(item.tax_price)}</td>
+        <td>${addCommas(item.totalPrice)}</td>
       </tr>`).join('');
+    const persianTotal = numberToWords(addCommas(totalAmount))
 
     return template.replace('{{date}}', date)
                    .replace('{{invoiceNumber}}', invoiceNumber)
@@ -76,10 +82,11 @@ export class OrderFileController {
                    .replace('{{buyerNationalId}}', buyerNationalId)
                    .replace('{{buyerAddress}}', buyerAddress)
                    .replace('{{itemsHTML}}', itemsHTML)
-                   .replace('{{totalAmount}}', totalAmount)
+                   .replace('{{totalAmount}}', addCommas(totalAmount))
                    .replace('{{additions}}', additions)
                    .replace('{{discount}}', discount)
                    .replace('{{grandTotal}}', grandTotal)
+                   .replace('{{persianTotal}}', `${persianTotal}`)
                    .replace('{{instructions}}', instructions);
   }
 }
