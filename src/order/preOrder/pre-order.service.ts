@@ -92,7 +92,9 @@ export class PreOrderService {
     }
 
     preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-    preOrder.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" });
+    preOrder.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" }); 
+    console.log('updatePreOrderInput.status', updatePreOrderInput.status)
+    console.log('farv.status',updateCurrentStatusByCommingProps[updatePreOrderInput.status])
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
     console.log('==================')
     console.log('preOrder.status', preOrder.status)
