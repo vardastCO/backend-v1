@@ -10,11 +10,11 @@ export class OrderFileController {
   @Get()
   async getOrderFiles(@Res() res: Response) {
     const templateURL = 'https://storage.vardast.com/vardast/order/invoice-template.html';
-
+    console.log('hi booody ')
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
-
+      console.log('resss',response.data)
       // Sample data object
       const data = {
         date: '1403/02/02',
