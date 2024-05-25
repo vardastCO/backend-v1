@@ -115,7 +115,7 @@ export class PreOrderService {
       let order = await PreOrder.findOne({
         where: { id: id, },
         relations: ["files", "lines"],
-        orderBy: {
+        order: {
           line: {
             type : 'DESC'
           }
