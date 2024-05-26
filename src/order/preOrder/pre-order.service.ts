@@ -94,8 +94,7 @@ export class PreOrderService {
       [PreOrderStates.CREATED]: PreOrderStates.PENDING_INFO,
       [PreOrderStates.PENDING_INFO]: isHaveAddress ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
       [PreOrderStates.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
-      [PreOrderStates.VERIFIED]: preOrder.status === PreOrderStates.VERIFIED ? PreOrderStates.PENDING_LINE :
-        (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
+      [PreOrderStates.VERIFIED]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
     }
     
 
