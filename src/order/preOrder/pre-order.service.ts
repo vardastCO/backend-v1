@@ -123,7 +123,7 @@ export class PreOrderService {
             where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT },
             relations: ["offerLine"],
             order: {
-              lines: {
+              offerLine: {
                 type : 'ASC'
               }
             }
@@ -132,7 +132,7 @@ export class PreOrderService {
             where: { preOrderId: order.id, type: TypeOrderOffer.SELLER },
             relations: ["offerLine"],
             order: {
-              lines: {
+              offerLine: {
                 type : 'ASC'
               }
             }
@@ -141,7 +141,7 @@ export class PreOrderService {
             where: { preOrderId: order.id, type: TypeOrderOffer.VARDAST },
             relations: ["offerLine"],
             order: {
-              lines: {
+              offerLine: {
                 type : 'ASC'
               }
             }
