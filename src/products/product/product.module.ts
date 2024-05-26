@@ -13,6 +13,7 @@ import { DeleteProductCommand } from "./command/delete-product-csv.command";
 import { AttProductValueCommand } from "../attribute-value/command/att-value-csv.command";
 import { SeperateProductCommand } from "./command/seperate-product-csv.command";
 import { XmlProductCommand } from "./command/generate-xml-product.command";
+import { ProductAttribuiteUpdateCommand } from "./product-attribuite-update.command";
 // import { ProductExportSeller } from "./product-export-controller";
 
 @Module({
@@ -27,6 +28,7 @@ import { XmlProductCommand } from "./command/generate-xml-product.command";
     RequiredCsvUpdateFilterCommand,
     DeleteProductCommand,
     XmlProductCommand,
+    ProductAttribuiteUpdateCommand,
     AttProductValueCommand,
     SeperateProductCommand
   ],
