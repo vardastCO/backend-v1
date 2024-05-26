@@ -100,18 +100,24 @@ export class OrderOfferService {
   async calculatePriceOfferLine(lineId: number,fi_price:string) {
     const line = await Line.findOneBy({ id: lineId })
     if (line) {
+      const qty = parseInt(line.qty, 10);
+      const price = parseInt(fi_price, 10);
+  
+      const taxPrice = Math.round((price * qty) * 0.1);
+      const totalPrice = Math.round((price * qty) * 1.1);
+  
       return {
         "fi_price": fi_price,
-        "tax_price": ((parseInt(fi_price, 10) * parseInt(line.qty)) * .1).toString(),
-        "total_price" : ((parseInt(fi_price, 10) * parseInt(line.qty)) * 1.1).toString()
-      }
+        "tax_price": taxPrice.toString(),
+        "total_price": totalPrice.toString()
+      };
     }
   }
   
   async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
   
     try {
-      const result: OfferOrder = await OfferOrder.findOne({
+      const offer: OfferOrder = await OfferOrder.findOne({
         where: { id: createLineOfferInput.offerOrderId },
         relations: ['offerLine'],
         order: {
@@ -123,36 +129,48 @@ export class OrderOfferService {
           lineId : createLineOfferInput.lineId
         })
         
-        if (offerline) {
-          const id = offerline.id
-          const amount = offerline.total_price
-          const things: OfferLine = await OfferLine.preload({
-            id,
-            ...createLineOfferInput,
-          });
-          result.total = (
-            parseInt(things.total_price, 10) + 
-            parseInt(createLineOfferInput.total_price, 10) - 
-            parseInt(amount, 10)
-          ).toString();
-          await result.save()
-          
-          await things.save()
-          
-        } else {
-          const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
-          newOrder.userId = user.id
-          newOrder.offerOrderId = createLineOfferInput.offerOrderId
-          result.total = (parseInt(await result.total, 10) + parseInt(createLineOfferInput.total_price, 10)).toString();
-          await result.save()
-          await newOrder.save();
-         
-
-        }
+      if (offerline) {
+        const id = offerline.id
+        console.log('offer',parseInt(offer.total, 10),offer.total)
+        const totalAmount = parseInt(offer.total, 10)
+        console.log('offerline',offerline)
+        const totalPriceStr = offerline.total_price;
+        const parsedPrice = parseInt(totalPriceStr, 10);
+        const currentPrice = isNaN(parsedPrice) ? 0 : parsedPrice;
+        const lines: OfferLine = await OfferLine.preload({
+          id,
+          ...createLineOfferInput,
+        });
+        const NewPrice =  parseInt(createLineOfferInput.total_price, 10) 
         
-     
+        console.log('NewPrice',NewPrice)
+        console.log('currentPrice',currentPrice)
+        console.log( 'totalAmount',totalAmount)
+        offer.total = (
+          NewPrice -
+          currentPrice +
+          totalAmount
+        ).toString();
+        await offer.save()
+          
+        await lines.save()
+      }
+          
+        // } else {
+        //   console.log
+        //   const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
+        //   newOrder.userId = user.id
+        //   newOrder.offerOrderId = createLineOfferInput.offerOrderId
+        //   console.log(parseInt(offer.total, 10))
+        //   console.log(parseInt(createLineOfferInput.total_price, 10))
+        //   console.log((parseInt(offer.total, 10) + parseInt(createLineOfferInput.total_price, 10)))
+        //   offer.total = (parseInt(offer.total, 10) + parseInt(createLineOfferInput.total_price, 10)).toString();
+        //   await offer.save()
+        //   await newOrder.save();
 
-        return result
+        // }
+      
+        return offer
       } catch (error) {
 
         console.log('createOffer err',error)
