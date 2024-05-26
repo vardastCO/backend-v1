@@ -23,10 +23,11 @@ export class OrderFileController {
         res.send('not found')
       }
       const result = await OfferOrder.findOne({
-        where: { id: 1},
+        where: { id: 2},
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
       const items = await Promise.all((await result.offerLine).map(async (offer) => ({
+        id:(await offer.line).id,
         name: (await offer.line).item_name,
         description: '',
         uom: (await offer.line).uom,
@@ -46,7 +47,10 @@ export class OrderFileController {
         buyerAddress: (await (await result.preOrder).address).address,
         items: await items,
         totalAmount: result.total,
-        instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.'
+        instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.',
+        instructions2: 'کالای فروخته شده و تحویل داده شده توسط فروشنده به شرح جدول فوق تا زمان تسویه حساب کامل به صورت امانت نزد خریدار می باشد.'
+      
+      
       };
       // Inject dynamic data into the template
       const invoiceHTML = this.injectDataIntoTemplate(template, data);
@@ -61,18 +65,37 @@ export class OrderFileController {
   }
 
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions } = data;
-    const itemsHTML = items.map(item => `
+    const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
+    const itemsHTML = items.map((item, index) => `
       <tr>
-        <td>${item.name}</td>
-        <td>${item.description}</td>
+        <td>${index+1}</td>
+        <td colspan="2">${item.id}</td>
+        <td colspan="5">${item.name}</td>
         <td>${item.uom}</td>
         <td>${item.qty}</td>
-        <td>${addCommas(item.unitPrice)}</td>
-        <td>${addCommas(item.tax_price)}</td>
-        <td>${addCommas(item.totalPrice)}</td>
-      </tr>`).join('');
-    const persianTotal = numberToWords(addCommas(totalAmount))
+        <td colspan="2">${addCommas(item.unitPrice * 10)}</td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2">${addCommas(item.tax_price * 10)}</td>
+        <td colspan="2">${addCommas(item.totalPrice * 10)}</td>
+      </tr>`).concat([...Array(10 - items.length+1)].map((_,item) => `
+      <tr>
+        <td>${item+items.length}</td>
+        <td colspan="2"></td>
+        <td colspan="5"></td>
+        <td></td>
+        <td></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+      </tr>`)).join('');
+    const persianTotal = numberToWords(addCommas(totalAmount *  10))
 
     return template.replace('{{date}}', date)
                    .replace('{{invoiceNumber}}', invoiceNumber)
@@ -85,8 +108,14 @@ export class OrderFileController {
                    .replace('{{totalAmount}}', addCommas(totalAmount))
                    .replace('{{additions}}', additions)
                    .replace('{{discount}}', discount)
-                   .replace('{{grandTotal}}', grandTotal)
+                   .replace('{{buyerNationalId}}', '1111111')
+                   .replace('{{buyerPhone}}', '09124484707')
+                    .replace('{{grandTotal}}', grandTotal)
+                    .replace('{{totalUOM}}', '0')
+                    .replace('{{totalFi}}', '0')
+                    .replace('{{totalTAX}}', '0')
                    .replace('{{persianTotal}}', `${persianTotal}`)
-                   .replace('{{instructions}}', instructions);
+                  .replace('{{instructions}}', instructions)
+                  .replace('{{instructions2}}', instructions2);
   }
 }
