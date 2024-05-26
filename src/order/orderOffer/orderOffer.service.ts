@@ -68,7 +68,7 @@ export class OrderOfferService {
         newOrder.userId = user.id
         
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-   
+        newOrder.request_name = user.fullName ?? "کاربر"
         
         await newOrder.save();
 
@@ -130,8 +130,11 @@ export class OrderOfferService {
             id,
             ...createLineOfferInput,
           });
-          result.total =
-            (parseInt(things.total_price) + parseInt(createLineOfferInput.total_price) - parseInt(amount)).toString()
+          result.total = (
+            parseInt(things.total_price, 10) + 
+            parseInt(createLineOfferInput.total_price, 10) - 
+            parseInt(amount, 10)
+          ).toString();
           await result.save()
           
           await things.save()
@@ -140,8 +143,7 @@ export class OrderOfferService {
           const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
           newOrder.userId = user.id
           newOrder.offerOrderId = createLineOfferInput.offerOrderId
-          result.total =
-            (parseInt(await result.total) + parseInt(createLineOfferInput.total_price)).toString()
+          result.total = (parseInt(await result.total, 10) + parseInt(createLineOfferInput.total_price, 10)).toString();
           await result.save()
           await newOrder.save();
          
