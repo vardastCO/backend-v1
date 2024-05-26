@@ -124,7 +124,9 @@ export class PreOrderService {
             relations: ["offerLine"],
             order: {
               offerLine: {
-                type : 'ASC'
+                line: {
+                  type : 'ASC'
+                }
               }
             }
           }),
@@ -133,7 +135,10 @@ export class PreOrderService {
             relations: ["offerLine"],
             order: {
               offerLine: {
-                type : 'ASC'
+                line: {
+                  type : 'ASC'
+                }
+               
               }
             }
           }),
@@ -142,7 +147,9 @@ export class PreOrderService {
             relations: ["offerLine"],
             order: {
               offerLine: {
-                type : 'ASC'
+                line: {
+                  type : 'ASC'
+                }
               }
             }
           }),
