@@ -109,12 +109,12 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
       },
     );
 
-    const batchSize = 5;
+    const batchSize = 50;
     let batchCount = 0;
   
     for (let i = 0; i < csvProducts.list.length; i += batchSize) {
       const batch = csvProducts.list.slice(i, i + batchSize);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
       try {
         for (const csvProduct of batch) {
           const { sku, attributes } = csvProduct;
