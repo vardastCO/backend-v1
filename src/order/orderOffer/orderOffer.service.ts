@@ -65,8 +65,10 @@ export class OrderOfferService {
           return order
         }
         const newOrder: OfferOrder = OfferOrder.create<OfferOrder>(createOrderOfferInput);
-        newOrder.userId =  user.id
-      
+        newOrder.userId = user.id
+        
+        newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
+   
 
         await newOrder.save();
 
