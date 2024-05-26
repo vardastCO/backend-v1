@@ -79,7 +79,8 @@ export class OrderOfferService {
             id: 'DESC'
           }
         });
-        (await offer.preOrder).lines.map(async (line) => {
+        const lines = await (await offer.preOrder).lines;
+        lines.map(async (line) => {
           const newOffer = new OfferLine;
           newOffer.userId = user.id
           newOffer.offerOrderId = newOrder.id
