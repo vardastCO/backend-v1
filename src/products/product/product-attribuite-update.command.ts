@@ -23,8 +23,7 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
     "attributes": "attributes",
   };
 
-  private attributeRegex =
-    /^([^\:]+)\:\s+([^\|\:]+)(?: +\| ([ضصثقفغعهخحجچپشسیبلاتنمکگظطزرژذدئوa-zA-Z0-9\.\s\/]+))?(?:- +([a-z0-9]+))?$/;
+  private attributeRegex = /^([^\:]+)\s*:\s*([^\|]+(?:\s*\|\s*[^\|]+)*)(?:\s*-\s*([a-z0-9]+))?$/;
 
   private valueMap = {
     attributes: value => {
@@ -119,6 +118,7 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
       try {
         for (const csvProduct of batch) {
           const { sku, attributes } = csvProduct;
+          
           let product: Product = await Product.findOneBy({ sku: sku });
 
           if (!product) {
