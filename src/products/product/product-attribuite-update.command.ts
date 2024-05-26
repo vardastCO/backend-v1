@@ -15,7 +15,7 @@ import { Uom } from "../uom/entities/uom.entity";
   name: "product:up",
   description: "update products from given csv file base on official format.",
 })
-export class ProductCsvUpdateCommand extends CommandRunner {
+export class ProductAttribuiteUpdateCommand extends CommandRunner {
   private headerMap = {
     "name": "name",
     "category": "category",
