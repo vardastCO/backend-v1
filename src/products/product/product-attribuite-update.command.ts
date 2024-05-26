@@ -136,7 +136,7 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
               await this.addOrUpdateAttribute(product, csvAttribute);
             }
   
-            await product.save();
+            // await product.save();
           }
         }  
       } catch (e) {
@@ -165,6 +165,7 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
     });
 
     if (!attribute) {
+      console.log('not attribuite',attribute.name)
       attribute = Attribute.create({
         name: csvAttribute.name,
         type: AttributeTypesEnum.TEXT,
@@ -196,15 +197,11 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
     for (const attributeValueCsv of csvAttribute.attributeValues) {
       const attributeValue = AttributeValue.create({
         ...attributeValueCsv,
+        productId: product.id,
+        attributeId: attribute.id,
+        isVariant: false,
       });
-      console.log('productId',await product.id,'attributeId',await attribute.id)
-      // attributeValue.product = Promise.resolve(product);
-      attributeValue.productId = await product.id
-      attributeValue.isVariant = false
-      // attributeValue.attribute = Promise.resolve(attribute);
-      attributeValue.attributeId = await attribute.id;
-
-      console.log('ressss',attributeValue)
+      console.log('pppppppppppppppppp',attributeValue)
       await attributeValue.save();
     }
   }
