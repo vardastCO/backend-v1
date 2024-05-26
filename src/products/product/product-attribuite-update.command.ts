@@ -203,6 +203,8 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
       attributeValue.isVariant = false
       // attributeValue.attribute = Promise.resolve(attribute);
       attributeValue.attributeId = await attribute.id;
+
+      console.log('ressss',attributeValue)
       await attributeValue.save();
     }
   }
