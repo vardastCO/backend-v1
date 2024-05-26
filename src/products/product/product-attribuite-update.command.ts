@@ -170,7 +170,7 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
         type: AttributeTypesEnum.TEXT,
         values: csvAttribute.values,
         slug: attributeSlug,
-        uomId: attributeUom ? attributeUom.id : null,
+        uomId: attributeUom ? attributeUom.id : 1,
       });
       attribute.categories = Promise.resolve([await product.category]);
       await attribute.save();
@@ -198,6 +198,7 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
         ...attributeValueCsv,
       });
       attributeValue.product = Promise.resolve(product);
+      attributeValue.isVariant = false
       attributeValue.attribute = Promise.resolve(attribute);
       await attributeValue.save();
     }
