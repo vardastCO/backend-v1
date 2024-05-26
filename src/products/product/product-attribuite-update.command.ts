@@ -124,9 +124,15 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
           if (!product) {
             throw new Error(`Product with SKU ${sku} not found`);
           }
-          if ((await product.attributeValues).length === 0) {
+          console.log('sku', sku)
+          console.log('(await product.attributeValues).length',(await product.attributeValues).length)
+          console.log('(await product.attributeValues).length',(await product.attributeValues).length==0)
+        
+          if ((await product.attributeValues).length == 0) {
             for (const attrName in attributes) {
+              console.log('atttttttt',attrName)
               const csvAttribute = attributes[attrName];
+              console.log('csvAttribute',csvAttribute)
               await this.addOrUpdateAttribute(product, csvAttribute);
             }
   
