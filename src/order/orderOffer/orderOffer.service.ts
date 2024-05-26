@@ -68,7 +68,7 @@ export class OrderOfferService {
         newOrder.userId = user.id
         
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-        newOrder.request_name = user.fullName ?? "کاربر"
+        order.request_name = user.fullName
         
         await newOrder.save();
 
@@ -100,24 +100,18 @@ export class OrderOfferService {
   async calculatePriceOfferLine(lineId: number,fi_price:string) {
     const line = await Line.findOneBy({ id: lineId })
     if (line) {
-      const qty = parseInt(line.qty, 10);
-      const price = parseInt(fi_price, 10);
-  
-      const taxPrice = Math.round((price * qty) * 0.1);
-      const totalPrice = Math.round((price * qty) * 1.1);
-  
       return {
         "fi_price": fi_price,
-        "tax_price": taxPrice.toString(),
-        "total_price": totalPrice.toString()
-      };
+        "tax_price": ((parseInt(fi_price, 10) * parseInt(line.qty)) * .1).toString(),
+        "total_price" : ((parseInt(fi_price, 10) * parseInt(line.qty)) * 1.1).toString()
+      }
     }
   }
   
   async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
   
     try {
-      const offer: OfferOrder = await OfferOrder.findOne({
+      const result: OfferOrder = await OfferOrder.findOne({
         where: { id: createLineOfferInput.offerOrderId },
         relations: ['offerLine'],
         order: {
@@ -129,48 +123,34 @@ export class OrderOfferService {
           lineId : createLineOfferInput.lineId
         })
         
-      if (offerline) {
-        const id = offerline.id
-        console.log('offer',parseInt(offer.total, 10),offer.total)
-        const totalAmount = parseInt(offer.total, 10)
-        console.log('offerline',offerline)
-        const totalPriceStr = offerline.total_price;
-        const parsedPrice = parseInt(totalPriceStr, 10);
-        const currentPrice = isNaN(parsedPrice) ? 0 : parsedPrice;
-        const lines: OfferLine = await OfferLine.preload({
-          id,
-          ...createLineOfferInput,
-        });
-        const NewPrice =  parseInt(createLineOfferInput.total_price, 10) 
-        
-        console.log('NewPrice',NewPrice)
-        console.log('currentPrice',currentPrice)
-        console.log( 'totalAmount',totalAmount)
-        offer.total = (
-          NewPrice -
-          currentPrice +
-          totalAmount
-        ).toString();
-        await offer.save()
+        if (offerline) {
+          const id = offerline.id
+          const amount = offerline.total_price
+          const things: OfferLine = await OfferLine.preload({
+            id,
+            ...createLineOfferInput,
+          });
+          result.total =
+            (parseInt(things.total_price) + parseInt(createLineOfferInput.total_price) - parseInt(amount)).toString()
+          await result.save()
           
-        await lines.save()
-      }
+          await things.save()
           
-        // } else {
-        //   console.log
-        //   const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
-        //   newOrder.userId = user.id
-        //   newOrder.offerOrderId = createLineOfferInput.offerOrderId
-        //   console.log(parseInt(offer.total, 10))
-        //   console.log(parseInt(createLineOfferInput.total_price, 10))
-        //   console.log((parseInt(offer.total, 10) + parseInt(createLineOfferInput.total_price, 10)))
-        //   offer.total = (parseInt(offer.total, 10) + parseInt(createLineOfferInput.total_price, 10)).toString();
-        //   await offer.save()
-        //   await newOrder.save();
+        } else {
+          const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
+          newOrder.userId = user.id
+          newOrder.offerOrderId = createLineOfferInput.offerOrderId
+          result.total =
+            (parseInt(await result.total) + parseInt(createLineOfferInput.total_price)).toString()
+          await result.save()
+          await newOrder.save();
+         
 
-        // }
-      
-        return offer
+        }
+        
+     
+
+        return result
       } catch (error) {
 
         console.log('createOffer err',error)
