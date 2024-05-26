@@ -23,7 +23,8 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
     "attributes": "attributes",
   };
 
-  private attributeRegex = /^([^\:]+)\s*:\s*([^\|]+(?:\s*\|\s*[^\|]+)*)(?:\s*-\s*([a-z0-9]+))?$/;
+  private attributeRegex = /^([^\:]+)\s*:\s*([^\|\:]+)(?:\s*\|\s*([ضصثقفغعهخحجچپشسیبلاتنمکگظطزرژذدئوa-zA-Z0-9\.\s\/]+))?(?:\s*-\s*([a-z0-9]+))?$/
+  ;
 
   private valueMap = {
     attributes: value => {
