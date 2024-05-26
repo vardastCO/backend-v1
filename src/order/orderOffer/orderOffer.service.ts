@@ -69,16 +69,26 @@ export class OrderOfferService {
         
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
    
-
+        
         await newOrder.save();
 
-        return await OfferOrder.findOne({
+        const  offer =  await OfferOrder.findOne({
           where: { id: newOrder.id },
           relations: ['offerLine'],
           order: {
             id: 'DESC'
           }
         });
+        (await offer.preOrder).lines.map(async (line) => {
+          const newOffer = new OfferLine;
+          newOffer.userId = user.id
+          newOffer.offerOrderId = newOrder.id
+          newOffer.lineId = line.id
+        
+          await newOffer.save();
+        })
+        
+        return offer
       } catch (error) {
 
         console.log('createOffer err',error)
@@ -107,7 +117,6 @@ export class OrderOfferService {
           id: 'DESC'
         }
       });
-      console.log('result',result)
         const offerline = await OfferLine.findOneBy({
           offerOrderId: createLineOfferInput.offerOrderId,
           lineId : createLineOfferInput.lineId
@@ -127,7 +136,6 @@ export class OrderOfferService {
           await things.save()
           
         } else {
-          console.log('no')
           const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
           newOrder.userId = user.id
           newOrder.offerOrderId = createLineOfferInput.offerOrderId
