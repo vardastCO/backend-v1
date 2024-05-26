@@ -197,11 +197,12 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
       const attributeValue = AttributeValue.create({
         ...attributeValueCsv,
       });
+      console.log('productId',await product.id,'attributeId',await attribute.id)
       attributeValue.product = Promise.resolve(product);
-      attributeValue.productId = product.id
+      attributeValue.productId = await product.id
       attributeValue.isVariant = false
       attributeValue.attribute = Promise.resolve(attribute);
-      attributeValue.attributeId = attribute.id;
+      attributeValue.attributeId = await attribute.id;
       await attributeValue.save();
     }
   }
