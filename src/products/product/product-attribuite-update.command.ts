@@ -198,8 +198,10 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
         ...attributeValueCsv,
       });
       attributeValue.product = Promise.resolve(product);
+      attributeValue.productId = product.id
       attributeValue.isVariant = false
       attributeValue.attribute = Promise.resolve(attribute);
+      attributeValue.attributeId = attribute.id;
       await attributeValue.save();
     }
   }
