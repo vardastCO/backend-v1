@@ -117,6 +117,7 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
       // await new Promise((resolve) => setTimeout(resolve, 1000));
       try {
         for (const csvProduct of batch) {
+          try {
           const { sku, attributes } = csvProduct;
           
           let product: Product = await Product.findOneBy({ sku: sku });
@@ -130,13 +131,21 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
         
           if ((await product.attributeValues).length == 0) {
             for (const attrName in attributes) {
-              console.log('atttttttt',attrName)
-              const csvAttribute = attributes[attrName];
-              console.log('csvAttribute',csvAttribute)
-              await this.addOrUpdateAttribute(product, csvAttribute);
+              try {
+                console.log('atttttttt',attrName)
+                const csvAttribute = attributes[attrName];
+                console.log('csvAttribute',csvAttribute)
+                await this.addOrUpdateAttribute(product, csvAttribute);
+              } catch (e) {
+                console.log('e',e)
+              }
+             
             }
   
             // await product.save();
+            }
+          } catch (e) {
+            console.log('Error:', e);
           }
         }  
       } catch (e) {
@@ -195,14 +204,19 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
     }
 
     for (const attributeValueCsv of csvAttribute.attributeValues) {
-      const attributeValue = AttributeValue.create({
-        ...attributeValueCsv,
-        productId: product.id,
-        attributeId: attribute.id,
-        isVariant: false,
-      });
-      console.log('pppppppppppppppppp',attributeValue)
-      await attributeValue.save();
+      try {
+        const attributeValue = AttributeValue.create({
+          ...attributeValueCsv,
+          productId: product.id,
+          attributeId: attribute.id,
+          isVariant: false,
+        });
+        console.log('pppppppppppppppppp',attributeValue)
+        await attributeValue.save();
+      } catch (e) {
+        console.log('e',e)
+      }
+      
     }
   }
 
