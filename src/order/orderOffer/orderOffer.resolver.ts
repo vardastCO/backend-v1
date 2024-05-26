@@ -1,7 +1,7 @@
 import { Resolver } from '@nestjs/graphql';
 import { OrderOfferService } from './orderOffer.service';
 
-import { Args, Mutation } from '@nestjs/graphql';
+import { Args, Mutation ,Query} from '@nestjs/graphql';
 import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
 import { Permission } from 'src/users/authorization/permission.decorator';
 import { User } from 'src/users/user/entities/user.entity';
@@ -69,7 +69,7 @@ export class OrderOfferResolver {
   }
 
   @Permission("gql.users.address.store")
-  @Mutation(() => OfferOrder)
+  @Query(() => OfferOrder, { name: "findOfferPreOrderById" })
   findOfferPreOrderById(
     @Args("id") id: number
   ) {
