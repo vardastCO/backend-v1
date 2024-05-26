@@ -175,7 +175,6 @@ export class ProductAttribuiteUpdateCommand extends CommandRunner {
     });
 
     if (!attribute) {
-      console.log('not attribuite',attribute.name)
       attribute = Attribute.create({
         name: csvAttribute.name,
         type: AttributeTypesEnum.TEXT,
