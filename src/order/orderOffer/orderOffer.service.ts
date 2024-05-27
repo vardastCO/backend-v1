@@ -84,13 +84,15 @@ export class OrderOfferService {
         offer.total_fi = '0'
         const lines = await (await offer.preOrder).lines;
         lines.map(async (line) => {
-          const newOffer = new OfferLine;
-          newOffer.userId = user.id
-          newOffer.total_price = '0'
-          newOffer.offerOrderId = newOrder.id
-          newOffer.lineId = line.id
+          const newOfferLine = new OfferLine;
+          newOfferLine.userId = user.id
+          newOfferLine.total_price = '0'
+          newOfferLine.fi_price = '0'
+          newOfferLine.tax_price = '0'
+          newOfferLine.offerOrderId = newOrder.id
+          newOfferLine.lineId = line.id
         
-          await newOffer.save();
+          await newOfferLine.save();
         })
         
         return offer
