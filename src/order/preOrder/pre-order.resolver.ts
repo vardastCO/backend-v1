@@ -1,5 +1,5 @@
 import { ValidationPipe } from "@nestjs/common";
-import { Args, Mutation, Query, Resolver,Context  } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver,Context,Int  } from '@nestjs/graphql';
 import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
 import { Public } from 'src/users/auth/decorators/public.decorator';
 import { Permission } from 'src/users/authorization/permission.decorator';
@@ -68,7 +68,16 @@ export class PreOrderResolver {
     }
     return this.preOrderService.paginate(currentUser, indexPreOrderInput,client);
   }
-
+  @Permission("gql.users.address.store")
+  @Mutation(() => Boolean)
+  removePreOrder(
+    @Args('id', { type: () => Int, nullable: true }, new ValidationPipe({ transform: true }))
+    id: number,
+    @CurrentUser() user: User
+  ) {
+  
+    return this.preOrderService.removePreOrder(id,user);
+  }
   // @Permission("gql.users.user.update")
   // @Mutation(() => PreOrderDTO)
   // updatePreOrder(

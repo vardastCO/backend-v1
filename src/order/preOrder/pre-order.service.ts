@@ -104,7 +104,27 @@ export class PreOrderService {
 
     return preOrder;
   }
+  async removePreOrder( id: number,user:User): Promise<Boolean> {
+    
+    try {
+     
+      let preOrder = await PreOrder.findOneBy({
+         id
+      })
+      if (preOrder) {
+         preOrder.deleted_at = new Date().toLocaleString()
+      }
+      await preOrder.save()
+      return true
+      
+    } catch (error) {
 
+      console.log('remove remove Pre Order err',error)
+      return false
+      
+    }   
+  
+  }
   async findPreOrderById(id : number,user:User): Promise<PreOrder> {
   
     try {
@@ -185,6 +205,7 @@ export class PreOrderService {
     } = indexPreOrderInput || {};
 
     const whereConditions = {}
+    whereConditions['deleted_At'] = IsNull()
 
     if (projectId) {
       whereConditions['projectId'] = projectId;
