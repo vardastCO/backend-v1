@@ -55,6 +55,14 @@ export class OfferOrder extends BaseEntity {
   @Column({ nullable: true, default: '0' })
   total?: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true, default: '0' })
+  total_tax?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true, default: '0' })
+  total_fi?: string;
+
 
   @Field(() => TypeOrderOffer)
   @Index()

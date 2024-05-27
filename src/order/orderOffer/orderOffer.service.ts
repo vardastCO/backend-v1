@@ -79,10 +79,14 @@ export class OrderOfferService {
             id: 'DESC'
           }
         });
+        offer.total = '0'
+        offer.total_tax = '0'
+        offer.total_fi = '0'
         const lines = await (await offer.preOrder).lines;
         lines.map(async (line) => {
           const newOffer = new OfferLine;
           newOffer.userId = user.id
+          newOffer.total_price = '0'
           newOffer.offerOrderId = newOrder.id
           newOffer.lineId = line.id
         
@@ -116,13 +120,13 @@ export class OrderOfferService {
   async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
   
     try {
-      const result: OfferOrder = await OfferOrder.findOne({
-        where: { id: createLineOfferInput.offerOrderId },
-        relations: ['offerLine'],
-        order: {
-          id: 'DESC'
-        }
-      });
+        const offer: OfferOrder = await OfferOrder.findOne({
+          where: { id: createLineOfferInput.offerOrderId },
+          relations: ['offerLine'],
+          order: {
+            id: 'DESC'
+          }
+        });
         const offerline = await OfferLine.findOneBy({
           offerOrderId: createLineOfferInput.offerOrderId,
           lineId : createLineOfferInput.lineId
@@ -130,32 +134,33 @@ export class OrderOfferService {
         
         if (offerline) {
           const id = offerline.id
-          const amount = offerline.total_price
-          const things: OfferLine = await OfferLine.preload({
+          const lastTotal = offerline.total_price
+          const lastFi    = offerline.total_fi
+          const lastTax   = offerline.total_tax
+
+          const newOfferLine: OfferLine = await OfferLine.preload({
             id,
             ...createLineOfferInput,
           });
-          result.total =
-            (parseInt(things.total_price) + parseInt(createLineOfferInput.total_price) - parseInt(amount)).toString()
-          await result.save()
+          offer.total =
+            ( parseInt(offer.total_fi) + 
+              parseInt(createLineOfferInput.total_price) -
+              parseInt(lastTotal)).toString()
+          offer.total_tax =
+            ( parseInt(offer.total_fi) + 
+              parseInt(createLineOfferInput.tax_price) -
+              parseInt(lastTax)).toString()
+          offer.total_fi =
+            ( parseInt(offer.total_fi) + 
+              parseInt(createLineOfferInput.fi_price) -
+              parseInt(lastFi)).toString()
+          await offer.save()
           
-          await things.save()
+          await newOfferLine.save()
           
-        } else {
-          const newOrder: OfferLine = OfferLine.create<OfferLine>(createLineOfferInput);
-          newOrder.userId = user.id
-          newOrder.offerOrderId = createLineOfferInput.offerOrderId
-          result.total =
-            (parseInt(await result.total) + parseInt(createLineOfferInput.total_price)).toString()
-          await result.save()
-          await newOrder.save();
-         
+        } 
 
-        }
-        
-     
-
-        return result
+        return offer
       } catch (error) {
 
         console.log('createOffer err',error)
