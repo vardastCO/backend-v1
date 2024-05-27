@@ -72,8 +72,15 @@ export class OrderOfferService {
         newOrder.request_name = user.fullName ?? 'کاربر'
 
         const preOrder = await newOrder.preOrder;
-        preOrder.offersNum += 1;
-        await preOrder.save();
+        if (preOrder) {
+          console.log('pre', preOrder)
+          console.log('pre2',preOrder.offersNum)
+          preOrder.offersNum += 1;
+          console.log('pre3',preOrder.offersNum)
+          await preOrder.save();
+        }
+
+   
         await newOrder.save();
 
         const  offer =  await OfferOrder.findOne({
