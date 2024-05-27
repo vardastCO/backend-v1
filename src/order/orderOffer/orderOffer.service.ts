@@ -137,11 +137,12 @@ export class OrderOfferService {
           const lastTotal = offerline.total_price
           const lastFi    = offerline.fi_price
           const lastTax   = offerline.tax_price
-
+          console.log(lastTax,lastFi,lastTotal)
           const newOfferLine: OfferLine = await OfferLine.preload({
             id,
             ...createLineOfferInput,
           });
+          console.log(parseInt(offer.total_fi),parseInt(createLineOfferInput.total_price),parseInt(lastTotal))
           offer.total =
             ( parseInt(offer.total_fi) + 
               parseInt(createLineOfferInput.total_price) -
