@@ -61,7 +61,9 @@ export class PreOrderResolver {
     @Context() context?: { req: Request }
   ) {
     const request = context?.req;
-     console.log('goolf',request)
+    console.log('request', request)
+    const referer = request.headers['referer'] || request.headers['origin'];
+    console.log('ggg',request.headers['origin'])
     return this.preOrderService.paginate(currentUser, indexPreOrderInput);
   }
 
