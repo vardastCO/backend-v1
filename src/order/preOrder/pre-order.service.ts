@@ -189,10 +189,6 @@ export class PreOrderService {
     if (projectId) {
       whereConditions['projectId'] = projectId;
     }
-    console.log('========================')
-    console.log(await this.authorizationService.setUser(user).hasRole("admin"))
-    console.log(client)
-    console.log('========================')
 
     if (!(await this.authorizationService.setUser(user).hasRole("admin")) || client) {
       whereConditions['userId'] = user.id;
