@@ -233,7 +233,7 @@ export class OrderOfferService {
       if (updateOrderOfferInput.status === OrderOfferStatuses.VERIFIED) {
         const preOrder = await offerOrder.preOrder;
         if (preOrder) {
-          preOrder.states = PreOrderStates.VERIFIED;
+          preOrder.status = PreOrderStates.VERIFIED;
           await preOrder.save(); 
         } else {
           throw new Error('PreOrder not found for this OfferOrder');
