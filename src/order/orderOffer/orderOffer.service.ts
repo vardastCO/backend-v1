@@ -70,7 +70,10 @@ export class OrderOfferService {
         
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
         newOrder.request_name = user.fullName ?? 'کاربر'
-        
+
+        const preOrder = await newOrder.preOrder;
+        preOrder.offersNum += 1;
+        await preOrder.save();
         await newOrder.save();
 
         const  offer =  await OfferOrder.findOne({
