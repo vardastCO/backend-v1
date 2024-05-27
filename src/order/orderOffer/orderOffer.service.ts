@@ -135,8 +135,8 @@ export class OrderOfferService {
         if (offerline) {
           const id = offerline.id
           const lastTotal = offerline.total_price
-          const lastFi    = offerline.total_fi
-          const lastTax   = offerline.total_tax
+          const lastFi    = offerline.fi_price
+          const lastTax   = offerline.tax_price
 
           const newOfferLine: OfferLine = await OfferLine.preload({
             id,
