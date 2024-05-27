@@ -205,7 +205,7 @@ export class PreOrderService {
     } = indexPreOrderInput || {};
 
     const whereConditions = {}
-    whereConditions['deleted_At'] = IsNull()
+    whereConditions['deleted_at'] = IsNull()
 
     if (projectId) {
       whereConditions['projectId'] = projectId;
