@@ -110,7 +110,13 @@ export class OrderOfferService {
       const qty = parseInt(line.qty, 10);
       const taxPrice = Math.round(fiPrice * qty * 0.1);
       const totalPrice = Math.round(fiPrice * qty * 1.1);
-  
+      if (fi_price == '0') {
+        return {
+          "fi_price": '0',
+          "tax_price": '0',
+          "total_price": '0'
+        };
+      }
       return {
         "fi_price": fi_price,
         "tax_price": taxPrice.toString(),
