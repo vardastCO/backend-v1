@@ -5,6 +5,7 @@ export enum PreOrderStates {
   PENDING_INFO = "PENDING_INFO",
   PENDING_LINE = "PENDING_LINE",
   VERIFIED = "VERIFIED",
+  CLOSED = "CLOSED"
 }
 
 registerEnumType(PreOrderStates, {
