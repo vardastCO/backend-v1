@@ -221,7 +221,7 @@ export class UserService {
     } else if (updateProfileInput.lastName) {
       user.fullName = updateProfileInput.lastName;
     } else {
-      user.fullName = 'کاربر'; 
+      user.fullName =  'کاربر وردست'; 
     }
 
     this.dataSource.transaction(async () => {
