@@ -70,7 +70,7 @@ export class OrderOfferService {
         
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
         newOrder.request_name = user.fullName ?? 'کاربر'
-
+        await newOrder.save();
         const preOrder = await newOrder.preOrder;
         if (preOrder) {
           console.log('pre', preOrder)
@@ -81,7 +81,7 @@ export class OrderOfferService {
         }
 
    
-        await newOrder.save();
+  
 
         const  offer =  await OfferOrder.findOne({
           where: { id: newOrder.id },
