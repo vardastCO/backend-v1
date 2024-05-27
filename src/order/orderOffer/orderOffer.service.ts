@@ -73,10 +73,9 @@ export class OrderOfferService {
         await newOrder.save();
         const preOrder = await newOrder.preOrder;
         if (preOrder) {
-          console.log('pre', preOrder)
-          console.log('pre2',preOrder.offersNum)
+  
           preOrder.offersNum += 1;
-          console.log('pre3',preOrder.offersNum)
+       
           await preOrder.save();
         }
 

@@ -102,7 +102,7 @@ export class AuthService {
         refreshToken: this._generateNewRefreshToken(user, session),
         refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
         user,
-        abilities: userWholePermissions,
+        abilities: [],
       };
     }
   
@@ -152,7 +152,7 @@ export class AuthService {
       refreshToken: this._generateNewRefreshToken(newUser, session),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user: newUser,
-      abilities: userWholePermissions,
+      abilities: [],
     };
   }
 
@@ -269,7 +269,7 @@ export class AuthService {
       refreshToken: this._generateNewRefreshToken(user, session),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
-      abilities: userWholePermissions,
+      abilities: [],
     };
   }
 
@@ -278,7 +278,6 @@ export class AuthService {
     requestIP: string,
     accessToken: string,
   ): Promise<LogoutResponse> {
-    console.log('logout')
     const accessTokenPayload = this.jwtService.decode(accessToken);
     await Session.update(
       { id: accessTokenPayload["sid"], deletedAt: IsNull() },
