@@ -63,9 +63,10 @@ export class OrderOfferResolver {
   calculatePriceOfferLine(
     @Args("lineId") lineId: number,
     @Args("fi_price") fi_price: string,
+    @Args("with_tax") with_tax: boolean,
     @CurrentUser() user: User
   ) {
-    return this.orderOfferService.calculatePriceOfferLine(lineId,fi_price);
+    return this.orderOfferService.calculatePriceOfferLine(lineId,fi_price,with_tax);
   }
 
   @Permission("gql.users.address.store")

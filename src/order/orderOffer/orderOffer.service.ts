@@ -103,7 +103,7 @@ export class OrderOfferService {
       }
     
   }
-  async calculatePriceOfferLine(lineId: number, fi_price: string) {
+  async calculatePriceOfferLine(lineId: number, fi_price: string,with_tax:boolean) {
     if (fi_price == '0') {
       return {
         "fi_price": '0',
@@ -119,13 +119,13 @@ export class OrderOfferService {
 
       const taxPrice = Math.round(fiPrice * qty * 0.1);
 
-      const totalPrice = Math.round(fiPrice * qty * 1.1);
-
+      const totalPriceWithTax = Math.round(fiPrice * qty * 1.1);
+      const totalPrice = Math.round(fiPrice * qty );
     
       return {
         "fi_price": fi_price,
-        "tax_price": taxPrice.toString(),
-        "total_price": totalPrice.toString()
+        "tax_price": with_tax ? taxPrice.toString() : "0",
+        "total_price": with_tax ?  totalPriceWithTax.toString() :  totalPrice
       };
     }
   }
