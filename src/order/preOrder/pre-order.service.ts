@@ -145,7 +145,8 @@ export class PreOrderService {
             order: {
               offerLine: {
                 line: {
-                  type : 'ASC'
+                  type: 'ASC',
+                  id: "DESC"
                 }
               }
             }
@@ -156,7 +157,8 @@ export class PreOrderService {
             order: {
               offerLine: {
                 line: {
-                  type : 'ASC'
+                  type: 'ASC',
+                  id: "DESC"
                 }
                
               }
@@ -168,7 +170,8 @@ export class PreOrderService {
             order: {
               offerLine: {
                 line: {
-                  type : 'ASC'
+                  type: 'ASC',
+                  id: "DESC"
                 }
               }
             }
