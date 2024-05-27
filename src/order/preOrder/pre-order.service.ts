@@ -190,7 +190,7 @@ export class PreOrderService {
       whereConditions['projectId'] = projectId;
     }
 
-    if (!(await this.authorizationService.setUser(user).hasRole("admin"))) {
+    if (!(await this.authorizationService.setUser(user).hasRole("admin")) && client) {
       whereConditions['userId'] = user.id;
     } 
 
