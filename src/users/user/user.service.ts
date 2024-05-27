@@ -281,12 +281,12 @@ export class UserService {
   
     if (cachedData) {
       const decompressedData = this.decompressionService.decompressData(cachedData);
-      return decompressedData 
+      return decompressedData.filter(permission => permission.endsWith('.index'));
     }
   
     const userWholePermissions = await user.wholePermissionNames();
-    const limitedPermissions = userWholePermissions 
-    
+    const limitedPermissions = userWholePermissions.filter(permission => permission.endsWith('.index'));
+  
     await this.cacheManager.set(
       cacheKey,
       this.compressionService.compressData(limitedPermissions),
@@ -295,6 +295,7 @@ export class UserService {
   
     return limitedPermissions;
   }
+  
   
 
   async getSellerRecordOf(user: User): Promise<Seller> {
