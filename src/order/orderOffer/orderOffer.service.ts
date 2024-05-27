@@ -131,6 +131,7 @@ export class OrderOfferService {
           offerOrderId: createLineOfferInput.offerOrderId,
           lineId : createLineOfferInput.lineId
         })
+      console.log('offer',offer)
         
         if (offerline) {
           const id = offerline.id
