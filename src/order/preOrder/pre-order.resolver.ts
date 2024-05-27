@@ -11,7 +11,8 @@ import { PreOrderDTO } from './dto/preOrderDTO';
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
 import { PreOrderService } from './pre-order.service';
-
+import { Req } from '@nestjs/common';
+import { Request } from 'express';
 
 @Resolver(() => Boolean)
 export class PreOrderResolver {
@@ -58,7 +59,19 @@ export class PreOrderResolver {
     @CurrentUser() currentUser: User,
     @Args("indexPreOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
     indexPreOrderInput?: IndexPreOrderInput,
+    @Req() request?: Request
   ) {
+    const referer = request.headers.referer || request.headers.origin;
+    console.log('fff',referer)
+    if (referer) {
+      if (referer.includes("seller.vardast.com")) {
+        console.log("Request from seller.vardast.com");
+      } else if (referer.includes("admin.vardast.com")) {
+        console.log("Request from admin.vardast.com");
+      } else {
+        console.log("Request from an unknown source");
+      }
+    }
     return this.preOrderService.paginate(currentUser, indexPreOrderInput);
   }
 

@@ -97,14 +97,19 @@ export class OrderOfferService {
       }
     
   }
-  async calculatePriceOfferLine(lineId: number,fi_price:string) {
-    const line = await Line.findOneBy({ id: lineId })
+  async calculatePriceOfferLine(lineId: number, fi_price: string) {
+    const line = await Line.findOneBy({ id: lineId });
     if (line) {
+      const fiPrice = parseFloat(fi_price);
+      const qty = parseInt(line.qty, 10);
+      const taxPrice = Math.round(fiPrice * qty * 0.1);
+      const totalPrice = Math.round(fiPrice * qty * 1.1);
+  
       return {
         "fi_price": fi_price,
-        "tax_price": ((parseInt(fi_price, 10) * parseInt(line.qty)) * .1).toString(),
-        "total_price" : ((parseInt(fi_price, 10) * parseInt(line.qty)) * 1.1).toString()
-      }
+        "tax_price": taxPrice.toString(),
+        "total_price": totalPrice.toString()
+      };
     }
   }
   
