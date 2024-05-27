@@ -27,6 +27,28 @@ export class PreOrderResolver {
     return this.preOrderService.createPreOrder(createPreOrderInput,user);
   }
 
+  
+  @Permission("gql.users.address.store")
+  @Mutation(() => PreOrder)
+  pickUpPreOrder(
+    @Args("preOrderId") preOrderId: number,
+    @CurrentUser() user: User
+  ) {
+  
+    return this.preOrderService.pickUpPreOrder(preOrderId,user);
+  }
+
+  @Permission("gql.users.address.store")
+  @Query(() => PaginationPreOrderResponse, { name: "myPreOrder" })
+  myPreOrder(
+    @CurrentUser() user: User,
+    @Args("indexPreOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
+    indexPreOrderInput?: IndexPreOrderInput,
+  ) {
+  
+    return this.preOrderService.myPreOrder(indexPreOrderInput,user);
+  }
+
   @Permission("gql.users.address.store")
   @Mutation(() => PreOrder)
   updatePreOrder(

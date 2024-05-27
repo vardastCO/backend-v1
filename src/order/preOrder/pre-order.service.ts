@@ -23,12 +23,12 @@ export class PreOrderService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
-    async generateNumericUuid(length: number = 10): Promise<string> {
+  async generateNumericUuid(length: number = 10): Promise<string> {
       const min = Math.pow(10, length - 1);
       const max = Math.pow(10, length) - 1;
-      return Math.floor(Math.random() * (max - min + 1) + min).toString();
-    }
-    async createPreOrder(createPreOrderInput : CreatePreOrderInput,user:User): Promise<PreOrder> {
+    return Math.floor(Math.random() * (max - min + 1) + min).toString();
+  }
+  async createPreOrder(createPreOrderInput : CreatePreOrderInput,user:User): Promise<PreOrder> {
     
       try {
         let order = await PreOrder.findOneBy({
@@ -53,6 +53,56 @@ export class PreOrderService {
       }
     
   }
+  async pickUpPreOrder(preOrderId : number,user:User): Promise<PreOrder> {
+    
+    try {
+      let order = await PreOrder.findOneBy({
+        id : preOrderId,
+      });
+      if (order) {
+        order.pickUpUserId =  user.id
+        await order.save();
+
+        return order
+      }
+      
+      return 
+    } catch (error) {
+
+      console.log('create_pre_order err',error)
+      
+    }
+  
+  }
+  async myPreOrder(indexPreOrderInput:IndexPreOrderInput,user:User): Promise<PaginationPreOrderResponse> {
+    indexPreOrderInput?.boot();
+    const {
+      take,
+      skip,
+    } = indexPreOrderInput || {};
+    try {
+      const whereConditions = {}
+      whereConditions['deleted_at'] = IsNull()
+      whereConditions['pickUpUserId'] = user.id;
+      const [data, total] = await PreOrder.findAndCount({
+        skip,
+        take,
+        where: whereConditions,
+        order: {
+          id:'DESC'
+        },
+      });
+  
+      
+      return PaginationPreOrderResponse.make(indexPreOrderInput,total,data)
+
+    } catch (error) {
+
+      console.log('create_pre_order err',error)
+      
+    }
+  
+}
   private calculateExpirationDate(expireTimeEnum: ExpireTypes): Date {
     const currentDate = new Date();
     switch (expireTimeEnum) {
@@ -217,7 +267,7 @@ export class PreOrderService {
     if (!(await this.authorizationService.setUser(user).hasRole("admin")) || client) {
       whereConditions['userId'] = user.id;
     } 
-
+    
   
     if (await this.authorizationService.setUser(user).hasRole("admin") && !client) {
       if (customerName) {
@@ -231,6 +281,7 @@ export class PreOrderService {
           { name: Like(`%${projectName}%`) }
         ];;
       }
+      whereConditions['pickUpUserId'] = IsNull();
 
       if (status) {
         whereConditions['status'] = status as PreOrderStates;

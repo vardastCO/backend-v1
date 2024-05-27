@@ -47,6 +47,12 @@ export class PreOrder extends BaseEntity {
   @Column({ nullable: true })
   userId: number;
 
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, user => null, { nullable: true })
+  pickUpUser: Promise<User>;
+  @Column({ nullable: true })
+  pickUpUserId: number;
+
 
   @Field({ nullable: true })
   @Index()
