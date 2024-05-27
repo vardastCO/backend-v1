@@ -27,7 +27,7 @@ const UOM_VALUES = [
 @InputType()
 export class CreateLineInput {
   @Field()
-  @IsNotEmpty()
+  @IsNotEmpty({message:"این فیلد ضروری است"})
   @IsString()
   @MaxLength(255)
   item_name: string;
@@ -43,7 +43,7 @@ export class CreateLineInput {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @IsNumberString({ message: 'qty must be a string representing a number' })
+  @IsNumberString({ message: 'مقدار به صورت عدد وارد شود' })
   qty?: string;
 
   @Field(() => String, { nullable: true })
@@ -51,7 +51,7 @@ export class CreateLineInput {
   @IsString()
   @MaxLength(255)
   @IsIn(UOM_VALUES, {
-    message: `uom must be one of the following values: ${UOM_VALUES.join(', ')}`
+    message: `مقدار واحد میتواند فقط مقادیر مشخصی داشته باشد: ${UOM_VALUES.join(', ')}`
   })
   uom?: string;
 
