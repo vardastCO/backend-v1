@@ -160,7 +160,9 @@ export class UserService {
       if (roles.length != updateUserInput.roleIds.length) {
         throw new BadRequestException("Some roles are invalid.");
       }
+      console.log('role ids',roles)
       user.roles = Promise.resolve(roles);
+      console.log('user roles',  user.roles)
     }
 
     if (updateUserInput.permissionIds) {

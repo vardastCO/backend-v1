@@ -133,35 +133,33 @@ export class OrderOfferService {
           offerOrderId: createLineOfferInput.offerOrderId,
           lineId : createLineOfferInput.lineId
         })
-      console.log('offer',offer)
+
         
         if (offerline) {
           const id = offerline.id
           const lastTotal = offerline.total_price
           const lastFi    = offerline.fi_price
           const lastTax   = offerline.tax_price
-          console.log(lastTax,lastFi,lastTotal)
+
           const newOfferLine: OfferLine = await OfferLine.preload({
             id,
             ...createLineOfferInput,
           });
-          console.log(parseInt(offer.total_fi),parseInt(createLineOfferInput.total_price),parseInt(lastTotal))
           offer.total =
             ( parseInt(offer.total) + 
               parseInt(createLineOfferInput.total_price) -
               parseInt(lastTotal)).toString()
-          console.log(' offer.total', offer.total)
+      
           offer.total_tax =
             ( parseInt(offer.total_tax) + 
               parseInt(createLineOfferInput.tax_price) -
               parseInt(lastTax)).toString()
-          console.log(parseInt(offer.total_tax),parseInt(createLineOfferInput.tax_price),parseInt(lastTax))
-          console.log('offer.total_tax',offer.total_tax)
+
           offer.total_fi =
             ( parseInt(offer.total_fi) + 
               parseInt(createLineOfferInput.fi_price) -
               parseInt(lastFi)).toString()
-          console.log('offer.total_fi',offer.total_fi)
+ 
           await offer.save()
           
           await newOfferLine.save()
