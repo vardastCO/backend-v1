@@ -139,13 +139,19 @@ export class AuthService {
     //     lastLoginIP: requestIP,
     //   },
     // );
-  
-    const session = Session.create({
-      userId: newUser.id,
-      agent,
-      loginIp: requestIP,
-    });
-    await session.save();
+    let sessions = await user.sessions ?? [];
+    let session: Session;
+    
+    if (sessions.length === 0) {
+      session = Session.create({
+        userId: newUser.id,
+        agent,
+        loginIp: requestIP,
+      });
+      await session.save();
+    } else {
+      session = sessions[0];
+    }
     return {
       accessToken: this._generateNewAccessToken(newUser, session),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
