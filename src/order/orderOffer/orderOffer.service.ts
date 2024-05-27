@@ -147,10 +147,15 @@ export class OrderOfferService {
             ( parseInt(offer.total_fi) + 
               parseInt(createLineOfferInput.total_price) -
               parseInt(lastTotal)).toString()
+            console.log(' offer.total', offer.total)
+            console.log(parseInt(offer.total_fi),parseInt(createLineOfferInput.total_price),parseInt(lastTotal))
+          
           offer.total_tax =
-            ( parseInt(offer.total_fi) + 
+            ( parseInt(offer.total_tax) + 
               parseInt(createLineOfferInput.tax_price) -
               parseInt(lastTax)).toString()
+              console.log(parseInt(offer.total_tax),parseInt(createLineOfferInput.tax_price),parseInt(lastTax))
+          console.log('offer.total_tax',offer.total_tax)
           offer.total_fi =
             ( parseInt(offer.total_fi) + 
               parseInt(createLineOfferInput.fi_price) -
