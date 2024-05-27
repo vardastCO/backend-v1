@@ -172,7 +172,7 @@ export class PreOrderService {
   
   }
    
-  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput): Promise<PaginationPreOrderResponse> {
+  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput,client:boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
     const {
       take,
@@ -195,7 +195,7 @@ export class PreOrderService {
     } 
 
   
-    if (await this.authorizationService.setUser(user).hasRole("admin")) {
+    if (await this.authorizationService.setUser(user).hasRole("admin") && !client) {
       if (customerName) {
         whereConditions['user'] =  [
           { firstName: Like(`%${customerName}%`) },

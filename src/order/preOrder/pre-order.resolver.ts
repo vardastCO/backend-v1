@@ -61,10 +61,12 @@ export class PreOrderResolver {
     @Context() context?: { req: Request }
   ) {
     const request = context?.req;
-    console.log('request', request)
-    const referer = request.headers['referer'] || request.headers['origin'];
-    console.log('ggg',request.headers['origin'])
-    return this.preOrderService.paginate(currentUser, indexPreOrderInput);
+    const referer = request.headers['origin'] ?? null;
+    let client = false 
+    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
+      client = true
+    }
+    return this.preOrderService.paginate(currentUser, indexPreOrderInput,client);
   }
 
   // @Permission("gql.users.user.update")
