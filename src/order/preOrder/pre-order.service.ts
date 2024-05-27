@@ -172,7 +172,7 @@ export class PreOrderService {
   
   }
    
-  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput,client:boolean): Promise<PaginationPreOrderResponse> {
+  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
     const {
       take,
@@ -182,7 +182,7 @@ export class PreOrderService {
       hasFile,
       projectName,
       status
-     } = indexPreOrderInput || {};
+    } = indexPreOrderInput || {};
 
     const whereConditions = {}
 
@@ -194,7 +194,7 @@ export class PreOrderService {
     console.log(client)
     console.log('========================')
 
-    if (!(await this.authorizationService.setUser(user).hasRole("admin")) && client) {
+    if (!(await this.authorizationService.setUser(user).hasRole("admin")) || client) {
       whereConditions['userId'] = user.id;
     } 
 
