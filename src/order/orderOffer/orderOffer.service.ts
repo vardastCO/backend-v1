@@ -15,6 +15,7 @@ import { AddSellerOrderOffer } from "./dto/add-seller-offer.input";
 import { TempSeller } from "./entities/temp-seller.entity";
 import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
 import { OrderOfferStatuses } from "./enums/order-offer-statuses";
+import { PreOrderStates } from "../enums/pre-order-states.enum";
 
 @Injectable()
 export class OrderOfferService {
@@ -229,6 +230,14 @@ export class OrderOfferService {
       offerOrder.status =
         updateOrderOfferInput.status as OrderOfferStatuses ?? OrderOfferStatuses.PENDING
       await offerOrder.save()
+      if (updateOrderOfferInput.status === OrderOfferStatuses.VERIFIED) {
+        if (offerOrder.pre_order) { 
+          offerOrder.pre_order.states = PreOrderStates.VERIFIED;
+          await offerOrder.pre_order.save(); 
+        } else {
+          throw new Error('PreOrder not found for this OfferOrder');
+        }
+      }
       return offerOrder
     } catch (error) {
 
