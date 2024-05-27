@@ -231,9 +231,10 @@ export class OrderOfferService {
         updateOrderOfferInput.status as OrderOfferStatuses ?? OrderOfferStatuses.PENDING
       await offerOrder.save()
       if (updateOrderOfferInput.status === OrderOfferStatuses.VERIFIED) {
-        if (offerOrder.pre_order) { 
-          offerOrder.pre_order.states = PreOrderStates.VERIFIED;
-          await offerOrder.pre_order.save(); 
+        const preOrder = await offerOrder.preOrder;
+        if (preOrder) {
+          preOrder.states = PreOrderStates.VERIFIED;
+          await preOrder.save(); 
         } else {
           throw new Error('PreOrder not found for this OfferOrder');
         }
