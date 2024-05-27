@@ -68,8 +68,7 @@ export class OrderOfferService {
         newOrder.userId = user.id
         
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-        console.log('user',user)
-        order.request_name = user.fullName ?? 'کاربر'
+        newOrder.request_name = user.fullName ?? 'کاربر'
         
         await newOrder.save();
 
