@@ -1,9 +1,11 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import {
   BaseEntity,
   Column,
   Entity,
   Index,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -15,6 +17,13 @@ export class TempSeller extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Field(() => PreOrder)
+  @ManyToOne(() => PreOrder,{ eager: true })
+  preOrder: Promise<PreOrder>;
+  @Index()
+  @Column()
+  preOrderId: number;
 
   @Field({ nullable: true })
   @Index()
