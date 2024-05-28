@@ -43,6 +43,7 @@ export class OfferOrder extends BaseEntity {
   @Column({ nullable: true })
   request_name: string;
 
+  @Field(() => TempSeller)
   @ManyToOne(() => TempSeller, { nullable: true, eager: true })
   tempSeller: Promise<TempSeller>;
 
