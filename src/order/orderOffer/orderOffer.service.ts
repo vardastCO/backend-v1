@@ -16,6 +16,7 @@ import { TempSeller } from "./entities/temp-seller.entity";
 import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
 import { OrderOfferStatuses } from "./enums/order-offer-statuses";
 import { PreOrderStates } from "../enums/pre-order-states.enum";
+import { TypeOrderOffer } from "../enums/type-order-offer.enum";
 
 @Injectable()
 export class OrderOfferService {
@@ -32,18 +33,21 @@ export class OrderOfferService {
       await temp.save();
 
        
-      let  result  =  await OfferOrder.findOne({
+      let  offer  =  await OfferOrder.findOne({
         where: { id: addSellerOrderOffer.orderOfferId },
-        relations: ['offerLine','tempSeller'],
+        relations: ['offerLine'],
         order: {
           id: 'DESC'
         }
       });
     
-      result.tempSellerId = temp.id
-      await result.save()
+      offer.tempSellerId = temp.id
+      offer.request_name = temp.seller_name
+      offer.type = TypeOrderOffer.SELLER
+    
+      await offer.save()
 
-      return result
+      return offer
       
     }
     async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User): Promise<OfferOrder> {
@@ -57,7 +61,7 @@ export class OrderOfferService {
             },
             status: OrderOfferStatuses.PENDING
           },
-          relations: ['offerLine','tempSeller'],
+          relations: ['offerLine'],
           order: {
             id: 'DESC'
           }
@@ -84,7 +88,7 @@ export class OrderOfferService {
 
         const  offer =  await OfferOrder.findOne({
           where: { id: newOrder.id },
-          relations: ['offerLine','tempSeller'],
+          relations: ['offerLine'],
           order: {
             id: 'DESC'
           }
@@ -145,7 +149,7 @@ export class OrderOfferService {
     try {
         const offer: OfferOrder = await OfferOrder.findOne({
           where: { id: createLineOfferInput.offerOrderId },
-          relations: ['offerLine','tempSeller'],
+          relations: ['offerLine'],
           order: {
             id: 'DESC'
           }
@@ -231,7 +235,7 @@ export class OrderOfferService {
     try {
       const offerOrder = await OfferOrder.findOne({
         where: {id: updateOrderOfferInput.id},
-        relations: ['offerLine','tempSeller'],
+        relations: ['offerLine'],
         order: {
           id: 'DESC'
         }
@@ -261,7 +265,7 @@ export class OrderOfferService {
       
       const orderOffer: OfferOrder = await OfferOrder.findOne({
         where: { id },
-        relations: ['offerLine','tempSeller'],
+        relations: ['offerLine'],
         order: {
           id: 'DESC'
         }

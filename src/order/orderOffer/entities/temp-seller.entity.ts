@@ -18,13 +18,6 @@ export class TempSeller extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => PreOrder)
-  @ManyToOne(() => PreOrder,{ eager: true })
-  preOrder: Promise<PreOrder>;
-  @Index()
-  @Column()
-  preOrderId: number;
-
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
