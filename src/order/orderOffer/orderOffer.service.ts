@@ -34,7 +34,7 @@ export class OrderOfferService {
        
       let  result  =  await OfferOrder.findOne({
         where: { id: addSellerOrderOffer.orderOfferId },
-        relations: ['offerLine'],
+        relations: ['offerLine','tempSeller'],
         order: {
           id: 'DESC'
         }
@@ -57,7 +57,7 @@ export class OrderOfferService {
             },
             status: OrderOfferStatuses.PENDING
           },
-          relations: ['offerLine'],
+          relations: ['offerLine','tempSeller'],
           order: {
             id: 'DESC'
           }
@@ -84,7 +84,7 @@ export class OrderOfferService {
 
         const  offer =  await OfferOrder.findOne({
           where: { id: newOrder.id },
-          relations: ['offerLine'],
+          relations: ['offerLine','tempSeller'],
           order: {
             id: 'DESC'
           }
@@ -145,7 +145,7 @@ export class OrderOfferService {
     try {
         const offer: OfferOrder = await OfferOrder.findOne({
           where: { id: createLineOfferInput.offerOrderId },
-          relations: ['offerLine'],
+          relations: ['offerLine','tempSeller'],
           order: {
             id: 'DESC'
           }
@@ -231,7 +231,7 @@ export class OrderOfferService {
     try {
       const offerOrder = await OfferOrder.findOne({
         where: {id: updateOrderOfferInput.id},
-        relations: ['offerLine'],
+        relations: ['offerLine','tempSeller'],
         order: {
           id: 'DESC'
         }
@@ -261,7 +261,7 @@ export class OrderOfferService {
       
       const orderOffer: OfferOrder = await OfferOrder.findOne({
         where: { id },
-        relations: ['offerLine'],
+        relations: ['offerLine','tempSeller'],
         order: {
           id: 'DESC'
         }

@@ -191,7 +191,7 @@ export class PreOrderService {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
             where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT },
-            relations: ["offerLine"],
+            relations: ["offerLine","tempSeller"],
             order: {
               offerLine: {
                 line: {
@@ -203,7 +203,7 @@ export class PreOrderService {
           }),
           OfferOrder.find({ 
             where: { preOrderId: order.id, type: TypeOrderOffer.SELLER },
-            relations: ["offerLine"],
+            relations: ["offerLine","tempSeller"],
             order: {
               offerLine: {
                 line: {
@@ -216,7 +216,7 @@ export class PreOrderService {
           }),
           OfferOrder.find({ 
             where: { preOrderId: order.id, type: TypeOrderOffer.VARDAST },
-            relations: ["offerLine"],
+            relations: ["offerLine","tempSeller"],
             order: {
               offerLine: {
                 line: {
