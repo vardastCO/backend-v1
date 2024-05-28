@@ -27,12 +27,12 @@ export class OrderOfferService {
 
   
   async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer) {
-    
-      const temp: TempSeller = TempSeller.create<TempSeller>(addSellerOrderOffer);
-    
-      await temp.save();
+      const findTempSeller = await TempSeller.findOneBy({
+        phone: addSellerOrderOffer.phone,
+        cellphone:addSellerOrderOffer.cellphone
+      })
+      
 
-       
       let  offer  =  await OfferOrder.findOne({
         where: { id: addSellerOrderOffer.orderOfferId },
         relations: ['offerLine'],
@@ -40,9 +40,17 @@ export class OrderOfferService {
           id: 'DESC'
         }
       });
+      if (!findTempSeller) {
+        const temp: TempSeller = TempSeller.create<TempSeller>(addSellerOrderOffer);
+        offer.tempSellerId = temp.id
+        offer.request_name = temp.seller_name
+        await temp.save();
+      } else {
+        offer.tempSellerId = findTempSeller.id
+        offer.request_name = findTempSeller.seller_name
+      }
     
-      offer.tempSellerId = temp.id
-      offer.request_name = temp.seller_name
+     
       offer.type = TypeOrderOffer.SELLER
       offer.status = OrderOfferStatuses.CONFIRMED
     
