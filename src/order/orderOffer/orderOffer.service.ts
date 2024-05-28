@@ -44,6 +44,7 @@ export class OrderOfferService {
       offer.tempSellerId = temp.id
       offer.request_name = temp.seller_name
       offer.type = TypeOrderOffer.SELLER
+      offer.status = OrderOfferStatuses.CONFIRMED
     
       await offer.save()
 
