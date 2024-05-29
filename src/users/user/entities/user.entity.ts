@@ -235,8 +235,8 @@ export class User extends BaseEntity {
     // Loop through each role and collect their permission names
     for (const role of userRoles) {
       const rolePermissions = await role.permissions;
-      console.log('rolePermissions',await role.permissions)
       for (const permission of rolePermissions) {
+        console.log('ppp',permission)
         permissionNamesSet.add(permission.name);
       }
     }
