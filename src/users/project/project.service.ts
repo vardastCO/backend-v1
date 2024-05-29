@@ -62,10 +62,11 @@ export class ProjectService {
       if (user) {
         delete createUserProjectInput.cellphone
 
-        const things: UserProject = UserProject.create<UserProject>(createUserProjectInput);
-        things.userId= await user.id
+        const assign: UserProject = UserProject.create<UserProject>(createUserProjectInput);
+        assign.userId = await user.id
+        assign.name = ''
       
-        await things.save()
+        await assign.save()
       } else {
         throw 'not found user';
 
