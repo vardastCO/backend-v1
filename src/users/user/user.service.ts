@@ -156,12 +156,18 @@ export class UserService {
     }
 
     if (updateUserInput.roleIds) {
-      const roles : Role[] = await Role.findBy({ id: In(updateUserInput.roleIds) });
+      const roles : Role[] = await Role.find({
+        where: {
+          id: In(updateUserInput.roleIds)
+        },
+        relations: ["permissions"],
+      });
       if (roles.length != updateUserInput.roleIds.length) {
         throw new BadRequestException("Some roles are invalid.");
       }
       user.roles = Promise.resolve(roles);
       let permissions: Permission[] = [];
+    
       roles.forEach((role) => {
         console.log('role', role)
         console.log('role_permissjion',role.permissions)
