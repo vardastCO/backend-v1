@@ -227,7 +227,6 @@ export class User extends BaseEntity {
   async wholePermissionNames(): Promise<string[]> {
     try {
       const userRoles = await this.roles;
-      console.log('userRoles', userRoles);
   
       // Initialize a Set to collect unique permission names
       const permissionNamesSet = new Set<string>();
@@ -249,7 +248,6 @@ export class User extends BaseEntity {
         }
   
         const rolePermissions = roleWithPermissions.permissions;
-        console.log('rolePermissions', rolePermissions);
   
         if (!Array.isArray(rolePermissions)) {
           console.error('rolePermissions is not an array:', rolePermissions);
@@ -257,7 +255,7 @@ export class User extends BaseEntity {
         }
   
         for (const permission of rolePermissions) {
-          console.log('permission', permission);
+
   
           // Ensure permission has a name property
           if (permission && typeof permission.name === 'string') {
@@ -268,7 +266,6 @@ export class User extends BaseEntity {
         }
       }
   
-      console.log('Array.from(permissionNamesSet)', Array.from(permissionNamesSet));
       
       // Convert the set to an array and return
       return Array.from(permissionNamesSet);

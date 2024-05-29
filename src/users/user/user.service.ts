@@ -280,11 +280,11 @@ export class UserService {
     const cachedData = await this.cacheManager.get<string>(cacheKey);
   
     if (cachedData) {
-      console.log('cachePermissionsOf')
+  
       const decompressedData = this.decompressionService.decompressData(cachedData);
       return decompressedData.filter(permission => permission.endsWith('.index'));
     }
-    console.log('no cachePermissionsOf')
+  
     const userWholePermissions = await user.wholePermissionNames();
     const limitedPermissions = userWholePermissions.filter(permission => permission.endsWith('.index'));
   
