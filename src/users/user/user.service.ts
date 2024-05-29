@@ -167,10 +167,11 @@ export class UserService {
       }
       user.roles = Promise.resolve(roles);
       const existingPermissions: Permission[] = await user.permissions;
-
+      console.log('user', user.fullName)
+      console.log('existingPermissions',existingPermissions)
       // Create a set of current permission IDs
       const existingPermissionIds = new Set(existingPermissions.map(permission => permission.id));
-
+      console.log('existingPermissionIds',existingPermissionIds)
       // Extract the new permissions from the roles
       let newPermissionsSet: Set<Permission> = new Set();
       roles.forEach((role) => {
@@ -183,7 +184,7 @@ export class UserService {
 
       // Convert the new permissions set to an array
       const newPermissionsArray: Permission[] = Array.from(newPermissionsSet);
-
+      console.log('newPermissionsSet',newPermissionsArray)
       // Filter out permissions that the user already has
       const permissionsToAdd = newPermissionsArray.filter(permission => !existingPermissionIds.has(permission.id));
 
