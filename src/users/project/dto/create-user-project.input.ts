@@ -21,11 +21,11 @@ export class CreateUserProjectInput {
   @MaxLength(255)
   cellphone: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({nullable:true})
+  @IsOptional()
   @IsString()
   @MaxLength(255)
-  name: string;
+  name?: string;
 
 
   @Field()
