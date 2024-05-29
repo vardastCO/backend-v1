@@ -55,30 +55,28 @@ export class ProjectService {
    
   }
   async assignUserProject(createUserProjectInput:CreateUserProjectInput,user:User): Promise<Project> {
-    try {
-      const user = await User.findOneBy({
-        cellphone:createUserProjectInput.cellphone
-      })
-      if (user) {
-        delete createUserProjectInput.cellphone
 
-        const assign: UserProject = UserProject.create<UserProject>(createUserProjectInput);
-        assign.userId = await user.id
-        assign.name = ''
-      
-        await assign.save()
-      } else {
-        throw new NotFoundException('کاربری با این شماره یافت نشد');
+    let findUser = await User.findOneBy({
+      cellphone:createUserProjectInput.cellphone
+    })
+    if (findUser) {
+      delete createUserProjectInput.cellphone
 
-      }
+      const assign: UserProject = UserProject.create<UserProject>(createUserProjectInput);
+      assign.userId = await user.id
+      assign.name = ''
     
-      return await Project.findOne({
-        where: { id: createUserProjectInput.projectId },
-        relations: ['user','address'],
-      });
-    }catch(e){
-      console.log('create project',e)
+      await assign.save()
+    } else {
+      throw new NotFoundException('کاربری با این شماره یافت نشد');
+
     }
+  
+    return await Project.findOne({
+      where: { id: createUserProjectInput.projectId },
+      relations: ['user','address'],
+    });
+
    
   }
   async removeUserProject(projectId:number,userId:number): Promise<Project> {
