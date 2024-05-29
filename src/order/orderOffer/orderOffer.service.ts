@@ -15,7 +15,7 @@ import { AddSellerOrderOffer } from "./dto/add-seller-offer.input";
 import { TempSeller } from "./entities/temp-seller.entity";
 import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
 import { OrderOfferStatuses } from "./enums/order-offer-statuses";
-import { PreOrderStates } from "../enums/pre-order-states.enum";
+import { PreOrderStatus } from "../enums/pre-order-states.enum";
 import { TypeOrderOffer } from "../enums/type-order-offer.enum";
 
 @Injectable()
@@ -255,7 +255,7 @@ export class OrderOfferService {
       if (updateOrderOfferInput.status === OrderOfferStatuses.CLOSED) {
         const preOrder = await offerOrder.preOrder;
         if (preOrder) {
-          preOrder.status = PreOrderStates.CLOSED;
+          preOrder.status = PreOrderStatus.CLOSED;
           await preOrder.save(); 
         } else {
           throw new Error('PreOrder not found for this OfferOrder');

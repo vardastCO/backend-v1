@@ -5,7 +5,7 @@ import { Cache } from "cache-manager";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from 'src/users/user/entities/user.entity';
 import { DataSource, Like } from "typeorm";
-import { PreOrderStates } from '../enums/pre-order-states.enum';
+import { PreOrderStatus } from '../enums/pre-order-states.enum';
 import { CreatePreOrderInput } from './dto/create-pre-order.input';
 import { IndexPreOrderInput } from './dto/index-preOrder.input';
 import { PaginationPreOrderResponse } from "./dto/pagination-preOrder.responde";
@@ -33,7 +33,7 @@ export class PreOrderService {
       try {
         let order = await PreOrder.findOneBy({
           userId : user.id,
-          status : PreOrderStates.CREATED
+          status : PreOrderStatus.CREATED
         });
         if (order) {
           return order
@@ -138,10 +138,10 @@ export class PreOrderService {
     let preOrderAddress = await preOrder.address;
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
     const updateCurrentStatusByCommingProps = {
-      [PreOrderStates.CREATED]: PreOrderStates.PENDING_INFO,
-      [PreOrderStates.PENDING_INFO]: isHaveAddress ? PreOrderStates.PENDING_LINE : PreOrderStates.PENDING_INFO,
-      [PreOrderStates.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
-      [PreOrderStates.VERIFIED]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStates.VERIFIED : PreOrderStates.PENDING_LINE,
+      [PreOrderStatus.CREATED]: PreOrderStatus.PENDING_INFO,
+      [PreOrderStatus.PENDING_INFO]: isHaveAddress ? PreOrderStatus.PENDING_LINE : PreOrderStatus.PENDING_INFO,
+      [PreOrderStatus.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStatus.VERIFIED : PreOrderStatus.PENDING_LINE,
+      [PreOrderStatus.VERIFIED]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStatus.VERIFIED : PreOrderStatus.PENDING_LINE,
     }
     
 
@@ -284,7 +284,7 @@ export class PreOrderService {
       whereConditions['pickUpUserId'] = IsNull();
 
       if (status) {
-        whereConditions['status'] = status as PreOrderStates;
+        whereConditions['status'] = status as PreOrderStatus;
       }
     }
     if (hasFile) {

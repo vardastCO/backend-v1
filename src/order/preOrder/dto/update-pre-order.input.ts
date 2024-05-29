@@ -2,7 +2,7 @@ import { IsInt, IsNotEmpty,IsOptional,IsEnum } from "class-validator";
 import { InputType, Field, Int, PartialType } from "@nestjs/graphql";
 import { CreatePreOrderInput } from "./create-pre-order.input";
 import { ExpireTypes } from "../enum/expire-types.enum";
-import { PreOrderStates } from "src/order/enums/pre-order-states.enum";
+import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
 
 @InputType()
 export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
@@ -11,12 +11,12 @@ export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
   @IsInt()
   id: number;
 
-  @Field(() => PreOrderStates, {
+  @Field(() => PreOrderStatus, {
     nullable: true,
   })
   @IsOptional()
-  @IsEnum(PreOrderStates)
-  status?: PreOrderStates ;
+  @IsEnum(PreOrderStatus)
+  status?: PreOrderStatus ;
 
   @Field(() => ExpireTypes, {
     defaultValue: ExpireTypes.ONE_DAY,

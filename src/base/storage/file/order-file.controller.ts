@@ -22,9 +22,11 @@ export class OrderFileController {
         uuid: uuid,
         status: PreOrderStatus.CLOSED
       })
+      console.log('order',order)
       if (!order) {
         res.send('not found')
       }
+
       const offer = await OfferOrder.findOne({
         where: {
           id: order.id,
@@ -32,6 +34,7 @@ export class OrderFileController {
         },
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
+      console.log('offer',offer)
       if (!offer) {
         res.send('not found')
       }

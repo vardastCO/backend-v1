@@ -9,7 +9,7 @@ import { User } from 'src/users/user/entities/user.entity';
 import { LineDTO } from './dto/lineDTO';
 import { Line } from './entities/order-line.entity';
 import { PreOrder } from '../preOrder/entities/pre-order.entity';
-import { PreOrderStates } from '../enums/pre-order-states.enum';
+import { PreOrderStatus } from '../enums/pre-order-states.enum';
 
 @Injectable()
 export class PreOrderLineService {
@@ -30,8 +30,8 @@ export class PreOrderLineService {
           where: { id: createLineInput.preOrderId},
           relations: ["files","lines"],
         })
-        if (result.status = PreOrderStates.VERIFIED) {
-          result.status = PreOrderStates.PENDING_LINE
+        if (result.status = PreOrderStatus.VERIFIED) {
+          result.status = PreOrderStatus.PENDING_LINE
           await result.save()
         }
         return result

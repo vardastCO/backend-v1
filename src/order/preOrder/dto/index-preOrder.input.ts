@@ -1,7 +1,7 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { IsInt, IsOptional, IsString } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
-import { PreOrderStates } from "src/order/enums/pre-order-states.enum";
+import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
 
 
 
@@ -26,7 +26,7 @@ export class IndexPreOrderInput extends IndexInput {
   @IsOptional()
   hasFile?: Boolean;
 
-  @Field(() => PreOrderStates, { nullable: true })
+  @Field(() => PreOrderStatus, { nullable: true })
   @IsOptional()
-  status?: PreOrderStates;
+  status?: PreOrderStatus;
 }
