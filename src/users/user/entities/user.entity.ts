@@ -225,25 +225,53 @@ export class User extends BaseEntity {
   }
 
   async wholePermissionNames(): Promise<string[]> {
-    const userRoles = await this.roles;
-
-    console.log('userRoles',userRoles)
+    try {
+      const userRoles = await this.roles;
+      console.log('userRoles', userRoles);
   
-    // Initialize a Set to collect unique permission names
-    const permissionNamesSet = new Set<string>();
+      // Initialize a Set to collect unique permission names
+      const permissionNamesSet = new Set<string>();
   
-    // Loop through each role and collect their permission names
-    for (const role of userRoles) {
-      const rolePermissions = await role.permissions;
-      for (const permission of rolePermissions) {
-        console.log('ppp',permission)
-        permissionNamesSet.add(permission.name);
+      // Loop through each role and collect their permission names
+      for (const role of userRoles) {
+        // Ensure role.permissions is loaded
+        const roleWithPermissions = await Role.findOne(role.id, { relations: ['permissions'] });
+  
+        if (!roleWithPermissions) {
+          console.error(`Role with ID ${role.id} not found`);
+          continue;
+        }
+  
+        const rolePermissions = roleWithPermissions.permissions;
+        console.log('rolePermissions', rolePermissions);
+  
+        if (!Array.isArray(rolePermissions)) {
+          console.error('rolePermissions is not an array:', rolePermissions);
+          continue;  // Skip this role if permissions are not in the expected format
+        }
+  
+        for (const permission of rolePermissions) {
+          console.log('permission', permission);
+  
+          // Ensure permission has a name property
+          if (permission && typeof permission.name === 'string') {
+            permissionNamesSet.add(permission.name);
+          } else {
+            console.error('permission is not valid:', permission);
+          }
+        }
       }
+  
+      console.log('Array.from(permissionNamesSet)', Array.from(permissionNamesSet));
+      
+      // Convert the set to an array and return
+      return Array.from(permissionNamesSet);
+    } catch (error) {
+      console.error('Error in wholePermissionNames:', error);
+      throw error;  // Rethrow the error after logging it
     }
-    console.log('Array.from(permissionNamesSet)',Array.from(permissionNamesSet))
-    // Convert the set to an array and return
-    return Array.from(permissionNamesSet);
   }
+  
 
   public getPermissionCacheKey(): string | null {
     if (!this.id) {
