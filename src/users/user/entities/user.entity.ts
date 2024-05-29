@@ -248,9 +248,9 @@ export class User extends BaseEntity {
           "up",
           "up.permissionId = id",
         )
-        .where("up.userId = :userId", {
-          userId: this.id,
-        })
+        // .where("up.userId = :userId", {
+        //   userId: this.id,
+        // })
         .getQueryAndParameters();
 
     return (

@@ -156,72 +156,22 @@ export class UserService {
     }
 
     if (updateUserInput.roleIds) {
-      const roles: Role[] = await Role.find({
-        where: {
-          id: In(updateUserInput.roleIds)
-        },
-        relations: ["permissions"],
-      });
-      if (roles.length !== updateUserInput.roleIds.length) {
+      const roles = await Role.findBy({ id: In(updateUserInput.roleIds) });
+      if (roles.length != updateUserInput.roleIds.length) {
         throw new BadRequestException("Some roles are invalid.");
       }
-    
-      let existingPermissionsSet: Set<Permission> = new Set();
-      const currentRoles = await user.roles;
-      currentRoles.forEach((role) => {
-        role.permissions.forEach((p) => {
-          existingPermissionsSet.add(p);
-        });
-      });
       user.roles = Promise.resolve(roles);
-    
-      console.log('user', user.fullName);
-      console.log('existingPermissions', existingPermissionsSet);
-    
-      // Convert existingPermissionsSet to an array to use the map method
-      const existingPermissionsArray = Array.from(existingPermissionsSet);
-      const existingPermissionIds = existingPermissionsArray.map(permission => permission.id);
-      console.log('existingPermissionIds', existingPermissionIds);
-    
-      // Extract the new permissions from the roles
-      let newPermissionsSet: Set<Permission> = new Set();
-      roles.forEach((role) => {
-        if (role.permissions) {
-          role.permissions.forEach((permission) => {
-            newPermissionsSet.add(permission);
-          });
-        }
-      });
-    
-      // Convert the new permissions set to an array
-      const newPermissionsArray: Permission[] = Array.from(newPermissionsSet);
-      console.log('newPermissionsSet', newPermissionsArray);
-    
-      // Filter out permissions that the user already has
-      const permissionsToAdd = newPermissionsArray.filter(permission => !existingPermissionIds.includes(permission.id));
-    
-      // Identify permissions to remove
-      const newPermissionIds = new Set(newPermissionsArray.map(permission => permission.id));
-      const permissionsToRemove = existingPermissionsArray.filter(permission => !newPermissionIds.has(permission.id));
-    
-      // Update user's permissions
-      user.permissions = Promise.resolve([...existingPermissionsArray.filter(permission => newPermissionIds.has(permission.id)), ...permissionsToAdd]);
-    
-      // Log results for debugging
-      console.log('Permissions to add:', permissionsToAdd);
-      console.log('Permissions to remove:', permissionsToRemove);
-      console.log('Updated permissions:', await user.permissions);
     }
-    
-    // if (updateUserInput.permissionIds) {
-    //   const permissions = await Permission.findBy({
-    //     id: In(updateUserInput.permissionIds),
-    //   });
-    //   if (permissions.length != updateUserInput.permissionIds.length) {
-    //     throw new BadRequestException("Some permissions are invalid.");
-    //   }
-      // user.permissions = Promise.resolve(permissions);
-    // }
+
+    if (updateUserInput.permissionIds) {
+      const permissions = await Permission.findBy({
+        id: In(updateUserInput.permissionIds),
+      });
+      if (permissions.length != updateUserInput.permissionIds.length) {
+        throw new BadRequestException("Some permissions are invalid.");
+      }
+      user.permissions = Promise.resolve(permissions);
+    }
 
     if (
       updateUserInput.status == UserStatusesEnum.ACTIVE &&
@@ -244,12 +194,12 @@ export class UserService {
       }
     });
 
-    // if (updateUserInput.roleIds) {
-    //   await this.cacheRolesOf(user);
-    //   await this.cachePermissionsOf(user);
-    // } else if (updateUserInput.permissionIds) {
-    //   await this.cachePermissionsOf(user);
-    // }
+    if (updateUserInput.roleIds) {
+      await this.cacheRolesOf(user);
+      await this.cachePermissionsOf(user);
+    } else if (updateUserInput.permissionIds) {
+      await this.cachePermissionsOf(user);
+    }
 
     return user;
   }
