@@ -68,7 +68,7 @@ export class ProjectService {
       
         await assign.save()
       } else {
-        throw 'not found user';
+        throw new NotFoundException('کاربری با این شماره یافت نشد');
 
       }
     
