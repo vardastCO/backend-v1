@@ -226,42 +226,20 @@ export class User extends BaseEntity {
 
   async wholePermissionNames(): Promise<string[]> {
     const userRoles = await this.roles;
-    const [rolePermissionsQuery, rolePermissionsParams] =
-      Permission.createQueryBuilder()
-        .select("name")
-        .innerJoin(
-          "users_authorization_role_permissions",
-          "rp",
-          "rp.permissionId = id",
-        )
-        .where("rp.roleId IN(:...roleIds)", {
-          roleIds:
-            userRoles.length !== 0 ? userRoles.map(role => role.id) : [0],
-        })
-        .getQueryAndParameters();
-
-    const [userPermissionsQuery, userPermissionsParams] =
-      Permission.createQueryBuilder()
-        .select("name")
-        .innerJoin(
-          "users_authorization_user_permissions",
-          "up",
-          "up.permissionId = id",
-        )
-        // .where("up.userId = :userId", {
-        //   userId: this.id,
-        // })
-        .getQueryAndParameters();
-
-    return (
-      await User.getRepository().query(
-        `${rolePermissionsQuery} UNION ${userPermissionsQuery.replace(
-          "$1",
-          "$" + (userRoles.length + 1),
-        )}`,
-        [...rolePermissionsParams, ...userPermissionsParams],
-      )
-    ).map(permission => permission.name);
+  
+    // Initialize a Set to collect unique permission names
+    const permissionNamesSet = new Set<string>();
+  
+    // Loop through each role and collect their permission names
+    for (const role of userRoles) {
+      const rolePermissions = await role.permissions;
+      for (const permission of rolePermissions) {
+        permissionNamesSet.add(permission.name);
+      }
+    }
+  
+    // Convert the set to an array and return
+    return Array.from(permissionNamesSet);
   }
 
   public getPermissionCacheKey(): string | null {
