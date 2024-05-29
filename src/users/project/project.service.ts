@@ -212,16 +212,24 @@ export class ProjectService {
   async updateUser(
     updateProjectUserInput: UpdateProjectUserInput
   ): Promise<Project> {
-    let userProject : UserProject = await UserProject.findOneBy({
+    let userProject: UserProject = await UserProject.findOneBy({
       userId: updateProjectUserInput.userId,
-      projectId : updateProjectUserInput.projectId
+      projectId: updateProjectUserInput.projectId
     })
    
-    if (!userProject) throw new NotFoundException();
+    if (!userProject) {
+      throw new BadRequestException(
+        (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+    );
+    };
     const user = await User.findOneBy({
-      cellphone : updateProjectUserInput.cellphone
+      cellphone: updateProjectUserInput.cellphone
     })
-    if (!user) throw new NotFoundException();
+    if (!user) {
+      throw new BadRequestException(
+        (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+    );
+    };
     updateProjectUserInput.userId = user.id
     const res: UserProject = await UserProject.preload({
       id: userProject.id,
