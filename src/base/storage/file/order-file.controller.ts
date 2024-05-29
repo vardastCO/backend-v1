@@ -5,6 +5,8 @@ import axios from 'axios';
 import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
 import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { addCommas,numberToWords } from "@persian-tools/persian-tools";
+import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
+import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
 @Controller("order/file")
 export class OrderFileController {
   @Public()
@@ -16,17 +18,24 @@ export class OrderFileController {
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
-      const preResult = await PreOrder.findOneBy({
-        uuid:uuid
+      const order = await PreOrder.findOneBy({
+        uuid: uuid,
+        status: PreOrderStatus.CLOSED
       })
-      if (!preResult) {
+      if (!order) {
         res.send('not found')
       }
-      const result = await OfferOrder.findOne({
-        where: { id: 2},
+      const offer = await OfferOrder.findOne({
+        where: {
+          id: order.id,
+          status : OrderOfferStatuses.CLOSED
+        },
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
-      const items = await Promise.all((await result.offerLine).map(async (offer) => ({
+      if (!offer) {
+        res.send('not found')
+      }
+      const items = await Promise.all((await offer.offerLine).map(async (offer) => ({
         id:(await offer.line).id,
         name: (await offer.line).item_name,
         description: '',
@@ -38,24 +47,22 @@ export class OrderFileController {
     })));
   
       const data = {
-        date: (await result.preOrder).request_date,
-        invoiceNumber: (await result.preOrder).uuid,
+        date: (await offer.preOrder).request_date,
+        invoiceNumber: (await offer.preOrder).uuid,
         sellerAddress: 'بلوار کاوه، نرسیده به خیابان دولت، نبش کوچه اخلاقی غربی، پلاك 12,1 طبقه 2 واحد 4',
         sellerNationalId: '14011385876',  
-        buyerName: (await (await result.preOrder).address).delivery_name,
-        buyerNationalId: (await (await result.preOrder).address).delivery_contact,
-        buyerAddress: (await (await result.preOrder).address).address,
+        buyerName: (await (await offer.preOrder).address).delivery_name,
+        buyerNationalId: (await (await offer.preOrder).address).delivery_contact,
+        buyerAddress: (await (await offer.preOrder).address).address,
         items: await items,
-        totalAmount: result.total,
+        totalAmount: offer.total,
         instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.',
         instructions2: 'کالای فروخته شده و تحویل داده شده توسط فروشنده به شرح جدول فوق تا زمان تسویه حساب کامل به صورت امانت نزد خریدار می باشد.'
       
       
       };
-      // Inject dynamic data into the template
       const invoiceHTML = this.injectDataIntoTemplate(template, data);
 
-      // Set the response headers and send the HTML
       res.setHeader('Content-Type', 'text/html');
       res.send(invoiceHTML);
     } catch (error) {

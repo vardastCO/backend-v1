@@ -45,6 +45,7 @@ export class CreateAddressProjectInput {
 
   @Field({ nullable: true })
   @IsOptional()
+  @MaxLength(10)
   postalCode?: string;
 
   @Field()

@@ -1,6 +1,6 @@
 import { registerEnumType } from "@nestjs/graphql";
 
-export enum PreOrderStates {
+export enum PreOrderStatus {
   CREATED = "CREATED",
   PENDING_INFO = "PENDING_INFO",
   PENDING_LINE = "PENDING_LINE",
@@ -8,6 +8,6 @@ export enum PreOrderStates {
   CLOSED = "CLOSED"
 }
 
-registerEnumType(PreOrderStates, {
+registerEnumType(PreOrderStatus, {
   name: "PreOrderStates",
 });

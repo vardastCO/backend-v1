@@ -11,6 +11,7 @@ import {
   Validate,
 } from "class-validator";
 import { IsNumberString } from "src/base/utilities/decorators/is-number-string.decorator";
+import { MultiTypeUom } from "src/order/enums/multi-type-uom.enum";
 import { MultiTypeOrder } from "src/order/enums/multu-type-order.enum";
 const UOM_VALUES = [
   "لنگه",
@@ -54,6 +55,14 @@ export class CreateLineInput {
     message: `مقدار واحد میتواند فقط مقادیر مشخصی داشته باشد: ${UOM_VALUES.join(', ')}`
   })
   uom?: string;
+
+  // @Field(() => MultiTypeUom, {
+  //   defaultValue: MultiTypeUom.PIECE,
+  //   nullable: true,
+  // })
+  // @IsNotEmpty()
+  // @IsEnum(MultiTypeOrder)
+  // uom?: MultiTypeUom = MultiTypeUom.PIECE;
 
   @Field(() => String,{nullable:true}) 
   @IsOptional()
