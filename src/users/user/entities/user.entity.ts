@@ -234,13 +234,7 @@ export class User extends BaseEntity {
   
       // Loop through each role and collect their permission names
       for (const role of userRoles) {
-        const offer = await OfferOrder.findOne({
-          where: {
-            preOrderId: order.id ,
-            status : OrderOfferStatuses.CLOSED
-          },
-          relations: ["preOrder.user","preOrder.address","offerLine"],
-        })
+        
         // Ensure role.permissions is loaded
         const roleWithPermissions = await Role.findOne({
           where : {
