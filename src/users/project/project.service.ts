@@ -68,7 +68,7 @@ export class ProjectService {
     
       await assign.save()
     } else {
-      throw new BadRequestException('کاربری با این شماره یافت نشد');
+      throw new BadRequestException("NOT_FOUND_USER");
 
     }
   
