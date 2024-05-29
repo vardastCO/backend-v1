@@ -19,7 +19,7 @@ export class OrderFileController {
       const response = await axios.get(templateURL);
       const template = response.data;
       const order = await PreOrder.findOneBy({
-        uuid: uuid,
+        uuid,
         status: PreOrderStatus.CLOSED
       })
       console.log('order',order)
@@ -29,7 +29,7 @@ export class OrderFileController {
 
       const offer = await OfferOrder.findOne({
         where: {
-          id: order.id,
+          preOrderId: order.id ,
           status : OrderOfferStatuses.CLOSED
         },
         relations: ["preOrder.user","preOrder.address","offerLine"],
