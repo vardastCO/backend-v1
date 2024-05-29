@@ -162,16 +162,27 @@ export class UserService {
         },
         relations: ["permissions"],
       });
-      if (roles.length != updateUserInput.roleIds.length) {
+      if (roles.length !== updateUserInput.roleIds.length) {
         throw new BadRequestException("Some roles are invalid.");
       }
+    
+      let existingPermissionsSet: Set<Permission> = new Set();
+      const currentRoles = await user.roles;
+      currentRoles.forEach((role) => {
+        role.permissions.forEach((p) => {
+          existingPermissionsSet.add(p);
+        });
+      });
       user.roles = Promise.resolve(roles);
-      const existingPermissions: Permission[] = await user.permissions;
-      console.log('user', user.fullName)
-      console.log('existingPermissions',existingPermissions)
-      // Create a set of current permission IDs
-      const existingPermissionIds = new Set(existingPermissions.map(permission => permission.id));
-      console.log('existingPermissionIds',existingPermissionIds)
+    
+      console.log('user', user.fullName);
+      console.log('existingPermissions', existingPermissionsSet);
+    
+      // Convert existingPermissionsSet to an array to use the map method
+      const existingPermissionsArray = Array.from(existingPermissionsSet);
+      const existingPermissionIds = existingPermissionsArray.map(permission => permission.id);
+      console.log('existingPermissionIds', existingPermissionIds);
+    
       // Extract the new permissions from the roles
       let newPermissionsSet: Set<Permission> = new Set();
       roles.forEach((role) => {
@@ -181,25 +192,27 @@ export class UserService {
           });
         }
       });
-
+    
       // Convert the new permissions set to an array
       const newPermissionsArray: Permission[] = Array.from(newPermissionsSet);
-      console.log('newPermissionsSet',newPermissionsArray)
+      console.log('newPermissionsSet', newPermissionsArray);
+    
       // Filter out permissions that the user already has
-      const permissionsToAdd = newPermissionsArray.filter(permission => !existingPermissionIds.has(permission.id));
-
+      const permissionsToAdd = newPermissionsArray.filter(permission => !existingPermissionIds.includes(permission.id));
+    
       // Identify permissions to remove
       const newPermissionIds = new Set(newPermissionsArray.map(permission => permission.id));
-      const permissionsToRemove = existingPermissions.filter(permission => !newPermissionIds.has(permission.id));
-
+      const permissionsToRemove = existingPermissionsArray.filter(permission => !newPermissionIds.has(permission.id));
+    
       // Update user's permissions
-      user.permissions = Promise.resolve([...existingPermissions.filter(permission => newPermissionIds.has(permission.id)), ...permissionsToAdd]);
-
+      user.permissions = Promise.resolve([...existingPermissionsArray.filter(permission => newPermissionIds.has(permission.id)), ...permissionsToAdd]);
+    
       // Log results for debugging
       console.log('Permissions to add:', permissionsToAdd);
       console.log('Permissions to remove:', permissionsToRemove);
       console.log('Updated permissions:', await user.permissions);
     }
+    
     // if (updateUserInput.permissionIds) {
     //   const permissions = await Permission.findBy({
     //     id: In(updateUserInput.permissionIds),
