@@ -156,22 +156,29 @@ export class UserService {
     }
 
     if (updateUserInput.roleIds) {
-      const roles = await Role.findBy({ id: In(updateUserInput.roleIds) });
+      const roles : Role[] = await Role.findBy({ id: In(updateUserInput.roleIds) });
       if (roles.length != updateUserInput.roleIds.length) {
         throw new BadRequestException("Some roles are invalid.");
       }
       user.roles = Promise.resolve(roles);
+      let permission = []
+      roles.map((role) => {
+        permission.push(role.permissions)
+      })
+      console.log('permission',permission)
+      user.permissions = Promise.resolve(permission);
+
     }
 
-    if (updateUserInput.permissionIds) {
-      const permissions = await Permission.findBy({
-        id: In(updateUserInput.permissionIds),
-      });
-      if (permissions.length != updateUserInput.permissionIds.length) {
-        throw new BadRequestException("Some permissions are invalid.");
-      }
-      user.permissions = Promise.resolve(permissions);
-    }
+    // if (updateUserInput.permissionIds) {
+    //   const permissions = await Permission.findBy({
+    //     id: In(updateUserInput.permissionIds),
+    //   });
+    //   if (permissions.length != updateUserInput.permissionIds.length) {
+    //     throw new BadRequestException("Some permissions are invalid.");
+    //   }
+    //   user.permissions = Promise.resolve(permissions);
+    // }
 
     if (
       updateUserInput.status == UserStatusesEnum.ACTIVE &&
