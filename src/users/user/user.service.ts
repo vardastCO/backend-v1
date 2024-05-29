@@ -156,7 +156,7 @@ export class UserService {
     }
 
     if (updateUserInput.roleIds) {
-      const roles : Role[] = await Role.find({
+      const roles: Role[] = await Role.find({
         where: {
           id: In(updateUserInput.roleIds)
         },
@@ -168,19 +168,20 @@ export class UserService {
       user.roles = Promise.resolve(roles);
       let permissions: Permission[] = [];
     
+      let permissionsSet: Set<Permission> = new Set();
       roles.forEach((role) => {
-        console.log('role', role)
-        console.log('role_permissjion',role.permissions)
+        console.log('role', role);
+        console.log('role_permissions', role.permissions);
         if (role.permissions) {
-          permissions = permissions.concat(role.permissions);
+          role.permissions.forEach((permission) => {
+            permissionsSet.add(permission);
+          });
         }
       });
-      
-      console.log('permissions', permissions); 
+    
+      permissions = Array.from(permissionsSet);
       user.permissions = Promise.resolve(permissions);
-
     }
-
     // if (updateUserInput.permissionIds) {
     //   const permissions = await Permission.findBy({
     //     id: In(updateUserInput.permissionIds),
@@ -188,7 +189,7 @@ export class UserService {
     //   if (permissions.length != updateUserInput.permissionIds.length) {
     //     throw new BadRequestException("Some permissions are invalid.");
     //   }
-    //   user.permissions = Promise.resolve(permissions);
+      // user.permissions = Promise.resolve(permissions);
     // }
 
     if (
@@ -212,12 +213,12 @@ export class UserService {
       }
     });
 
-    if (updateUserInput.roleIds) {
-      await this.cacheRolesOf(user);
-      await this.cachePermissionsOf(user);
-    } else if (updateUserInput.permissionIds) {
-      await this.cachePermissionsOf(user);
-    }
+    // if (updateUserInput.roleIds) {
+    //   await this.cacheRolesOf(user);
+    //   await this.cachePermissionsOf(user);
+    // } else if (updateUserInput.permissionIds) {
+    //   await this.cachePermissionsOf(user);
+    // }
 
     return user;
   }
