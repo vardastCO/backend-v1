@@ -18,7 +18,7 @@ export class UpdateProjectUserInput extends PartialType(CreateUserProjectInput) 
     @Field()
     @IsNotEmpty()
     @IsString()
-    cellphone: String;
+    cellphone: string;
 }
 
 
