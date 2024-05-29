@@ -233,11 +233,12 @@ export class User extends BaseEntity {
     // Loop through each role and collect their permission names
     for (const role of userRoles) {
       const rolePermissions = await role.permissions;
+      console.log('rolePermissions',await role.permissions)
       for (const permission of rolePermissions) {
         permissionNamesSet.add(permission.name);
       }
     }
-  
+    console.log('Array.from(permissionNamesSet)',Array.from(permissionNamesSet))
     // Convert the set to an array and return
     return Array.from(permissionNamesSet);
   }
