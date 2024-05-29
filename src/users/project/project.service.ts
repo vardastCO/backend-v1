@@ -1,5 +1,5 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { User } from "../user/entities/user.entity";
 import { CreateAddressProjectInput } from "./dto/create-address-project.input";
@@ -68,7 +68,7 @@ export class ProjectService {
     
       await assign.save()
     } else {
-      throw new NotFoundException('کاربری با این شماره یافت نشد');
+      throw new BadRequestException('کاربری با این شماره یافت نشد');
 
     }
   
