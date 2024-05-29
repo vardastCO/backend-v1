@@ -210,14 +210,16 @@ export class ProjectService {
     updateProjectUserInput: UpdateProjectUserInput
   ): Promise<Project> {
     let userProject : UserProject = await UserProject.findOneBy({
-      projectId: updateProjectUserInput.projectId,
-      user: {
-        cellphone:updateProjectUserInput.cellphone
-      }
+      userId: updateProjectUserInput.userId,
+      projectId : updateProjectUserInput.projectId
     })
    
     if (!userProject) throw new NotFoundException();
-
+    const user = await User.findOneBy({
+      cellphone : updateProjectUserInput.cellphone
+    })
+    if (!user) throw new NotFoundException();
+    updateProjectUserInput.userId = user.id
     const res: UserProject = await UserProject.preload({
       id: userProject.id,
       ...updateProjectUserInput

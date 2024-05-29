@@ -2,6 +2,7 @@ import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
 import {
     IsInt,
     IsNotEmpty,
+    IsOptional,
     IsString
 } from "class-validator";
 import { CreateUserProjectInput } from "./create-user-project.input";
@@ -14,6 +15,11 @@ export class UpdateProjectUserInput extends PartialType(CreateUserProjectInput) 
     @IsNotEmpty()
     @IsInt()
     projectId: number;
+
+    @Field(() => Int)
+    @IsNotEmpty()
+    @IsInt()
+    userId: number;
 
     @Field()
     @IsNotEmpty()
