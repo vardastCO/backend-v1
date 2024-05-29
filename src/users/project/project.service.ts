@@ -12,11 +12,14 @@ import { Project } from "./entities/project.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
 import { UpdateProjectUserInput } from "./dto/update-user-input";
-import {  In } from 'typeorm';
+import { In } from 'typeorm';
+import { I18n, I18nService } from "nestjs-i18n";
+
 @Injectable()
 export class ProjectService {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    @I18n() protected readonly i18n: I18nService,
   )  {}
   async create(createProjectInput: CreateProjectInput,userId:number): Promise<Project> {
     try {
@@ -68,7 +71,9 @@ export class ProjectService {
     
       await assign.save()
     } else {
-      throw new BadRequestException("NOT_FOUND_USER");
+      throw new BadRequestException(
+          (await this.i18n.translate("exeptions.NOT_FOUND_USER")),
+      );
 
     }
   
