@@ -166,22 +166,36 @@ export class UserService {
         throw new BadRequestException("Some roles are invalid.");
       }
       user.roles = Promise.resolve(roles);
-      let permissions: Permission[] = [];
-    
-      let permissionsSet: Set<Permission> = new Set();
-      roles.forEach((role) => {
-        console.log('role', role);
-        console.log('role_permissions', role.permissions);
-        if (role.permissions) {
-          role.permissions.forEach((permission) => {
-            permissionsSet.add(permission);
+      const existingPermissions = await user.permissions;
+
+          // Extract the permissions from the provided roles
+          let newPermissionsSet: Set<Permission> = new Set();
+          roles.forEach((role) => {
+            if (role.permissions) {
+              role.permissions.forEach((permission) => {
+                newPermissionsSet.add(permission);
+              });
+            }
           });
+
+          // Convert sets to arrays
+          const newPermissions = Array.from(newPermissionsSet);
+
+          // Determine permissions to keep (those that are in newPermissions)
+          const updatedPermissions = existingPermissions.filter(permission =>
+            newPermissionsSet.has(permission)
+          );
+
+          // Add any new permissions that were not previously assigned
+          newPermissions.forEach(permission => {
+            if (!existingPermissions.includes(permission)) {
+              updatedPermissions.push(permission);
+            }
+          });
+
+          console.log('updatedPermissions', updatedPermissions); // Verify the updated permissions
+          user.permissions = Promise.resolve(updatedPermissions);
         }
-      });
-    
-      permissions = Array.from(permissionsSet);
-      user.permissions = Promise.resolve(permissions);
-    }
     // if (updateUserInput.permissionIds) {
     //   const permissions = await Permission.findBy({
     //     id: In(updateUserInput.permissionIds),
