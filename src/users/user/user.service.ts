@@ -161,12 +161,15 @@ export class UserService {
         throw new BadRequestException("Some roles are invalid.");
       }
       user.roles = Promise.resolve(roles);
-      let permission = []
-      roles.map((role) => {
-        permission.push(role.permissions)
-      })
-      console.log('permission',permission)
-      user.permissions = Promise.resolve(permission);
+      let permissions: Permission[] = [];
+      roles.forEach((role) => {
+        if (role.permissions) {
+          permissions = permissions.concat(role.permissions);
+        }
+      });
+      
+      console.log('permissions', permissions); 
+      user.permissions = Promise.resolve(permissions);
 
     }
 
