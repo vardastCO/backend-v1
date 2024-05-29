@@ -163,6 +163,8 @@ export class UserService {
       user.roles = Promise.resolve(roles);
       let permissions: Permission[] = [];
       roles.forEach((role) => {
+        console.log('role', role)
+        console.log('role_permissjion',role.permissions)
         if (role.permissions) {
           permissions = permissions.concat(role.permissions);
         }
