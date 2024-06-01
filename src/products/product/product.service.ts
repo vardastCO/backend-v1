@@ -226,9 +226,21 @@ export class ProductService {
   
       }
     }
-    
+    let categoryCondition = {};
+    if (categoryIds && categoryIds.length > 0) {
+      // Fetch all relevant category IDs
+      const allCategoryIds = await getConnection()
+        .query(
+          `SELECT id FROM category WHERE id IN (SELECT * FROM child_category_ids($1))`,
+          [categoryIds]
+        );
+
+      categoryCondition = { categoryId: In(allCategoryIds.map(cat => cat.id)) };
+    }
+
+    const finalConditions = { ...whereConditions, ...categoryCondition };
     const [products, totalCount] = await Product.findAndCount({
-      where: whereConditions,
+      where: finalConditions,
       relations: ["images", "prices", "uom", "category"],
       order: {
         rating: "DESC",
