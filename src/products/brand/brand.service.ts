@@ -220,6 +220,7 @@ export class BrandService {
         const jsonString = JSON.stringify(brand).replace(/__logoFile__/g, 'logoFile')
         .replace(/__bannerFile__/g, 'bannerFile')
         .replace(/__catalog__/g, 'catalog')
+        .replace(/__bannerDesktop__/g, 'bannerDesktop')
         .replace(/__priceList__/g, 'priceList')
       ;
   
