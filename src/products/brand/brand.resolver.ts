@@ -105,6 +105,13 @@ export class BrandResolver {
     return this.brandService.remove(id);
   }
 
+  @Permission("gql.products.brand.destroy")
+  @Mutation(() => Brand)
+  removeBrandFile(@Args("fileId", { type: () => Int }) fileId: number,
+  @Args("id", { type: () => Int }) id: number) {
+    return this.brandService.removeBrandFile(id,fileId);
+  }
+
   @ResolveField(() => [Product])
   products(@Parent() brand: Brand): Promise<Product[]> {
     return this.brandService.getProductsOf(brand);

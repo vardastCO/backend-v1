@@ -337,6 +337,28 @@ export class BrandService {
     return brand;
   }
 
+  async removeBrandFile(id: number,fileId:number): Promise<Brand> {
+    const brand: Brand = await Brand.findOneBy({id});
+    const bannerFile = await brand.bannerFile;
+    const logoFile = await brand.logoFile;
+    const bannerDesktop = await brand.bannerDesktop;
+
+    if (bannerFile?.id === fileId) {
+        brand.bannerFile = null;
+    }
+    if (bannerDesktop?.id === fileId) {
+      brand.bannerDesktop = null;
+    }
+    else if (logoFile?.id === fileId) {
+        brand.logoFile = null;
+    }
+    else {
+        throw new Error(`File with id ${fileId} not found in the brand's files`);
+    }
+    await brand.save();
+    return brand;
+  }
+
   async getProductsOf(brand: Brand): Promise<Product[]> {
     return await brand.products;
   }
