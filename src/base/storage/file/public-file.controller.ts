@@ -72,7 +72,25 @@ export class PublicFileController {
   ) {
     return this.fileService.uploadCatalogue(file, user, brandId);
   }
-
+  @Post("/brand/banner/:id")
+  @UseInterceptors(FileInterceptor("file"))
+  @Permission("rest.base.storage.file.store")
+  uploadBannerBrand(
+    @Param('id') brandId: number, 
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType:
+            /png|gif|jpg|jpeg/,
+        })
+        .addMaxSizeValidator({ maxSize: 50 * 1_000_000 }) // 50MB
+        .build({ fileIsRequired: true }),
+    )
+    file: Express.Multer.File,
+    @CurrentUser() user: User,
+  ) {
+    return this.fileService.uploadBanner(file, user, brandId);
+  }
 
   @Post("/brand/priceList/:id")
   @UseInterceptors(FileInterceptor("file"))

@@ -178,7 +178,84 @@ export class PublicFileService {
       expiresAt: oneHourLater,
     };
   }
+  async uploadBanner(
+    file: Express.Multer.File,
+    user: User,
+    brandId: number
+  ) {
 
+    const brand: Brand = await Brand.findOneBy({id: brandId});
+    if (!brand) {
+      throw new NotFoundException("Brand Not Found");
+    }
+
+    const directory: Directory = await Directory.findOneBy({
+      path: 'brand/banner',
+    });
+
+    // TODO: check for directory upload permission
+    if (!directory) {
+      throw new BadRequestException("Specified directory path is invalid!");
+    }
+
+    const filename = File.generateNewFileName(file);
+
+    const fileRecord: File = File.create<File>({
+      name: `${directory.path}/${filename}`,
+      originalName: file.originalname,
+      size: file.size,
+      mimeType: file.mimetype,
+      disk: "minio",
+      bucketName: this.bucketName,
+      orderColumn : 1 ,
+      modelType: directory.relatedModel
+    });
+    fileRecord.directory = Promise.resolve(directory);
+    fileRecord.createdBy = Promise.resolve(user);
+   
+    await this.dataSource.transaction(async () => {
+      await fileRecord.save({ transaction: false });
+      const uploadedFileInfo = await this.minioClient.putObject(
+        this.bucketName,
+        fileRecord.name,
+        file.buffer,
+        {
+          "Content-Type": file.mimetype,
+          "File-Uuid": fileRecord.uuid,
+          "File-Id": fileRecord.id,
+        },
+      );
+    });
+
+    brand.bannerDesktop = Promise.resolve(fileRecord);
+    // console.log('brand', await brand.catalog)
+    try {
+
+         await brand.save();
+    } catch (e) {
+      console.log('eee',e)
+    }
+
+    // TODO: add retention for files
+    const fileTTL = 3600;
+    const oneHourLater = new Date();
+    oneHourLater.setSeconds(oneHourLater.getSeconds() + fileTTL);
+
+    // await this.minioClient.putObjectRetention(
+    //   this.bucketName,
+    //   fileRecord.name,
+    //   {
+    //     versionId: uploadedFileInfo.versionId,
+    //     retainUntilDate: oneHourLater.toISOString(),
+    //     mode: RETENTION_MODES.COMPLIANCE,
+    //   },
+    // );
+
+    return {
+      uuid: fileRecord.uuid,
+      expiresAt: oneHourLater,
+    };
+  }
 
     async uploadSellerLogo(
     file: Express.Multer.File,

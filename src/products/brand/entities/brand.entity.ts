@@ -93,6 +93,11 @@ export class Brand extends BaseEntity {
   @JoinColumn()
   bannerFile: Promise<File>;
 
+  @Field(() => File, { nullable: true })
+  @OneToOne(() => File, file => null, { eager: true, nullable: true })
+  @JoinColumn()
+  bannerDesktop: Promise<File>;
+
   @Field(type => [Product], { nullable: "items" })
   @OneToMany(type => Product, product => product.brand)
   products: Promise<Product[]>;

@@ -155,7 +155,7 @@ export class BrandService {
     });
 
     try {
-      const jsonString = JSON.stringify(data).replace(/__bannerFile__/g, 'bannerFile').replace(/__logoFile__/g, 'logoFile')
+      const jsonString = JSON.stringify(data).replace(/__bannerDesktop__/g, 'bannerDesktop').replace(/__bannerFile__/g, 'bannerFile').replace(/__logoFile__/g, 'logoFile')
         .replace(/__catalog__/g, 'catalog').replace(/__priceList__/g, 'priceList')
       ;
 
