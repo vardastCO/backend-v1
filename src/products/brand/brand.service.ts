@@ -203,7 +203,14 @@ export class BrandService {
             (await parsedData.priceList).createdAt = new Date(priceCreatedAt);
           }
         }
+        const desktopBannerFile = await parsedData.bannerDesktop;
+        if (desktopBannerFile) {
+          const desktopBannerFileCreatedAt = await desktopBannerFile.createdAt;
         
+          if (desktopBannerFileCreatedAt) {
+            (await parsedData.bannerDesktop).createdAt = new Date(desktopBannerFileCreatedAt);
+          }
+        }
       
         return parsedData
       }
@@ -212,11 +219,6 @@ export class BrandService {
         throw new NotFoundException();
       }
       try {
-        // const prevousTotal = brand.total;
-        // brand.total = await this.getOfferLength(brand.id)
-        // if (prevousTotal != brand.total) {
-        //   await brand.save();
-        // }
         const jsonString = JSON.stringify(brand).replace(/__logoFile__/g, 'logoFile')
         .replace(/__bannerFile__/g, 'bannerFile')
         .replace(/__catalog__/g, 'catalog')
@@ -224,7 +226,6 @@ export class BrandService {
         .replace(/__priceList__/g, 'priceList')
       ;
   
-      // Parse the modified JSON back to objects
         const modifiedDataWithOutText = JSON.parse(jsonString);
         const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
         await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
