@@ -15,6 +15,8 @@ import { UpdateProjectInput } from "./dto/update-project-input";
 import { Project } from "./entities/project.entity";
 import { ProjectService } from "./project.service";
 import { UpdateProjectUserInput } from "./dto/update-user-input";
+import { IndexProjectInput } from "./dto/index-project.input";
+import { PaginationProjectResponse } from "./dto/pagination-project.response";
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -105,6 +107,14 @@ export class ProjectResolver {
   ) {
     return this.projectService.update(updateProjectInput.id,
       updateProjectInput)
+  }
+
+  @Permission("gql.users.address.store")
+  @Query(() => PaginationProjectResponse, { name: "projects" })
+  Projects(
+    @Args("indexProjectInput") indexProjectInput: IndexProjectInput
+  ) {
+    return this.projectService.paginate(indexProjectInput)
   }
 
   @Permission("gql.users.address.store")

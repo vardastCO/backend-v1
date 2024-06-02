@@ -227,11 +227,8 @@ export class User extends BaseEntity {
   async wholePermissionNames(): Promise<string[]> {
     try {
       const userRoles = await this.roles;
-  
-      // Initialize a Set to collect unique permission names
+      
       const permissionNamesSet = new Set<string>();
-  
-      // Loop through each role and collect their permission names
       for (const role of userRoles) {
         
         // Ensure role.permissions is loaded

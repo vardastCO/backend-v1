@@ -14,6 +14,8 @@ import { UserProject } from "./entities/user-project.entity";
 import { UpdateProjectUserInput } from "./dto/update-user-input";
 import { In } from 'typeorm';
 import { I18n, I18nService } from "nestjs-i18n";
+import { PaginationProjectResponse } from "./dto/pagination-project.response";
+import { IndexProjectInput } from "./dto/index-project.input";
 
 @Injectable()
 export class ProjectService {
@@ -268,7 +270,20 @@ export class ProjectService {
   }
 
 
+  async paginate(
+    indexProjectInput: IndexProjectInput,
+  ): Promise<PaginationProjectResponse> {
+    indexProjectInput.boot()
+    const { take, skip } = indexProjectInput || {};
+    const [data, total] = await Project.findAndCount({
+      take,
+      skip,
+      order: { sort: "ASC", id: "DESC" },
+    });
 
+    return PaginationProjectResponse.make(indexProjectInput, total, data);
+  
+  }
 
   async assignUserToProject(projectId: number,userId:number): Promise<boolean> {
     try{

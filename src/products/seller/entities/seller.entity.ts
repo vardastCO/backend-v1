@@ -15,11 +15,13 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { SellerRepresentative } from "./seller-representative.entity";
 import { Brand } from "src/products/brand/entities/brand.entity";
+import { SellerType } from "../enums/seller-type.enum";
 
 @ObjectType()
 @Entity("product_sellers")
@@ -28,14 +30,14 @@ export class Seller extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  
-
   @Field(() => Int, { nullable:true ,defaultValue: 1 })
-  @Column( {nullable: true } )
+  @Column({ nullable: true })
+  @Index()
   sum : number;
 
   @Field()
   @Column({ unique: true })
+  @Index()
   name: string;
 
   @Field({ nullable: true })
@@ -47,6 +49,7 @@ export class Seller extends BaseEntity {
   tag?: string;
 
   @Field(() => Int, { nullable: true })
+  @Index()
   @Column( {nullable: true })
   rating?: number= 4;
 
@@ -62,6 +65,7 @@ export class Seller extends BaseEntity {
   bannerFile: Promise<File>;
 
   @Field(() => ThreeStateSupervisionStatuses)
+  @Index()
   @Column("enum", {
     enum: ThreeStateSupervisionStatuses,
     default: ThreeStateSupervisionStatuses.CONFIRMED,
@@ -69,10 +73,12 @@ export class Seller extends BaseEntity {
   status: ThreeStateSupervisionStatuses;
 
   @Field(() => Boolean)
+  @Index()
   @Column("boolean", { default: true })
   isPublic: boolean;
 
   @Field(() => Int, { nullable: true })
+  @Index()
   @Column( {nullable: true })
   brandsCount?: number = 0;
   
@@ -97,6 +103,14 @@ export class Seller extends BaseEntity {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Field(() => SellerType)
+  @Index()
+  @Column("enum", {
+    enum: SellerType,
+    default: SellerType.NORMAL,
+  })
+  sellerType: SellerType;
 
   @Field(() => [Price], { nullable: "items" })
   @OneToMany(() => Price, price => price.seller)

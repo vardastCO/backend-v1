@@ -42,6 +42,7 @@ export class Product extends InfraEntity {
   @Field()
   @Column({ unique: true })
   name: string;
+  
 
   @Field()
   @Column({ unique: true })
