@@ -1,3 +1,3 @@
 // constants.ts
 
-export const suggestvalue = 10;
+export const suggestvalue = 5;
