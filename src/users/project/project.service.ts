@@ -278,7 +278,6 @@ export class ProjectService {
     const [data, total] = await Project.findAndCount({
       take,
       skip,
-      order: { sort: "ASC", id: "DESC" },
     });
 
     return PaginationProjectResponse.make(indexProjectInput, total, data);
