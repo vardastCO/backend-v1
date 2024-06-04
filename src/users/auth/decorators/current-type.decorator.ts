@@ -14,7 +14,7 @@ export const CurrentType = createParamDecorator(
     const token = authHeader.slice(7); // Extract token from Bearer prefix
     console.log('token',token)
     try {
-
+      console.log('process.env.AUTH_JWT_ACCESS_SECRET',process.env.AUTH_JWT_ACCESS_SECRET)
       const decoded = verify(token, process.env.AUTH_JWT_ACCESS_SECRET);
       console.log('dec',decoded)
 
