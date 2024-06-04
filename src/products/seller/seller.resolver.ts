@@ -55,6 +55,7 @@ export class SellerResolver {
       new ValidationPipe({ transform: true }),
     )
     indexSellerInput?: IndexSellerInput,
+
   ) {
     return this.sellerService.findAll(user, indexSellerInput);
   }
@@ -70,8 +71,15 @@ export class SellerResolver {
       new ValidationPipe({ transform: true }),
     )
     indexSellerInput?: IndexSellerInput,
+    @Context() context?: { req: Request }
   ) {
-    return this.sellerService.paginate(user, indexSellerInput);
+    const request = context?.req;
+    const referer = request.headers['origin'] ?? null;
+    let client = false 
+    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
+      client = true
+    }
+    return this.sellerService.paginate(user, indexSellerInput,client);
   }
 
   @Public()
@@ -81,15 +89,8 @@ export class SellerResolver {
   ) id: number,
   @Context() context?: { req: Request }
   ) {
-    const request = context?.req;
-    console.log('request',request)
-    const referer = request.headers['origin'] ?? null;
-    console.log('REDER',referer)
-    let client = false 
-    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
-      client = true
-    }
-    return this.sellerService.findOne(id,client);
+
+    return this.sellerService.findOne(id);
   }
 
   @Permission("gql.products.seller.update")

@@ -155,6 +155,7 @@ export class SellerService {
   async paginate(
     user: User,
     indexSellerInput?: IndexSellerInput,
+    client?:boolean
   ): Promise<PaginationSellerResponse> {
 
     indexSellerInput.boot();
@@ -166,10 +167,13 @@ export class SellerService {
     if (cachedData) {
       return cachedData;
     }
-  
+    
     const whereConditions: any = {};
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
+    }
+    if (client) {
+      whereConditions['sellerType'] = SellerType.ONLINE || SellerType.NORMAL
     }
 
     if (indexSellerInput.hasLogoFile !== undefined) {
@@ -228,7 +232,7 @@ export class SellerService {
     return lastOffer ? [lastOffer] : [];
   }
   
-  async findOne(id: number,client:boolean): Promise<Seller> {
+  async findOne(id: number): Promise<Seller> {
     try {
       // this.logSellerView(id);
       const cacheKey = `seller_${JSON.stringify(id)}`;
@@ -266,11 +270,6 @@ export class SellerService {
 
       } catch (e) {
         throw e
-      }
-      if (client) {
-        if (seller.sellerType == SellerType.OFFLINE || SellerType.EXTENDED) {
-           return 
-        }
       }
       return seller;
 
@@ -378,7 +377,7 @@ export class SellerService {
   }
 
   async remove(id: number): Promise<Seller> {
-    const seller: Seller = await this.findOne(id,true);
+    const seller: Seller = await this.findOne(id);
     await seller.remove();
     seller.id = id;
     return seller;
