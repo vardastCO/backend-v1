@@ -102,6 +102,7 @@ export class AuthService {
         refreshToken: this._generateNewRefreshToken(user, session),
         refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
         user,
+        type:"LEGAL",
         abilities: userWholePermissions,
       };
     }
@@ -193,6 +194,7 @@ export class AuthService {
       refreshToken: this._generateNewRefreshToken(user, session),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
+      type:'LEGAL',
       abilities: userWholePermissions,
     };
   }
@@ -269,6 +271,7 @@ export class AuthService {
       refreshToken: this._generateNewRefreshToken(user, session),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
+      type:"LEGAL",
       abilities: userWholePermissions,
     };
   }

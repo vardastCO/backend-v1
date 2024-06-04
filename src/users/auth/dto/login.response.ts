@@ -9,6 +9,9 @@ export class LoginResponse {
   })
   accessToken: string;
 
+  @Field()
+  type: string;
+
   @Field(type => Int, {
     description: "Access token validity period in seconds.",
   })
