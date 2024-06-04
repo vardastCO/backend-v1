@@ -45,9 +45,11 @@ export class PermissionService {
   async allClaim(
   ): Promise<Permission[]> {
     
-    return await Permission.find({
-      select: ["claim"],
-  });
+    const uniqueClaims = await Permission.createQueryBuilder("permission")
+    .select("DISTINCT permission.claim", "claim")
+    .getRawMany();
+
+    return uniqueClaims.map((entry) => entry.claim);
   }
 
   async findOne(id: number, name?: string): Promise<Permission> {
