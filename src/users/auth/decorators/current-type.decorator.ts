@@ -19,7 +19,7 @@ export const CurrentType = createParamDecorator(
       const decoded = verify(token, process.env.AUTH_JWT_ACCESS_SECRET);
       console.log('dec',decoded)
 
-      return decoded.type; // Return user type from decoded payload
+      return decoded; // Return user type from decoded payload
     } catch (error) {
       throw new UnauthorizedException('Invalid token or unauthorized access');
     }
