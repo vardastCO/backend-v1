@@ -10,9 +10,9 @@ export const CurrentType = createParamDecorator(
     if (!authHeader?.startsWith('Bearer ')) {
       throw new UnauthorizedException('Unauthorized');
     }
-
+  
     const token = authHeader.slice(7); // Extract token from Bearer prefix
-
+    console.log('token',token)
     try {
 
       const decoded = verify(token, process.env.AUTH_JWT_ACCESS_SECRET);
