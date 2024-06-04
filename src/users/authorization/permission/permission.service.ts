@@ -46,7 +46,6 @@ export class PermissionService {
   ): Promise<Permission[]> {
     
     return await Permission.find({
-      order: { id: "ASC" },
       select: ["claim"],
   });
   }
