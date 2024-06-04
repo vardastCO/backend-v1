@@ -83,6 +83,7 @@ export class SellerResolver {
   ) {
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
+    console.log('REDER',referer)
     let client = false 
     if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
       client = true
