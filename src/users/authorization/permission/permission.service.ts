@@ -47,7 +47,7 @@ export class PermissionService {
     
     return await Permission.find({
       order: { id: "ASC" },
-      groupBy: ["claim"],
+      select: ["claim"],
   });
   }
 
