@@ -11,6 +11,7 @@ import { LogoutResponse } from "./dto/logout.response";
 import { RefreshInput } from "./dto/refresh.input";
 import { RefreshResponse } from "./dto/refresh.response";
 import { GqlAuthGuard } from "./guards/gql-auth.guard";
+import { CurrentType } from "./decorators/current-type.decorator";
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
@@ -61,7 +62,8 @@ export class AuthResolver {
   }
 
   @Query(() => User)
-  whoAmI(@CurrentUser() user: User) {
+  whoAmI(@CurrentUser() user: User, @CurrentType() type: string) {
+    console.log('y',type)
     return this.authService.whoAmI(user);
   }
 
