@@ -378,7 +378,7 @@ export class SellerService {
   }
 
   async remove(id: number): Promise<Seller> {
-    const seller: Seller = await this.findOne(id);
+    const seller: Seller = await this.findOne(id,true);
     await seller.remove();
     seller.id = id;
     return seller;
