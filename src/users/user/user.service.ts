@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { filterObject } from "src/base/utilities/helpers";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Cache } from "cache-manager";
 import { Country } from "src/base/location/country/entities/country.entity";
@@ -104,11 +105,24 @@ export class UserService {
     indexUserInput?: IndexUserInput,
   ): Promise<PaginationUserResponse> {
     indexUserInput.boot();
-    const { take, skip, status, displayRoleId } = indexUserInput || {};
+    const {
+      take,
+      skip,
+
+    } = indexUserInput || {};
+    const whereConditions: any = {}
+    if (indexUserInput.status) {
+      whereConditions['status'] = indexUserInput.status
+    }
+  
+    if (indexUserInput.roleIds && indexUserInput.roleIds.length > 0) {
+      whereConditions.roles = { id: In(indexUserInput.roleIds) };
+    }
+  
     const [data, total] = await User.findAndCount({
       skip,
       take,
-      where: { status, displayRoleId },
+      where:whereConditions,
       order: { createdAt: "DESC", id: "DESC" },
     });
 

@@ -1,5 +1,5 @@
-import { Field, InputType } from "@nestjs/graphql";
-import { IsOptional } from "class-validator";
+import { Field, InputType,Int } from "@nestjs/graphql";
+import { IsOptional,IsArray,IsInt } from "class-validator";
 import { IndexInput } from "../../../base/utilities/dto/index.input";
 import { UserStatusesEnum } from "../enums/user-statuses.enum";
 
@@ -12,4 +12,10 @@ export class IndexUserInput extends IndexInput {
   @Field({ nullable: true })
   @IsOptional()
   displayRoleId?: number;
+
+  @Field(() => [Int], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  roleIds?: number[];
 }
