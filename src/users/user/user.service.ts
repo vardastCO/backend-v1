@@ -123,7 +123,7 @@ export class UserService {
       skip,
       take,
       where:whereConditions,
-      order: { createdAt: "DESC", id: "DESC" },
+      order: { id: "DESC" },
     });
 
     return PaginationUserResponse.make(indexUserInput, total, data);
