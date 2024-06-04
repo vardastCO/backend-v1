@@ -297,6 +297,7 @@ export class AuthService {
     return this.jwtService.sign({
       uuid: user.uuid,
       sid: session.id,
+      type:'LEGAL'
     });
   }
 
@@ -305,6 +306,7 @@ export class AuthService {
       {
         uuid: user.uuid,
         sid: session.id,
+        type:'LEGAL'
       },
       {
         expiresIn: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),

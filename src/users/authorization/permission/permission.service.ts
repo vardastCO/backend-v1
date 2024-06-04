@@ -5,6 +5,7 @@ import { IndexPermissionInput } from "./dto/index-permission.input";
 import { PaginationPermissionResponse } from "./dto/pagination-permission.response";
 import { UpdatePermissionInput } from "./dto/update-permission.input";
 import { Permission } from "./entities/permission.entity";
+import { DataSource } from "typeorm";
 
 // @Injectable()
 export class PermissionService {
@@ -45,11 +46,10 @@ export class PermissionService {
   async allClaim(
   ): Promise<Permission[]> {
     
-    const uniqueClaims = await Permission.createQueryBuilder("permission")
-    .select("DISTINCT permission.claim", "claim")
-    .getRawMany();
-
-    return uniqueClaims.map((entry) => entry.claim);
+    return await Permission.find({
+      select: ["claim"],
+      unique:true
+  });
   }
 
   async findOne(id: number, name?: string): Promise<Permission> {
