@@ -21,6 +21,7 @@ import { SuggestResponseV2 } from "./dto/suggest.response-v2";
 import { ProductEntity } from "src/products/product/entities/product-service.entity";
 import { Like } from "typeorm";
 import { suggestvalue } from "./constants/suggestConstants";
+import { SellerType } from "src/products/seller/enums/seller-type.enum";
 
 @Injectable()
 export class SearchService {
@@ -203,6 +204,9 @@ export class SearchService {
     const fieldsString = `COALESCE(name, '') || ' '`;
     return Seller.createQueryBuilder()
       .where("name ILIKE :query", { query: `%${query}%` })
+      .where({
+        sellerType : SellerType.ONLINE || SellerType.NORMAL
+      })
       .orderBy(
         `ts_rank_cd(to_tsvector(${fieldsString}), websearch_to_tsquery(:query))`,
         "DESC",
