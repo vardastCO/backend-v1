@@ -33,6 +33,7 @@ import { UpdateSellerInput } from "./dto/update-seller.input";
 import { SellerRepresentative } from "./entities/seller-representative.entity";
 import { Seller } from "./entities/seller.entity";
 import { SellerRepresentativeRoles } from "./enums/seller-representative-roles.enum";
+import { SellerType } from "./enums/seller-type.enum";
 
 @Injectable()
 export class SellerService {
@@ -549,7 +550,7 @@ export class SellerService {
     const repUserRoles = await user.roles;
     repUserRoles.push(await Role.findOneBy({ name: "seller" }));
     user.roles = Promise.resolve(repUserRoles);
-
+    seller.sellerType = SellerType.NORMAL
     await seller.save();
     await user.save();
 

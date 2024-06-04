@@ -17,6 +17,10 @@ import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
 import { OrderOfferStatuses } from "./enums/order-offer-statuses";
 import { PreOrderStatus } from "../enums/pre-order-states.enum";
 import { TypeOrderOffer } from "../enums/type-order-offer.enum";
+import { Seller } from "src/products/seller/entities/seller.entity";
+import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
+import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
+import { ContactInfoTypes } from "src/users/contact-info/enums/contact-info-types.enum";
 
 @Injectable()
 export class OrderOfferService {
@@ -27,9 +31,8 @@ export class OrderOfferService {
 
   
   async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer) {
-      const findTempSeller = await TempSeller.findOneBy({
-        phone: addSellerOrderOffer.phone,
-        cellphone:addSellerOrderOffer.cellphone
+      const findTempSeller = await Seller.findOneBy({
+        name: `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`,
       })
       
 
@@ -41,12 +44,26 @@ export class OrderOfferService {
         }
       });
       if (!findTempSeller) {
-        const temp: TempSeller = TempSeller.create<TempSeller>(addSellerOrderOffer);
-        offer.tempSellerId = temp.id
-        offer.request_name = temp.seller_name
-        await temp.save();
+        let seller: Seller = new Seller()
+        seller.name = `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`
+        await seller.save()
+        let PhoneContact = new ContactInfo()
+        PhoneContact.relatedId = seller.id
+        PhoneContact.relatedType = ContactInfoRelatedTypes.SELLER
+        PhoneContact.type = ContactInfoTypes.TEL
+        PhoneContact.number = addSellerOrderOffer.phone
+        await PhoneContact.save()
+        let CellContact = new ContactInfo()
+        CellContact.relatedType = ContactInfoRelatedTypes.SELLER
+        PhoneContact.relatedId = seller.id
+        CellContact.type = ContactInfoTypes.MOBILE
+        CellContact.number = addSellerOrderOffer.cellphone
+        await CellContact.save()
+        offer.sellerId = seller.id
+        offer.request_name = seller.name
+        ;
       } else {
-        offer.tempSellerId = findTempSeller.id
+        offer.sellerId = findTempSeller.id
         offer.request_name = findTempSeller.seller_name
       }
     
