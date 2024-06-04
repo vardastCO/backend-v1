@@ -47,8 +47,7 @@ export class PermissionService {
   ): Promise<Permission[]> {
     
     return await Permission.find({
-      select: ["claim"],
-      unique:true
+      select: ["claim"]      
   });
   }
 
