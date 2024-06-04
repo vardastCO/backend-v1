@@ -7,6 +7,7 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Context,
 } from "@nestjs/graphql";
 import { Address } from "src/users/address/entities/address.entity";
 import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
@@ -76,8 +77,17 @@ export class SellerResolver {
   @Public()
   // @Permission("gql.products.seller.show")
   @Query(() => Seller, { name: "seller" })
-  findOne(@Args("id", { type: () => Int, nullable: true }) id: number) {
-    return this.sellerService.findOne(id);
+  findOne(@Args("id", { type: () => Int, nullable: true },
+  ) id: number,
+  @Context() context?: { req: Request }
+  ) {
+    const request = context?.req;
+    const referer = request.headers['origin'] ?? null;
+    let client = false 
+    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
+      client = true
+    }
+    return this.sellerService.findOne(id,client);
   }
 
   @Permission("gql.products.seller.update")

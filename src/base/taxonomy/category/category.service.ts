@@ -48,7 +48,6 @@ export class CategoryService {
     const cachedResult = await this.cacheManager.get<Category[]>(cacheKey);
   
     if (cachedResult) {
-      // Return the cached result if available
       return cachedResult;
     }
 

@@ -228,7 +228,7 @@ export class SellerService {
     return lastOffer ? [lastOffer] : [];
   }
   
-  async findOne(id: number): Promise<Seller> {
+  async findOne(id: number,client:true): Promise<Seller> {
     try {
       // this.logSellerView(id);
       const cacheKey = `seller_${JSON.stringify(id)}`;
@@ -267,7 +267,11 @@ export class SellerService {
       } catch (e) {
         throw e
       }
-      
+      if (client) {
+        if (seller.sellerType == SellerType.OFFLINE || SellerType.EXTENDED) {
+           return 
+        }
+      }
       return seller;
 
     } catch (e) {
