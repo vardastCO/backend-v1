@@ -82,6 +82,7 @@ export class SellerResolver {
   @Context() context?: { req: Request }
   ) {
     const request = context?.req;
+    console.log('request',request)
     const referer = request.headers['origin'] ?? null;
     console.log('REDER',referer)
     let client = false 
