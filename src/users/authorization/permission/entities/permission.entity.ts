@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { Role } from "../../role/entities/role.entity";
 import { PermissionActionsEnum } from "../enums/permission-actions.enum";
+import { PermissionClaimEnum } from "../enums/permission-claim.enum";
 
 @ObjectType()
 @Entity("users_authorization_permissions")
@@ -37,6 +38,13 @@ export class Permission extends BaseEntity {
   @Field({ nullable: true })
   @Column({ nullable: true })
   field?: string;
+
+  @Field(() => PermissionClaimEnum)
+  @Column("enum", {
+    enum: PermissionClaimEnum,
+    default: PermissionClaimEnum.GENERAL,
+  })
+  claim: PermissionClaimEnum;
 
   @Field(() => GraphQLJSON, { nullable: true })
   @Column("jsonb", { nullable: true })

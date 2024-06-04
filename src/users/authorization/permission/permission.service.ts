@@ -42,6 +42,15 @@ export class PermissionService {
     return PaginationPermissionResponse.make(indexPermissionInput, total, data);
   }
 
+  async allClaim(
+  ): Promise<Permission[]> {
+    
+    return await Permission.find({
+      order: { id: "ASC" },
+      groupBy: ["claim"],
+  });
+  }
+
   async findOne(id: number, name?: string): Promise<Permission> {
     const permission = await this.permissionRepository.findOneBy({ id, name });
     if (!permission) {
