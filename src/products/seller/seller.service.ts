@@ -228,7 +228,7 @@ export class SellerService {
     return lastOffer ? [lastOffer] : [];
   }
   
-  async findOne(id: number,client:true): Promise<Seller> {
+  async findOne(id: number,client:boolean): Promise<Seller> {
     try {
       // this.logSellerView(id);
       const cacheKey = `seller_${JSON.stringify(id)}`;
