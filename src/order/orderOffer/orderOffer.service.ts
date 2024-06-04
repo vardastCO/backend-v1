@@ -64,7 +64,7 @@ export class OrderOfferService {
         ;
       } else {
         offer.sellerId = findTempSeller.id
-        offer.request_name = findTempSeller.seller_name
+        offer.request_name = findTempSeller.name
       }
     
      
