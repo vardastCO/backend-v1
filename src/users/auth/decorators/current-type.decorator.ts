@@ -5,8 +5,7 @@ import { verify } from "argon2";
 export const CurrentType = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const ctx = GqlExecutionContext.create(context);
-    const request = ctx.switchToHttp().getRequest();
-
+    const request = context?.req;
     const authHeader = request.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
       throw new UnauthorizedException('Unauthorized');
