@@ -153,6 +153,7 @@ export class AuthService {
       refreshToken: this._generateNewRefreshToken(newUser, session),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user: newUser,
+      type:"legal",
       abilities: userWholePermissions,
     };
   }
