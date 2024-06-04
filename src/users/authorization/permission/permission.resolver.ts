@@ -38,7 +38,7 @@ export class PermissionResolver {
   }
 
   @PermissionGuard("gql.users.authorization.permission.index")
-  @Query(() => [Permission], { name: "permissions" })
+  @Query(() => [Permission], { name: "allClaim" })
   allClaim() {
     return this.permissionService.allClaim();
   }
