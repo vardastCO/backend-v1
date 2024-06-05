@@ -16,6 +16,7 @@ import { PaginationPermissionResponse } from "./dto/pagination-permission.respon
 import { UpdatePermissionInput } from "./dto/update-permission.input";
 import { Permission } from "./entities/permission.entity";
 import { PermissionService } from "./permission.service";
+import { PermissionClaimEnum } from "./enums/permission-claim.enum";
 
 @Resolver(() => Permission)
 export class PermissionResolver {
@@ -38,9 +39,10 @@ export class PermissionResolver {
   }
 
   @PermissionGuard("gql.users.authorization.permission.index")
-  @Query(() => [Permission], { name: "allClaim" })
+  @Query(() => [PermissionClaimEnum], { name: "allClaim" }) 
   allClaim() {
-    return this.permissionService.allClaim();
+    const allClaims = Object.values(PermissionClaimEnum); 
+    return allClaims;
   }
 
   @PermissionGuard("gql.users.authorization.permission.show")
