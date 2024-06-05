@@ -129,8 +129,13 @@ export class UserService {
   }
 
   async findOne(id: number, uuid?: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id, uuid });
-
+    const user = await User.findOne({
+      where: {
+        id: id,
+        uuid: uuid,
+      },
+      relations: ['roles.permissions'],
+    })
     if (!user) {
       throw new NotFoundException();
     }
