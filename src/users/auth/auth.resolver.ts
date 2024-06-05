@@ -12,6 +12,7 @@ import { RefreshInput } from "./dto/refresh.input";
 import { RefreshResponse } from "./dto/refresh.response";
 import { GqlAuthGuard } from "./guards/gql-auth.guard";
 import { CurrentType } from "./decorators/current-type.decorator";
+import { ChangeNumberInput } from "./dto/change-number.input";
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
@@ -38,6 +39,15 @@ export class AuthResolver {
     );
   }
 
+  @Mutation(() => LoginResponse)
+  @Public()
+  changeNumberWithOtp(@Args("loginOTPInput") changeNumberInput: ChangeNumberInput, @Context() context) {
+    return this.authService.changeNumberWithOtp(
+      changeNumberInput,
+      context.req.ip,
+      this._getAgentFromHeader(context),
+    );
+  }
   @Mutation(() => RefreshResponse)
   @Public()
   refresh(

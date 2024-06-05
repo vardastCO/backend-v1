@@ -19,6 +19,7 @@ import { RefreshResponse } from "./dto/refresh.response";
 import { OneTimePassword } from "../registration/entities/one-time-password.entity";
 import { OneTimePasswordStates } from "../registration/enums/one-time-password-states.enum";
 import { OneTimePasswordTypes } from "../registration/enums/one-time-password-types.enum";
+import { ChangeNumberInput } from "./dto/change-number.input";
 
 @Injectable()
 export class AuthService {
@@ -157,7 +158,70 @@ export class AuthService {
       abilities: userWholePermissions,
     };
   }
+  async changeNumberWithOtp(
+    changeNumberInput: ChangeNumberInput,
+    requestIP: string,
+    agent: string,
+  ): Promise<LoginResponse> {
+    const now = new Date();
+    now.setSeconds(
+      now.getSeconds() -
+      OneTimePassword.SIGNUP_DEADLINE_AFTER_VALIDATION_SECONDS,
+    );
+    const lastRecentValidatedOtp = await OneTimePassword.createQueryBuilder()
+      .where({
+        id: changeNumberInput.validationKey,
+        state: OneTimePasswordStates.VALIDATED,
+        type: OneTimePasswordTypes.AUTH_SMS_OTP,
+        requesterIp: requestIP,
+        validatedAt: MoreThanOrEqual(now),
+      })
+      .orderBy({ '"createdAt"': "DESC" })
+      .getOne();
+    
+  
+    if (!lastRecentValidatedOtp) {
+      throw new BadRequestException(
+        "token is not expired yet or is invalid altogether.",
+      );
+    }
+  
+    const user: User = await User.findOneBy({ cellphone: changeNumberInput.cellphone });
+    if (!user) {
+      throw new BadRequestException(
+        "user is not found yet or is invalid altogether.",
+      );
+    }
+    user.cellphone = changeNumberInput.cellphone_new
+    await user.save()
+    const userWholePermissions = await this.userService.cachePermissionsOf(
+      user,
+    );
 
+    let session = await Session.findOneBy({ userId: user.id });
+
+    if (!session) {
+      session = Session.create({
+        userId: user.id,
+        agent,
+        loginIp: requestIP,
+      });
+    
+      await session.save();
+    }
+
+    return {
+      accessToken: this._generateNewAccessToken(user, session),
+      accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
+      refreshToken: this._generateNewRefreshToken(user, session),
+      refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
+      user,
+      type:"LEGAL",
+      abilities: userWholePermissions,
+    };
+    
+  
+  }
 
   async login(
     user: User,
