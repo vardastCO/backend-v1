@@ -300,20 +300,16 @@ export class ProjectService {
     if (nameManager) {
       
       whereConditions['user'] = {
-        user: {
-          user: {
-            fullname : Like(`%${nameManager}%`)
-          }
+        user :  {
+          firstName : Like(`%${nameManager}%`)
         },
         type : TypeUserProject.MANAGER
       }
     }
     if (nameEmployer) {
-      whereConditions.user = {
-        user: {
-          user: {
-            fullname : Like(`%${nameEmployer}%`)
-          }
+      whereConditions['user'] = {
+        user :  {
+          firstName : Like(`%${nameEmployer}%`)
         },
         type : TypeUserProject.EMPLOYER
       }
