@@ -135,6 +135,7 @@ export class UserService {
       throw new NotFoundException();
     }
     const roles = await user.roles;
+    console.log('roles',roles)
     const permissions = roles.flatMap(role => role.permissions); 
     console.log('permissions',permissions)
     const uniqueClaims = [...new Set<string>(permissions.map(permission => permission.claim))];
