@@ -55,10 +55,10 @@ export class Project extends BaseEntity {
   user: Promise<UserProject[]>;
 
   
-  @Field(() => ThreeStateSupervisionStatuses)
-  @Column("enum", {
-    enum: ThreeStateSupervisionStatuses,
-    default: ThreeStateSupervisionStatuses.CONFIRMED,
-  })
-  status: ThreeStateSupervisionStatuses;
+  // @Field(() => ThreeStateSupervisionStatuses)
+  // @Column("enum", {
+  //   enum: ThreeStateSupervisionStatuses,
+  //   default: ThreeStateSupervisionStatuses.CONFIRMED,
+  // })
+  // status: ThreeStateSupervisionStatuses;
 }

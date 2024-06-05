@@ -36,8 +36,8 @@ export class IndexProjectInput extends IndexInput {
   @IsString()
   nameEmployer?: string;
 
-  @Field(() => ThreeStateSupervisionStatuses, { nullable: true })
-  @IsOptional()
-  @IsEnum(ThreeStateSupervisionStatuses)
-  status?: ThreeStateSupervisionStatuses;
+  // @Field(() => ThreeStateSupervisionStatuses, { nullable: true })
+  // @IsOptional()
+  // @IsEnum(ThreeStateSupervisionStatuses)
+  // status?: ThreeStateSupervisionStatuses;
 }

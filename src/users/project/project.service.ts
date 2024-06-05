@@ -296,9 +296,9 @@ export class ProjectService {
         { id: Like(`%${nameOrUuid}%`) },
       ];
     }
-    if (status) {
-      where.status = status;
-    }
+    // if (status) {
+    //   where.status = status;
+    // }
     if (nameManager) {
       where.user = {
         user :  {
