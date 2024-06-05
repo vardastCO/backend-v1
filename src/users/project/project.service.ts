@@ -16,7 +16,8 @@ import { In } from 'typeorm';
 import { I18n, I18nService } from "nestjs-i18n";
 import { PaginationProjectResponse } from "./dto/pagination-project.response";
 import { IndexProjectInput } from "./dto/index-project.input";
-
+import { TypeUserProject } from "./enums/type-user-project.enum";
+import { Like } from 'typeorm';
 @Injectable()
 export class ProjectService {
   constructor(
@@ -30,7 +31,7 @@ export class ProjectService {
       const userProject = new UserProject()
       userProject.userId = userId
       userProject.projectId = await project.id
-     
+      userProject.type = TypeUserProject.MANAGER
       await userProject.save();
       return project;
     }catch(e){
@@ -274,8 +275,48 @@ export class ProjectService {
     indexProjectInput: IndexProjectInput,
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
-    const { take, skip } = indexProjectInput || {};
+    const { take, skip, createTime, startTime, endTime ,nameOrUuid,status,nameManager,nameEmployer  } = indexProjectInput || {};
+    const where: any = {};
+
+    if (createTime) {
+      where.createTime = createTime;
+    }
+  
+    if (startTime) {
+      where.startTime = startTime;
+    }
+  
+    if (endTime) {
+      where.endTime = endTime;
+    }
+  
+    if (nameOrUuid) {
+      where.where = [
+        { name: Like(`%${nameOrUuid}%`) },
+        { id: Like(`%${nameOrUuid}%`) },
+      ];
+    }
+    if (status) {
+      where.status = status;
+    }
+    if (nameManager) {
+      where.user = {
+        user :  {
+          fullname : Like(`%${nameManager}%`)
+        },
+        type : TypeUserProject.MANAGER
+      }
+    }
+    if (nameEmployer) {
+      where.user = {
+        user :  {
+          fullname : Like(`%${nameEmployer}%`)
+        },
+        type : TypeUserProject.EMPLOYER
+      }
+    }
     const [data, total] = await Project.findAndCount({
+      where,
       take,
       skip,
     });

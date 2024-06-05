@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Project } from "./project.entity";
+import { TypeUserProject } from "../enums/type-user-project.enum";
 
 @ObjectType()
 @Entity("user_project")
@@ -33,6 +34,13 @@ export class UserProject extends BaseEntity {
   user: Promise<User>;
   @Column()
   userId: number;
+
+  @Field(() => TypeUserProject)
+  @Column("enum", {
+    enum: TypeUserProject,
+    default: TypeUserProject.EMPLOYER,
+  })
+  type: TypeUserProject;
 
 
 }
