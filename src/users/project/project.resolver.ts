@@ -17,7 +17,7 @@ import { ProjectService } from "./project.service";
 import { UpdateProjectUserInput } from "./dto/update-user-input";
 import { IndexProjectInput } from "./dto/index-project.input";
 import { PaginationProjectResponse } from "./dto/pagination-project.response";
-
+import { ValidationPipe } from "@nestjs/common";
 @Resolver(() => Project)
 export class ProjectResolver {
   constructor(private readonly projectService: ProjectService) {}
@@ -112,7 +112,12 @@ export class ProjectResolver {
   @Permission("gql.users.address.store")
   @Query(() => PaginationProjectResponse, { name: "projects" })
   Projects(
-    @Args("indexProjectInput") indexProjectInput: IndexProjectInput
+    @Args(
+      "indexProjectInput",
+      { nullable: true },
+      new ValidationPipe({ transform: true }),
+    )
+    indexProjectInput?: IndexProjectInput,
   ) {
     return this.projectService.paginate(indexProjectInput)
   }

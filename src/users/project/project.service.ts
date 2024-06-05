@@ -272,7 +272,7 @@ export class ProjectService {
 
 
   async paginate(
-    indexProjectInput: IndexProjectInput,
+    indexProjectInput?: IndexProjectInput,
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
     const { take, skip, createTime, startTime, endTime ,nameOrUuid,nameManager,nameEmployer  } = indexProjectInput || {};
