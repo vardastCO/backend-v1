@@ -275,7 +275,7 @@ export class ProjectService {
     indexProjectInput: IndexProjectInput,
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
-    const { take, skip, createTime, startTime, endTime ,nameOrUuid,status,nameManager,nameEmployer  } = indexProjectInput || {};
+    const { take, skip, createTime, startTime, endTime ,nameOrUuid,nameManager,nameEmployer  } = indexProjectInput || {};
     const where: any = {};
 
     if (createTime) {
