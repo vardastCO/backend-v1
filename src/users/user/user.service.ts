@@ -136,8 +136,10 @@ export class UserService {
     }
     const roles = await user.roles;
     const permissions = roles.flatMap(role => role.permissions); 
+    console.log('permissions',permissions)
     const uniqueClaims = [...new Set<string>(permissions.map(permission => permission.claim))];
-    user.claims = uniqueClaims;
+    console.log('uniquie',uniqueClaims)
+    user.claims = uniqueClaims.length > 0 ? uniqueClaims : [];
     return user;
   }
 
