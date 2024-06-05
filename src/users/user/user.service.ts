@@ -108,7 +108,6 @@ export class UserService {
     const {
       take,
       skip,
-
     } = indexUserInput || {};
     const whereConditions: any = {}
     if (indexUserInput.status) {
@@ -131,9 +130,12 @@ export class UserService {
 
   async findOne(id: number, uuid?: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ id, uuid });
+
     if (!user) {
       throw new NotFoundException();
     }
+    const uniqueClaims = [...new Set(user.role.permissions.map(permission => permission.claim))]; 
+    user.claims = uniqueClaims;
     return user;
   }
 
