@@ -279,38 +279,41 @@ export class ProjectService {
     const whereConditions: any = {};
 
     if (createTime) {
-      whereConditions.createTime = createTime;
+      whereConditions['createTime'] = createTime;
     }
   
     if (startTime) {
-      whereConditions.startTime = startTime;
+      whereConditions['startTime'] = startTime;
     }
   
     if (endTime) {
-      whereConditions.endTime = endTime;
+      whereConditions['endTime'] = endTime;
     }
   
     if (nameOrUuid) {
-      whereConditions.where = [
-        { name: Like(`%${nameOrUuid}%`) },
-        { id: Like(`%${nameOrUuid}%`) },
-      ];
+      whereConditions['name'] =  Like(`%${nameOrUuid}%`)
+
     }
     // if (status) {
     //   where.status = status;
     // }
     if (nameManager) {
-      whereConditions.user = {
-        user :  {
-          fullname : Like(`%${nameManager}%`)
+      
+      whereConditions['user'] = {
+        user: {
+          user: {
+            fullname : Like(`%${nameManager}%`)
+          }
         },
         type : TypeUserProject.MANAGER
       }
     }
     if (nameEmployer) {
       whereConditions.user = {
-        user :  {
-          fullname : Like(`%${nameEmployer}%`)
+        user: {
+          user: {
+            fullname : Like(`%${nameEmployer}%`)
+          }
         },
         type : TypeUserProject.EMPLOYER
       }
