@@ -276,22 +276,22 @@ export class ProjectService {
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
     const { take, skip, createTime, startTime, endTime ,nameOrUuid,nameManager,nameEmployer  } = indexProjectInput || {};
-    const where: any = {};
+    const whereConditions: any = {};
 
     if (createTime) {
-      where.createTime = createTime;
+      whereConditions.createTime = createTime;
     }
   
     if (startTime) {
-      where.startTime = startTime;
+      whereConditions.startTime = startTime;
     }
   
     if (endTime) {
-      where.endTime = endTime;
+      whereConditions.endTime = endTime;
     }
   
     if (nameOrUuid) {
-      where.where = [
+      whereConditions.where = [
         { name: Like(`%${nameOrUuid}%`) },
         { id: Like(`%${nameOrUuid}%`) },
       ];
@@ -300,7 +300,7 @@ export class ProjectService {
     //   where.status = status;
     // }
     if (nameManager) {
-      where.user = {
+      whereConditions.user = {
         user :  {
           fullname : Like(`%${nameManager}%`)
         },
@@ -308,7 +308,7 @@ export class ProjectService {
       }
     }
     if (nameEmployer) {
-      where.user = {
+      whereConditions.user = {
         user :  {
           fullname : Like(`%${nameEmployer}%`)
         },
@@ -316,7 +316,7 @@ export class ProjectService {
       }
     }
     const [data, total] = await Project.findAndCount({
-      where,
+      where:whereConditions ,
       take,
       skip,
     });
