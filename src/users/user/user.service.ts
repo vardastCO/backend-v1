@@ -134,7 +134,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException();
     }
-    const uniqueClaims = [...new Set(user.role.permissions.map(permission => permission.claim))]; 
+    const uniqueClaims = [...new Set<string>(user.roles.permissions.map(permission => permission.claim))]; 
     user.claims = uniqueClaims;
     return user;
   }
