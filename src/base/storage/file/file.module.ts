@@ -5,9 +5,10 @@ import { PublicFileController } from "./public-file.controller";
 import { PublicFileService } from "./public-file.service";
 import { AppFileController } from "./app-file.controller";
 import { OrderFileController } from "./order-file.controller";
+import { PreOrderFileController } from "./pre-order-file.controller";
 
 @Module({
-  controllers: [PublicFileController,AppFileController,OrderFileController],
+  controllers: [PublicFileController,AppFileController,OrderFileController,PreOrderFileController],
   providers: [PublicFileService, FileResolver, FileService],
   exports: [FileService],
 })
