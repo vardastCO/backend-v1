@@ -10,26 +10,19 @@ import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statu
 @Controller("pre/order/file")
 export class PreOrderFileController {
   @Public()
-  @Get(':uuid')
-  async getOrderFiles(@Param("uuid") uuid: string, @Res() res: Response): Promise<void> {
+  @Get(':id')
+  async getOrderFiles(@Param("uuid") id: string, @Res() res: Response): Promise<void> {
   
     const templateURL = 'https://storage.vardast.com/vardast/order/pre-invoice-template.html';
 
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
-      const order = await PreOrder.findOneBy({
-        uuid,
-        status: PreOrderStatus.CLOSED
-      })
-      console.log('order',order)
-      if (!order) {
-        res.send('not found')
-      }
+
 
       const offer = await OfferOrder.findOne({
         where: {
-          preOrderId: order.id ,
+          id: id ,
           status : OrderOfferStatuses.CLOSED
         },
         relations: ["preOrder.user","preOrder.address","offerLine"],
