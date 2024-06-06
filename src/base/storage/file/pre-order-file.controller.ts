@@ -51,6 +51,8 @@ export class PreOrderFileController {
         buyerAddress: (await (await offer.preOrder).address).address,
         items: await items,
         totalAmount: offer.total,
+        totalTax: offer.total_tax,
+        totalFi: offer.total_fi,
         instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.',
         instructions2: 'کالای فروخته شده و تحویل داده شده توسط فروشنده به شرح جدول فوق تا زمان تسویه حساب کامل به صورت امانت نزد خریدار می باشد.'
       
@@ -67,7 +69,7 @@ export class PreOrderFileController {
   }
 
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
+    const { date, invoiceNumber, sellerAddress, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
     const itemsHTML = items.map((item, index) => `
       <tr>
         <td>${index+1}</td>
@@ -114,8 +116,8 @@ export class PreOrderFileController {
                    .replace('{{buyerPhone}}', '09124484707')
                     .replace('{{grandTotal}}', grandTotal)
                     .replace('{{totalUOM}}', '0')
-                    .replace('{{totalFi}}', '0')
-                    .replace('{{totalTAX}}', '0')
+                    .replace('{{totalFi}}', totalFi)
+                    .replace('{{totalTAX}}', totalTax)
                    .replace('{{persianTotal}}', `${persianTotal}`)
                   .replace('{{instructions_sheba}}', instructions)
                   .replace('{{instructions_expire}}', instructions2);
