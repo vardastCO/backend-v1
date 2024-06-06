@@ -42,7 +42,7 @@ export class PreOrderFileController {
     })));
      
       const data = {
-        date: (await offer.preOrder).request_date,
+        date: (await offer.preOrder).request_date.toLocaleDateString('fa-IR'),
         invoiceNumber: (await offer.preOrder).uuid,
         sellerAddress: 'بلوار کاوه، نرسیده به خیابان دولت، نبش کوچه اخلاقی غربی، پلاك 12,1 طبقه 2 واحد 4',
         sellerNationalId: '14011385876',  
@@ -116,8 +116,8 @@ export class PreOrderFileController {
                    .replace('{{buyerPhone}}', '09124484707')
                     .replace('{{grandTotal}}', grandTotal)
                     .replace('{{totalUOM}}', '0')
-                    .replace('{{totalFi}}', totalFi)
-                    .replace('{{totalTAX}}', totalTax)
+                    .replace('{{totalFi}}',  addCommas(totalFi))
+                    .replace('{{totalTAX}}', addCommas(totalTax))
                    .replace('{{persianTotal}}', `${persianTotal}`)
                   .replace('{{instructions_sheba}}', instructions)
                   .replace('{{instructions_expire}}', instructions2);
