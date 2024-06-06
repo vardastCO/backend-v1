@@ -1,4 +1,4 @@
-import { Controller, Get, Res, Param, } from "@nestjs/common";
+import { Controller, Get, Res, Param } from "@nestjs/common";
 import { Response } from "express";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import axios from 'axios';
@@ -11,7 +11,7 @@ import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statu
 export class PreOrderFileController {
   @Public()
   @Get(':id')
-  async getOrderFiles(@Param("uuid") id: string, @Res() res: Response): Promise<void> {
+  async getOrderFiles(@Param("uuid") id: number, @Res() res: Response): Promise<void> {
   
     const templateURL = 'https://storage.vardast.com/vardast/order/pre-invoice-template.html';
 
