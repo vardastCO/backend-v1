@@ -46,7 +46,7 @@ export class OrderOfferResolver {
     @Args("addSellerOrderOffer") addSellerOrderOffer: AddSellerOrderOffer,
     @CurrentUser() user: User
   ) {
-    return this.orderOfferService.addSellerOrderOffer(addSellerOrderOffer);
+    return this.orderOfferService.addSellerOrderOffer(addSellerOrderOffer,user);
   }
 
   @Permission("gql.users.address.store")

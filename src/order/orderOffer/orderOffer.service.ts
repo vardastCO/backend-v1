@@ -30,7 +30,7 @@ export class OrderOfferService {
      { }
 
   
-  async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer) {
+  async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer,user:User) {
       const findTempSeller = await Seller.findOneBy({
         name: `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`,
       })
@@ -46,6 +46,7 @@ export class OrderOfferService {
       if (!findTempSeller) {
         let seller: Seller = new Seller()
         seller.name = `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`
+        seller.createdById = user.id
         await seller.save()
         let PhoneContact = new ContactInfo()
         PhoneContact.relatedId = seller.id
