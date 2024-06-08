@@ -32,7 +32,7 @@ export class OrderOfferService {
     return Math.floor(Math.random() * (max - min + 1) + min).toString();
    }
   
-  async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer) {
+  async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer,user:User) {
       const findTempSeller = await Seller.findOneBy({
         name: `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`,
       })
@@ -48,16 +48,19 @@ export class OrderOfferService {
       if (!findTempSeller) {
         let seller: Seller = new Seller()
         seller.name = `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`
+        seller.createdById = user.id
         await seller.save()
         let PhoneContact = new ContactInfo()
         PhoneContact.relatedId = seller.id
         PhoneContact.relatedType = ContactInfoRelatedTypes.SELLER
+        PhoneContact.title = 'تلفن'
         PhoneContact.type = ContactInfoTypes.TEL
         PhoneContact.number = addSellerOrderOffer.phone
         await PhoneContact.save()
         let CellContact = new ContactInfo()
         CellContact.relatedType = ContactInfoRelatedTypes.SELLER
         PhoneContact.relatedId = seller.id
+        PhoneContact.title = 'موبایل'
         CellContact.type = ContactInfoTypes.MOBILE
         CellContact.number = addSellerOrderOffer.cellphone
         await CellContact.save()
