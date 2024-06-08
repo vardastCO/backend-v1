@@ -1,17 +1,14 @@
-import { Controller, Get, Res, Param } from "@nestjs/common";
-import { Response } from "express";
-import { Public } from "src/users/auth/decorators/public.decorator";
+import { Controller, Get, Param, Res } from "@nestjs/common";
+import { addCommas, numberToWords } from "@persian-tools/persian-tools";
 import axios from 'axios';
+import { Response } from "express";
 import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
-import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
-import { addCommas,numberToWords } from "@persian-tools/persian-tools";
-import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
-import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
+import { Public } from "src/users/auth/decorators/public.decorator";
 @Controller("pre/order/file")
 export class PreOrderFileController {
   @Public()
-  @Get(':id')
-  async getOrderFiles(@Param("id") id: number, @Res() res: Response): Promise<void> {
+  @Get(':uuid')
+  async getOrderFiles(@Param("uuid") uuid: string, @Res() res: Response): Promise<void> {
   
     const templateURL = 'https://storage.vardast.com/vardast/order/pre-invoice-template.html';
 
@@ -19,10 +16,10 @@ export class PreOrderFileController {
       const response = await axios.get(templateURL);
       const template = response.data;
 
-     console.log('id')
+     console.log('uuid')
       const offer = await OfferOrder.findOne({
         where: {
-          id: id ,
+          uuid: uuid ,
         },
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
@@ -30,17 +27,22 @@ export class PreOrderFileController {
       if (!offer) {
         res.send('not found')
       }
-      const items = await Promise.all((await offer.offerLine).map(async (offer) => ({
-        id:(await offer.line).id,
-        name: (await offer.line).item_name,
-        description: '',
-        uom: (await offer.line).uom,
-        qty: (await offer.line).qty,
-        unitPrice: offer.fi_price,
-        tax_price: offer.tax_price,
-        totalPrice: offer.total_price,
-    })));
-     
+      let totalQty = 0;
+      const items = await Promise.all((await offer.offerLine).map(async (offer) => {
+        const data = {
+          id:(await offer.line).id,
+          name: (await offer.line).item_name,
+          description: '',
+          uom: (await offer.line).uom,
+          qty: (await offer.line).qty,
+          unitPrice: offer.fi_price,
+          tax_price: offer.tax_price,
+          totalPrice: offer.total_price,
+        }
+        totalQty = totalQty + parseInt(data.qty)
+        return data;
+       }));
+
       const data = {
         date: new Date((await offer.preOrder).request_date).toLocaleDateString('fa-IR'),
         invoiceNumber: (await offer.preOrder).uuid,
@@ -54,8 +56,8 @@ export class PreOrderFileController {
         totalTax: offer.total_tax,
         totalFi: offer.total_fi,
         instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.',
-        instructions2: 'کالای فروخته شده و تحویل داده شده توسط فروشنده به شرح جدول فوق تا زمان تسویه حساب کامل به صورت امانت نزد خریدار می باشد.'
-      
+        instructions2: 'کالای فروخته شده و تحویل داده شده توسط فروشنده به شرح جدول فوق تا زمان تسویه حساب کامل به صورت امانت نزد خریدار می باشد.',
+        totalQty
       
       };
       const invoiceHTML = this.injectDataIntoTemplate(template, data);
@@ -69,7 +71,7 @@ export class PreOrderFileController {
   }
 
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, sellerAddress, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
+    const { date, invoiceNumber, totalQty, sellerAddress, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
     const itemsHTML = items.map((item, index) => `
       <tr>
         <td>${index+1}</td>
@@ -115,7 +117,7 @@ export class PreOrderFileController {
                    .replace('{{buyerNationalId}}', '1111111')
                    .replace('{{buyerPhone}}', '09124484707')
                     .replace('{{grandTotal}}', grandTotal)
-                    .replace('{{totalUOM}}', '0')
+                    .replace('{{totalUOM}}', totalQty)
                     .replace('{{totalFi}}',  addCommas(totalFi))
                     .replace('{{totalTAX}}', addCommas(totalTax))
                    .replace('{{persianTotal}}', `${persianTotal}`)
