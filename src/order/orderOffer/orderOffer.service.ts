@@ -51,12 +51,14 @@ export class OrderOfferService {
         let PhoneContact = new ContactInfo()
         PhoneContact.relatedId = seller.id
         PhoneContact.relatedType = ContactInfoRelatedTypes.SELLER
+        PhoneContact.title = 'تلفن'
         PhoneContact.type = ContactInfoTypes.TEL
         PhoneContact.number = addSellerOrderOffer.phone
         await PhoneContact.save()
         let CellContact = new ContactInfo()
         CellContact.relatedType = ContactInfoRelatedTypes.SELLER
         PhoneContact.relatedId = seller.id
+        PhoneContact.title = 'موبایل'
         CellContact.type = ContactInfoTypes.MOBILE
         CellContact.number = addSellerOrderOffer.cellphone
         await CellContact.save()
