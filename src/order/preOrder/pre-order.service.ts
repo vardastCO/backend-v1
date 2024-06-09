@@ -33,7 +33,7 @@ export class PreOrderService {
       try {
         let order = await PreOrder.findOneBy({
           userId : user.id,
-          status : PreOrderStatus.CREATED
+          status : PreOrderStatus.PENDING_INFO
         });
         if (order) {
           return order
@@ -136,12 +136,14 @@ export class PreOrderService {
     }
 
     let preOrderAddress = await preOrder.address;
+    // let preOrderFile = await preOrder.files;
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
+    // let isHaveFile = (preOrderFile?.length > 0) ?? false;
     const updateCurrentStatusByCommingProps = {
-      [PreOrderStatus.CREATED]: PreOrderStatus.PENDING_INFO,
-      [PreOrderStatus.PENDING_INFO]: isHaveAddress ? PreOrderStatus.PENDING_LINE : PreOrderStatus.PENDING_INFO,
-      [PreOrderStatus.PENDING_LINE]: (await preOrder.lines).length > 0 ? PreOrderStatus.VERIFIED : PreOrderStatus.PENDING_LINE,
-      [PreOrderStatus.VERIFIED]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStatus.VERIFIED : PreOrderStatus.PENDING_LINE,
+      [PreOrderStatus.PENDING_INFO]: PreOrderStatus.PENDING_INFO,
+      [PreOrderStatus.PENDING_PRODUCT]: isHaveAddress ? PreOrderStatus.PENDING_PRODUCT : PreOrderStatus.PENDING_INFO,
+      // [PreOrderStatus.VERIFY_FILE]: isHaveFile ? PreOrderStatus.PENDING_ADMIN : PreOrderStatus.PENDING_INFO,
+      [PreOrderStatus.COMPLITED]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStatus.COMPLITED : PreOrderStatus.PENDING_PRODUCT,
     }
     
 

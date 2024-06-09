@@ -63,8 +63,7 @@ export class OrderOfferService {
         CellContact.number = addSellerOrderOffer.cellphone
         await CellContact.save()
         offer.sellerId = seller.id
-        offer.request_name = seller.name
-        ;
+        offer.request_name = seller.name;
       } else {
         offer.sellerId = findTempSeller.id
         offer.request_name = findTempSeller.name
@@ -72,7 +71,7 @@ export class OrderOfferService {
     
      
       offer.type = TypeOrderOffer.SELLER
-      offer.status = OrderOfferStatuses.CONFIRMED
+      offer.status = OrderOfferStatuses.INVOICE
     
       await offer.save()
 
@@ -88,7 +87,7 @@ export class OrderOfferService {
             preOrder :  {
               id : createOrderOfferInput.preOrderId
             },
-            status: OrderOfferStatuses.PENDING
+            status: OrderOfferStatuses.PENDING_PRICE
           },
           relations: ['offerLine'],
           order: {
@@ -270,7 +269,7 @@ export class OrderOfferService {
         }
       });
       offerOrder.status =
-        updateOrderOfferInput.status as OrderOfferStatuses ?? OrderOfferStatuses.PENDING
+        updateOrderOfferInput.status as OrderOfferStatuses ?? OrderOfferStatuses.PENDING_PRICE
       await offerOrder.save()
       if (updateOrderOfferInput.status === OrderOfferStatuses.CLOSED) {
         const preOrder = await offerOrder.preOrder;

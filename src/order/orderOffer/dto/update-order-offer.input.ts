@@ -10,11 +10,11 @@ export class UpdateOrderOfferInput {
   id: number;
 
   @Field(() => OrderOfferStatuses, {
-    defaultValue: OrderOfferStatuses.CONFIRMED,
+    defaultValue: OrderOfferStatuses.PENDING_PRICE,
     nullable: true,
   })
   @IsNotEmpty()
   @IsEnum(OrderOfferStatuses)
-  status?: OrderOfferStatuses = OrderOfferStatuses.CONFIRMED;
+  status?: OrderOfferStatuses = OrderOfferStatuses.PENDING_PRICE;
   
 }

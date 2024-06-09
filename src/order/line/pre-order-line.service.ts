@@ -30,8 +30,8 @@ export class PreOrderLineService {
           where: { id: createLineInput.preOrderId},
           relations: ["files","lines"],
         })
-        if (result.status = PreOrderStatus.VERIFIED) {
-          result.status = PreOrderStatus.PENDING_LINE
+        if (result.status = PreOrderStatus.PENDING_INFO) {
+          result.status = PreOrderStatus.PENDING_PRODUCT
           await result.save()
         }
         return result

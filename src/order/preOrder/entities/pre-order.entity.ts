@@ -18,6 +18,7 @@ import {
 } from "typeorm";
 import { PaymentMethodEnum } from "../enum/sort-types.enum";
 import { ExpireTypes } from "../enum/expire-types.enum";
+import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
 
 @ObjectType()
 @Entity("pre_order")
@@ -106,9 +107,18 @@ export class PreOrder extends BaseEntity {
   @Index()
   @Column("enum", {
     enum: PreOrderStatus,
-    default: PreOrderStatus.CREATED,
+    default: PreOrderStatus.PENDING_INFO,
   })
   status: PreOrderStatus;
+
+  @Field(() => OrderOfferStatuses)
+  @Index()
+  @Column("enum", {
+    enum: OrderOfferStatuses,
+    default: OrderOfferStatuses.PENDING_PRICE,
+  })
+  last_offer_status: OrderOfferStatuses;
+
 
   @Field({ nullable: true })
   @Column({ nullable: true, default: 0 })
