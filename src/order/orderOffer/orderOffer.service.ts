@@ -2,25 +2,22 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource } from "@nestjs/typeorm";
 import { Cache } from "cache-manager";
-import { User } from 'src/users/user/entities/user.entity';
-import { DataSource } from "typeorm";
-import { ThreeStateSupervisionStatuses } from '../enums/three-state-supervision-statuses.enum';
-import { CreateLineOfferInput } from './dto/create-line-offer.input';
-import { CreateOrderOfferInput } from './dto/create-order-offer.input';
-import { OfferLine } from './entities/offer-line.entity';
-import { OfferOrder } from './entities/order-offer.entity';
-import { PreOrder } from "../preOrder/entities/pre-order.entity";
-import { Line } from "../line/entities/order-line.entity";
-import { AddSellerOrderOffer } from "./dto/add-seller-offer.input";
-import { TempSeller } from "./entities/temp-seller.entity";
-import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
-import { OrderOfferStatuses } from "./enums/order-offer-statuses";
-import { PreOrderStatus } from "../enums/pre-order-states.enum";
-import { TypeOrderOffer } from "../enums/type-order-offer.enum";
 import { Seller } from "src/products/seller/entities/seller.entity";
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { ContactInfoTypes } from "src/users/contact-info/enums/contact-info-types.enum";
+import { User } from 'src/users/user/entities/user.entity';
+import { DataSource } from "typeorm";
+import { PreOrderStatus } from "../enums/pre-order-states.enum";
+import { TypeOrderOffer } from "../enums/type-order-offer.enum";
+import { Line } from "../line/entities/order-line.entity";
+import { AddSellerOrderOffer } from "./dto/add-seller-offer.input";
+import { CreateLineOfferInput } from './dto/create-line-offer.input';
+import { CreateOrderOfferInput } from './dto/create-order-offer.input';
+import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
+import { OfferLine } from './entities/offer-line.entity';
+import { OfferOrder } from './entities/order-offer.entity';
+import { OrderOfferStatuses } from "./enums/order-offer-statuses";
 
 @Injectable()
 export class OrderOfferService {
@@ -29,6 +26,11 @@ export class OrderOfferService {
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
 
+    async generateNumericUuid(length: number = 10): Promise<string> {
+      const min = Math.pow(10, length - 1);
+      const max = Math.pow(10, length) - 1;
+    return Math.floor(Math.random() * (max - min + 1) + min).toString();
+   }
   
   async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer,user:User) {
       const findTempSeller = await Seller.findOneBy({
@@ -78,8 +80,8 @@ export class OrderOfferService {
       return offer
       
     }
-    async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User): Promise<OfferOrder> {
-    
+  async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User): Promise<OfferOrder> {
+
       try {
         let order = await OfferOrder.findOne({
           where: {
@@ -99,7 +101,7 @@ export class OrderOfferService {
         }
         const newOrder: OfferOrder = OfferOrder.create<OfferOrder>(createOrderOfferInput);
         newOrder.userId = user.id
-        
+        newOrder.uuid = await this.generateNumericUuid();
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
         newOrder.request_name = user.fullName ??  'کاربر وردست';
         await newOrder.save();

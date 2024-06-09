@@ -1,21 +1,19 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import {
   BaseEntity,
   Column,
-  OneToMany,
   Entity,
-  ManyToOne,
   Index,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
-import { OfferLine } from "./offer-line.entity";
-import { TempSeller } from "./temp-seller.entity";
-import { OrderOfferStatuses } from "../enums/order-offer-statuses";
+import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { Seller } from "src/products/seller/entities/seller.entity";
+import { OrderOfferStatuses } from "../enums/order-offer-statuses";
+import { OfferLine } from "./offer-line.entity";
 
 
 @ObjectType()
@@ -78,6 +76,11 @@ export class OfferOrder extends BaseEntity {
   offerLine: OfferLine[];
 
 
+  @Field({ nullable: true })
+  @Column({ nullable: true})
+  uuid?: string;
+
+  
   @Field(() => OrderOfferStatuses)
   @Index()
   @Column("enum", {
