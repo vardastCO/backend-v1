@@ -51,10 +51,6 @@ export class Legals extends BaseEntity {
   @OneToMany(() => Address, address => null, { nullable: true })
   addresses: Address[];
 
-  @Field(() => [UserProject], { nullable: "items" })
-  @OneToMany(() => UserProject, userProject => userProject.project)
-  user: Promise<UserProject[]>;
-
   
   @Field(() => ThreeStateSupervisionStatuses)
   @Column("enum", {
