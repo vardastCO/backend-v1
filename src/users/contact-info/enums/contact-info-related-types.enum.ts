@@ -4,6 +4,7 @@ export enum ContactInfoRelatedTypes {
   SELLER = "Seller",
   BRAND = "Brand",
   USER = "User",
+  LEGAL = "LEGAL",
 }
 
 registerEnumType(ContactInfoRelatedTypes, {
