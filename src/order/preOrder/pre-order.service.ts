@@ -131,33 +131,37 @@ export class PreOrderService {
       id,
       ...updatePreOrderInput,
     });
+    
     if (!preOrder) {
-    return
+      return null; 
     }
-
+  
+    preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
+    preOrder.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" }); 
+  
     let preOrderAddress = await preOrder.address;
-    // let preOrderFile = await preOrder.files;
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
-    // let isHaveFile = (preOrderFile?.length > 0) ?? false;
+  
+
+    const isHaveLines = preOrder.lines && (await preOrder.lines).length > 0;
+   
+    const isHaveOffers = preOrder.offers && preOrder.offers.length > 0;
+  
     const updateCurrentStatusByCommingProps = {
       [PreOrderStatus.PENDING_INFO]: PreOrderStatus.PENDING_INFO,
       [PreOrderStatus.PENDING_PRODUCT]: isHaveAddress ? PreOrderStatus.PENDING_PRODUCT : PreOrderStatus.PENDING_INFO,
-      // [PreOrderStatus.PENDING_OFFER]: isHaveFile ? PreOrderStatus.PENDING_ADMIN : PreOrderStatus.PENDING_INFO,
-      [PreOrderStatus.PENDING_OFFER]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStatus.PENDING_OFFER : PreOrderStatus.PENDING_PRODUCT,
-      [PreOrderStatus.COMPLETED]: (await preOrder.offers).length > 0 ? PreOrderStatus.COMPLETED : PreOrderStatus.PENDING_OFFER,
-      [PreOrderStatus.CLOSED]:PreOrderStatus.CLOSED,
+      [PreOrderStatus.PENDING_OFFER]: isHaveLines && isHaveAddress ? PreOrderStatus.PENDING_OFFER : PreOrderStatus.PENDING_PRODUCT,
+      [PreOrderStatus.COMPLETED]: isHaveOffers ? PreOrderStatus.COMPLETED : PreOrderStatus.PENDING_OFFER,
+      [PreOrderStatus.CLOSED]: PreOrderStatus.CLOSED,
     }
-    
-
-    preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-    preOrder.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" }); 
-
+  
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
-
+  
     await preOrder.save()
-
+  
     return preOrder;
   }
+  
   async removePreOrder( id: number,user:User): Promise<Boolean> {
     
     try {
