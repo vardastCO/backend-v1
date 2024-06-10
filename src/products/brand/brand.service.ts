@@ -73,7 +73,7 @@ export class BrandService {
     //   return cachedResult;
     // }
     const {  skip, name } = indexBrandInput || {};
-    const  take = 10;
+    const  take = 50;
     const result =  await Brand.find({
       skip,
       take,
