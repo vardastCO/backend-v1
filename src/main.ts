@@ -8,7 +8,7 @@ import { AppModule } from "./app.module";
 // import 'winston-elasticsearch';
 // import { initializeApm } from './initapm';
 import * as compression from 'compression';
-import {  NotFoundExceptionFilter, TimingMiddleware } from "./notFoundExceptionFilter";
+import {  NotFoundExceptionFilter } from "./notFoundExceptionFilter";
 // import * as cluster from 'cluster';
 // import * as os from 'os';
 
