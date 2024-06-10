@@ -8,7 +8,7 @@ import { AppModule } from "./app.module";
 // import 'winston-elasticsearch';
 // import { initializeApm } from './initapm';
 import * as compression from 'compression';
-import {  TimingMiddleware } from "./timeout.middleware";
+import {  NotFoundExceptionFilter, TimingMiddleware } from "./notFoundExceptionFilter";
 // import * as cluster from 'cluster';
 // import * as os from 'os';
 
@@ -52,6 +52,7 @@ async function bootstrap() {
   // app.use(new TimingMiddleware().use);
   // app.useLogger(logger);
   // try {
+  app.useGlobalFilters(new NotFoundExceptionFilter());
   await app.listen(3080, '::');
   //   logger.info('Nest.js application started successfully.');
   // } catch (error) {

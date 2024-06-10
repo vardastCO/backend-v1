@@ -19,7 +19,7 @@ export class PreOrderFileController {
      console.log('uuid')
       const offer = await OfferOrder.findOne({
         where: {
-          uuid: uuid ,
+          uuid ,
         },
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })

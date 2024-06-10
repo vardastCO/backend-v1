@@ -50,7 +50,7 @@ export class OrderFileController {
     })));
   
       const data = {
-        date: (await offer.preOrder).request_date,
+        date: new Date((await offer.preOrder).request_date).toLocaleDateString('fa-IR'),
         invoiceNumber: (await offer.preOrder).uuid,
         sellerAddress: 'بلوار کاوه، نرسیده به خیابان دولت، نبش کوچه اخلاقی غربی، پلاك 12,1 طبقه 2 واحد 4',
         sellerNationalId: '14011385876',  

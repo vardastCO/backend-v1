@@ -142,8 +142,10 @@ export class PreOrderService {
     const updateCurrentStatusByCommingProps = {
       [PreOrderStatus.PENDING_INFO]: PreOrderStatus.PENDING_INFO,
       [PreOrderStatus.PENDING_PRODUCT]: isHaveAddress ? PreOrderStatus.PENDING_PRODUCT : PreOrderStatus.PENDING_INFO,
-      // [PreOrderStatus.VERIFY_FILE]: isHaveFile ? PreOrderStatus.PENDING_ADMIN : PreOrderStatus.PENDING_INFO,
-      [PreOrderStatus.COMPLITED]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStatus.COMPLITED : PreOrderStatus.PENDING_PRODUCT,
+      // [PreOrderStatus.PENDING_OFFER]: isHaveFile ? PreOrderStatus.PENDING_ADMIN : PreOrderStatus.PENDING_INFO,
+      [PreOrderStatus.PENDING_OFFER]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStatus.PENDING_OFFER : PreOrderStatus.PENDING_PRODUCT,
+      [PreOrderStatus.COMPLITED]: (await preOrder.offers).length > 0 ? PreOrderStatus.COMPLITED : PreOrderStatus.PENDING_OFFER,
+      [PreOrderStatus.CLOSED]:PreOrderStatus.CLOSED,
     }
     
 
@@ -247,7 +249,7 @@ export class PreOrderService {
   
   }
    
-  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean): Promise<PaginationPreOrderResponse> {
+  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean,seller:boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
     const {
       take,
@@ -284,10 +286,14 @@ export class PreOrderService {
         ];;
       }
       whereConditions['pickUpUserId'] = IsNull();
-
-      if (status) {
-        whereConditions['status'] = status as PreOrderStatus;
+      if (seller) {
+        whereConditions['status'] = PreOrderStatus.PENDING_OFFER
+      } else {
+        if (status) {
+          whereConditions['status'] = status as PreOrderStatus;
+        }
       }
+    
     }
     if (hasFile) {
       whereConditions['files'] = {

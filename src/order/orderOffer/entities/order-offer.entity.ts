@@ -8,7 +8,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-
 import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { Seller } from "src/products/seller/entities/seller.entity";

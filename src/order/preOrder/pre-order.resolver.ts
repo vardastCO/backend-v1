@@ -88,7 +88,11 @@ export class PreOrderResolver {
     if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
       client = true
     }
-    return this.preOrderService.paginate(currentUser, indexPreOrderInput,client);
+    let seller = false 
+    if (referer == 'https://seller.vardast.ir' || referer == 'https://seller.vardast.com') {
+      seller = true
+    }
+    return this.preOrderService.paginate(currentUser, indexPreOrderInput,client,seller);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Boolean)

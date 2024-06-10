@@ -7,12 +7,13 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  Unique,
 } from "typeorm";
 import { Project } from "./project.entity";
 import { TypeUserProject } from "../enums/type-user-project.enum";
 
 @ObjectType()
+@Unique(["projectId", "userId"])
 @Entity("user_project")
 export class UserProject extends BaseEntity {
   @Field(() => Int)

@@ -73,7 +73,6 @@ export class AuthResolver {
 
   @Query(() => User)
   whoAmI(@CurrentUser() user: User, @CurrentType() type: string) {
-    console.log('y',type)
     return this.authService.whoAmI(user);
   }
 
