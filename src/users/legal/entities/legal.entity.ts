@@ -18,9 +18,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-
-import { UserProject } from "./user-project.entity";
-import { ProjectHasAddress } from "./projectHasAddress.entity";
 import { ThreeStateSupervisionStatuses } from "src/order/enums/three-state-supervision-statuses.enum";
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { Address } from "src/users/address/entities/address.entity";

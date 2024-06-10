@@ -144,7 +144,7 @@ export class PreOrderService {
       [PreOrderStatus.PENDING_PRODUCT]: isHaveAddress ? PreOrderStatus.PENDING_PRODUCT : PreOrderStatus.PENDING_INFO,
       // [PreOrderStatus.PENDING_OFFER]: isHaveFile ? PreOrderStatus.PENDING_ADMIN : PreOrderStatus.PENDING_INFO,
       [PreOrderStatus.PENDING_OFFER]: (await preOrder.lines).length > 0 && isHaveAddress ? PreOrderStatus.PENDING_OFFER : PreOrderStatus.PENDING_PRODUCT,
-      [PreOrderStatus.COMPLITED]: (await preOrder.offers).length > 0 ? PreOrderStatus.COMPLITED : PreOrderStatus.PENDING_OFFER,
+      [PreOrderStatus.COMPLETED]: (await preOrder.offers).length > 0 ? PreOrderStatus.COMPLETED : PreOrderStatus.PENDING_OFFER,
       [PreOrderStatus.CLOSED]:PreOrderStatus.CLOSED,
     }
     
