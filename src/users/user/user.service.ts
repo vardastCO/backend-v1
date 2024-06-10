@@ -139,9 +139,9 @@ export class UserService {
     if (!user) {
       throw new NotFoundException();
     }
-    const roles = await user.roles;
-    const permissions = roles.flatMap(role => role.permissions); 
-    const uniqueClaims = [...new Set<string>(permissions.map(permission => permission.claim))];
+    // const roles = await user.roles;
+    // const permissions = roles.flatMap(role => role.permissions); 
+    // const uniqueClaims = [...new Set<string>(permissions.map(permission => permission.claim))];
     // user.claims = uniqueClaims.length > 0 ? uniqueClaims : [];
     return user;
   }

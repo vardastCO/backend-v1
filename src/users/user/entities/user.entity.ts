@@ -137,9 +137,9 @@ export class User extends BaseEntity {
   @Column("int")
   displayRoleId: number;
 
-  @Field(() => [String], { nullable: "items" }) 
-  @Column("text", { array: true, nullable: true }) 
-  claims: string[];
+  // @Field(() => [String], { nullable: "items" }) 
+  // @Column("text", { array: true, nullable: true }) 
+  // claims: string[];
 
   @Field(type => [Role], { nullable: "items" })
   @JoinTable({
