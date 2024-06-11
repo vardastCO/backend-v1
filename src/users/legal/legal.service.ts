@@ -17,21 +17,18 @@ export class LegalService {
   ) {}
 
   async create(createLegalInput: CreateLegalInput, userId: number): Promise<Legal> {
-    try {
-      const findLegal = await Legal.findOneBy({
-        national_id: createLegalInput.national_id,
-      });
-      if (findLegal) {
-        throw new BadRequestException(
-          await this.i18n.translate("exceptions.NOT_FOUND_USER"),
-        );
-      }
-      const legal: Legal = Legal.create<Legal>(createLegalInput);
-      await legal.save();
-      return legal;
-    } catch (e) {
-      console.log('create legal', e);
+    const findLegal = await Legal.findOneBy({
+      national_id: createLegalInput.national_id,
+    });
+    if (findLegal) {
+      throw new BadRequestException(
+        await this.i18n.translate("exceptions.NOT_FOUND_USER"),
+      );
     }
+    const legal: Legal = Legal.create<Legal>(createLegalInput);
+    await legal.save();
+    return legal;
+
   }
 
   async update(id: number, updateLegalInput: UpdateLegalInput, userId: number): Promise<Legal> {
