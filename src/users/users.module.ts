@@ -9,6 +9,8 @@ import { SessionsModule } from "./sessions/sessions.module";
 import { UserModule } from "./user/user.module";
 import { FavoriteModule } from './favorite/favorite.module';
 import { ProjectModule } from "./project/project.module";
+import { LegalModule } from "./legal/legal.module";
+import { MemberModule } from "./member/member.module";
 @Module({
   imports: [
     AuthModule,
@@ -20,7 +22,9 @@ import { ProjectModule } from "./project/project.module";
     RegistrationModule,
     PasswordResetModule,
     FavoriteModule,
-    ProjectModule
+    ProjectModule,
+    LegalModule,
+    MemberModule
   ],
 })
 export class UsersModule {}
