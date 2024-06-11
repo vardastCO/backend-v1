@@ -21,7 +21,7 @@ import {
 
 import { UserProject } from "./user-project.entity";
 import { ProjectHasAddress } from "./projectHasAddress.entity";
-import { ThreeStateSupervisionStatuses } from "src/order/enums/three-state-supervision-statuses.enum";
+import { TypeProject } from "../enums/type-project.enum";
 
 @ObjectType()
 @Entity("projects")
@@ -33,6 +33,13 @@ export class Project extends BaseEntity {
   @Field({ nullable: true })
   @Column({ nullable: true })
   name?: string;
+
+  @Field(() => TypeProject)
+  @Column("enum", {
+    enum: TypeProject,
+    default: TypeProject.LEGAL,
+  })
+  type: TypeProject;
 
   @Field(() => Date, { nullable: true })
   @CreateDateColumn({ type: 'timestamp', nullable: true })

@@ -1,14 +1,10 @@
 import { Field, Float, InputType, Int } from "@nestjs/graphql";
 import {
-  IsBoolean,
-  IsEnum,
-  IsInt,
   IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsPositive,
+  Length,
   IsString,
   MaxLength,
+  IsOptional
 } from "class-validator";
 
 
@@ -28,5 +24,9 @@ export class CreateLegalInput {
   national_id: string;
 
 
+  @Field({nullable:true})
+  @IsOptional()
+  @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
+  cellphone?: string;
 
 }
