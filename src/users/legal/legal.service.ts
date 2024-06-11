@@ -59,6 +59,7 @@ export class LegalService {
       const [data, total] = await Legal.findAndCount({
         take,
         skip,
+        relations: ["members", "addresses", "contacts"],
       });
   
     return PaginationLegalResponse.make(indexLegalInput, total, data);
