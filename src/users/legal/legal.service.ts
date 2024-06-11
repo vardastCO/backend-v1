@@ -22,7 +22,7 @@ export class LegalService {
     });
     if (findLegal) {
       throw new BadRequestException(
-        await this.i18n.translate("exceptions.NOT_FOUND_USER"),
+        await this.i18n.translate("exceptions.FOUND_LEGAL"),
       );
     }
     const legal: Legal = Legal.create<Legal>(createLegalInput);
