@@ -8,4 +8,7 @@ export class UpdateLegalInput extends PartialType(CreateLegalInput) {
 
   @Field({ nullable: true })
   national_id?: string;
+
+  @Field({nullable:true})
+  cellphone?: string;
 }

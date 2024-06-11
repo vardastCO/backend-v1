@@ -21,6 +21,7 @@ import {
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { Address } from "src/users/address/entities/address.entity";
 import { Member } from "src/users/member/entities/members.entity";
+import { User } from "src/users/user/entities/user.entity";
 
 
 @ObjectType()
@@ -41,6 +42,12 @@ export class Legal extends BaseEntity {
   @Field(() => Date, { nullable: true })
   @CreateDateColumn({ type: 'timestamp', nullable: true })
   create_at?: Date;
+
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, user => null, { nullable: false })
+  createdBy: Promise<User>;
+  @Column({ nullable: true })
+  createdById: number;
 
   
   @Field(() => [ContactInfo])
