@@ -8,6 +8,7 @@ import { SearchService } from "./search.service";
 import { FilterableAttributeResponse } from "./dto/filterable-attribute.response";
 import { FilterableAttributeInput } from "./dto/filterable-attribute.input";
 import { SuggestResponseV2 } from "./dto/suggest.response-v2";
+import { TotalInfoResponse } from "./dto/totalInfo.output";
 
 @Resolver()
 export class SearchResolver {
@@ -30,6 +31,15 @@ export class SearchResolver {
   ) {
     return this.searchService.suggest(suggestInput);
   }
+
+
+  @Public()
+  @Query(() => TotalInfoResponse, { name: "totalInfo" })
+  totalInfo(
+  ) {
+    return this.searchService.totalInfo();
+  }
+
 
   @Public()
   @Query(() => SuggestResponseV2, { name: "suggestV2" })

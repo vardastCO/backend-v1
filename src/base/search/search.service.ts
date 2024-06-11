@@ -2,13 +2,18 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
 import { Attribute } from "src/products/attribute/entities/attribute.entity";
 import { Brand } from "src/products/brand/entities/brand.entity";
 import { PaginationProductResponse } from "src/products/product/dto/pagination-product.response";
+import { ProductEntity } from "src/products/product/entities/product-service.entity";
 import { Product } from "src/products/product/entities/product.entity";
 import { Seller } from "src/products/seller/entities/seller.entity";
-import { SelectQueryBuilder } from "typeorm";
+import { SellerType } from "src/products/seller/enums/seller-type.enum";
+import { User } from "src/users/user/entities/user.entity";
+import { Like, SelectQueryBuilder } from "typeorm";
 import { Category } from "../taxonomy/category/entities/category.entity";
+import { suggestvalue } from "./constants/suggestConstants";
 import { FilterableAttributeInput } from "./dto/filterable-attribute.input";
 import { FilterableAttributeResponse } from "./dto/filterable-attribute.response";
 import { FilterableAttributesInput } from "./dto/filterable-attributes.input";
@@ -18,10 +23,8 @@ import { SearchResponse } from "./dto/search.response";
 import { SuggestInput } from "./dto/suggest.input";
 import { SuggestResponse } from "./dto/suggest.response";
 import { SuggestResponseV2 } from "./dto/suggest.response-v2";
-import { ProductEntity } from "src/products/product/entities/product-service.entity";
-import { Like } from "typeorm";
-import { suggestvalue } from "./constants/suggestConstants";
-import { SellerType } from "src/products/seller/enums/seller-type.enum";
+import { TotalInfoResponse } from "./dto/totalInfo.output";
+import { Project } from "src/users/project/entities/project.entity";
 
 @Injectable()
 export class SearchService {
@@ -159,6 +162,112 @@ export class SearchService {
       products,
     };
   }
+
+
+  async totalInfo(): Promise<TotalInfoResponse>{
+    
+    const [
+      countOfBrands ,
+      countOfSellers ,
+      countOfSellersOnline,
+      countOfSellersNormal,
+      countOfSellersOffline,
+      countOfUsers ,
+      countOfProducts ,
+      countOfCategories,
+      countOfOrders,
+      countOfProjects
+    ] = await Promise.all([
+      this.getCountOfBrands(),
+      this.getCountOfSellers(),
+      this.getCountOfSellersOnline(),
+      this.getCountOfSellersNormal(),
+      this.getCountOfSellersOffline(),
+      this.getCountOfUsers(),
+      this.getCountOfProducts(),
+      this.getCountOfCategories(),
+      this.getCountOfOrders(),
+      this.getCountOfProjects(),
+    ]);
+
+    return {
+      countOfBrands ,
+      countOfSellers ,
+      countOfSellersOnline,
+      countOfSellersNormal,
+      countOfSellersOffline,
+      countOfUsers ,
+      countOfProducts ,
+      countOfCategories,
+      countOfOrders,
+      countOfProjects
+    }
+  }
+
+  private async getCountOfBrands(): Promise<number> {
+    const countOfBrands = await Brand.count();
+    return countOfBrands;
+  }
+
+  private async getCountOfSellers(): Promise<number> {
+    const countOfSellers = await Seller.count();
+    return countOfSellers;
+  }
+
+  private async getCountOfSellersOnline(): Promise<number> {
+    const countOfSellersOnline = await Seller.count({
+      where: {
+        sellerType: SellerType.ONLINE
+      }
+    });
+    return countOfSellersOnline;
+  }
+
+  private async getCountOfSellersNormal(): Promise<number> {
+    const countOfSellersNormal = await Seller.count({
+      where: {
+        sellerType: SellerType.NORMAL
+      }
+    });
+    return countOfSellersNormal;
+  }
+
+  private async getCountOfSellersOffline(): Promise<number> {
+    const countOfSellersoffline = await Seller.count({
+      where: {
+        sellerType: SellerType.OFFLINE
+      }
+    });
+    return countOfSellersoffline;
+  }
+
+  private async getCountOfUsers(): Promise<number> {
+    const countOfUsers = await User.count();
+    return countOfUsers;
+  }
+
+  private async getCountOfProducts(): Promise<number> {
+    const countOfProducts = await Product.count();
+    return countOfProducts;
+  }
+
+  private async getCountOfCategories(): Promise<number> {
+    const countOfCategories = await Category.count();
+    return countOfCategories;
+  }
+
+
+  private async getCountOfOrders(): Promise<number> {
+    const countOfOrders = await OfferOrder.count()
+    return countOfOrders;
+  }
+
+  private async getCountOfProjects(): Promise<number> {
+    const countOfProjects = await Project.count()
+    return countOfProjects;
+  }
+
+
   private getProductsSearchQuery(
     query: string,
     take?: number,
