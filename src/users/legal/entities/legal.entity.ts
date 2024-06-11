@@ -44,11 +44,11 @@ export class Legal extends BaseEntity {
 
   
   @Field(() => [ContactInfo])
-  @OneToMany(() => ContactInfo, contactInfo => null, { nullable: true })
+  @OneToMany(() => ContactInfo, contactInfo => contactInfo.relatedId, { nullable: true })
   contacts: ContactInfo[];
 
   @Field(() => [Address])
-  @OneToMany(() => Address, address => null, { nullable: true })
+  @OneToMany(() => Address, address => address.relatedId, { nullable: true })
   addresses: Address[];
 
   @Field(() => [Member])
