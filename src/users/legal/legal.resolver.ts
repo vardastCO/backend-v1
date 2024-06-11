@@ -12,6 +12,8 @@ import { Legal } from "./entities/legal.entity";
 import { LegalService } from "./legal.service";
 import { CreateLegalInput } from "./dto/create-legal.input";
 import { UpdateLegalInput } from "./dto/update-legal.input";
+import { PaginationLegalResponse } from "./dto/pagination-legal.response";
+import { IndexLegalInput } from "./dto/index-legal.input";
 
 
 @Resolver(() => Legal)
@@ -43,9 +45,16 @@ export class LegalResolver {
     return this.legalService.remove(id, user.id);
   }
 
-  @Query(() => [Legal])
-  findAllLegals() {
-    return this.legalService.findAll();
+  @Query(() => PaginationLegalResponse)
+  findAllLegals(
+    @Args(
+      "indexProjectInput",
+      { nullable: true },
+      new ValidationPipe({ transform: true }),
+    )
+    indexLegalInput?: IndexLegalInput,
+  ) {
+    return this.legalService.findAll(indexLegalInput);
   }
 
   @Query(() => Legal)

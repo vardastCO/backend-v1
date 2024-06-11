@@ -8,6 +8,8 @@ import { Like } from 'typeorm';
 import { Legal } from "./entities/legal.entity";
 import { CreateLegalInput } from "./dto/create-legal.input";
 import { UpdateLegalInput } from "./dto/update-legal.input";
+import { IndexLegalInput } from "./dto/index-legal.input";
+import { PaginationLegalResponse } from "./dto/pagination-legal.response";
 
 @Injectable()
 export class LegalService {
@@ -50,8 +52,17 @@ export class LegalService {
     return true;
   }
 
-  async findAll(): Promise<Legal[]> {
-    return await Legal.find();
+  async findAll(indexLegalInput: IndexLegalInput): Promise<PaginationLegalResponse> {
+    indexLegalInput.boot()
+    const { take, skip } =
+      indexLegalInput || {};
+      const [data, total] = await Legal.findAndCount({
+        take,
+        skip,
+      });
+  
+    return PaginationLegalResponse.make(indexLegalInput, total, data);
+
   }
 
   async findOne(id: number): Promise<Legal> {
