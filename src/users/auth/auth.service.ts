@@ -402,10 +402,9 @@ export class AuthService {
   async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
 
     const cacheKey = `isRealUserType-${isRealUserType}-${user}`;
-    let legalData = await this.cacheManager.get<Legal>(cacheKey);
-
-  
-    if (!legalData) {
+    user.legal = null
+    if (!isRealUserType) {
+      let legalData = await this.cacheManager.get<Legal>(cacheKey);
       legalData = await Legal.findOneBy({
         createdById: user.id
       });
@@ -414,12 +413,9 @@ export class AuthService {
       } catch (e) {
         console.log('whoAmI', e);
       }
+      user.legal = legalData; 
     }
  
-
-    user.legal = legalData; 
-    
-  
     return user;
   }
   
