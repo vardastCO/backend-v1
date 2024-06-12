@@ -293,7 +293,7 @@ export class ProjectService {
     indexProjectInput?: IndexProjectInput,
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
-    const { take, skip, createTime,nameOrUuid,nameManager,nameEmployer  } = indexProjectInput || {};
+    const { take, skip, createTime,nameOrUuid,nameManager,nameEmployer , status} = indexProjectInput || {};
     const whereConditions: any = {};
 
     if (createTime) {
@@ -305,9 +305,9 @@ export class ProjectService {
       whereConditions['name'] =  Like(`%${nameOrUuid}%`)
 
     }
-    // if (status) {
-    //   where.status = status;
-    // }
+    if (status) {
+      whereConditions['status'] = status;
+    }
     if (nameManager) {
       
       whereConditions['user'] = {
