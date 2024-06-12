@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { User } from "../../user/entities/user.entity";
 import { Legal } from "src/users/legal/entities/legal.entity";
+import { UserType } from "../enums/type-user.enum";
 
 @ObjectType()
 export class RefreshResponse {
@@ -10,8 +11,8 @@ export class RefreshResponse {
   })
   accessToken: string;
 
-  @Field()
-  type: string;
+  @Field(type => UserType)
+  type: UserType;
 
   @Field(type => Int, {
     description: "Access token validity period in seconds.",

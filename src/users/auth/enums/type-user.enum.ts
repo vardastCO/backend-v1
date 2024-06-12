@@ -1,10 +1,10 @@
 import { registerEnumType } from "@nestjs/graphql";
 
-export enum TypeUser {
+export enum UserType {
   LEGAL = "LEGAL",
   REAL = "REAL",
 }
 
-registerEnumType(TypeUser, {
-  name: "TypeUser",
+registerEnumType(UserType, {
+  name: "UserType",
 });

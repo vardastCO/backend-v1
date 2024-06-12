@@ -1,23 +1,22 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Inject, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Cache } from "cache-manager";
+import { I18n, I18nService } from "nestjs-i18n";
+import { In, Like, MoreThan } from 'typeorm';
 import { User } from "../user/entities/user.entity";
 import { CreateAddressProjectInput } from "./dto/create-address-project.input";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { CreateUserProjectInput } from "./dto/create-user-project.input";
+import { IndexProjectInput } from "./dto/index-project.input";
+import { PaginationProjectResponse } from "./dto/pagination-project.response";
 import { UpdateProjectAddressInput } from "./dto/update-address-input";
 import { UpdateProjectInput } from "./dto/update-project-input";
+import { UpdateProjectUserInput } from "./dto/update-user-input";
 import { ProjectAddress } from "./entities/addressProject.entity";
 import { Project } from "./entities/project.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
-import { UpdateProjectUserInput } from "./dto/update-user-input";
-import { In } from 'typeorm';
-import { I18n, I18nService } from "nestjs-i18n";
-import { PaginationProjectResponse } from "./dto/pagination-project.response";
-import { IndexProjectInput } from "./dto/index-project.input";
-import { TypeUserProject } from "./enums/type-user-project.enum";
-import { Like,MoreThan } from 'typeorm';
+import { UserTypeProject } from "./enums/type-user-project.enum";
 @Injectable()
 export class ProjectService {
   constructor(
@@ -48,7 +47,7 @@ export class ProjectService {
       }
       userProject.userId = user_id
       userProject.projectId = await project.id
-      userProject.type = TypeUserProject.MANAGER
+      userProject.type = UserTypeProject.MANAGER
       await userProject.save();
       return project;
 
@@ -314,7 +313,7 @@ export class ProjectService {
         user :  {
           firstName : Like(`%${nameManager}%`)
         },
-        type : TypeUserProject.MANAGER
+        type : UserTypeProject.MANAGER
       }
     }
     if (nameEmployer) {
@@ -322,7 +321,7 @@ export class ProjectService {
         user :  {
           firstName : Like(`%${nameEmployer}%`)
         },
-        type : TypeUserProject.EMPLOYER
+        type : UserTypeProject.EMPLOYER
       }
     }
     const [data, total] = await Project.findAndCount({

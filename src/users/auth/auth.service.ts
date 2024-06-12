@@ -2,25 +2,25 @@ import { BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { verify } from "argon2";
-import { IsNull, MoreThanOrEqual } from "typeorm";
-import { Session } from "../sessions/entities/session.entity";
-import { DeletionReasons } from "../sessions/enums/deletion-reasons.enum";
-import { User } from "../user/entities/user.entity";
-import { UserService } from "../user/user.service";
-import { LoginResponse } from "./dto/login.response";
-import { UserLanguagesEnum } from "../user/enums/user-languages.enum";
-import { UserStatusesEnum } from "../user/enums/user-statuses.enum";
-import { LoginOTPInput } from "./dto/login-otp.input";
 import { Country } from "src/base/location/country/entities/country.entity";
+import { IsNull, MoreThanOrEqual } from "typeorm";
 import { Role } from "../authorization/role/entities/role.entity";
-import { LogoutResponse } from "./dto/logout.response";
-import { RefreshInput } from "./dto/refresh.input";
-import { RefreshResponse } from "./dto/refresh.response";
 import { OneTimePassword } from "../registration/entities/one-time-password.entity";
 import { OneTimePasswordStates } from "../registration/enums/one-time-password-states.enum";
 import { OneTimePasswordTypes } from "../registration/enums/one-time-password-types.enum";
+import { Session } from "../sessions/entities/session.entity";
+import { DeletionReasons } from "../sessions/enums/deletion-reasons.enum";
+import { User } from "../user/entities/user.entity";
+import { UserLanguagesEnum } from "../user/enums/user-languages.enum";
+import { UserStatusesEnum } from "../user/enums/user-statuses.enum";
+import { UserService } from "../user/user.service";
 import { ChangeNumberInput } from "./dto/change-number.input";
-import { TypeUser } from "./enums/type-user.enum";
+import { LoginOTPInput } from "./dto/login-otp.input";
+import { LoginResponse } from "./dto/login.response";
+import { LogoutResponse } from "./dto/logout.response";
+import { RefreshInput } from "./dto/refresh.input";
+import { RefreshResponse } from "./dto/refresh.response";
+import { UserType } from "./enums/type-user.enum";
 
 @Injectable()
 export class AuthService {
@@ -228,7 +228,7 @@ export class AuthService {
   }
 
   async login(
-    type: TypeUser,
+    type: UserType,
     user: User,
     requestIP: string,
     agent: string,
@@ -368,7 +368,7 @@ export class AuthService {
     return { user };
   }
 
-  private _generateNewAccessToken(user: User, session: Session,type:TypeUser): string {
+  private _generateNewAccessToken(user: User, session: Session,type:UserType): string {
     return this.jwtService.sign({
       uuid: user.uuid,
       sid: session.id,
@@ -376,7 +376,7 @@ export class AuthService {
     });
   }
 
-  private _generateNewRefreshToken(user: User, session: Session,type:TypeUser): string {
+  private _generateNewRefreshToken(user: User, session: Session,type:UserType): string {
     return this.jwtService.sign(
       {
         uuid: user.uuid,

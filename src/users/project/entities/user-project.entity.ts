@@ -3,14 +3,13 @@ import { User } from "src/users/user/entities/user.entity";
 import {
   BaseEntity,
   Column,
-  CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Unique,
+  Unique
 } from "typeorm";
+import { UserTypeProject } from "../enums/type-user-project.enum";
 import { Project } from "./project.entity";
-import { TypeUserProject } from "../enums/type-user-project.enum";
 
 @ObjectType()
 @Unique(["projectId", "userId"])
@@ -36,12 +35,12 @@ export class UserProject extends BaseEntity {
   @Column()
   userId: number;
 
-  @Field(() => TypeUserProject)
+  @Field(() => UserTypeProject)
   @Column("enum", {
-    enum: TypeUserProject,
-    default: TypeUserProject.EMPLOYER,
+    enum: UserTypeProject,
+    default: UserTypeProject.EMPLOYER,
   })
-  type: TypeUserProject;
+  type: UserTypeProject;
 
 
 }
