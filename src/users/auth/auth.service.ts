@@ -404,7 +404,6 @@ export class AuthService {
     const cacheKey = `isRealUserType-${isRealUserType}-${user}`;
     let legalData = await this.cacheManager.get<Legal>(cacheKey);
 
-    console.log('legal',legalData)
   
     if (!legalData) {
       legalData = await Legal.findOneBy({
@@ -417,7 +416,7 @@ export class AuthService {
       }
     }
  
-    console.log('legal',legalData)
+
     user.legal = legalData; 
     
   
