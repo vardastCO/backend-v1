@@ -33,11 +33,11 @@ export class PreOrderFileController {
           id:(await offer.line).id,
           name: (await offer.line).item_name,
           description: '',
-          uom: (await offer.line).uom,
-          qty: (await offer.line).qty,
-          unitPrice: offer.fi_price,
-          tax_price: offer.tax_price,
-          totalPrice: offer.total_price,
+          uom: (await offer.line).uom ?? 'عدد',
+          qty: (await offer.line).qty ?? '-',
+          unitPrice: offer.fi_price ?? '-',
+          tax_price: offer.tax_price ?? '-',
+          totalPrice: offer.total_price ?? '-',
         }
         totalQty = totalQty + parseInt(data.qty)
         return data;

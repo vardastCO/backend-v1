@@ -42,7 +42,7 @@ export class OrderFileController {
         id:(await offer.line).id,
         name: (await offer.line).item_name,
         description: '',
-        uom: (await offer.line).uom,
+        uom: (await offer.line).uom ?? 'عدد',
         qty: (await offer.line).qty,
         unitPrice: offer.fi_price,
         tax_price: offer.tax_price,
