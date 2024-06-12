@@ -1,22 +1,19 @@
-import { Field, InputType, Int } from "@nestjs/graphql";
+import { Field, Float, InputType, Int } from "@nestjs/graphql";
 import {
   IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
   MaxLength,
 } from "class-validator";
 
+
 @InputType()
-export class CreateMemberInput {
-  @Field(() => Int)
-  @IsNotEmpty()
-  @IsInt()
-  @IsPositive()
-  relatedId: number;
+export class CreateUserLegalInput {
 
   @Field()
   @IsNotEmpty()
@@ -25,9 +22,9 @@ export class CreateMemberInput {
   cellphone: string;
 
 
-
-  @Field({ defaultValue: true })
+  @Field()
   @IsNotEmpty()
-  @IsBoolean()
-  isActive: boolean;
+  @IsInt()
+  legalId: number;
+
 }

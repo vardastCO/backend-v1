@@ -34,6 +34,10 @@ export class Project extends BaseEntity {
   @Column({ nullable: true })
   name?: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  description?: string;
+
   @Field(() => TypeProject)
   @Column("enum", {
     enum: TypeProject,

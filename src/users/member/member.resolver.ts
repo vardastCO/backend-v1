@@ -23,9 +23,9 @@ export class MemberResolver {
   ) {}
 
   @Permission("gql.products.seller_representative.store")
-  @Mutation(() => Member)
-  createSellerRepresentative(
-    @Args("createSellerRepresentativeInput")
+  @Mutation(() => Boolean)
+  createMmeber(
+    @Args("createMemberInput")
     createMemberInput: CreateMemberInput,
     @CurrentUser() user: User,
   ) {

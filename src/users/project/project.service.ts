@@ -28,13 +28,24 @@ export class ProjectService {
     try {
       const project: Project = Project.create<Project>(createProjectInput);
       await project.save();
+      let user_id = userId
       const userProject = new UserProject()
-      userProject.userId = userId
+      if (createProjectInput.cellphone) {
+        let findUserId = (await await User.findOneBy({ cellphone: createProjectInput.cellphone })).id
+        if (!findUserId) {
+          throw new BadRequestException(
+            (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+          );
+        }
+        user_id = findUserId
+      }
+      userProject.userId = user_id
       userProject.projectId = await project.id
       userProject.type = TypeUserProject.MANAGER
       await userProject.save();
       return project;
-    }catch(e){
+
+    } catch(e) {
       console.log('create project',e)
     }
    

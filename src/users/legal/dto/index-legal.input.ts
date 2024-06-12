@@ -7,9 +7,9 @@ import { IndexInput } from "src/base/utilities/dto/index.input";
 export class IndexLegalInput extends IndexInput {
 
 
-  @Field(() => Date, { nullable: true })
+  @Field({ nullable: true })
   @IsOptional()
-  @IsDateString()
-  startTime?: Date;
+  @IsString()
+  nameOrUuid?: string;
 
 }

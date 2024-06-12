@@ -59,10 +59,7 @@ export class Legal extends BaseEntity {
   addresses: Address[];
 
   @Field(() => [Member])
-  @OneToMany(
-    () => Member,
-    member => member.relatedId,
-  )
-  members: Promise<Member[]>;
+  @OneToMany(() => Member, member => null, { nullable: true })
+  members:Member[];
   
 }

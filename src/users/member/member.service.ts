@@ -16,15 +16,22 @@ export class MemberService {
   async create(
     createMemberInput: CreateMemberInput,
     user: User,
-  ): Promise<Member> {
-    const representative: Member =
-    Member.create<Member>({
-        userId: user.id,
-        ...createMemberInput,
-      });
+  ): Promise<Boolean> {
+    let findUser = await User.findOneBy({
+      cellphone:createMemberInput.cellphone
+    })
+    if (findUser) {
+      delete createMemberInput.cellphone
 
-    await representative.save();
-    return representative;
+      const assign: Member = new Member();
+      assign.userId = await user.id
+      assign.relatedId = createMemberInput.relatedId
+      await assign.save()
+      return true
+    } else {
+      return false
+
+    }
   }
 
   // async findAll(

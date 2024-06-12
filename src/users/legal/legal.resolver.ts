@@ -14,6 +14,7 @@ import { CreateLegalInput } from "./dto/create-legal.input";
 import { UpdateLegalInput } from "./dto/update-legal.input";
 import { PaginationLegalResponse } from "./dto/pagination-legal.response";
 import { IndexLegalInput } from "./dto/index-legal.input";
+import { CreateUserLegalInput } from "./dto/create-user-legal.input";
 
 
 @Resolver(() => Legal)
@@ -29,7 +30,7 @@ export class LegalResolver {
     return this.legalService.create(createLegalInput, user.id);
   }
 
-  @Permission("gql.users.address.update")
+  @Permission("gql.users.address.store")
   @Mutation(() => Legal)
   updateLegal(
     @Args("id") id: number,
@@ -39,12 +40,12 @@ export class LegalResolver {
     return this.legalService.update(id, updateLegalInput, user.id);
   }
 
-  @Permission("gql.users.address.delete")
+  @Permission("gql.users.address.store")
   @Mutation(() => Boolean)
   deleteLegal(@Args("id") id: number, @CurrentUser() user: User) {
     return this.legalService.remove(id, user.id);
   }
-
+  @Permission("gql.users.address.store")
   @Query(() => PaginationLegalResponse)
   findAllLegals(
     @Args(
@@ -56,9 +57,11 @@ export class LegalResolver {
   ) {
     return this.legalService.findAll(indexLegalInput);
   }
-
+  @Permission("gql.users.address.store")
   @Query(() => Legal)
   findOneLegal(@Args("id") id: number) {
     return this.legalService.findOne(id);
   }
+
+
 }

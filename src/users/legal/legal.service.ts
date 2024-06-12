@@ -14,6 +14,9 @@ import { ContactInfo } from "../contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "../contact-info/enums/contact-info-related-types.enum";
 import { Address } from "../address/entities/address.entity";
 import { AddressRelatedTypes } from "../address/enums/address-related-types.enum";
+import { CreateUserLegalInput } from "./dto/create-user-legal.input";
+import { Member } from "../member/entities/members.entity";
+import { TypeMember } from "../member/enums/type-member.enum";
 
 @Injectable()
 export class LegalService {
@@ -33,7 +36,13 @@ export class LegalService {
     }
     let id = userId
     if (createLegalInput.cellphone) {
-      id = (await await User.findOneBy({cellphone :createLegalInput.cellphone})).id
+      let findUserId = (await await User.findOneBy({ cellphone: createLegalInput.cellphone })).id
+      if (!findUserId) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+        );
+      }
+      id = findUserId
     }
     const legal: Legal = Legal.create<Legal>(createLegalInput);
     legal.createdById = id
@@ -41,7 +50,6 @@ export class LegalService {
     return legal;
 
   }
-
   async update(id: number, updateLegalInput: UpdateLegalInput, userId: number): Promise<Legal> {
     const legal = await Legal.findOneBy({ id });
     if (!legal) {
@@ -50,7 +58,13 @@ export class LegalService {
     Object.assign(legal, updateLegalInput);
     let user_id = userId
     if (updateLegalInput.cellphone) {
-      user_id = (await await User.findOneBy({cellphone :updateLegalInput.cellphone})).id
+      let findUser = (await await User.findOneBy({ cellphone: updateLegalInput.cellphone })).id
+      if (!findUser) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+        );
+      }
+      user_id = findUser
     }
     legal.createdById = user_id
     await legal.save();
@@ -68,12 +82,21 @@ export class LegalService {
 
   async findAll(indexLegalInput: IndexLegalInput): Promise<PaginationLegalResponse> {
     indexLegalInput.boot()
-    const { take, skip } =
+    const { take, skip,nameOrUuid } =
       indexLegalInput || {};
-      const [data, total] = await Legal.findAndCount({
+    const whereConditions: any = {};
+  
+    if (nameOrUuid) {
+      whereConditions['name_company'] =  Like(`%${nameOrUuid}%`)
+
+    }
+    const [data, total] = await Legal.findAndCount({
+        where:whereConditions,
         take,
         skip,
-        // relations: [ "contacts"],
+        order: {
+          id:'DESC'
+        }
       });
   
     return PaginationLegalResponse.make(indexLegalInput, total, data);
@@ -97,13 +120,21 @@ export class LegalService {
         relatedId: id,
       },
     });
+
+    const membersPromise = Member.find({
+      where: {
+        type: TypeMember.LEGAL,
+        relatedId: id,
+      },
+    });
   
-    const [legal, contacts, addresses] = await Promise.all([legalPromise, contactsPromise, addressesPromise]);
+    const [legal, contacts, addresses,members] = await Promise.all([legalPromise, contactsPromise, addressesPromise,membersPromise]);
   
     if (!legal) {
       throw new NotFoundException('Legal entity not found');
     }
     legal.contacts = contacts;
+    legal.members = members;
     legal.addresses = addresses;
   
     return legal;

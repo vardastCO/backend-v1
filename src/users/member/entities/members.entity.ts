@@ -8,6 +8,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Unique,
 } from "typeorm";
 import {
   IsEnum,
@@ -17,6 +18,7 @@ import { MemberRoles } from "../enums/member.enum";
 import { TypeMember } from "../enums/type-member.enum";
 
 @ObjectType()
+@Unique(["relatedId", "userId"])
 @Entity("members")
 export class Member extends BaseEntity {
   @Field(() => Int)
@@ -28,8 +30,10 @@ export class Member extends BaseEntity {
   relatedId: number;
 
   @Field(() => MemberRoles)
-  @IsNotEmpty()
-  @IsEnum(MemberRoles)
+  @Column("enum", {
+    enum: MemberRoles,
+    default: MemberRoles.ADMIN,
+  })
   role: MemberRoles;
 
   @Field(() => TypeMember)
@@ -46,7 +50,7 @@ export class Member extends BaseEntity {
   userId: number;
 
   @Field()
-  @Column("boolean", { default: false })
+  @Column("boolean", { default: true })
   isActive: boolean;
 
   @Field()
