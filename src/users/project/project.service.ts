@@ -17,16 +17,23 @@ import { I18n, I18nService } from "nestjs-i18n";
 import { PaginationProjectResponse } from "./dto/pagination-project.response";
 import { IndexProjectInput } from "./dto/index-project.input";
 import { TypeUserProject } from "./enums/type-user-project.enum";
-import { Like } from 'typeorm';
+import { Like,MoreThan } from 'typeorm';
 @Injectable()
 export class ProjectService {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @I18n() protected readonly i18n: I18nService,
-  )  {}
+  ) { }
+  
+  async generateNumericUuid(length: number = 10): Promise<string> {
+    const min = Math.pow(10, length - 1);
+    const max = Math.pow(10, length) - 1;
+  return Math.floor(Math.random() * (max - min + 1) + min).toString();
+  }
   async create(createProjectInput: CreateProjectInput,userId:number): Promise<Project> {
     try {
       const project: Project = Project.create<Project>(createProjectInput);
+      project.uuid = await this.generateNumericUuid()
       await project.save();
       let user_id = userId
       const userProject = new UserProject()
@@ -286,20 +293,13 @@ export class ProjectService {
     indexProjectInput?: IndexProjectInput,
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
-    const { take, skip, createTime, startTime, endTime ,nameOrUuid,nameManager,nameEmployer  } = indexProjectInput || {};
+    const { take, skip, createTime,nameOrUuid,nameManager,nameEmployer  } = indexProjectInput || {};
     const whereConditions: any = {};
 
     if (createTime) {
-      whereConditions['createTime'] = createTime;
+      whereConditions['createTime'] = MoreThan(createTime); 
     }
   
-    if (startTime) {
-      whereConditions['startTime'] = startTime;
-    }
-  
-    if (endTime) {
-      whereConditions['endTime'] = endTime;
-    }
   
     if (nameOrUuid) {
       whereConditions['name'] =  Like(`%${nameOrUuid}%`)

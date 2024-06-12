@@ -11,16 +11,6 @@ export class IndexProjectInput extends IndexInput {
   @IsDateString()
   createTime?: Date;
 
-  @Field(() => Date, { nullable: true })
-  @IsOptional()
-  @IsDateString()
-  startTime?: Date;
-
-  @Field(() => Date, { nullable: true })
-  @IsOptional()
-  @IsDateString()
-  endTime?: Date;
-
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
