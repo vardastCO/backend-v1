@@ -7,10 +7,10 @@ import { MultiStatuses } from "../enums/multi-statuses.enum";
 
 @InputType()
 export class IndexProjectInput extends IndexInput {
-  @Field(() => Date, { nullable: true })
+  @Field({ nullable: true })
   @IsOptional()
   @IsDateString()
-  createTime?: Date;
+  createTime?: string;
 
   @Field({ nullable: true })
   @IsOptional()
