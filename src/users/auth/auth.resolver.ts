@@ -2,17 +2,17 @@ import { UseGuards } from "@nestjs/common";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { User } from "../user/entities/user.entity";
 import { AuthService } from "./auth.service";
+import { IsRealUserType } from "./decorators/current-type.decorator";
 import { CurrentUser } from "./decorators/current-user.decorator";
 import { Public } from "./decorators/public.decorator";
-import { LoginInput } from "./dto/login.input";
+import { ChangeNumberInput } from "./dto/change-number.input";
 import { LoginOTPInput } from "./dto/login-otp.input";
+import { LoginInput } from "./dto/login.input";
 import { LoginResponse } from "./dto/login.response";
 import { LogoutResponse } from "./dto/logout.response";
 import { RefreshInput } from "./dto/refresh.input";
 import { RefreshResponse } from "./dto/refresh.response";
 import { GqlAuthGuard } from "./guards/gql-auth.guard";
-import { CurrentType } from "./decorators/current-type.decorator";
-import { ChangeNumberInput } from "./dto/change-number.input";
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
@@ -73,7 +73,8 @@ export class AuthResolver {
   }
 
   @Query(() => User)
-  whoAmI(@CurrentUser() user: User, @CurrentType() type: string) {
+  whoAmI(@CurrentUser() user: User, @IsRealUserType() isRealUserType: boolean) {
+    console.log('IsRealUserType',isRealUserType)
     return this.authService.whoAmI(user);
   }
 

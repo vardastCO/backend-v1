@@ -1,9 +1,8 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { UnauthorizedException } from '@nestjs/common';
-import { verify } from "argon2";
-export const CurrentType = createParamDecorator(
-  (data: unknown, context: ExecutionContext) => {
+import { UserType } from '../enums/type-user.enum';
+export const IsRealUserType = createParamDecorator(
+  (data: unknown, context: ExecutionContext): boolean => {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext().req;
     const authHeader = request.headers.authorization;
@@ -28,9 +27,7 @@ export const CurrentType = createParamDecorator(
       const payload = JSON.parse(decodedPayload);
 
       console.log('payload',payload)
-
-      // Return the decoded payload containing user information
-      return payload;
+      return payload.type === UserType.REAL;
     } catch (error) {
       throw new UnauthorizedException('Invalid token or unauthorized access');
     }
