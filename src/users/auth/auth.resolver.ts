@@ -74,8 +74,7 @@ export class AuthResolver {
 
   @Query(() => User)
   whoAmI(@CurrentUser() user: User, @IsRealUserType() isRealUserType: boolean) {
-    console.log('IsRealUserType',isRealUserType)
-    return this.authService.whoAmI(user);
+    return this.authService.whoAmI(user,isRealUserType);
   }
 
   private _getAccessTokenFromHeader(context): string {

@@ -9,24 +9,14 @@ export const IsRealUserType = createParamDecorator(
     if (!authHeader?.startsWith('Bearer ')) {
       throw new UnauthorizedException('Unauthorized');
     }
-  
-    const token = authHeader.slice(7); // Extract token from Bearer prefix
-
+    const token = authHeader.slice(7);
     try {
-     
       const parts = token.split('.');
       if (parts.length !== 3) {
         throw new UnauthorizedException('Invalid token format');
       }
-      console.log('paret',parts)
-
-      const decodedHeader = atob(parts[0]); // Decode header (optional)
-      const decodedPayload = atob(parts[1]); // Decode payload
-      console.log('decodedPayload',decodedPayload)
-      // Parse the decoded payload into a JavaScript object (assuming it's JSON)
+      const decodedPayload = atob(parts[1]); 
       const payload = JSON.parse(decodedPayload);
-
-      console.log('payload',payload)
       return payload.type === UserType.REAL;
     } catch (error) {
       throw new UnauthorizedException('Invalid token or unauthorized access');

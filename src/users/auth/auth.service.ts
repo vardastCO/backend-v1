@@ -21,6 +21,14 @@ import { LogoutResponse } from "./dto/logout.response";
 import { RefreshInput } from "./dto/refresh.input";
 import { RefreshResponse } from "./dto/refresh.response";
 import { UserType } from "./enums/type-user.enum";
+import { Legal } from "../legal/entities/legal.entity";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import {
+  Inject,
+} from "@nestjs/common";
+import { Cache } from "cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+
 
 @Injectable()
 export class AuthService {
@@ -28,7 +36,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) { }
 
   async validateUser(username: string, password: string): Promise<User | null> {
     const user: User = await this.userService.findOneBy({ username });
@@ -353,7 +362,7 @@ export class AuthService {
     requestIP: string,
     accessToken: string,
   ): Promise<LogoutResponse> {
-    console.log('logout')
+  
     const accessTokenPayload = this.jwtService.decode(accessToken);
     await Session.update(
       { id: accessTokenPayload["sid"], deletedAt: IsNull() },
@@ -390,7 +399,26 @@ export class AuthService {
     );
   }
 
-  whoAmI(user: User): User {
+  async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
+
+    const cacheKey = `isRealUserType-${isRealUserType}`;
+    let legalData = await this.cacheManager.get<Legal>(cacheKey);
+  
+    if (!legalData) {
+      legalData = await Legal.findOneBy({
+        createdById: user.id
+      });
+      try {
+        await this.cacheManager.set(cacheKey, JSON.stringify(legalData), CacheTTL.ONE_WEEK);
+      } catch (e) {
+        console.log('whoAmI', e);
+      }
+    }
+ 
+    user.legal = legalData; 
+    
+  
     return user;
   }
+  
 }

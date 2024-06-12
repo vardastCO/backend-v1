@@ -298,8 +298,6 @@ export class ProjectService {
     if (createTime) {
       whereConditions['createTime'] = MoreThan(createTime); 
     }
-  
-  
     if (nameOrUuid) {
       whereConditions['name'] =  Like(`%${nameOrUuid}%`)
 

@@ -26,6 +26,7 @@ import { Country } from "../../../base/location/country/entities/country.entity"
 import { Role } from "../../authorization/role/entities/role.entity";
 import { UserLanguagesEnum } from "../enums/user-languages.enum";
 import { UserStatusesEnum } from "../enums/user-statuses.enum";
+import { Legal } from "src/users/legal/entities/legal.entity";
 
 @ObjectType()
 @Entity("users")
@@ -117,6 +118,10 @@ export class User extends BaseEntity {
   @JoinColumn()
   avatarFile: Promise<File>;
   avatarFileId: number;
+
+  @Field(type => Legal, { nullable: true })
+  legal: Legal;
+
 
   @Field(type => UserStatusesEnum, {
     defaultValue: UserStatusesEnum.ACTIVE,
