@@ -16,7 +16,7 @@ WORKDIR /usr/src/app
 # Copy only package.json and pnpm lock for installation
 COPY --chown=node:node package.json pnpm-lock.yaml ./
 
-RUN pnpm install
+RUN pnpm install --force
 
 # Copy the rest of the application files
 COPY --chown=node:node . .
