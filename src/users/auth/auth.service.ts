@@ -409,11 +409,12 @@ export class AuthService {
         createdById: user.id
       });
       try {
-        await this.cacheManager.set(cacheKey, legalData, CacheTTL.ONE_WEEK);
+        await this.cacheManager.set(cacheKey, legalData ?? [], CacheTTL.ONE_WEEK);
+  
       } catch (e) {
         console.log('whoAmI', e);
       }
-      user.legal = legalData; 
+      user.legal = legalData ?? null; 
     }
  
     return user;
