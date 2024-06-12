@@ -401,20 +401,23 @@ export class AuthService {
 
   async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
 
-    const cacheKey = `isRealUserType-${isRealUserType}`;
+    const cacheKey = `isRealUserType-${isRealUserType}-${user}`;
     let legalData = await this.cacheManager.get<Legal>(cacheKey);
+
+    console.log('legal',legalData)
   
     if (!legalData) {
       legalData = await Legal.findOneBy({
         createdById: user.id
       });
       try {
-        await this.cacheManager.set(cacheKey, JSON.stringify(legalData), CacheTTL.ONE_WEEK);
+        await this.cacheManager.set(cacheKey, legalData, CacheTTL.ONE_WEEK);
       } catch (e) {
         console.log('whoAmI', e);
       }
     }
  
+    console.log('legal',legalData)
     user.legal = legalData; 
     
   
