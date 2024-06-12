@@ -15,6 +15,7 @@ import { Not, IsNull } from "typeorm"
 import { ExpireTypes } from "./enum/expire-types.enum";
 import { OfferOrder } from "../orderOffer/entities/order-offer.entity";
 import { TypeOrderOffer } from "../enums/type-order-offer.enum";
+import { TypeOrder } from "./enum/type-order.enum";
 
 @Injectable()
 export class PreOrderService {
@@ -253,7 +254,7 @@ export class PreOrderService {
   
   }
    
-  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean,seller:boolean): Promise<PaginationPreOrderResponse> {
+  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean,seller:boolean,isRealUserType:boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
     const {
       take,
@@ -274,6 +275,10 @@ export class PreOrderService {
 
     if (!(await this.authorizationService.setUser(user).hasRole("admin")) || client) {
       whereConditions['userId'] = user.id;
+    } 
+
+    if (!(await this.authorizationService.setUser(user).hasRole("admin")) || client) {
+      whereConditions['type'] = isRealUserType ? TypeOrder.REAL : TypeOrder.LEGAL;
     } 
     
   

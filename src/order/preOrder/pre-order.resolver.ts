@@ -11,6 +11,7 @@ import { PreOrderDTO } from './dto/preOrderDTO';
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
 import { PreOrderService } from './pre-order.service';
+import { IsRealUserType } from "src/users/auth/decorators/current-type.decorator";
 
 
 @Resolver(() => Boolean)
@@ -78,6 +79,7 @@ export class PreOrderResolver {
   @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
   findAll(
     @CurrentUser() currentUser: User,
+    @IsRealUserType() isRealUserType: boolean,
     @Args("indexPreOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
     indexPreOrderInput?: IndexPreOrderInput,
     @Context() context?: { req: Request }
@@ -92,7 +94,7 @@ export class PreOrderResolver {
     if (referer == 'https://seller.vardast.ir' || referer == 'https://seller.vardast.com') {
       seller = true
     }
-    return this.preOrderService.paginate(currentUser, indexPreOrderInput,client,seller);
+    return this.preOrderService.paginate(currentUser, indexPreOrderInput,client,seller,isRealUserType);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Boolean)

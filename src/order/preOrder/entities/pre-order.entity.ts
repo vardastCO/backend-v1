@@ -19,6 +19,7 @@ import {
 import { PaymentMethodEnum } from "../enum/sort-types.enum";
 import { ExpireTypes } from "../enum/expire-types.enum";
 import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
+import { TypeOrder } from "../enum/type-order.enum";
 
 @ObjectType()
 @Entity("pre_order")
@@ -30,6 +31,14 @@ export class PreOrder extends BaseEntity {
   @Field(() => Project, { nullable: true })
   @ManyToOne(() => Project, { eager: true, nullable: true })
   project: Promise<Project>;
+
+  
+  @Field(() => TypeOrder)
+  @Column("enum", {
+    enum: TypeOrder,
+    default: TypeOrder.REAL,
+  })
+  type: TypeOrder;
 
   @Index()
   @Column({ nullable: true })
