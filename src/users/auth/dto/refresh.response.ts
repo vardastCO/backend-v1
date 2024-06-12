@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { User } from "../../user/entities/user.entity";
+import { Legal } from "src/users/legal/entities/legal.entity";
 
 @ObjectType()
 export class RefreshResponse {
@@ -27,6 +28,9 @@ export class RefreshResponse {
 
   @Field(() => User)
   user: User;
+
+  @Field(() => Legal, { nullable: true })
+  legal: Legal;
 
   @Field(() => [String], { nullable: "items" })
   abilities: string[];

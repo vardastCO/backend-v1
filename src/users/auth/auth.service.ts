@@ -20,6 +20,7 @@ import { OneTimePassword } from "../registration/entities/one-time-password.enti
 import { OneTimePasswordStates } from "../registration/enums/one-time-password-states.enum";
 import { OneTimePasswordTypes } from "../registration/enums/one-time-password-types.enum";
 import { ChangeNumberInput } from "./dto/change-number.input";
+import { TypeUser } from "./enums/type-user.enum";
 
 @Injectable()
 export class AuthService {
@@ -98,12 +99,13 @@ export class AuthService {
       // }])
   
       return {
-        accessToken: this._generateNewAccessToken(user, session),
+        accessToken: this._generateNewAccessToken(user, session,LoginOTPInput.type),
         accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-        refreshToken: this._generateNewRefreshToken(user, session),
+        refreshToken: this._generateNewRefreshToken(user, session,LoginOTPInput.type),
         refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
         user,
-        type:"LEGAL",
+        type: LoginOTPInput.type,
+        legal : null,
         abilities: userWholePermissions,
       };
     }
@@ -149,12 +151,13 @@ export class AuthService {
     await session.save();
 
     return {
-      accessToken: this._generateNewAccessToken(newUser, session),
+      accessToken: this._generateNewAccessToken(newUser, session,LoginOTPInput.type),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(newUser, session),
+      refreshToken: this._generateNewRefreshToken(newUser, session,LoginOTPInput.type),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user: newUser,
-      type:"legal",
+      type: LoginOTPInput.type,
+      legal : null,
       abilities: userWholePermissions,
     };
   }
@@ -211,12 +214,13 @@ export class AuthService {
     }
 
     return {
-      accessToken: this._generateNewAccessToken(user, session),
+      accessToken: this._generateNewAccessToken(user, session,changeNumberInput.type),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(user, session),
+      refreshToken: this._generateNewRefreshToken(user, session,changeNumberInput.type),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
-      type:"LEGAL",
+      type:changeNumberInput.type,
+      legal : null,
       abilities: userWholePermissions,
     };
     
@@ -224,6 +228,7 @@ export class AuthService {
   }
 
   async login(
+    type: TypeUser,
     user: User,
     requestIP: string,
     agent: string,
@@ -254,12 +259,13 @@ export class AuthService {
 
     delete user.password;
     return {
-      accessToken: this._generateNewAccessToken(user, session),
+      accessToken: this._generateNewAccessToken(user, session,type),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(user, session),
+      refreshToken: this._generateNewRefreshToken(user, session,type),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
-      type:'LEGAL',
+      type: type,
+      legal : null,
       abilities: userWholePermissions,
     };
   }
@@ -331,12 +337,13 @@ export class AuthService {
     delete user.password;
 
     return {
-      accessToken: this._generateNewAccessToken(user, session),
+      accessToken: this._generateNewAccessToken(user, session,refreshInput.type),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(user, session),
+      refreshToken: this._generateNewRefreshToken(user, session,refreshInput.type),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
-      type:"LEGAL",
+      type: refreshInput.type,
+      legal : null,
       abilities: userWholePermissions,
     };
   }
@@ -361,20 +368,20 @@ export class AuthService {
     return { user };
   }
 
-  private _generateNewAccessToken(user: User, session: Session): string {
+  private _generateNewAccessToken(user: User, session: Session,type:TypeUser): string {
     return this.jwtService.sign({
       uuid: user.uuid,
       sid: session.id,
-      type:'LEGAL'
+      type:type
     });
   }
 
-  private _generateNewRefreshToken(user: User, session: Session): string {
+  private _generateNewRefreshToken(user: User, session: Session,type:TypeUser): string {
     return this.jwtService.sign(
       {
         uuid: user.uuid,
         sid: session.id,
-        type:'LEGAL'
+        type:type
       },
       {
         expiresIn: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),

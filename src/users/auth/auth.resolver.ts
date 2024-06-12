@@ -22,6 +22,7 @@ export class AuthResolver {
   @UseGuards(GqlAuthGuard)
   login(@Args("loginInput") loginInput: LoginInput, @Context() context) {
     return this.authService.login(
+      loginInput.type,
       context.user,
       context.req.ip,
       this._getAgentFromHeader(context),
