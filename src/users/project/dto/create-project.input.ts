@@ -34,9 +34,9 @@ export class CreateProjectInput {
   @IsOptional()
   description?: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
-  cellphone: string;
+  cellphone?: string;
 
 }
