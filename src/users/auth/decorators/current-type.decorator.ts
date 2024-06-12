@@ -19,12 +19,15 @@ export const CurrentType = createParamDecorator(
       if (parts.length !== 3) {
         throw new UnauthorizedException('Invalid token format');
       }
+      console.log('paret',parts)
 
       const decodedHeader = atob(parts[0]); // Decode header (optional)
       const decodedPayload = atob(parts[1]); // Decode payload
-
+      console.log('decodedPayload',decodedPayload)
       // Parse the decoded payload into a JavaScript object (assuming it's JSON)
       const payload = JSON.parse(decodedPayload);
+
+      console.log('payload',payload)
 
       // Return the decoded payload containing user information
       return payload;
