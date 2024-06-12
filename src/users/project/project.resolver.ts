@@ -18,6 +18,7 @@ import { UpdateProjectUserInput } from "./dto/update-user-input";
 import { IndexProjectInput } from "./dto/index-project.input";
 import { PaginationProjectResponse } from "./dto/pagination-project.response";
 import { ValidationPipe } from "@nestjs/common";
+import { IsRealUserType } from "../auth/decorators/current-type.decorator";
 @Resolver(() => Project)
 export class ProjectResolver {
   constructor(private readonly projectService: ProjectService) {}
@@ -94,10 +95,11 @@ export class ProjectResolver {
   @Permission("gql.users.address.store")
   @Query(() => [Project], { name: "myProjects" })
   myProjects(
+    @IsRealUserType() isRealUserType: boolean,
     @CurrentUser() user: User,
   ) {
   
-    return this.projectService.myProjects(user.id);
+    return this.projectService.myProjects(user.id,isRealUserType);
   }
 
   @Permission("gql.users.address.store")

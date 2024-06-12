@@ -17,6 +17,7 @@ import { Project } from "./entities/project.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
 import { UserTypeProject } from "./enums/type-user-project.enum";
+import { TypeProject } from "./enums/type-project.enum";
 @Injectable()
 export class ProjectService {
   constructor(
@@ -268,6 +269,7 @@ export class ProjectService {
 
   async myProjects(
     userId?: number,
+    isRealUserType?: boolean
   ): Promise<Project[]> {
     const all = await Project.find({
       where: { user: { userId: userId } },
@@ -278,7 +280,7 @@ export class ProjectService {
     });
     const ids = all.map(item => item.id);
     return await Project.find({
-      where: { id: In(ids) },
+      where: { id: In(ids), type:isRealUserType ? TypeProject.REAL : TypeProject.LEGAL },
       relations: ['user', 'address'],
       order: {
         id: 'DESC'
