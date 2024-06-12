@@ -279,10 +279,8 @@ export class ProjectService {
       }
     });
     const ids = all.map(item => item.id);
-
-    console.log('gggg',isRealUserType)
     return await Project.find({
-      where: { id: In(ids), type:isRealUserType ? TypeProject.LEGAL : TypeProject.REAL },
+      where: { id: In(ids), type:isRealUserType ? TypeProject.REAL : TypeProject.LEGAL },
       relations: ['user', 'address'],
       order: {
         id: 'DESC'
