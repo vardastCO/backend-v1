@@ -78,8 +78,7 @@ export class PreOrderFileController {
   }
 
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, totalTax, totalFi, instructions, instructions2, instructions3, totalQty } = data;
-
+    const { date, invoiceNumber, totalQty, sellerAddress,instructions3, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
     const itemsHTML = items.map((item, index) => `
       <tr>
         <td>${index + 1}</td>
@@ -124,14 +123,19 @@ export class PreOrderFileController {
                    .replace('{{buyerName}}', buyerName)
                    .replace('{{buyerNationalId}}', buyerNationalId)
                    .replace('{{buyerAddress}}', buyerAddress)
-                   .replace('{{itemsHTML}}', fullItemsHTML)
+                   .replace('{{itemsHTML}}', itemsHTML)
                    .replace('{{totalAmount}}', addCommas(totalAmount))
-                   .replace('{{totalTax}}', addCommas(totalTax))
-                   .replace('{{totalFi}}', addCommas(totalFi))
-                   .replace('{{instructions}}', instructions)
-                   .replace('{{instructions2}}', instructions2)
-                   .replace('{{instructions3}}', instructions3)
-                   .replace('{{totalQty}}', totalQty.toString())
-                   .replace('{{persianTotal}}', `${persianTotal}`);
+                   .replace('{{additions}}', additions)
+                   .replace('{{discount}}', discount)
+                   .replace('{{buyerNationalId}}', '1111111')
+                   .replace('{{buyerPhone}}', '09124484707')
+                    .replace('{{grandTotal}}', grandTotal)
+                    .replace('{{totalUOM}}', totalQty)
+                    .replace('{{totalFi}}',  addCommas(totalFi))
+                    .replace('{{totalTAX}}', addCommas(totalTax))
+                    .replace('{{persianTotal}}', `${persianTotal}`)
+                    .replace('{{instructions_sheba}}', instructions)
+                    .replace('{{instructions_expire}}', instructions2)
+                    .replace('{{instructions_expire_time}}', instructions3);
   }
 }
