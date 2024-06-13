@@ -73,7 +73,7 @@ export class PreOrderFileController {
   }
 
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, totalQty, sellerAddress, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
+    const { date, invoiceNumber, totalQty, sellerAddress,instructions3, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
     const itemsHTML = items.map((item, index) => `
       <tr>
         <td>${index+1}</td>
@@ -122,8 +122,9 @@ export class PreOrderFileController {
                     .replace('{{totalUOM}}', totalQty)
                     .replace('{{totalFi}}',  addCommas(totalFi))
                     .replace('{{totalTAX}}', addCommas(totalTax))
-                   .replace('{{persianTotal}}', `${persianTotal}`)
-                  .replace('{{instructions_sheba}}', instructions)
-                  .replace('{{instructions_expire}}', instructions2);
+                    .replace('{{persianTotal}}', `${persianTotal}`)
+                    .replace('{{instructions_sheba}}', instructions)
+                    .replace('{{instructions_expire}}', instructions2)
+                    .replace('{{instructions_expire_time}}', instructions3);
   }
 }
