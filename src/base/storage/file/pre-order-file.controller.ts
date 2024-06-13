@@ -123,7 +123,7 @@ export class PreOrderFileController {
                    .replace('{{buyerName}}', buyerName)
                    .replace('{{buyerNationalId}}', buyerNationalId)
                    .replace('{{buyerAddress}}', buyerAddress)
-                   .replace('{{itemsHTML}}', itemsHTML)
+                   .replace('{{itemsHTML}}', fullItemsHTML)
                    .replace('{{totalAmount}}', addCommas(totalAmount))
                    .replace('{{additions}}', additions)
                    .replace('{{discount}}', discount)
