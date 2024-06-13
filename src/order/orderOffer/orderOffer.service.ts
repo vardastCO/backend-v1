@@ -18,6 +18,7 @@ import { UpdateOrderOfferInput } from "./dto/update-order-offer.input";
 import { OfferLine } from './entities/offer-line.entity';
 import { OfferOrder } from './entities/order-offer.entity';
 import { OrderOfferStatuses } from "./enums/order-offer-statuses";
+import { SellerType } from "src/products/seller/enums/seller-type.enum";
 
 @Injectable()
 export class OrderOfferService {
@@ -48,6 +49,7 @@ export class OrderOfferService {
       if (!findTempSeller) {
         let seller: Seller = new Seller()
         seller.name = `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`
+        seller.sellerType = SellerType.EXTENDED
         seller.createdById = user.id
         await seller.save()
         let PhoneContact = new ContactInfo()
@@ -55,6 +57,7 @@ export class OrderOfferService {
         PhoneContact.relatedType = ContactInfoRelatedTypes.SELLER
         PhoneContact.title = 'تلفن'
         PhoneContact.type = ContactInfoTypes.TEL
+        PhoneContact.countryId = 244
         PhoneContact.number = addSellerOrderOffer.phone
         await PhoneContact.save()
         let CellContact = new ContactInfo()
@@ -63,6 +66,7 @@ export class OrderOfferService {
         PhoneContact.title = 'موبایل'
         CellContact.type = ContactInfoTypes.MOBILE
         CellContact.number = addSellerOrderOffer.cellphone
+        CellContact.countryId = 244
         await CellContact.save()
         offer.sellerId = seller.id
         offer.request_name = seller.name;
