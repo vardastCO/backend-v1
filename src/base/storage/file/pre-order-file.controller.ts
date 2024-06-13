@@ -9,12 +9,19 @@ export class PreOrderFileController {
   @Public()
   @Get(':uuid')
   async getOrderFiles(@Param("uuid") uuid: string, @Res() res: Response): Promise<void> {
-  
+    let template
     const templateURL = 'https://storage.vardast.com/vardast/order/pre-invoice-template.html';
-
     try {
       const response = await axios.get(templateURL);
-      const template = response.data;
+       template = response.data;
+      // Further processing
+    } catch (error) {
+      console.error('Failed to fetch invoice template:', error);
+      res.status(500).send('Failed to fetch invoice template');
+      return; 
+    }
+    
+    try {
 
       const offer = await OfferOrder.findOne({
         where: {
