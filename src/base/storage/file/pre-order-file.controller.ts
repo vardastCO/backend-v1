@@ -42,6 +42,8 @@ export class PreOrderFileController {
         return data;
        }));
       const expire_time = new Date(await (await offer.preOrder).expire_date).toLocaleDateString('fa-IR')
+      console.log(await (await offer.preOrder).expire_date)
+      console.log(expire_time)
       const data = {
         date: new Date((await offer.preOrder).request_date).toLocaleDateString('fa-IR'),
         invoiceNumber: (await offer.preOrder).uuid,
@@ -56,7 +58,7 @@ export class PreOrderFileController {
         totalFi: offer.total_fi,
         instructions: 'خواهشمند است مبلغ فاکتور را به شماره شباي 530780100610810707075859 IR به نام شرکت خلق ارزش مهستان واریز فرمایید.',
         instructions2: 'کالای فروخته شده و تحویل داده شده توسط فروشنده به شرح جدول فوق تا زمان تسویه حساب کامل به صورت امانت نزد خریدار می باشد.',
-        instructions3: `ثبت شده است` + expire_time + `تاریخ انقضای سفارش `,
+        instructions3: `تاریخ انقضا ی سفارش ${expire_time} ثبت شده است `,
         totalQty
 
       };
@@ -71,7 +73,7 @@ export class PreOrderFileController {
   }
 
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, totalQty, sellerAddress,instructions3, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
+    const { date, invoiceNumber, totalQty, sellerAddress, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
     const itemsHTML = items.map((item, index) => `
       <tr>
         <td>${index+1}</td>
@@ -120,9 +122,8 @@ export class PreOrderFileController {
                     .replace('{{totalUOM}}', totalQty)
                     .replace('{{totalFi}}',  addCommas(totalFi))
                     .replace('{{totalTAX}}', addCommas(totalTax))
-                    .replace('{{persianTotal}}', `${persianTotal}`)
-                    .replace('{{instructions_sheba}}', instructions)
-                    .replace('{{instructions_expire}}', instructions2)
-                    .replace('{{instructions_expire_time}}', instructions3);
+                   .replace('{{persianTotal}}', `${persianTotal}`)
+                  .replace('{{instructions_sheba}}', instructions)
+                  .replace('{{instructions_expire}}', instructions2);
   }
 }
