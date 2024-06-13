@@ -22,7 +22,7 @@ export class OrderFileController {
         uuid,
         status: PreOrderStatus.CLOSED
       })
-      console.log('order',order)
+
       if (!order) {
         res.send('not found')
       }
@@ -34,7 +34,6 @@ export class OrderFileController {
         },
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
-      console.log('offer',offer)
       if (!offer) {
         res.send('not found')
       }
