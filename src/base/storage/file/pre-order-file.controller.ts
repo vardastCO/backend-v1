@@ -41,7 +41,7 @@ export class PreOrderFileController {
         totalQty = totalQty + parseInt(data.qty)
         return data;
        }));
-      const expire_time = new Date(await (await offer.preOrder).expire_date).toLocaleDateString('fa-IR')
+      const expire_time = new Date(await (await offer.preOrder).expire_time).toLocaleDateString('fa-IR')
       console.log(await (await offer.preOrder).expire_date)
       console.log(expire_time)
       const data = {
