@@ -39,6 +39,10 @@ export class Legal extends BaseEntity {
   @Column({ unique: true })
   national_id: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  wallet?: string;
+
   @Field(() => Date, { nullable: true })
   @CreateDateColumn({ type: 'timestamp', nullable: true })
   create_at?: Date;
