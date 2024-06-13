@@ -42,8 +42,6 @@ export class PreOrderFileController {
         return data;
        }));
       const expire_time = new Date(await (await offer.preOrder).expire_time).toLocaleDateString('fa-IR')
-      console.log(await (await offer.preOrder).expire_date)
-      console.log(expire_time)
       const data = {
         date: new Date((await offer.preOrder).request_date).toLocaleDateString('fa-IR'),
         invoiceNumber: (await offer.preOrder).uuid,
