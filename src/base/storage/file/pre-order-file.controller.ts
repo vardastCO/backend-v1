@@ -45,7 +45,7 @@ export class PreOrderFileController {
           tax_price: offer.tax_price ?? '-',
           totalPrice: offer.total_price ?? '-',
         }
-        totalQty = totalQty + parseInt(data.qty)
+        totalQty += parseInt(data.qty, 10);
         return data;
        }));
       const expire_time = new Date(await (await offer.preOrder).expire_time).toLocaleDateString('fa-IR')
@@ -78,10 +78,11 @@ export class PreOrderFileController {
   }
 
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, totalQty, sellerAddress,instructions3, sellerNationalId,totalTax,totalFi, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
+    const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, totalTax, totalFi, instructions, instructions2, instructions3, totalQty } = data;
+
     const itemsHTML = items.map((item, index) => `
       <tr>
-        <td>${index+1}</td>
+        <td>${index + 1}</td>
         <td colspan="2">${item.id}</td>
         <td colspan="5">${item.name}</td>
         <td>${item.uom}</td>
@@ -93,9 +94,12 @@ export class PreOrderFileController {
         <td colspan="2"></td>
         <td colspan="2">${addCommas(item.tax_price * 10)}</td>
         <td colspan="2">${addCommas(item.totalPrice * 10)}</td>
-      </tr>`).concat([...Array(10 - items.length+1)].map((_,item) => `
+      </tr>`).join('');
+
+    const remainingRows = Math.max(0, 10 - items.length);
+    const additionalRowsHTML = [...Array(remainingRows)].map(() => `
       <tr>
-        <td>${item+items.length}</td>
+        <td></td>
         <td colspan="2"></td>
         <td colspan="5"></td>
         <td></td>
@@ -107,8 +111,11 @@ export class PreOrderFileController {
         <td colspan="2"></td>
         <td colspan="2"></td>
         <td colspan="2"></td>
-      </tr>`)).join('');
-    const persianTotal = numberToWords(addCommas(totalAmount *  10))
+      </tr>`).join('');
+
+    const fullItemsHTML = itemsHTML + additionalRowsHTML;
+
+    const persianTotal = numberToWords(addCommas(totalAmount * 10));
 
     return template.replace('{{date}}', date)
                    .replace('{{invoiceNumber}}', invoiceNumber)
@@ -117,19 +124,14 @@ export class PreOrderFileController {
                    .replace('{{buyerName}}', buyerName)
                    .replace('{{buyerNationalId}}', buyerNationalId)
                    .replace('{{buyerAddress}}', buyerAddress)
-                   .replace('{{itemsHTML}}', itemsHTML)
+                   .replace('{{itemsHTML}}', fullItemsHTML)
                    .replace('{{totalAmount}}', addCommas(totalAmount))
-                   .replace('{{additions}}', additions)
-                   .replace('{{discount}}', discount)
-                   .replace('{{buyerNationalId}}', '1111111')
-                   .replace('{{buyerPhone}}', '09124484707')
-                    .replace('{{grandTotal}}', grandTotal)
-                    .replace('{{totalUOM}}', totalQty)
-                    .replace('{{totalFi}}',  addCommas(totalFi))
-                    .replace('{{totalTAX}}', addCommas(totalTax))
-                    .replace('{{persianTotal}}', `${persianTotal}`)
-                    .replace('{{instructions_sheba}}', instructions)
-                    .replace('{{instructions_expire}}', instructions2)
-                    .replace('{{instructions_expire_time}}', instructions3);
+                   .replace('{{totalTax}}', addCommas(totalTax))
+                   .replace('{{totalFi}}', addCommas(totalFi))
+                   .replace('{{instructions}}', instructions)
+                   .replace('{{instructions2}}', instructions2)
+                   .replace('{{instructions3}}', instructions3)
+                   .replace('{{totalQty}}', totalQty.toString())
+                   .replace('{{persianTotal}}', `${persianTotal}`);
   }
 }
