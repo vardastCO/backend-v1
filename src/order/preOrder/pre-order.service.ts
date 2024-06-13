@@ -41,7 +41,15 @@ export class PreOrderService {
         }
         const newOrder: PreOrder = PreOrder.create<PreOrder>(createPreOrderInput);
         newOrder.uuid = await this.generateNumericUuid()
-        newOrder.userId =  user.id
+        let user_id = user.id
+        if (createPreOrderInput.cellphone) {
+          const findUserId = (await await User.findOneBy({ cellphone: createPreOrderInput.cellphone })).id
+          if (!findUserId) {
+            throw 'error not found user'
+          }
+          user_id = findUserId
+        }
+        newOrder.userId = user_id
       
 
         await newOrder.save();

@@ -1,6 +1,7 @@
 import { Field, InputType, Int} from "@nestjs/graphql";
 import { PaymentMethodEnum } from "../enum/sort-types.enum";
-import { IsNotEmpty, IsEnum, IsString } from "class-validator";
+import { IsNotEmpty, IsEnum, IsOptional,Length } from "class-validator";
+import { TypeOrder } from "../enum/type-order.enum";
 
 @InputType()
 export class CreatePreOrderInput {
@@ -22,4 +23,18 @@ export class CreatePreOrderInput {
 
   @Field({ nullable: true })
   descriptions: string;
+
+  @Field(() => TypeOrder, {
+    defaultValue: TypeOrder.REAL,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  @IsEnum(TypeOrder)
+  type?: TypeOrder = TypeOrder.REAL;
+
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
+  cellphone?: string;
 }
