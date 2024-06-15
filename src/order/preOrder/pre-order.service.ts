@@ -227,13 +227,9 @@ export class PreOrderService {
           }),
         ]);
   
-        // Wait for all offers to resolve
         const [clientOffers ] = await offersPromises;
         order.offers = [...clientOffers];
-        order.offersNum = clientOffers.length;
-        console.log('clientOffers',clientOffers)
-        order.offers = order.offers || [];
-        order.offersNum = order.offersNum || 0;
+        console.log('gggg',order.offers)
       } else {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
@@ -274,17 +270,10 @@ export class PreOrderService {
             }
           }),
         ]);
-  
-        // Wait for all offers to resolve
-        const [clientOffers, sellerOffers, adminOffers ] = await offersPromises;
-        console.log('clientOffers',clientOffers)
-        console.log('sellerOffers',sellerOffers)
-        // Push offers into the order's offers array
-        order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
-        order.offersNum = order.offers.length;
 
-        order.offers = order.offers || [];
-        order.offersNum = order.offersNum || 0;
+        const [clientOffers, sellerOffers, adminOffers ] = await offersPromises;
+       
+        order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
 
       }
 
