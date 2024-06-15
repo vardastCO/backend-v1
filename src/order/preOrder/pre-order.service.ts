@@ -206,6 +206,9 @@ export class PreOrderService {
           }
         }
       })
+      if (!order) {
+        throw new Error('Order not found');
+      }
       if (order && client) {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
@@ -224,9 +227,12 @@ export class PreOrderService {
         ]);
   
         // Wait for all offers to resolve
-        const [clientOffers] = await offersPromises;
+        const [clientOffers = []] = await offersPromises;
         order.offers = [...clientOffers];
         order.offersNum = clientOffers.length;
+
+        order.offers = order.offers || [];
+        order.offersNum = order.offersNum || 0;
       } else {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
@@ -269,11 +275,15 @@ export class PreOrderService {
         ]);
   
         // Wait for all offers to resolve
-        const [clientOffers, sellerOffers, adminOffers] = await offersPromises;
+        const [clientOffers = [], sellerOffers = [], adminOffers = []] = await offersPromises;
+
   
         // Push offers into the order's offers array
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
         order.offersNum = order.offers.length;
+
+        order.offers = order.offers || [];
+        order.offersNum = order.offersNum || 0;
 
       }
 
