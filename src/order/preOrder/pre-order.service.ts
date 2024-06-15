@@ -206,7 +206,6 @@ export class PreOrderService {
           }
         }
       })
-      console.log('order',order)
       if (!order) {
         throw new Error('Order not found');
       }

@@ -30,5 +30,8 @@ export class TotalInfoResponse {
   countOfSellersOffline: number;
 
   @Field()
+  countOfSellersExtended: number;
+
+  @Field()
   countOfProjects: number;
 }

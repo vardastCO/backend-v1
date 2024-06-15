@@ -172,6 +172,7 @@ export class SearchService {
       countOfSellersOnline,
       countOfSellersNormal,
       countOfSellersOffline,
+      countOfSellersExtended,
       countOfUsers ,
       countOfProducts ,
       countOfCategories,
@@ -183,6 +184,7 @@ export class SearchService {
       this.getCountOfSellersOnline(),
       this.getCountOfSellersNormal(),
       this.getCountOfSellersOffline(),
+      this.getCountOfSellersExtended(),
       this.getCountOfUsers(),
       this.getCountOfProducts(),
       this.getCountOfCategories(),
@@ -196,6 +198,7 @@ export class SearchService {
       countOfSellersOnline,
       countOfSellersNormal,
       countOfSellersOffline,
+      countOfSellersExtended,
       countOfUsers ,
       countOfProducts ,
       countOfCategories,
@@ -241,6 +244,14 @@ export class SearchService {
     return countOfSellersoffline;
   }
 
+  private async getCountOfSellersExtended(): Promise<number> {
+    const countOfSellersoffline = await Seller.count({
+      where: {
+        sellerType: SellerType.EXTENDED
+      }
+    });
+    return countOfSellersoffline;
+  }
   private async getCountOfUsers(): Promise<number> {
     const countOfUsers = await User.count();
     return countOfUsers;
