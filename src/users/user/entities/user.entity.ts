@@ -123,9 +123,8 @@ export class User extends BaseEntity {
   legal: Legal;
 
   @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Column({  default: '0', nullable: true  })
   wallet?: string;
-
 
   @Field(type => UserStatusesEnum, {
     defaultValue: UserStatusesEnum.ACTIVE,

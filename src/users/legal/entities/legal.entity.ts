@@ -41,7 +41,7 @@ export class Legal extends BaseEntity {
   national_id?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true })
+  @Column({  default: '0', nullable: true  })
   wallet?: string;
 
   @Field(() => Date, { nullable: true })
