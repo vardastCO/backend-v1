@@ -213,7 +213,7 @@ export class PreOrderService {
       if (client) {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
-            where: { preOrderId: order.id, status: OrderOfferStatuses.INVOICE},
+            where: { preOrderId: order.id, type: TypeOrderOffer.SELLER,status: OrderOfferStatuses.INVOICE},
             relations: ["offerLine"],
             order: {
               offerLine: {
@@ -229,7 +229,6 @@ export class PreOrderService {
   
         const [clientOffers ] = await offersPromises;
         order.offers = [...clientOffers];
-        console.log('gggg',order.offers)
       } else {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
