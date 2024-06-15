@@ -284,7 +284,7 @@ export class UserService {
         console.log('new legal', legal)
         await legal.save()
       }
-
+      user.legal = legal
       } catch (e) {
         console.log('err in add legal',e)
       }
