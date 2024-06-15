@@ -49,7 +49,7 @@ export class LegalResolver {
   @Query(() => PaginationLegalResponse)
   findAllLegals(
     @Args(
-      "indexProjectInput",
+      "indexLegalInput",
       { nullable: true },
       new ValidationPipe({ transform: true }),
     )
