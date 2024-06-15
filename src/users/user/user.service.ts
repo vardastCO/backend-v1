@@ -272,7 +272,6 @@ export class UserService {
        }) 
       }
       if (!legal) {
-        console.log('new legal')
         legal        = new Legal()
         if (updateProfileInput.name_company) {
           legal.name_company = updateProfileInput.name_company
@@ -281,7 +280,6 @@ export class UserService {
           legal.national_id = updateProfileInput.national_id
         }
         legal.createdById = user.id
-        console.log('new legal', legal)
        
       }
         
