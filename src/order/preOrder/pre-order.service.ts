@@ -276,7 +276,7 @@ export class PreOrderService {
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
 
       }
-
+  
       return order
     } catch (error) {
 
