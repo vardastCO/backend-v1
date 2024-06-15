@@ -259,7 +259,8 @@ export class UserService {
     });
 
     if (updateProfileInput.name_company || updateProfileInput.national_id) {
-      let legal
+      try {
+        let legal
       if (updateProfileInput.national_id) {
          legal = await Legal.findOneBy({
           national_id : updateProfileInput.national_id
@@ -279,9 +280,15 @@ export class UserService {
         if (updateProfileInput.national_id) {
           legal.national_id = updateProfileInput.national_id
         }
+        legal.createdById = user.id
+        console.log('new legal', legal)
+        await legal.save()
       }
-      legal.createdById = user.id
-      await legal.save()
+
+      } catch (e) {
+        console.log('err in add legal',e)
+      }
+      
      
     }
 
