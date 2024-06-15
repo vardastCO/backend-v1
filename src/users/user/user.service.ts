@@ -259,15 +259,30 @@ export class UserService {
     });
 
     if (updateProfileInput.name_company || updateProfileInput.national_id) {
-      const legal        = new Legal()
-      legal.createdById = user.id
-      if (updateProfileInput.name_company) {
-        legal.name_company = updateProfileInput.name_company
-      }
+      let legal
       if (updateProfileInput.national_id) {
-        legal.national_id = updateProfileInput.national_id
+         legal = await Legal.findOneBy({
+          national_id : updateProfileInput.national_id
+        }) 
       }
+      if (updateProfileInput.name_company) {
+        legal = await Legal.findOneBy({
+          name_company : updateProfileInput.name_company
+       }) 
+      }
+      if (!legal) {
+        console.log('new legal')
+        legal        = new Legal()
+        if (updateProfileInput.name_company) {
+          legal.name_company = updateProfileInput.name_company
+        }
+        if (updateProfileInput.national_id) {
+          legal.national_id = updateProfileInput.national_id
+        }
+      }
+      legal.createdById = user.id
       await legal.save()
+     
     }
 
     return user;
