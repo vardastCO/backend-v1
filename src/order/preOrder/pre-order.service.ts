@@ -17,6 +17,7 @@ import { OfferOrder } from "../orderOffer/entities/order-offer.entity";
 import { TypeOrderOffer } from "../enums/type-order-offer.enum";
 import { TypeOrder } from "./enum/type-order.enum";
 import { OrderOfferStatuses } from "../orderOffer/enums/order-offer-statuses";
+import { Offer } from "src/products/offer/entities/offer.entity";
 
 @Injectable()
 export class PreOrderService {
@@ -223,11 +224,9 @@ export class PreOrderService {
         ]);
   
         // Wait for all offers to resolve
-        const [clientOffers,] = await offersPromises;
-  
-        // Push offers into the order's offers array
+        const [clientOffers] = await offersPromises;
         order.offers = [...clientOffers];
-        return order
+        order.offersNum = clientOffers.length;
       } else {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
@@ -274,6 +273,8 @@ export class PreOrderService {
   
         // Push offers into the order's offers array
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
+        order.offersNum = order.offers.length;
+
       }
 
       return 
