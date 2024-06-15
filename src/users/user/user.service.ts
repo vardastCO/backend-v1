@@ -261,16 +261,9 @@ export class UserService {
     if (updateProfileInput.name_company || updateProfileInput.national_id) {
       try {
       let legal
-      if (updateProfileInput.national_id) {
-         legal = await Legal.findOneBy({
-          national_id : updateProfileInput.national_id
-        }) 
-      }
-      if (updateProfileInput.name_company) {
-        legal = await Legal.findOneBy({
-          name_company : updateProfileInput.name_company
-       }) 
-      }
+      legal = await Legal.findOneBy({
+        createdById : user.id
+      }) 
       if (!legal) {
         legal        = new Legal()
         if (updateProfileInput.name_company) {
@@ -280,16 +273,16 @@ export class UserService {
           legal.national_id = updateProfileInput.national_id
         }
         legal.createdById = user.id
-       
+        await legal.save()
+      } else {
+        if (updateProfileInput.name_company) {
+          legal.name_company = updateProfileInput.name_company
+        }
+        if (updateProfileInput.national_id) {
+          legal.national_id = updateProfileInput.national_id
+        }
+        await legal.save()
       }
-        
-      if (updateProfileInput.name_company) {
-        legal.name_company = updateProfileInput.name_company
-      }
-      if (updateProfileInput.national_id) {
-        legal.national_id = updateProfileInput.national_id
-      }
-      await legal.save()
       user.legal = legal
       } catch (e) {
         console.log('err in add legal',e)
