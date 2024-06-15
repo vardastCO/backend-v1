@@ -28,6 +28,7 @@ import { UserStatusesEnum } from "./enums/user-statuses.enum";
 import { UpdateProfileInput } from "./dto/update-profile.input";
 import { CompressionService } from "src/compression.service";
 import { DecompressionService } from "src/decompression.service";
+import { Legal } from "../legal/entities/legal.entity";
 
 @Injectable()
 export class UserService {
@@ -223,7 +224,13 @@ export class UserService {
     } else if (updateUserInput.permissionIds) {
       await this.cachePermissionsOf(user);
     }
-
+    if (updateUserInput.name_company && updateUserInput.national_id) {
+      const legal        = new Legal()
+      legal.createdById  = user.id
+      legal.name_company = updateUserInput.name_company
+      legal.national_id  = updateUserInput.national_id
+      await legal.save()
+    }
     return user;
   }
   async updateProfile(

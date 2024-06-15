@@ -16,7 +16,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  Unique,
 } from "typeorm";
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { Address } from "src/users/address/entities/address.entity";
@@ -26,6 +26,7 @@ import { User } from "src/users/user/entities/user.entity";
 
 @ObjectType()
 @Entity("legals")
+@Unique(["national_id", "createdById"])
 export class Legal extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()

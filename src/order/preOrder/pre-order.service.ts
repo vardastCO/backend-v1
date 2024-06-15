@@ -16,6 +16,7 @@ import { ExpireTypes } from "./enum/expire-types.enum";
 import { OfferOrder } from "../orderOffer/entities/order-offer.entity";
 import { TypeOrderOffer } from "../enums/type-order-offer.enum";
 import { TypeOrder } from "./enum/type-order.enum";
+import { OrderOfferStatuses } from "../orderOffer/enums/order-offer-statuses";
 
 @Injectable()
 export class PreOrderService {
@@ -192,7 +193,7 @@ export class PreOrderService {
     }   
   
   }
-  async findPreOrderById(id : number,user:User): Promise<PreOrder> {
+  async findPreOrderById(id : number,user:User,client:boolean): Promise<PreOrder> {
   
     try {
       let order = await PreOrder.findOne({
@@ -204,7 +205,30 @@ export class PreOrderService {
           }
         }
       })
-      if (order) {
+      if (order && client) {
+        const offersPromises = Promise.all([
+          OfferOrder.find({ 
+            where: { preOrderId: order.id, type: TypeOrderOffer.SELLER,status: OrderOfferStatuses.INVOICE},
+            relations: ["offerLine"],
+            order: {
+              offerLine: {
+                line: {
+                  type: 'ASC',
+                  id: "DESC"
+                }
+               
+              }
+            }
+          }),
+        ]);
+  
+        // Wait for all offers to resolve
+        const [clientOffers,] = await offersPromises;
+  
+        // Push offers into the order's offers array
+        order.offers = [...clientOffers];
+        return order
+      } else {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
             where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT },
@@ -250,7 +274,6 @@ export class PreOrderService {
   
         // Push offers into the order's offers array
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
-        return order
       }
 
       return 

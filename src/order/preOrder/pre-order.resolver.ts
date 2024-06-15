@@ -66,10 +66,16 @@ export class PreOrderResolver {
   @Query(() => PreOrder, { name: "findPreOrderById" })
   findPreOrderById(
     @Args("id") id: number,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
+    @Context() context?: { req: Request }
   ) {
-  
-    return this.preOrderService.findPreOrderById(id,user);
+    const request = context?.req;
+    const referer = request.headers['origin'] ?? null;
+    let client = false 
+    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
+      client = true
+    }
+    return this.preOrderService.findPreOrderById(id,user,client);
   }
 
 
