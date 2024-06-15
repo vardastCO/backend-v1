@@ -21,6 +21,7 @@ export class CreateLegalInput {
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
+  @Length(11, 11, { message: " شناسه ملی یازده رقمی باید باشد" })
   national_id: string;
 
 

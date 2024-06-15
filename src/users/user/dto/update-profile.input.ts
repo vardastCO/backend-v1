@@ -1,5 +1,5 @@
 import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
-import { MaxLength, IsNotEmpty,IsOptional,IsString } from "class-validator";
+import { MaxLength, Length,IsOptional,IsString } from "class-validator";
 
 @InputType()
 export class UpdateProfileInput  {
@@ -27,5 +27,6 @@ export class UpdateProfileInput  {
   @IsOptional()
   @IsString()
   @MaxLength(255)
+  @Length(11, 11, { message: " شناسه ملی یازده رقمی باید باشد" })
   national_id: string;
 }
