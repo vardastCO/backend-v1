@@ -17,14 +17,14 @@ export class UpdateProfileInput  {
   @IsOptional()
   email: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   name_company: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   national_id: string;
