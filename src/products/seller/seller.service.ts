@@ -179,6 +179,10 @@ export class SellerService {
     if (indexSellerInput.hasLogoFile !== undefined) {
       whereConditions[`logoFile`] = indexSellerInput.hasLogoFile ? Not(IsNull()) : IsNull();
     }
+
+    if (indexSellerInput.type) {
+      whereConditions[`type`] = indexSellerInput.type as SellerType;
+    }
     
 
     const [data, total] = await Seller.findAndCount({

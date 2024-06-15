@@ -108,7 +108,7 @@ export class Seller extends BaseEntity {
   @Index()
   @Column("enum", {
     enum: SellerType,
-    default: SellerType.NORMAL,
+    default: SellerType.OFFLINE,
   })
   sellerType: SellerType;
 

@@ -2,6 +2,7 @@ import { Field, InputType, Int } from "@nestjs/graphql";
 import { IsBoolean, IsInt, IsOptional,IsEnum ,IsString } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
+import { SellerType } from "../enums/seller-type.enum";
 
 enum SortOrder {
   ASC = 'ASC',
@@ -12,6 +13,11 @@ export class IndexSellerInput extends IndexInput {
   @Field(() => ThreeStateSupervisionStatuses, { nullable: true })
   @IsOptional()
   status: ThreeStateSupervisionStatuses;
+
+
+  @Field(() => SellerType, { nullable: true })
+  @IsOptional()
+  type: SellerType;
 
   @Field({ nullable: true })
   @IsOptional()
