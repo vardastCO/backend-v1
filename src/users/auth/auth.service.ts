@@ -401,16 +401,12 @@ export class AuthService {
 
   async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
 
-    const cacheKey = `isRealUserType-${isRealUserType}-${user}`;
     user.legal = null
-    console.log('who am i ')
     const legalData = await Legal.findOneBy({
       createdById: user.id
     });
-    console.log('  user.legal',  user.legal)
     user.legal = legalData ?? null; 
   
- 
     return user;
   }
   
