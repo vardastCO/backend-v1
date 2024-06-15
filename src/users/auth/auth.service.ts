@@ -403,19 +403,13 @@ export class AuthService {
 
     const cacheKey = `isRealUserType-${isRealUserType}-${user}`;
     user.legal = null
-    if (!isRealUserType) {
-      let legalData = await this.cacheManager.get<Legal>(cacheKey);
-      legalData = await Legal.findOneBy({
-        createdById: user.id
-      });
-      try {
-        await this.cacheManager.set(cacheKey, legalData ?? [], CacheTTL.ONE_WEEK);
+    console.log('who am i ')
+    const legalData = await Legal.findOneBy({
+      createdById: user.id
+    });
+    console.log('  user.legal',  user.legal)
+    user.legal = legalData ?? null; 
   
-      } catch (e) {
-        console.log('whoAmI', e);
-      }
-      user.legal = legalData ?? null; 
-    }
  
     return user;
   }
