@@ -227,8 +227,13 @@ export class PreOrderService {
           }),
         ]);
   
-        const [clientOffers ] = await offersPromises;
-        order.offers = [...clientOffers];
+        const [clientOffers] = await offersPromises;
+        if (clientOffers.length) {
+          order.offers = [...clientOffers];
+        } else {
+          order.offers = []
+        }
+
       } else {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
