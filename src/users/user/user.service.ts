@@ -258,6 +258,18 @@ export class UserService {
       await user.save({ transaction: false });
     });
 
+    if (updateProfileInput.name_company || updateProfileInput.national_id) {
+      const legal        = new Legal()
+      legal.createdById = user.id
+      if (updateProfileInput.name_company) {
+        legal.name_company = updateProfileInput.name_company
+      }
+      if (updateProfileInput.national_id) {
+        legal.national_id = updateProfileInput.national_id
+      }
+      await legal.save()
+    }
+
     return user;
   }
 

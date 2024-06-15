@@ -32,13 +32,13 @@ export class Legal extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
-  @Column({ unique:true})
-  name_company: string;
+  @Field({ nullable: true })
+  @Column({ nullable:true,unique:true})
+  name_company?: string;
 
-  @Field()
-  @Column({ unique: true })
-  national_id: string;
+  @Field({ nullable: true })
+  @Column({ nullable:true,unique: true })
+  national_id?: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
