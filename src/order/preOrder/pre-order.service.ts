@@ -206,10 +206,11 @@ export class PreOrderService {
           }
         }
       })
+      console.log('order',order)
       if (!order) {
         throw new Error('Order not found');
       }
-      if (order && client) {
+      if (client) {
         const offersPromises = Promise.all([
           OfferOrder.find({ 
             where: { preOrderId: order.id, type: TypeOrderOffer.SELLER,status: OrderOfferStatuses.INVOICE},
@@ -227,10 +228,10 @@ export class PreOrderService {
         ]);
   
         // Wait for all offers to resolve
-        const [clientOffers = []] = await offersPromises;
+        const [clientOffers ] = await offersPromises;
         order.offers = [...clientOffers];
         order.offersNum = clientOffers.length;
-
+        console.log('clientOffers',clientOffers)
         order.offers = order.offers || [];
         order.offersNum = order.offersNum || 0;
       } else {
@@ -275,9 +276,9 @@ export class PreOrderService {
         ]);
   
         // Wait for all offers to resolve
-        const [clientOffers = [], sellerOffers = [], adminOffers = []] = await offersPromises;
-
-  
+        const [clientOffers, sellerOffers, adminOffers ] = await offersPromises;
+        console.log('clientOffers',clientOffers)
+        console.log('sellerOffers',sellerOffers)
         // Push offers into the order's offers array
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
         order.offersNum = order.offers.length;
@@ -290,7 +291,7 @@ export class PreOrderService {
       return 
     } catch (error) {
 
-      console.log('create_pre_order err',error)
+      console.log('find one pre order err',error)
       
     }
   

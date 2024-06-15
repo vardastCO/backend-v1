@@ -75,6 +75,7 @@ export class PreOrderResolver {
     if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
       client = true
     }
+    console.log('client',client)
     return this.preOrderService.findPreOrderById(id,user,client);
   }
 
