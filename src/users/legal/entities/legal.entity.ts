@@ -26,7 +26,6 @@ import { User } from "src/users/user/entities/user.entity";
 
 @ObjectType()
 @Entity("legals")
-@Unique(["createdById"])
 export class Legal extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
