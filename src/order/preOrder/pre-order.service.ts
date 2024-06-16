@@ -287,22 +287,8 @@ export class PreOrderService {
       
       const userProjectIds = userProjects.map(project => project.id);
   
-      if (projectId) {
-        if (userProjectIds.includes(projectId)) {
-          whereConditions['projectId'] = projectId;
-        } else {
-          throw new Error("Unauthorized access to project");
-        }
-      } else {
-        whereConditions['projectId'] = In(userProjectIds);
-      }
-  
-      if (projectId) {
-        const project = await Project.findOneBy({ id: projectId });
-        if (project) {
-          whereConditions['type'] = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL;
-        }
-      }
+      whereConditions['projectId'] = In(userProjectIds);
+      whereConditions['type'] = isRealUserType ? TypeOrder.REAL : TypeOrder.LEGAL;
     } else {
       if (projectId) {
         whereConditions['projectId'] = projectId;
