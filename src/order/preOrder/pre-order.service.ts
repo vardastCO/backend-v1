@@ -59,7 +59,11 @@ export class PreOrderService {
         const project = await Project.findOneBy({
           id : createPreOrderInput.projectId
         })
-        newOrder.type = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
+        console.log('project', project)
+        const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
+        console.log('project.type ===', project.type === TypeProject.REAL)
+        newOrder.type = findType
+        console.log('findType', findType)
         console.log('newOrder',newOrder)
 
         await newOrder.save();
