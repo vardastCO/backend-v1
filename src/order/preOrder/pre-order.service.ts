@@ -32,7 +32,7 @@ export class PreOrderService {
     return Math.floor(Math.random() * (max - min + 1) + min).toString();
   }
   async createPreOrder(createPreOrderInput : CreatePreOrderInput,user:User,isRealUserType:boolean): Promise<PreOrder> {
-    
+      console.log('isRealUserType',isRealUserType)
       try {
         let order = await PreOrder.findOneBy({
           userId : user.id,
@@ -58,6 +58,8 @@ export class PreOrderService {
         if (!isRealUserType) {
           newOrder.type = TypeOrder.LEGAL
         }
+
+        console.log('newOrder',newOrder)
 
         await newOrder.save();
 
