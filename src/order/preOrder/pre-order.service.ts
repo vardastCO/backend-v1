@@ -284,9 +284,6 @@ export class PreOrderService {
       const userProjects = await UserProject.find({
         where: {
           userId: user.id,
-          project :  {
-            type : isRealUserType ? TypeOrder.REAL : TypeOrder.LEGAL
-          }
          }
       });
       console.log('userProjects',userProjects)
