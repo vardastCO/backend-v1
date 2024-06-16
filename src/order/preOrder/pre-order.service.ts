@@ -214,32 +214,8 @@ export class PreOrderService {
       if (!order) {
         throw new Error('Order not found');
       }
-      if (client) {
-        const offersPromises = Promise.all([
-          OfferOrder.find({ 
-            where: { preOrderId: order.id, type: TypeOrderOffer.SELLER,status: OrderOfferStatuses.INVOICE},
-            relations: ["offerLine"],
-            order: {
-              offerLine: {
-                line: {
-                  type: 'ASC',
-                  id: "DESC"
-                }
-               
-              }
-            }
-          }),
-        ]);
-  
-        const [clientOffers] = await offersPromises;
-        if (clientOffers.length) {
-          order.offers = [...clientOffers];
-        } else {
-          order.offers = []
-        }
-
-      } else {
-        const offersPromises = Promise.all([
+     
+      const offersPromises = Promise.all([
           OfferOrder.find({ 
             where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT },
             relations: ["offerLine"],
@@ -283,7 +259,6 @@ export class PreOrderService {
        
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
 
-      }
   
       return order
     } catch (error) {
