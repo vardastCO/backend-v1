@@ -280,23 +280,21 @@ export class PreOrderService {
     whereConditions['deleted_at'] = IsNull();
   
     if (client) {
-
       const userProjects = await UserProject.find({
         where: {
-          userId: user.id,
-         }
+          project :  {
+            type : isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
+          },
+          userId: user.id
+        }
       });
-      console.log('userProjects',userProjects)
+  
       const userProjectIds = userProjects.map(data => data.projectId);
 
-      console.log('userProjectIds',userProjectIds)
   
       whereConditions['projectId'] = In(userProjectIds);
-      console.log('isRealUserType',isRealUserType)
       whereConditions['type'] = isRealUserType ? TypeOrder.REAL : TypeOrder.LEGAL;
-      console.log('   whereConditions type',   whereConditions['type'])
     } else {
-      console.log('hiii2')
       if (projectId) {
         whereConditions['projectId'] = projectId;
       }
