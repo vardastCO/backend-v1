@@ -328,6 +328,7 @@ export class ProjectService {
       where:whereConditions ,
       take,
       skip,
+      order: {id: "DESC" },
     });
 
     return PaginationProjectResponse.make(indexProjectInput, total, data);
