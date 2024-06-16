@@ -22,10 +22,11 @@ export class PreOrderResolver {
   @Mutation(() => PreOrder)
   createPreOrder(
     @Args("createPreOrderInput") createPreOrderInput: CreatePreOrderInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
+    @IsRealUserType() isRealUserType: boolean,
   ) {
   
-    return this.preOrderService.createPreOrder(createPreOrderInput,user);
+    return this.preOrderService.createPreOrder(createPreOrderInput,user,isRealUserType);
   }
 
   
@@ -75,7 +76,6 @@ export class PreOrderResolver {
     if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
       client = true
     }
-    console.log('client',client)
     return this.preOrderService.findPreOrderById(id,user,client);
   }
 
