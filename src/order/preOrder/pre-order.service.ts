@@ -284,12 +284,17 @@ export class PreOrderService {
       const userProjects = await UserProject.find({
         where: { userId: user.id }
       });
-      
+      console.log('userProjects',userProjects)
       const userProjectIds = userProjects.map(project => project.id);
+
+      console.log('userProjectIds',userProjectIds)
   
       whereConditions['projectId'] = In(userProjectIds);
+      console.log('isRealUserType',isRealUserType)
       whereConditions['type'] = isRealUserType ? TypeOrder.REAL : TypeOrder.LEGAL;
+      console.log('   whereConditions type',   whereConditions['type'])
     } else {
+      console.log('hiii2')
       if (projectId) {
         whereConditions['projectId'] = projectId;
       }
