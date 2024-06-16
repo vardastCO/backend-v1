@@ -87,7 +87,7 @@ export class ProjectService {
       delete createUserProjectInput.cellphone
 
       const assign: UserProject = UserProject.create<UserProject>(createUserProjectInput);
-      assign.userId = await user.id
+      assign.userId = await findUser.id
       assign.name = ''
     
       await assign.save()
