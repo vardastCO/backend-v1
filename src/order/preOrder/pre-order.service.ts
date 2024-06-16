@@ -11,13 +11,16 @@ import { IndexPreOrderInput } from './dto/index-preOrder.input';
 import { PaginationPreOrderResponse } from "./dto/pagination-preOrder.responde";
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
-import { Not, IsNull } from "typeorm"
+import { Not, IsNull,In } from "typeorm"
 import { ExpireTypes } from "./enum/expire-types.enum";
 import { OfferOrder } from "../orderOffer/entities/order-offer.entity";
 import { TypeOrderOffer } from "../enums/type-order-offer.enum";
 import { TypeOrder } from "./enum/type-order.enum";
 import { OrderOfferStatuses } from "../orderOffer/enums/order-offer-statuses";
 import { Offer } from "src/products/offer/entities/offer.entity";
+import { Project } from "src/users/project/entities/project.entity";
+import { TypeProject } from "src/users/project/enums/type-project.enum";
+import { UserProject } from "src/users/project/entities/user-project.entity";
 
 @Injectable()
 export class PreOrderService {
@@ -31,8 +34,8 @@ export class PreOrderService {
       const max = Math.pow(10, length) - 1;
     return Math.floor(Math.random() * (max - min + 1) + min).toString();
   }
-  async createPreOrder(createPreOrderInput : CreatePreOrderInput,user:User,isRealUserType:boolean): Promise<PreOrder> {
-      console.log('isRealUserType',isRealUserType)
+  async createPreOrder(createPreOrderInput : CreatePreOrderInput,user:User): Promise<PreOrder> {
+
       try {
         let order = await PreOrder.findOneBy({
           userId : user.id,
@@ -52,17 +55,15 @@ export class PreOrderService {
           user_id = findUserId
         }
         newOrder.userId = user_id
-        if (createPreOrderInput.type === TypeOrder.LEGAL) {
-          newOrder.type = TypeOrder.LEGAL
-        } 
-        if (!isRealUserType) {
-          newOrder.type = TypeOrder.LEGAL
-        }
-
+ 
+        const project = await Project.findOneBy({
+          id : createPreOrderInput.projectId
+        })
+        newOrder.type = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
         console.log('newOrder',newOrder)
 
         await newOrder.save();
-
+        console.log('AFTER newOrder',newOrder)
         return newOrder
       } catch (error) {
 
@@ -271,56 +272,65 @@ export class PreOrderService {
   
   }
    
-  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean,seller:boolean,isRealUserType:boolean): Promise<PaginationPreOrderResponse> {
+  async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean, seller: boolean, isRealUserType: boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
-    const {
-      take,
-      skip,
-      projectId,
-      customerName,
-      hasFile,
-      projectName,
-      status
-    } = indexPreOrderInput || {};
+    const { take, skip, projectId, customerName, hasFile, projectName, status } = indexPreOrderInput || {};
+  
+    const whereConditions: any = {};
+    whereConditions['deleted_at'] = IsNull();
+  
+    if (client) {
 
-    const whereConditions = {}
-    whereConditions['deleted_at'] = IsNull()
-
-    if (projectId) {
-      whereConditions['projectId'] = projectId;
+      const userProjects = await UserProject.find({
+        where: { userId: user.id }
+      });
+      
+      const userProjectIds = userProjects.map(project => project.id);
+  
+      if (projectId) {
+        if (userProjectIds.includes(projectId)) {
+          whereConditions['projectId'] = projectId;
+        } else {
+          throw new Error("Unauthorized access to project");
+        }
+      } else {
+        whereConditions['projectId'] = In(userProjectIds);
+      }
+  
+      if (projectId) {
+        const project = await Project.findOneBy({ id: projectId });
+        if (project) {
+          whereConditions['type'] = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL;
+        }
+      }
+    } else {
+      if (projectId) {
+        whereConditions['projectId'] = projectId;
+      }
     }
-
-    if (!(await this.authorizationService.setUser(user).hasRole("admin")) || client) {
-      whereConditions['userId'] = user.id;
-    } 
-
-    if (!(await this.authorizationService.setUser(user).hasRole("admin")) || client) {
-      whereConditions['type'] = isRealUserType ? TypeOrder.REAL : TypeOrder.LEGAL;
-    } 
-    
   
     if (await this.authorizationService.setUser(user).hasRole("admin") && !client) {
       if (customerName) {
-        whereConditions['user'] =  [
+        whereConditions['user'] = [
           { firstName: Like(`%${customerName}%`) },
           { lastName: Like(`%${customerName}%`) }
         ];
       }
       if (projectName) {
-        whereConditions['project'] =  [
+        whereConditions['project'] = [
           { name: Like(`%${projectName}%`) }
-        ];;
+        ];
       }
       whereConditions['pickUpUserId'] = IsNull();
       if (seller) {
-        whereConditions['status'] = PreOrderStatus.PENDING_OFFER
+        whereConditions['status'] = PreOrderStatus.PENDING_OFFER;
       } else {
         if (status) {
           whereConditions['status'] = status as PreOrderStatus;
         }
       }
-    
     }
+  
     if (hasFile) {
       whereConditions['files'] = {
         id: Not(IsNull()),
@@ -328,18 +338,18 @@ export class PreOrderService {
     } else {
       whereConditions['files'] = null;
     }
-
+  
     const [data, total] = await PreOrder.findAndCount({
       skip,
       take,
       where: whereConditions,
       order: {
-        id:'DESC'
+        id: 'DESC'
       },
     });
-
-    
-    return PaginationPreOrderResponse.make(indexPreOrderInput,total,data)
+  
+    return PaginationPreOrderResponse.make(indexPreOrderInput, total, data);
   }
+  
     
 }

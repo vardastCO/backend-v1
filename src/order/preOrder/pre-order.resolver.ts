@@ -23,10 +23,9 @@ export class PreOrderResolver {
   createPreOrder(
     @Args("createPreOrderInput") createPreOrderInput: CreatePreOrderInput,
     @CurrentUser() user: User,
-    @IsRealUserType() isRealUserType: boolean,
   ) {
   
-    return this.preOrderService.createPreOrder(createPreOrderInput,user,isRealUserType);
+    return this.preOrderService.createPreOrder(createPreOrderInput,user);
   }
 
   
