@@ -261,9 +261,14 @@ export class UserService {
     if (updateProfileInput.name_company || updateProfileInput.national_id) {
       try {
       let legal
-      legal = await Legal.findOneBy({
-        createdById : user.id
-      }) 
+      legal = await Legal.findOne({
+        where: {
+          createdById: user.id
+        },
+        order: {
+          id: "DESC"
+        }
+      });
       if (!legal) {
         legal        = new Legal()
         if (updateProfileInput.name_company) {
