@@ -282,10 +282,15 @@ export class PreOrderService {
     if (client) {
 
       const userProjects = await UserProject.find({
-        where: { userId: user.id }
+        where: {
+          userId: user.id,
+          project :  {
+            type : isRealUserType ? TypeOrder.REAL : TypeOrder.LEGAL
+          }
+         }
       });
       console.log('userProjects',userProjects)
-      const userProjectIds = userProjects.map(project => project.id);
+      const userProjectIds = userProjects.map(data => data.projectId);
 
       console.log('userProjectIds',userProjectIds)
   
