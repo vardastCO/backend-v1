@@ -59,12 +59,8 @@ export class PreOrderService {
         const project = await Project.findOneBy({
           id : createPreOrderInput.projectId
         })
-        console.log('project', project)
         const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
-        console.log('project.type ===', project.type === TypeProject.REAL)
         newOrder.type = findType
-        console.log('findType', findType)
-        console.log('newOrder',newOrder)
 
         await newOrder.save();
         console.log('AFTER newOrder',newOrder)
@@ -179,7 +175,12 @@ export class PreOrderService {
     }
   
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
-  
+    const project = await Project.findOneBy({
+      id : id
+    })
+    const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
+    preOrder.type = findType
+
     await preOrder.save()
   
     return preOrder;
