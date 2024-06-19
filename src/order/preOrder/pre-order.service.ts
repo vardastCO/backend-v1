@@ -322,9 +322,9 @@ export class PreOrderService {
           { name: Like(`%${projectName}%`) }
         ];
       }
-      whereConditions['pickUpUserId'] = IsNull();
       if (seller) {
         whereConditions['status'] = PreOrderStatus.PENDING_OFFER;
+        whereConditions['pickUpUserId'] = IsNull();
       } else {
         if (status) {
           whereConditions['status'] = status as PreOrderStatus;
