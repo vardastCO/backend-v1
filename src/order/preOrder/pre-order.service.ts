@@ -336,9 +336,8 @@ export class PreOrderService {
       whereConditions['files'] = {
         id: Not(IsNull()),
       };
-    } else {
-      whereConditions['files'] = null;
     }
+  
   
     const [data, total] = await PreOrder.findAndCount({
       skip,
