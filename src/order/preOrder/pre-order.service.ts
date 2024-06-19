@@ -46,6 +46,7 @@ export class PreOrderService {
         }
         const newOrder: PreOrder = PreOrder.create<PreOrder>(createPreOrderInput);
         newOrder.uuid = await this.generateNumericUuid()
+        newOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
         let user_id = user.id
         if (createPreOrderInput.cellphone) {
           const findUserId = (await await User.findOneBy({ cellphone: createPreOrderInput.cellphone })).id
@@ -63,7 +64,7 @@ export class PreOrderService {
         newOrder.type = findType
 
         await newOrder.save();
-        console.log('AFTER newOrder',newOrder)
+  
         return newOrder
       } catch (error) {
 
