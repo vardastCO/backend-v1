@@ -181,7 +181,7 @@ export class SellerService {
     }
 
     if (indexSellerInput.type) {
-      whereConditions[`type`] = indexSellerInput.type as SellerType;
+      whereConditions[`sellerType`] = indexSellerInput.type as SellerType;
     }
     
 
