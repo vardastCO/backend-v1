@@ -110,6 +110,8 @@ export class User extends BaseEntity {
   @ManyToOne(type => Country)
   country: Country;
 
+  
+
   @Column("int")
   countryId: number;
 
