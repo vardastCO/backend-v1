@@ -53,6 +53,12 @@ export class Legal extends BaseEntity {
   @Column({ nullable: true })
   createdById: number;
 
+  @Field(() => User, { nullable: true })
+  @ManyToOne(() => User, user => null, { nullable: false })
+  owner: Promise<User>;
+  @Column({ nullable: true })
+  ownerId: number;
+
   
   @Field(() => [ContactInfo])
   @OneToMany(() => ContactInfo, contactInfo => null, { nullable: true })

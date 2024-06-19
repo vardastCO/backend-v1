@@ -46,6 +46,7 @@ export class LegalService {
     }
     const legal: Legal = Legal.create<Legal>(createLegalInput);
     legal.createdById = id
+    legal.ownerId = userId
     await legal.save();
     return legal;
 
