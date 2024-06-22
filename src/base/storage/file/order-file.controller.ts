@@ -99,8 +99,9 @@ export class OrderFileController {
     
     
     const entities = await this.csvParser.parse(bufferStream, UserDto);
-
+    console.log('entities',entities)
     const transformedResults = entities.list.map(item => ({
+  
       name: item.name,
       date: item.date,
 
