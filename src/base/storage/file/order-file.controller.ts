@@ -13,6 +13,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CsvParser } from 'nest-csv-parser';
 import { Readable } from 'stream';
 import { UserDto } from "./dto/order-csv.dto";
+import { Line } from "src/order/line/entities/order-line.entity";
+import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
+import { User } from "src/users/user/entities/user.entity";
 @Controller("order/file")
 export class OrderFileController {
   constructor(private readonly csvParser: CsvParser) {}
@@ -79,9 +82,11 @@ export class OrderFileController {
       throw new Error('Failed to fetch invoice template');
     }
   }
-  @Post('csv')
+  @Post('line/:id')
   @UseInterceptors(FileInterceptor("file"))
   async uploadCsv(
+    @Param("id") id: string,
+    @CurrentUser() user: User,
     @UploadedFile(
     new ParseFilePipeBuilder()
       .addFileTypeValidator({
@@ -102,10 +107,16 @@ export class OrderFileController {
       const transformedResults = entities.list.map(item => {
      
         const fields = item["name,date,واحد رمز/تامین,نوع قلم,مرکز درخواست کننده,درخواست کننده,نوع طرف مقابل,طرف مقابل,نوع درخواست خرید,کد قلم خریدنی,items,مشخصه فنی,fi,uom,تاریخ نیاز,مصرف کننده,فی,مبلغ,نوع خرید,روند خرید,مهلت استعلام,کارشناس خرید,رمز فوریت,توضیحات,وضعیت"].split(',');
-        return { id: fields[0], date: fields[1],item:fields[10] ,fi:fields[12],uom:fields[13]};
+        const line = new Line()
+        line.preOrderId = parseInt(id)
+        line.userId = user.id
+        line.item_name = fields[10]
+        line.qty = fields[10]
+        line.uom = fields[13]
+        console.log('line',line)
+        return { id: fields[0], date: fields[1], item: fields[10], qty: fields[12], uom: fields[13] };
       });
-    
-      
+       
       return transformedResults;
     } catch (e) {
       console.log('lll',e)
