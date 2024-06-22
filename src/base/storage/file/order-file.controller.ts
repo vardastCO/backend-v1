@@ -99,21 +99,23 @@ export class OrderFileController {
     
     const entities = await this.csvParser.parse(bufferStream, UserDto);
     try {
-      const transformedResults = entities.list.map(item => {
-        console.log('Original item:', item); 
+      const transformedResults = entities.list.map(itemString => {
+        // Split the CSV-like string into individual fields
+        const fields = itemString.split(',');
       
-        const transformedItem = {
-          name: item['name'] ? item['name'].trim() : '',
-          date: item['date'] ? item['date'].trim() : '',
-          unit: item['واحد رمز/تامین'] ? item['واحد رمز/تامین'].trim() : '',
+        // Create a transformed object by mapping fields to their respective properties
+        return {
+          name: fields[0]?.trim() || '', // Accessing the first field as 'name'
+          date: fields[1]?.trim() || '', // Accessing the second field as 'date'
+          unit: fields[2]?.trim() || '', // Accessing the third field as 'unit'
+          // Add more fields as needed based on your data structure
         };
-      
-        return transformedItem;
       });
       
-      console.log('Transformed results:', transformedResults); 
+      console.log('Transformed results:', transformedResults); // Log the transformed results
       
       return transformedResults;
+      
     } catch (e) {
       console.log('lll',e)
     }
