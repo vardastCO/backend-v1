@@ -96,9 +96,18 @@ export class OrderFileController {
     const bufferStream = new Readable();
     bufferStream.push(file.buffer);
     bufferStream.push(null);
+    
+    
+    const entities = await this.csvParser.parse(bufferStream, UserDto);
 
-    const parsed = await  this.csvParser.parse(bufferStream, UserDto);
-    return parsed;
+    const transformedResults = entities.list.map(item => ({
+      name: item.name,
+      date: item.date,
+
+    }));
+
+    return transformedResults;
+
   }
   
   private injectDataIntoTemplate(template: string, data: any): string {
