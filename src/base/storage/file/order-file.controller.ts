@@ -99,23 +99,16 @@ export class OrderFileController {
     
     const entities = await this.csvParser.parse(bufferStream, UserDto);
     try {
-      const transformedResults = entities.list.map(itemString => {
-        // Split the CSV-like string into individual fields
-        const fields = itemString.split(',');
-      
-        // Create a transformed object by mapping fields to their respective properties
-        return {
-          name: fields[0]?.trim() || '', // Accessing the first field as 'name'
-          date: fields[1]?.trim() || '', // Accessing the second field as 'date'
-          unit: fields[2]?.trim() || '', // Accessing the third field as 'unit'
-          // Add more fields as needed based on your data structure
-        };
+      const transformedResults = entities.list.map(item => {
+        const fields = item['name,date,واحد رمز/تامین,نوع قلم,مرکز درخواست کننده,درخواست کننده,نوع طرف مقابل,طرف مقابل,نوع درخواست خرید,کد قلم خریدنی,items,مشخصه فنی,fi,uom,تاریخ نیاز,مصرف کننده,فی,مبلغ,نوع خرید,روند خرید,مهلت استعلام,کارشناس خرید,رمز فوریت,توضیحات,وضعیت'].split(',');
+  
+        console.log('ffff',fields)
+        return item;
       });
       
-      console.log('Transformed results:', transformedResults); // Log the transformed results
+      console.log('Transformed results:', transformedResults); 
       
       return transformedResults;
-      
     } catch (e) {
       console.log('lll',e)
     }
