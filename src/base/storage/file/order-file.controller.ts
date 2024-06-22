@@ -9,10 +9,7 @@ import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
 import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
 import {  Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { join } from 'path';
-import { createReadStream } from 'fs';
 import { CsvParser } from 'nest-csv-parser';
-import { UserDto } from "./dto/order-csv.dto";
 import { Readable } from 'stream';
 @Controller("order/file")
 export class OrderFileController {
