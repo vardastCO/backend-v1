@@ -105,13 +105,17 @@ export class OrderFileController {
     try {
       entities.list.map(async item => {
         const fields = item[ "شماره درخواست,تاریخ درخواست,واحد رمز/تامین,نوع قلم,مرکز درخواست کننده,درخواست کننده,نوع طرف مقابل,طرف مقابل,نوع درخواست خرید,کد قلم خریدنی,عنوان قلم خریدنی,مشخصه فنی,مقدار,واحد,تاریخ نیاز,مصرف کننده,فی,مبلغ,نوع خرید,روند خرید,مهلت استعلام,کارشناس خرید,رمز فوریت,توضیحات,وضعیت"].split(',');
-        const line = new Line()
-        line.preOrderId = parseInt(id)
-        line.userId = user.id
-        line.item_name = fields[10]
-        line.qty = fields[12]
-        line.uom = fields[13]
-        await line.save()
+        
+        if (fields[10]) {
+          const line = new Line()
+          line.preOrderId = parseInt(id)
+          line.userId = user.id
+          line.item_name = fields[10]
+          line.qty = fields[12]
+          line.uom = fields[13]
+          await line.save()
+        }
+      
         return ;
       });
       return true;
