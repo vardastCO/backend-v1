@@ -9,8 +9,10 @@ import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
 import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
 import {  Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+
 import { CsvParser } from 'nest-csv-parser';
 import { Readable } from 'stream';
+import { UserDto } from "./dto/order-csv.dto";
 @Controller("order/file")
 export class OrderFileController {
   constructor(private readonly csvParser: CsvParser) {}
@@ -95,36 +97,10 @@ export class OrderFileController {
     bufferStream.push(null);
     
     
-    const entities = await this.csvParser.parse(bufferStream, {
-      headers: [
-        'name',
-        'date',
-        'واحد رمز/تامین',
-        'نوع قلم',
-        'مرکز درخواست کننده',
-        'درخواست کننده',
-        'نوع طرف مقابل',
-        'طرف مقابل',
-        'نوع درخواست خرید',
-        'کد قلم خریدنی',
-        'items',
-        'مشخصه فنی',
-        'fi',
-        'uom',
-        'تاریخ نیاز',
-        'مصرف کننده',
-        'فی',
-        'مبلغ',
-        'نوع خرید',
-        'روند خرید',
-        'مهلت استعلام',
-        'کارشناس خرید',
-        'رمز فوریت',
-        'توضیحات',
-        'وضعیت',
-      ],
-    });
-
+    const entities = await this.csvParser.parse(bufferStream,UserDto);
+    entities.list.map((c) => {
+      console.log('c',c)
+    })
     const transformedResults = entities.list.map(item => ({
       name: item.name,
       date: item.date,
