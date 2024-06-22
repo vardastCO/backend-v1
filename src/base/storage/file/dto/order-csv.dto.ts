@@ -1,4 +1,11 @@
+import { CsvColumn } from 'nest-csv-parser';
+
 export class UserDto {
-    name: string;
-    date: string;
-  }
+  @CsvColumn('name')
+  name: string;
+
+  @CsvColumn('date')
+  date: string;
+
+  // Define other fields if necessary
+}

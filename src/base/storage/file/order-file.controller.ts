@@ -98,16 +98,45 @@ export class OrderFileController {
     bufferStream.push(null);
     
     
-    const entities = await this.csvParser.parse(bufferStream, UserDto);
-    console.log('entities',entities)
+    const entities = await this.csvParser.parse(bufferStream, {
+      headers: [
+        'name',
+        'date',
+        'واحد رمز/تامین',
+        'نوع قلم',
+        'مرکز درخواست کننده',
+        'درخواست کننده',
+        'نوع طرف مقابل',
+        'طرف مقابل',
+        'نوع درخواست خرید',
+        'کد قلم خریدنی',
+        'items',
+        'مشخصه فنی',
+        'fi',
+        'uom',
+        'تاریخ نیاز',
+        'مصرف کننده',
+        'فی',
+        'مبلغ',
+        'نوع خرید',
+        'روند خرید',
+        'مهلت استعلام',
+        'کارشناس خرید',
+        'رمز فوریت',
+        'توضیحات',
+        'وضعیت',
+      ],
+    });
+
     const transformedResults = entities.list.map(item => ({
-  
       name: item.name,
       date: item.date,
-
+      // Add other fields as needed
     }));
 
     return transformedResults;
+  
+   
 
   }
   
