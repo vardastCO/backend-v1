@@ -116,7 +116,7 @@ export class OrderFileController {
         // await line.save()
         // return { id: fields[0], date: fields[1], item: fields[10], qty: fields[12], uom: fields[13] };
       });
-       
+      console.log('ddd',transformedResults)
       return transformedResults;
     } catch (e) {
       console.log('lll',e)
