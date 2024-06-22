@@ -101,14 +101,31 @@ export class OrderFileController {
     entities.list.map((c) => {
       console.log('c',c)
     })
-    const transformedResults = entities.list.map(item => ({
-      name: item.name,
-      date: item.date,
-      // Add other fields as needed
-    }));
-
+    const transformedResults = entities.list.map(item => {
+      return {
+        name: item['name'].trim(),
+        date: item['date'].trim(), // Assuming 'date' is a string in format 'yyyy/mm/dd'
+        unit: item['واحد رمز/تامین'].trim(), // Adjust accordingly
+        itemType: item['نوع قلم'].trim(), // Adjust accordingly
+        requesterCenter: item['مرکز درخواست کننده'].trim(), // Adjust accordingly
+        requester: item['درخواست کننده'].trim(), // Adjust accordingly
+        counterpartType: item['نوع طرف مقابل'].trim(), // Adjust accordingly
+        counterpart: item['طرف مقابل'].trim(), // Adjust accordingly
+        purchaseRequestType: item['نوع درخواست خرید'].trim(), // Adjust accordingly
+        purchaseItemCode: item['کد قلم خریدنی'].trim(), // Adjust accordingly
+        items: item['items'].trim(), // Adjust accordingly
+        technicalSpecification: item['مشخصه فنی'].trim(), // Adjust accordingly
+        fi: item['fi'].trim(), // Adjust accordingly
+        uom: item['uom'].trim(), // Adjust accordingly
+        requiredDate: item['تاریخ نیاز'].trim(), // Adjust accordingly
+        consumer: item['مصرف کننده'].trim(), // Adjust accordingly
+        unitPrice: item['فی'].trim(), // Adjust accordingly
+        amount: item['مبلغ'].trim() // Adjust accordingly
+        // Add more fields as needed
+      };
+    });
+    
     return transformedResults;
-  
    
 
   }
