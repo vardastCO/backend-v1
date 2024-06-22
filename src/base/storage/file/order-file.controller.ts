@@ -110,7 +110,7 @@ export class OrderFileController {
         line.preOrderId = parseInt(id)
         line.userId = user.id
         line.item_name = fields[10]
-        line.qty = fields[10]
+        line.qty = fields[12]
         line.uom = fields[13]
         console.log('line',line)
         return { id: fields[0], date: fields[1], item: fields[10], qty: fields[12], uom: fields[13] };
