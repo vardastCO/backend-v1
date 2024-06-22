@@ -1,4 +1,4 @@
-import { Controller, Get, Res, Param, } from "@nestjs/common";
+import { Controller, Get, Res, Param, ParseFilePipeBuilder, } from "@nestjs/common";
 import { Response } from "express";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import axios from 'axios';
@@ -13,7 +13,7 @@ import { join } from 'path';
 import { createReadStream } from 'fs';
 import { CsvParser } from 'nest-csv-parser';
 import { UserDto } from "./dto/order-csv.dto";
-
+import { Readable } from 'stream';
 @Controller("order/file")
 export class OrderFileController {
   constructor(private readonly csvParser: CsvParser) {}
@@ -81,15 +81,26 @@ export class OrderFileController {
     }
   }
   @Post('csv')
-  @UseInterceptors(
-    FileInterceptor('file'),
+  @UseInterceptors(FileInterceptor("file"))
+  async uploadCsv(
+    @UploadedFile(
+    new ParseFilePipeBuilder()
+      .addFileTypeValidator({
+        fileType:
+          /csv/,
+      })
+      .addMaxSizeValidator({ maxSize: 50 * 1_000_000 }) // 50MB
+      .build({ fileIsRequired: true }),
   )
-  async uploadCsv(@UploadedFile() file: Express.Multer.File) {
-    const filePath = join(__dirname, '..', 'uploads', file.filename);
-    const stream = createReadStream(filePath);
-    const parsed = await this.csvParser.parse(stream, UserDto);
-    return parsed.list;
+  file: Express.Multer.File,) {
+    const bufferStream = new Readable();
+    bufferStream.push(file.buffer);
+    bufferStream.push(null);
+
+    const parsed = await  this.csvParser.parse(bufferStream, UserDto);
+    return parsed;
   }
+  
   private injectDataIntoTemplate(template: string, data: any): string {
     const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
     const itemsHTML = items.map((item, index) => `
