@@ -101,29 +101,24 @@ export class OrderFileController {
     bufferStream.push(file.buffer);
     bufferStream.push(null);
     
-    
     const entities = await this.csvParser.parse(bufferStream, UserDto);
     try {
-      const transformedResults = entities.list.map( item => {
-        // console.log('items',await item[0])
-        return  item
-        // const fields = item["شماره درخواست,تاریخ درخواست,واحد رمز/تامین,نوع قلم,مرکز درخواست کننده,درخواست کننده,نوع طرف مقابل,طرف مقابل,نوع درخواست خرید,کد قلم خریدنی,عنوان قلم خریدنی,مشخصه فنی,مقدار,واحد,تاریخ نیاز,مصرف کننده,فی,مبلغ,نوع خرید,روند خرید,مهلت استعلام,کارشناس خرید,رمز فوریت,توضیحات,وضعیت"].split(',');
-        // const line = new Line()
-        // line.preOrderId = parseInt(id)
-        // line.userId = user.id
-        // line.item_name = fields[10]
-        // line.qty = fields[12]
-        // line.uom = fields[13]
-        // await line.save()
-        // return { id: fields[0], date: fields[1], item: fields[10], qty: fields[12], uom: fields[13] };
+      entities.list.map(async item => {
+        const fields = item[ "شماره درخواست,تاریخ درخواست,واحد رمز/تامین,نوع قلم,مرکز درخواست کننده,درخواست کننده,نوع طرف مقابل,طرف مقابل,نوع درخواست خرید,کد قلم خریدنی,عنوان قلم خریدنی,مشخصه فنی,مقدار,واحد,تاریخ نیاز,مصرف کننده,فی,مبلغ,نوع خرید,روند خرید,مهلت استعلام,کارشناس خرید,رمز فوریت,توضیحات,وضعیت"].split(',');
+        const line = new Line()
+        line.preOrderId = parseInt(id)
+        line.userId = user.id
+        line.item_name = fields[10]
+        line.qty = fields[12]
+        line.uom = fields[13]
+        await line.save()
+        return ;
       });
-      console.log('ddd',transformedResults)
-      return transformedResults;
+      return true;
     } catch (e) {
-      console.log('lll',e)
+      console.log('create line by csv ', e)
+      return false;
     }
-
-   
 
   }
   
