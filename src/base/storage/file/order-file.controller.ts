@@ -7,8 +7,16 @@ import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { addCommas,numberToWords } from "@persian-tools/persian-tools";
 import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
 import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
+import {  Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { join } from 'path';
+import { createReadStream } from 'fs';
+import { CsvParser } from 'nest-csv-parser';
+import { UserDto } from "./dto/order-csv.dto";
+
 @Controller("order/file")
 export class OrderFileController {
+  constructor(private readonly csvParser: CsvParser) {}
   @Public()
   @Get(':uuid')
   async getOrderFiles(@Param("uuid") uuid: string, @Res() res: Response): Promise<void> {
@@ -72,7 +80,16 @@ export class OrderFileController {
       throw new Error('Failed to fetch invoice template');
     }
   }
-
+  @Post('csv')
+  @UseInterceptors(
+    FileInterceptor('file'),
+  )
+  async uploadCsv(@UploadedFile() file: Express.Multer.File) {
+    const filePath = join(__dirname, '..', 'uploads', file.filename);
+    const stream = createReadStream(filePath);
+    const parsed = await this.csvParser.parse(stream, UserDto);
+    return parsed.list;
+  }
   private injectDataIntoTemplate(template: string, data: any): string {
     const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
     const itemsHTML = items.map((item, index) => `
