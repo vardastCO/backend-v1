@@ -21,6 +21,7 @@ import { Offer } from "src/products/offer/entities/offer.entity";
 import { Project } from "src/users/project/entities/project.entity";
 import { TypeProject } from "src/users/project/enums/type-project.enum";
 import { UserProject } from "src/users/project/entities/user-project.entity";
+import { PaymentResponse } from "./dto/payment.responde";
 
 @Injectable()
 export class PreOrderService {
@@ -215,9 +216,17 @@ export class PreOrderService {
   async payment( id: number,user:User): Promise<PaymentResponse> {
     
     try {
-     
+      const offer = await OfferOrder.findOneBy({ id })
+      const preOrder = await PreOrder.findOneBy({ id:offer.preOrderId })
+      preOrder.status = PreOrderStatus.PENDING_PAYMENT
+      await preOrder.save()
+
+      return {
+          success: true,
+          message: "پرداخت انجام شد",
+          callbackUrl : "https://vardast.com"
+      }
       
-      return
     } catch (error) {
 
       

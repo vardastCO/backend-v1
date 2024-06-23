@@ -12,6 +12,7 @@ import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
 import { PreOrderService } from './pre-order.service';
 import { IsRealUserType } from "src/users/auth/decorators/current-type.decorator";
+import { PaymentResponse } from "./dto/payment.responde";
 
 
 @Resolver(() => Boolean)
