@@ -220,9 +220,10 @@ export class PreOrderService {
     try {
       const offer = await OfferOrder.findOneBy({ id })
       const preOrder = await PreOrder.findOneBy({ id:offer.preOrderId })
-      preOrder.status = PreOrderStatus.PENDING_PAYMENT
+      preOrder.status = PreOrderStatus.CLOSED
+      offer.status = OrderOfferStatuses.CLOSED
       await preOrder.save()
-
+      await offer.save()
       return {
           success: true,
           message: "پرداخت انجام شد",
