@@ -34,7 +34,7 @@ export class OrderFileController {
       })
 
       if (!order) {
-        res.send('not found')
+        res.send('not found pre order')
       }
 
       const offer = await OfferOrder.findOne({
@@ -45,7 +45,7 @@ export class OrderFileController {
         relations: ["preOrder.user","preOrder.address","offerLine"],
       })
       if (!offer) {
-        res.send('not found')
+        res.send('not found offer')
       }
       const items = await Promise.all((await offer.offerLine).map(async (offer) => ({
         id:(await offer.line).id,
