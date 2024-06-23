@@ -226,8 +226,8 @@ export class PreOrderService {
       await offer.save()
       return {
           success: true,
-          message: "پرداخت انجام شد",
-          callbackUrl : "https://vardast.com"
+          message: "پرداخت با موفقیت انجام شد",
+          callbackUrl : `https://vardast.com/payment/order/${preOrder.uuid}`
       }
       
     } catch (error) {
