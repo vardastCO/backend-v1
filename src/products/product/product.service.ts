@@ -33,6 +33,7 @@ import { SellerRepresentative } from "../seller/entities/seller-representative.e
 import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { IndexOffersPrice } from "./dto/index-price-offers.input";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
+import { SortFieldProduct } from "./enums/sort-filed-product.enum";
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -154,7 +155,8 @@ export class ProductService {
     user ?: User
   ): Promise<PaginationProductResponse> {
     indexProductInput.boot();
-  
+    const { sortField, sortDirection } = indexProductInput;
+
     let admin = false
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
       admin = true
@@ -226,20 +228,23 @@ export class ProductService {
   
       }
     }
+    const order: any = {}
+    switch (sortField) {
+      case SortFieldProduct.TIME:
+        order['id'] = sortDirection;
+        break;
+      case SortFieldProduct.NAME:
+        order['name'] = sortDirection;
+        break;
+      case SortFieldProduct.RATING:
+        order['rating'] = sortDirection;
+        break;
+    }
     
     const [products, totalCount] = await Product.findAndCount({
       where: whereConditions,
       relations: ["images", "prices", "uom", "category"],
-      order: {
-        rating: "DESC",
-        // prices: {
-        //   id: 'DESC' ,
-        //   createdAt: 'DESC'
-        // },
-        // createdAt: indexProductInput.orderBy == ProductSortablesEnum.NEWEST ?
-        //   'DESC' : 'ASC'
-      },
-      // order: this.getOrderClause(indexProductInput.orderBy) as any,
+      order: order,
       skip: skip,
       take: take,
     });

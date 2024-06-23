@@ -13,6 +13,8 @@ import {
 } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
 import { ProductSortablesEnum } from "../enums/product-sortables.enum";
+import { SortFieldProduct } from "../enums/sort-filed-product.enum";
+import { SortDirection } from "src/base/utilities/enums/sort-direction.enum";
 
 @InputType()
 export class IndexProductInput extends IndexInput {
@@ -82,6 +84,22 @@ export class IndexProductInput extends IndexInput {
   @IsOptional()
   @IsInt()
   cityId?: number;
+
+  @Field(() => SortFieldProduct, {
+    defaultValue: SortFieldProduct.RATING,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  @IsEnum(SortFieldProduct)
+  sortField?: SortFieldProduct = SortFieldProduct.RATING;
+
+  @Field(() => SortDirection, {
+    defaultValue: SortDirection.DESC,
+    nullable: true,
+    })
+  @IsNotEmpty()
+  @IsEnum(SortDirection)
+  sortDirection?: SortDirection = SortDirection.ASC;
 
   @Field(() => ProductSortablesEnum, { nullable: true })
   @IsOptional()
