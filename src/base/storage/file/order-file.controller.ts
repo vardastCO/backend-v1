@@ -144,9 +144,9 @@ export class OrderFileController {
           <td colspan="2"></td>
           <td colspan="2">${addCommas(item.tax_price * 10)}</td>
           <td colspan="2">${addCommas(item.totalPrice * 10)}</td>
-        </tr>`).concat([...Array(10 - items.length+1)].map((_,item) => `
+        </tr>`).concat([...Array(Math.max(10 - items.length + 1, 0))].map((_, index) => `
         <tr>
-          <td>${item+items.length}</td>
+          <td>${index + items.length}</td>
           <td colspan="2"></td>
           <td colspan="5"></td>
           <td></td>
