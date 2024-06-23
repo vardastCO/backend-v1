@@ -28,7 +28,7 @@ export class OrderFileController {
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
-      console.log('res status',response.status)
+
       const order = await PreOrder.findOneBy({
         uuid,
         status: PreOrderStatus.CLOSED
