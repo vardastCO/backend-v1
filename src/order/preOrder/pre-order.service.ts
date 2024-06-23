@@ -47,6 +47,7 @@ export class PreOrderService {
         }
         const newOrder: PreOrder = PreOrder.create<PreOrder>(createPreOrderInput);
         newOrder.uuid = await this.generateNumericUuid()
+        newOrder.need_date = createPreOrderInput.need_date ?? new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
         newOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
         let user_id = user.id
         if (createPreOrderInput.cellphone) {
@@ -158,6 +159,7 @@ export class PreOrderService {
     }
   
     preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
+    preOrder.need_date = updatePreOrderInput.need_date ?? new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
     preOrder.expire_time = this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" }); 
   
     let preOrderAddress = await preOrder.address;

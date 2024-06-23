@@ -16,7 +16,10 @@ export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
   })
   @IsOptional()
   @IsEnum(PreOrderStatus)
-  status?: PreOrderStatus ;
+  status?: PreOrderStatus;
+  
+  @Field({ nullable: true })
+  need_date: string;
 
   @Field(() => ExpireTypes, {
     defaultValue: ExpireTypes.ONE_DAY,

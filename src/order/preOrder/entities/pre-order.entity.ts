@@ -72,6 +72,11 @@ export class PreOrder extends BaseEntity {
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
+  need_date: string; 
+
+  @Field({ nullable: true })
+  @Index()
+  @Column({ nullable: true })
   expire_time: string; 
 
   @Field({ nullable: true })
