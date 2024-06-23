@@ -68,7 +68,7 @@ export class Project extends BaseEntity {
   @Field(() => MultiStatuses)
   @Column("enum", {
     enum: MultiStatuses,
-    default: MultiStatuses.PENDING,
+    default: MultiStatuses.CONFIRMED,
   })
   status: MultiStatuses;
 }
