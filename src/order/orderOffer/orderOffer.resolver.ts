@@ -90,7 +90,7 @@ export class OrderOfferResolver {
   }
 
   @Permission("gql.users.address.store")
-  @Mutation(() => PaginationOrderOfferResponse)
+  @Query(() => PaginationOrderOfferResponse, { name: "preOrderOffers" })
   preOrderOffers(
     @Args("indexPreOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
     indexPreOrderInput?: IndexPreOrderOfferInput,
