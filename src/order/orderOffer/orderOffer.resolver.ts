@@ -1,6 +1,6 @@
 import { Resolver } from '@nestjs/graphql';
 import { OrderOfferService } from './orderOffer.service';
-
+import { ValidationPipe } from "@nestjs/common";
 import { Args, Mutation ,Query} from '@nestjs/graphql';
 import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
 import { Permission } from 'src/users/authorization/permission.decorator';
@@ -13,6 +13,8 @@ import { AddSellerOrderOffer } from './dto/add-seller-offer.input';
 import { TypeOrderOffer } from '../enums/type-order-offer.enum';
 import { ThreeStateSupervisionStatuses } from '../enums/three-state-supervision-statuses.enum';
 import { UpdateOrderOfferInput } from './dto/update-order-offer.input';
+import { PaginationOrderOfferResponse } from './dto/pagination-order-offer.responde';
+import { IndexPreOrderOfferInput } from './dto/index-preOrder-offer.input';
 
 interface PriceOfferDto {
   fi_price: string;
@@ -85,6 +87,16 @@ export class OrderOfferResolver {
   ) {
   
     return this.orderOfferService.removeOrderOfferLine(id)
+  }
+
+  @Permission("gql.users.address.store")
+  @Mutation(() => PaginationOrderOfferResponse)
+  preOrderOffers(
+    @Args("indexPreOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
+    indexPreOrderInput?: IndexPreOrderOfferInput,
+  ) {
+  
+    return this.orderOfferService.preOrderOffers(indexPreOrderInput)
   }
 
 }

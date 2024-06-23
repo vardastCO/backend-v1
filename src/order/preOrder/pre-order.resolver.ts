@@ -112,6 +112,16 @@ export class PreOrderResolver {
   
     return this.preOrderService.removePreOrder(id,user);
   }
+  @Permission("gql.users.address.store")
+  @Mutation(() => Boolean)
+  payment(
+    @Args('offerId', { type: () => Int, nullable: true }, new ValidationPipe({ transform: true }))
+    offerId: number,
+    @CurrentUser() user: User
+  ) : Promise<PaymentResponse>{
+  
+    return this.preOrderService.payment(offerId,user);
+  }
   // @Permission("gql.users.user.update")
   // @Mutation(() => PreOrderDTO)
   // updatePreOrder(

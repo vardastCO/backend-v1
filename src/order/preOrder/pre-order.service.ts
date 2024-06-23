@@ -212,6 +212,18 @@ export class PreOrderService {
     }   
   
   }
+  async payment( id: number,user:User): Promise<PaymentResponse> {
+    
+    try {
+     
+      
+      return
+    } catch (error) {
+
+      
+    }   
+  
+  }
   async findPreOrderById(id : number,user:User,client:boolean): Promise<PreOrder> {
   
     try {

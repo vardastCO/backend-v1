@@ -19,6 +19,8 @@ import { OfferLine } from './entities/offer-line.entity';
 import { OfferOrder } from './entities/order-offer.entity';
 import { OrderOfferStatuses } from "./enums/order-offer-statuses";
 import { SellerType } from "src/products/seller/enums/seller-type.enum";
+import { PaginationOrderOfferResponse } from "./dto/pagination-order-offer.responde";
+import { IndexPreOrderInput } from "../preOrder/dto/index-preOrder.input";
 
 @Injectable()
 export class OrderOfferService {
@@ -263,7 +265,27 @@ export class OrderOfferService {
       }
     
   }
+  async preOrderOffers(indexPreOrderInput : IndexPreOrderInput): Promise<PaginationOrderOfferResponse> {
+    
+    try {
+      indexPreOrderInput?.boot();
+      const { take, skip} = indexPreOrderInput || {};
+  
+      const [data, total] = await OfferOrder.findAndCount({
+        skip,
+        take,
+        order: {
+          id: 'DESC'
+        },
+      });
+    
+      return PaginationOrderOfferResponse.make(indexPreOrderInput, total, data);
+    } catch (error) {
 
+      console.log('preOrderOffers err',error)
+    }
+  
+}
   async updateOrderOffer(updateOrderOfferInput : UpdateOrderOfferInput): Promise<OfferOrder> {
     
     try {
