@@ -144,7 +144,7 @@ export class BrandService {
     }
     
     if (indexBrandInput.hasBannerFile !== undefined) {
-      whereConditions[`bannerFile`] = indexBrandInput.hasBannerFile ? Not(IsNull()) : IsNull();
+      whereConditions[`bannerDesktop`] = indexBrandInput.hasBannerFile ? Not(IsNull()) : IsNull();
     }
     whereConditions[`id`] = Not(12269);
     const [data, total] = await Brand.findAndCount({
