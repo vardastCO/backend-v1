@@ -28,6 +28,7 @@ export class OrderFileController {
     try {
       const response = await axios.get(templateURL);
       const template = response.data;
+      console.log('res status',response.status)
       const order = await PreOrder.findOneBy({
         uuid,
         status: PreOrderStatus.CLOSED
@@ -127,57 +128,62 @@ export class OrderFileController {
   }
   
   private injectDataIntoTemplate(template: string, data: any): string {
-    const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
-    const itemsHTML = items.map((item, index) => `
-      <tr>
-        <td>${index+1}</td>
-        <td colspan="2">${item.id}</td>
-        <td colspan="5">${item.name}</td>
-        <td>${item.uom}</td>
-        <td>${item.qty}</td>
-        <td colspan="2">${addCommas(item.unitPrice * 10)}</td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2">${addCommas(item.tax_price * 10)}</td>
-        <td colspan="2">${addCommas(item.totalPrice * 10)}</td>
-      </tr>`).concat([...Array(10 - items.length+1)].map((_,item) => `
-      <tr>
-        <td>${item+items.length}</td>
-        <td colspan="2"></td>
-        <td colspan="5"></td>
-        <td></td>
-        <td></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-      </tr>`)).join('');
-    const persianTotal = numberToWords(addCommas(totalAmount *  10))
-
-    return template.replace('{{date}}', date)
-                   .replace('{{invoiceNumber}}', invoiceNumber)
-                   .replace('{{sellerAddress}}', sellerAddress)
-                   .replace('{{sellerNationalId}}', sellerNationalId)
-                   .replace('{{buyerName}}', buyerName)
-                   .replace('{{buyerNationalId}}', buyerNationalId)
-                   .replace('{{buyerAddress}}', buyerAddress)
-                   .replace('{{itemsHTML}}', itemsHTML)
-                   .replace('{{totalAmount}}', addCommas(totalAmount))
-                   .replace('{{additions}}', additions)
-                   .replace('{{discount}}', discount)
-                   .replace('{{buyerNationalId}}', '1111111')
-                   .replace('{{buyerPhone}}', '09124484707')
-                    .replace('{{grandTotal}}', grandTotal)
-                    .replace('{{totalUOM}}', '0')
-                    .replace('{{totalFi}}', '0')
-                    .replace('{{totalTAX}}', '0')
-                   .replace('{{persianTotal}}', `${persianTotal}`)
-                  .replace('{{instructions}}', instructions)
-                  .replace('{{instructions2}}', instructions2);
+    try {
+      const { date, invoiceNumber, sellerAddress, sellerNationalId, buyerName, buyerNationalId, buyerAddress, items, totalAmount, additions, discount, grandTotal, instructions2,instructions } = data;
+      const itemsHTML = items.map((item, index) => `
+        <tr>
+          <td>${index+1}</td>
+          <td colspan="2">${item.id}</td>
+          <td colspan="5">${item.name}</td>
+          <td>${item.uom}</td>
+          <td>${item.qty}</td>
+          <td colspan="2">${addCommas(item.unitPrice * 10)}</td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2">${addCommas(item.tax_price * 10)}</td>
+          <td colspan="2">${addCommas(item.totalPrice * 10)}</td>
+        </tr>`).concat([...Array(10 - items.length+1)].map((_,item) => `
+        <tr>
+          <td>${item+items.length}</td>
+          <td colspan="2"></td>
+          <td colspan="5"></td>
+          <td></td>
+          <td></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+          <td colspan="2"></td>
+        </tr>`)).join('');
+      const persianTotal = numberToWords(addCommas(totalAmount *  10))
+  
+      return template.replace('{{date}}', date)
+                     .replace('{{invoiceNumber}}', invoiceNumber)
+                     .replace('{{sellerAddress}}', sellerAddress)
+                     .replace('{{sellerNationalId}}', sellerNationalId)
+                     .replace('{{buyerName}}', buyerName)
+                     .replace('{{buyerNationalId}}', buyerNationalId)
+                     .replace('{{buyerAddress}}', buyerAddress)
+                     .replace('{{itemsHTML}}', itemsHTML)
+                     .replace('{{totalAmount}}', addCommas(totalAmount))
+                     .replace('{{additions}}', additions)
+                     .replace('{{discount}}', discount)
+                     .replace('{{buyerNationalId}}', '1111111')
+                     .replace('{{buyerPhone}}', '09124484707')
+                      .replace('{{grandTotal}}', grandTotal)
+                      .replace('{{totalUOM}}', '0')
+                      .replace('{{totalFi}}', '0')
+                      .replace('{{totalTAX}}', '0')
+                     .replace('{{persianTotal}}', `${persianTotal}`)
+                    .replace('{{instructions}}', instructions)
+                    .replace('{{instructions2}}', instructions2);
+    } catch (e) {
+      console.log('eee',e)
+    }
+   
   }
 }
