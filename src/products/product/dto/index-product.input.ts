@@ -99,7 +99,7 @@ export class IndexProductInput extends IndexInput {
     })
   @IsNotEmpty()
   @IsEnum(SortDirection)
-  sortDirection?: SortDirection = SortDirection.ASC;
+  sortDirection?: SortDirection = SortDirection.DESC;
 
   @Field(() => ProductSortablesEnum, { nullable: true })
   @IsOptional()
