@@ -295,7 +295,7 @@ export class PreOrderService {
             }
           }),
           OfferOrder.find({ 
-            where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT,status:OrderOfferStatuses.INVOICE },
+            where: { preOrderId: order.id,status:OrderOfferStatuses.INVOICE },
             relations: ["offerLine"],
             order: {
               offerLine: {
@@ -315,9 +315,12 @@ export class PreOrderService {
       } else {
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
       } 
+      console.log('client', client)
+      
+      console.log('clientInvoiceOffers',clientInvoiceOffers)
       return order
     } catch (error) {
-
+ 
       console.log('find one pre order err',error)
       
     }
