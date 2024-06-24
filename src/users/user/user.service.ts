@@ -226,7 +226,8 @@ export class UserService {
     }
     if (updateUserInput.name_company && updateUserInput.national_id) {
       const legal        = new Legal()
-      legal.createdById  = user.id
+      legal.createdById = user.id
+      legal.ownerId  = user.id
       legal.name_company = updateUserInput.name_company
       legal.national_id  = updateUserInput.national_id
       await legal.save()
