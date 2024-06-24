@@ -52,7 +52,7 @@ export class PreOrderFileController {
           ownerId:user_manager.id
         })
         console.log('legal',legal)
-        if (legal) {
+        if (legal !== null) {
           address_legal = await Address.findOneBy({
             relatedId:legal.id
           })
@@ -81,9 +81,9 @@ export class PreOrderFileController {
         invoiceNumber: (await offer.preOrder).uuid,
         sellerAddress: 'بلوار کاوه، نرسیده به خیابان دولت، نبش کوچه اخلاقی غربی، پلاك 12,1 طبقه 2 واحد 4',
         sellerNationalId: '14011385876',  
-        buyerName: legal.length > 0 ? legal.name_company : (await (await offer.preOrder).address).delivery_name,
-        buyerNationalId:legal.length > 0 ? legal.national_id : '-',
-        buyerAddress: legal.length > 0 ? address_legal?.address : (await (await offer.preOrder).address).address,
+        buyerName: legal !== null ? legal.name_company : (await (await offer.preOrder).address).delivery_name,
+        buyerNationalId:legal !== null ? legal.national_id : '-',
+        buyerAddress: address_legal !== null ? address_legal?.address : (await (await offer.preOrder).address).address,
         items: await items,
         totalAmount: offer.total,
         totalTax: offer.total_tax,
