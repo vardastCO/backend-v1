@@ -161,10 +161,13 @@ export class SellerService {
     indexSellerInput.boot();
     const { take, skip, isPublic, status, createdById, name,hasLogoFile } =
       indexSellerInput || {};
-
+    let admin = false
+    if (await this.authorizationService.setUser(user).hasRole("admin")) {
+      admin = true
+    }
     const cacheKey = `sellers_${JSON.stringify(indexSellerInput)}`;
     const cachedData = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
-    if (cachedData) {
+    if (cachedData && !admin) {
       return cachedData;
     }
     
@@ -217,9 +220,9 @@ export class SellerService {
         total,
         result,
       );
-
-      await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
-
+      if (!admin) {
+        await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
+      }
       return response;
     } catch (e) {}
 
