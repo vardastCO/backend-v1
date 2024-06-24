@@ -303,8 +303,6 @@ export class PreOrderService {
         } else {
           order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
         } 
-        console.log('offers',order.offers)
-        console.log('client',client)
       return order
     } catch (error) {
 
