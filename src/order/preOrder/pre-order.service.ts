@@ -294,15 +294,27 @@ export class PreOrderService {
               }
             }
           }),
+          OfferOrder.find({ 
+            where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT,status:OrderOfferStatuses.INVOICE },
+            relations: ["offerLine"],
+            order: {
+              offerLine: {
+                line: {
+                  type: 'ASC',
+                  id: "DESC"
+                }
+              }
+            }
+          }),
         ]);
 
-      const [clientOffers, sellerOffers, adminOffers] = await offersPromises;
+      const [clientOffers, sellerOffers, adminOffers,clientInvoiceOffers] = await offersPromises;
  
-        if (client) {
-         order.offers = [...sellerOffers, ...adminOffers];
-        } else {
-          order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
-        } 
+      if (client) {
+        order.offers = [...clientInvoiceOffers];
+      } else {
+        order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
+      } 
       return order
     } catch (error) {
 
