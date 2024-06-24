@@ -315,9 +315,6 @@ export class PreOrderService {
       } else {
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
       } 
-      console.log('client', client)
-      
-      console.log('clientInvoiceOffers',clientInvoiceOffers)
       return order
     } catch (error) {
  
