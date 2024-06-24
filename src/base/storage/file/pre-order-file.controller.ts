@@ -42,7 +42,7 @@ export class PreOrderFileController {
 
       let legal = null
       let address_legal = null
-      console.log('(await offer.preOrder).type === TypeOrder.LEGA',(await offer.preOrder).type === TypeOrder.LEGA)
+      console.log('(await offer.preOrder).type === TypeOrder.LEGA',(await offer.preOrder).type === TypeOrder.LEGAL)
       if ((await offer.preOrder).type === TypeOrder.LEGAL) {
         const user_manager = await UserProject.findOneBy({
           projectId: (await offer.preOrder).projectId,
