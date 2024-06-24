@@ -230,11 +230,8 @@ export class ProductService {
     }
     const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
     if (sortField == SortFieldProduct.PRICE) {
-      console.log('where',whereConditions['prices'])
-      if (!whereConditions['prices']) {
-        whereConditions['prices'] = {};
-      }
-      whereConditions['prices']['createdAt'] = MoreThan(fifteenMinutesAgo);
+      whereConditions['prices'] = {
+        createdAt: MoreThan(fifteenMinutesAgo)
       }
     }
     const order: any = {}
