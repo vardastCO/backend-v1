@@ -228,10 +228,11 @@ export class ProductService {
   
       }
     }
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    // const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 30 * 90);
     if (sortField == SortFieldProduct.PRICE) {
       whereConditions['prices'] = {
-        createdAt: MoreThan(fifteenMinutesAgo)
+        createdAt: '2024-06-24 17:16:00.000'
+
       }
     }
     const order: any = {}
