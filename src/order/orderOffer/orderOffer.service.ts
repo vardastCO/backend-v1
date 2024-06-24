@@ -21,6 +21,8 @@ import { OrderOfferStatuses } from "./enums/order-offer-statuses";
 import { SellerType } from "src/products/seller/enums/seller-type.enum";
 import { PaginationOrderOfferResponse } from "./dto/pagination-order-offer.responde";
 import { IndexPreOrderInput } from "../preOrder/dto/index-preOrder.input";
+import { Address } from "src/users/address/entities/address.entity";
+import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
 
 @Injectable()
 export class OrderOfferService {
@@ -50,13 +52,12 @@ export class OrderOfferService {
         }
       });
       if (!findTempSeller) {
+        
         let seller: Seller = new Seller()
         seller.name = `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`
         seller.sellerType = SellerType.EXTENDED
         seller.createdById = user.id
         await seller.save()
-        console.log('seller', seller)
-        console.log('seller id',seller.id)
         let PhoneContact = new ContactInfo()
         PhoneContact.relatedId = await seller.id
         PhoneContact.relatedType = ContactInfoRelatedTypes.SELLER
@@ -67,12 +68,22 @@ export class OrderOfferService {
         await PhoneContact.save()
         let CellContact = new ContactInfo()
         CellContact.relatedType = ContactInfoRelatedTypes.SELLER
-        PhoneContact.relatedId = await seller.id
-        PhoneContact.title = 'موبایل'
+        CellContact.relatedId = await seller.id
+        CellContact.title = 'موبایل'
         CellContact.type = ContactInfoTypes.MOBILE
         CellContact.number = addSellerOrderOffer.cellphone
         CellContact.countryId = 244
         await CellContact.save()
+        let address = new Address()
+        address.relatedType = AddressRelatedTypes.SELLER
+        address.countryId = 244
+        address.address = addSellerOrderOffer.address
+        address.cityId = 1303
+        address.relatedId = await seller.id
+        address.relatedId = await seller.id
+        address.title = 'آدرس'
+        address.provinceId = 12
+        await address.save()
         offer.sellerId = await seller.id
         offer.request_name = seller.name;
       } else {
