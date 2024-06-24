@@ -42,7 +42,6 @@ export class PreOrderFileController {
 
       let legal = null
       let address_legal = null
-      console.log('(await offer.preOrder).type === TypeOrder.LEGA',(await offer.preOrder).type === TypeOrder.LEGAL)
       if ((await offer.preOrder).type === TypeOrder.LEGAL) {
         const user_manager = await UserProject.findOneBy({
           projectId: (await offer.preOrder).projectId,
@@ -51,7 +50,6 @@ export class PreOrderFileController {
         legal = await Legal.findOneBy({
           ownerId:user_manager.userId
         })
-        console.log('legal',legal)
         if (legal !== null) {
           address_legal = await Address.findOneBy({
             relatedId:legal.id
@@ -75,7 +73,6 @@ export class PreOrderFileController {
         return data;
        }));
       const expire_time = new Date(await (await offer.preOrder).expire_time).toLocaleDateString('fa-IR')
-      console.log('dddd',legal ,address_legal)
       const data = {
         date: new Date((await offer.preOrder).request_date).toLocaleDateString('fa-IR'),
         invoiceNumber: (await offer.preOrder).uuid,
