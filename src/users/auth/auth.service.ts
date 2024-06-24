@@ -403,7 +403,7 @@ export class AuthService {
 
     user.legal = null
     const legalData = await Legal.findOneBy({
-      createdById: user.id
+      ownerId: user.id
     });
     user.legal = legalData ?? null; 
   
