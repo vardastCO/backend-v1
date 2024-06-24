@@ -202,14 +202,14 @@ export class OrderOfferService {
   
     try {
         const offer: OfferOrder = await OfferOrder.findOne({
-          where: { id: createLineOfferInput.offerOrderId },
+          where: { id: createLineOfferInput.offerId },
           relations: ['offerLine'],
           order: {
             id: 'DESC'
           }
         });
         const offerline = await OfferLine.findOneBy({
-          offerOrderId: createLineOfferInput.offerOrderId,
+          offerOrderId: createLineOfferInput.offerId,
           lineId : createLineOfferInput.lineId
         })
 

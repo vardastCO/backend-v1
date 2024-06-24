@@ -11,7 +11,7 @@ import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 export class CreateLineOfferInput {
   @Field(() => Int)
   @IsNotEmpty()
-  offerOrderId: number;
+  offerId: number;
 
   @Field(() => Int)
   @IsNotEmpty()
