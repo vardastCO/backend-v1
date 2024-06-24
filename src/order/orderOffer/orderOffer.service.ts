@@ -35,7 +35,8 @@ export class OrderOfferService {
     return Math.floor(Math.random() * (max - min + 1) + min).toString();
    }
   
-  async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer,user:User) {
+  async addSellerOrderOffer(addSellerOrderOffer: AddSellerOrderOffer, user: User) {
+    try {
       const findTempSeller = await Seller.findOneBy({
         name: `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`,
       })
@@ -54,8 +55,10 @@ export class OrderOfferService {
         seller.sellerType = SellerType.EXTENDED
         seller.createdById = user.id
         await seller.save()
+        console.log('seller', seller)
+        console.log('seller id',seller.id)
         let PhoneContact = new ContactInfo()
-        PhoneContact.relatedId = seller.id
+        PhoneContact.relatedId = await seller.id
         PhoneContact.relatedType = ContactInfoRelatedTypes.SELLER
         PhoneContact.title = 'تلفن'
         PhoneContact.type = ContactInfoTypes.TEL
@@ -64,13 +67,13 @@ export class OrderOfferService {
         await PhoneContact.save()
         let CellContact = new ContactInfo()
         CellContact.relatedType = ContactInfoRelatedTypes.SELLER
-        PhoneContact.relatedId = seller.id
+        PhoneContact.relatedId = await seller.id
         PhoneContact.title = 'موبایل'
         CellContact.type = ContactInfoTypes.MOBILE
         CellContact.number = addSellerOrderOffer.cellphone
         CellContact.countryId = 244
         await CellContact.save()
-        offer.sellerId = seller.id
+        offer.sellerId = await seller.id
         offer.request_name = seller.name;
       } else {
         offer.sellerId = findTempSeller.id
@@ -84,6 +87,10 @@ export class OrderOfferService {
       await offer.save()
 
       return offer
+    } catch (e) {
+      console.log('err in addSellerOrderOffer',e)
+    }
+      
       
     }
   async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User): Promise<OfferOrder> {
