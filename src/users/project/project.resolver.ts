@@ -2,7 +2,8 @@ import {
   Args,
   Mutation,
   Query,
-  Resolver
+  Resolver,
+  Context
 } from "@nestjs/graphql";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { Permission } from "../authorization/permission.decorator";
@@ -120,8 +121,17 @@ export class ProjectResolver {
       new ValidationPipe({ transform: true }),
     )
     indexProjectInput?: IndexProjectInput,
-  ) {
-    return this.projectService.paginate(indexProjectInput)
+    @Context() context?: { req: Request },
+    @CurrentUser() user: User,
+  )
+  {
+    const request = context?.req;
+    const referer = request.headers['origin'] ?? null;
+    let client = false 
+    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
+      client = true
+    }
+    return this.projectService.paginate(indexProjectInput,client,user)
   }
 
   @Permission("gql.users.address.store")

@@ -292,38 +292,50 @@ export class ProjectService {
 
   async paginate(
     indexProjectInput?: IndexProjectInput,
+    client?: boolean,
+    user?: User
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
     const { take, skip, createTime,nameOrUuid,nameManager,nameEmployer , status} = indexProjectInput || {};
     const whereConditions: any = {};
 
-    if (createTime) {
-      whereConditions['createTime'] = MoreThan(createTime); 
+    if (client) {
+      whereConditions['user'] = {
+        user :  {
+          id :user.id
+        },
+      }
+    } else {
+      if (createTime) {
+        whereConditions['createTime'] = MoreThan(createTime); 
+      }
+      if (nameOrUuid) {
+        whereConditions['name'] =  Like(`%${nameOrUuid}%`)
+  
+      }
+      if (status) {
+        whereConditions['status'] = status;
+      }
+      if (nameManager) {
+        
+        whereConditions['user'] = {
+          user :  {
+            firstName : Like(`%${nameManager}%`)
+          },
+          type : UserTypeProject.MANAGER
+        }
+      }
+      if (nameEmployer) {
+        whereConditions['user'] = {
+          user :  {
+            firstName : Like(`%${nameEmployer}%`)
+          },
+          type : UserTypeProject.EMPLOYER
+        }
+      }
     }
-    if (nameOrUuid) {
-      whereConditions['name'] =  Like(`%${nameOrUuid}%`)
 
-    }
-    if (status) {
-      whereConditions['status'] = status;
-    }
-    if (nameManager) {
-      
-      whereConditions['user'] = {
-        user :  {
-          firstName : Like(`%${nameManager}%`)
-        },
-        type : UserTypeProject.MANAGER
-      }
-    }
-    if (nameEmployer) {
-      whereConditions['user'] = {
-        user :  {
-          firstName : Like(`%${nameEmployer}%`)
-        },
-        type : UserTypeProject.EMPLOYER
-      }
-    }
+   
     const [data, total] = await Project.findAndCount({
       where:whereConditions ,
       take,
