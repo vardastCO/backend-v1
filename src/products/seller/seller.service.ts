@@ -204,6 +204,8 @@ export class SellerService {
         data.map(async (seller, index) => {
           if (client) {
             seller.brands = index < 4 ? await this.getOfferBrand(seller.id) : [];
+          } else {
+            seller.brands = []
           }
           return seller;
         })
