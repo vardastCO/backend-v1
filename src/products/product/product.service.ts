@@ -152,7 +152,8 @@ export class ProductService {
 
   async paginate(
     indexProductInput?: IndexProductInput,
-    user ?: User
+    user?: User,
+    client ?: boolean
   ): Promise<PaginationProductResponse> {
     indexProductInput.boot();
     const { sortField, sortDirection } = indexProductInput;
@@ -165,12 +166,12 @@ export class ProductService {
     const cachedData = await this.cacheManager.get<String>(
       cacheKey,
     );
-    // if (cachedData && !admin) {
-    //   console.log('priceeeeeeeeeeeeee3')
-    //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-    //   const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
-    //   return parsedData;
-    // }
+    if (cachedData && !admin && !client) {
+      console.log('priceeeeeeeeeeeeee3')
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
+      return parsedData;
+    }
    
     const {
       take,
@@ -233,8 +234,9 @@ export class ProductService {
     // const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 30 * 90);
     if (sortField == SortFieldProduct.PRICE) {
       console.log('priceeeeeeeeeeeeee')
+      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
       whereConditions.prices = {
-        id:572477,
+        createdAt:  MoreThan(fifteenMinutesAgo),
       };
     }
     const order: any = {}
