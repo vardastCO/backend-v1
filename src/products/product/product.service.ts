@@ -166,8 +166,12 @@ export class ProductService {
     const cachedData = await this.cacheManager.get<String>(
       cacheKey,
     );
-    if (cachedData && !admin && !client) {
-      console.log('priceeeeeeeeeeeeee3')
+    let isAlicePrice = false
+    if (sortField === SortFieldProduct.PRICE) {
+      isAlicePrice = true
+    }
+    if (cachedData && !admin && !isAlicePrice) {
+      console.log('cahced')
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
       return parsedData;
@@ -230,10 +234,8 @@ export class ProductService {
   
       }
     }
-    console.log('priceeeeeeeeeeeeee2')
-    // const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 30 * 90);
+    console.log('no cahced')
     if (sortField == SortFieldProduct.PRICE) {
-      console.log('priceeeeeeeeeeeeee')
       const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
       whereConditions.prices = {
         createdAt:  MoreThan(fifteenMinutesAgo),
