@@ -8,7 +8,7 @@ import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { filterObject } from "src/base/utilities/helpers";
 import { User } from "src/users/user/entities/user.entity";
-import { Brackets, EntityManager, In, Like,IsNull } from 'typeorm';
+import { Brackets, EntityManager, In, Like,IsNull, MoreThan } from 'typeorm';
 import { AttributeValue } from "../attribute-value/entities/attribute-value.entity";
 import { Brand } from "../brand/entities/brand.entity";
 import { Image } from "../images/entities/image.entity";
@@ -228,6 +228,15 @@ export class ProductService {
   
       }
     }
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+    if (sortField == SortFieldProduct.PRICE) {
+      whereConditions['prices'] = {
+        prices :  {
+          createdAt: MoreThan(fifteenMinutesAgo)
+        },
+      
+      }
+    }
     const order: any = {}
     switch (sortField) {
       case SortFieldProduct.TIME:
@@ -239,6 +248,9 @@ export class ProductService {
       case SortFieldProduct.RATING:
         order['rating'] = sortDirection;
         break;
+      case SortFieldProduct.PRICE:
+        order['rating'] = sortDirection;
+        break
     }
     
     const [products, totalCount] = await Product.findAndCount({
