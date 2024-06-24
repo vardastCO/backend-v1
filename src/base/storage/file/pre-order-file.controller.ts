@@ -27,12 +27,13 @@ export class PreOrderFileController {
         where: {
           uuid ,
         },
-        relations: ["preOrder.user","preOrder.address","offerLine"],
+        relations: ["preOrder.user","preOrder.address","offerLine","preOrder.project"],
       })
 
       if (!offer) {
         res.send('not found')
       }
+      console.log('project',offer)
       let totalQty = 0;
       const items = await Promise.all((await offer.offerLine).map(async (offer) => {
         const data = {
