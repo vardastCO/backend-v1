@@ -42,7 +42,8 @@ export class PreOrderFileController {
 
       let legal = null
       let address_legal = null
-      if ((await offer.preOrder).type = TypeOrder.LEGAL) {
+      console.log('(await offer.preOrder).type === TypeOrder.LEGA',(await offer.preOrder).type === TypeOrder.LEGA)
+      if ((await offer.preOrder).type === TypeOrder.LEGAL) {
         const user_manager = await UserProject.findOneBy({
           projectId: (await offer.preOrder).projectId,
           type:UserTypeProject.MANAGER
@@ -94,8 +95,8 @@ export class PreOrderFileController {
       res.setHeader('Content-Type', 'text/html');
       res.send(invoiceHTML);
     } catch (error) {
-      console.error('Failed to fetch invoice template:', error);
-      throw new Error('Failed to fetch invoice template');
+      console.error('Failed :', error);
+      throw new Error('Failed');
     }
   }
 
