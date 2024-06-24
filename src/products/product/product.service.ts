@@ -230,6 +230,7 @@ export class ProductService {
     }
     // const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 30 * 90);
     if (sortField == SortFieldProduct.PRICE) {
+      console.log('priceeeeeeeeeeeeee')
       whereConditions.prices = {
         id:572477,
       };
