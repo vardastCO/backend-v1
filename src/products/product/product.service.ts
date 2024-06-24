@@ -165,11 +165,12 @@ export class ProductService {
     const cachedData = await this.cacheManager.get<String>(
       cacheKey,
     );
-    if (cachedData && !admin) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-      const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
-      return parsedData;
-    }
+    // if (cachedData && !admin) {
+    //   console.log('priceeeeeeeeeeeeee3')
+    //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+    //   const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
+    //   return parsedData;
+    // }
    
     const {
       take,
@@ -228,6 +229,7 @@ export class ProductService {
   
       }
     }
+    console.log('priceeeeeeeeeeeeee2')
     // const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 30 * 90);
     if (sortField == SortFieldProduct.PRICE) {
       console.log('priceeeeeeeeeeeeee')
