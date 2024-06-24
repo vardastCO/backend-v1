@@ -2,8 +2,14 @@ import { Controller, Get, Param, Res } from "@nestjs/common";
 import { addCommas, numberToWords } from "@persian-tools/persian-tools";
 import axios from 'axios';
 import { Response } from "express";
+import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
+import { TypeOrder } from "src/order/preOrder/enum/type-order.enum";
+import { Address } from "src/users/address/entities/address.entity";
 import { Public } from "src/users/auth/decorators/public.decorator";
+import { Legal } from "src/users/legal/entities/legal.entity";
+import { UserProject } from "src/users/project/entities/user-project.entity";
+import { UserTypeProject } from "src/users/project/enums/type-user-project.enum";
 @Controller("pre/order/file")
 export class PreOrderFileController {
   @Public()
@@ -33,7 +39,21 @@ export class PreOrderFileController {
       if (!offer) {
         res.send('not found')
       }
-      console.log('project',offer)
+
+      let legal = null
+      let address_legal = null
+      if ((await offer.preOrder).type = TypeOrder.LEGAL) {
+        const user_manager = await UserProject.findOneBy({
+          projectId: (await offer.preOrder).projectId,
+          type:UserTypeProject.MANAGER
+        })
+        legal = await Legal.findOneBy({
+          ownerId:user_manager.id
+        })
+        address_legal = await Address.findOneBy({
+          relatedId:legal.id
+        })
+      }
       let totalQty = 0;
       const items = await Promise.all((await offer.offerLine).map(async (offer) => {
         const data = {
@@ -55,9 +75,9 @@ export class PreOrderFileController {
         invoiceNumber: (await offer.preOrder).uuid,
         sellerAddress: 'بلوار کاوه، نرسیده به خیابان دولت، نبش کوچه اخلاقی غربی، پلاك 12,1 طبقه 2 واحد 4',
         sellerNationalId: '14011385876',  
-        buyerName: (await (await offer.preOrder).address).delivery_name,
-        buyerNationalId: (await (await offer.preOrder).address).delivery_contact,
-        buyerAddress: (await (await offer.preOrder).address).address,
+        buyerName: legal.length > 0 ? legal.name_company : (await (await offer.preOrder).address).delivery_name,
+        buyerNationalId:legal.length > 0 ? legal.national_id : '-',
+        buyerAddress: legal.length > 0 ? address_legal?.address : (await (await offer.preOrder).address).address,
         items: await items,
         totalAmount: offer.total,
         totalTax: offer.total_tax,
