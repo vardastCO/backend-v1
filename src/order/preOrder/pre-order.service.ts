@@ -296,14 +296,15 @@ export class PreOrderService {
           }),
         ]);
 
-        const [clientOffers, sellerOffers, adminOffers ] = await offersPromises;
+      const [clientOffers, sellerOffers, adminOffers] = await offersPromises;
+ 
         if (client) {
          order.offers = [...sellerOffers, ...adminOffers];
         } else {
           order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
         } 
-    
-  
+        console.log('offers',order.offers)
+        console.log('client',client)
       return order
     } catch (error) {
 
