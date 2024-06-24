@@ -279,6 +279,7 @@ export class UserService {
           legal.national_id = updateProfileInput.national_id
         }
         legal.createdById = user.id
+        legal.ownerId = user.id
         await legal.save()
       } else {
         if (updateProfileInput.name_company) {
