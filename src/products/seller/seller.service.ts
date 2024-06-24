@@ -202,9 +202,11 @@ export class SellerService {
     try {
       const modifiedData = await Promise.all(
         data.map(async (seller, index) => {
-          seller.brands = index < 9 ? await this.getOfferBrand(seller.id) : [];
+          if (client) {
+            seller.brands = index < 5 ? await this.getOfferBrand(seller.id) : [];
+          }
           return seller;
-      })
+        })
       );
 
       const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
@@ -212,8 +214,6 @@ export class SellerService {
         .replace(/__offers__/g, 'offers')
         .replace(/__has_offers__/g, 'has_offers');
 
-      
-      // Parse the modified JSON back to objects
       const result = JSON.parse(jsonString);
       const response = PaginationSellerResponse.make(
         indexSellerInput,
