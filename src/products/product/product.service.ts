@@ -231,7 +231,7 @@ export class ProductService {
     // const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 30 * 90);
     if (sortField == SortFieldProduct.PRICE) {
       whereConditions.prices = {
-        createdAt:'2024-06-24 17:16:00.000',
+        id:572477,
       };
     }
     const order: any = {}
