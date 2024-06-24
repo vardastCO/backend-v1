@@ -49,7 +49,7 @@ export class PreOrderFileController {
           type:UserTypeProject.MANAGER
         })
         legal = await Legal.findOneBy({
-          ownerId:user_manager.id
+          ownerId:user_manager.userId
         })
         console.log('legal',legal)
         if (legal !== null) {
