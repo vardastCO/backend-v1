@@ -122,7 +122,7 @@ export class ProjectResolver {
     )
     indexProjectInput?: IndexProjectInput,
     @Context() context?: { req: Request },
-    @CurrentUser() user: User,
+    @CurrentUser() user?: User,
   )
   {
     const request = context?.req;
