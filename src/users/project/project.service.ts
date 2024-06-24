@@ -293,7 +293,8 @@ export class ProjectService {
   async paginate(
     indexProjectInput?: IndexProjectInput,
     client?: boolean,
-    user?: User
+    user?: User,
+    isRealUserType?:boolean
   ): Promise<PaginationProjectResponse> {
     indexProjectInput.boot()
     const { take, skip, createTime,nameOrUuid,nameManager,nameEmployer , status} = indexProjectInput || {};
@@ -305,6 +306,7 @@ export class ProjectService {
           id :user.id
         },
       }
+      whereConditions['type'] = isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
     } else {
       if (createTime) {
         whereConditions['createTime'] = MoreThan(createTime); 

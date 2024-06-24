@@ -123,6 +123,7 @@ export class ProjectResolver {
     indexProjectInput?: IndexProjectInput,
     @Context() context?: { req: Request },
     @CurrentUser() user?: User,
+    @IsRealUserType() isRealUserType?: boolean,
   )
   {
     const request = context?.req;
@@ -131,7 +132,7 @@ export class ProjectResolver {
     if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
       client = true
     }
-    return this.projectService.paginate(indexProjectInput,client,user)
+    return this.projectService.paginate(indexProjectInput,client,user,isRealUserType)
   }
 
   @Permission("gql.users.address.store")
