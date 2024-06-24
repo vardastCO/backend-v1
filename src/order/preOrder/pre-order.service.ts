@@ -297,9 +297,12 @@ export class PreOrderService {
         ]);
 
         const [clientOffers, sellerOffers, adminOffers ] = await offersPromises;
-       
-        order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
-
+        if (client) {
+         order.offers = [...sellerOffers, ...adminOffers];
+        } else {
+          order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
+        } 
+    
   
       return order
     } catch (error) {
