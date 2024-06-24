@@ -51,9 +51,13 @@ export class PreOrderFileController {
         legal = await Legal.findOneBy({
           ownerId:user_manager.id
         })
-        address_legal = await Address.findOneBy({
-          relatedId:legal.id
-        })
+        console.log('legal',legal)
+        if (legal) {
+          address_legal = await Address.findOneBy({
+            relatedId:legal.id
+          })
+        }
+
       }
       let totalQty = 0;
       const items = await Promise.all((await offer.offerLine).map(async (offer) => {
