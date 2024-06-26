@@ -105,25 +105,33 @@ export class OrderFileController {
     const entities = await this.csvParser.parse(bufferStream, UserDto);
     try {
       entities.list.map(async item => {
-        const fields = item['شماره درخواست,تاریخ درخواست,واحد رمز/تامین,نوع قلم,مرکز درخواست کننده,درخواست کننده,نوع طرف مقابل,طرف مقابل,نوع درخواست خرید,کد قلم خریدنی,عنوان قلم خریدنی,مشخصه فنی,مقدار,واحد,تاریخ نیاز,مصرف کننده,فی,مبلغ,نوع خرید,روند خرید,مهلت استعلام,کارشناس خرید,رمز فوریت,توضیحات,وضعیت'].split(',');
-        
-        if (fields[10]) {
-          const line = new Line()
-          line.preOrderId = parseInt(id)
-          line.userId = user.id
-          line.item_name = fields[10]
-          line.qty = fields[12]
-          line.uom = fields[13]
-          await line.save()
-        }
-      
-        return ;
+          // Extract the key dynamically
+          const itemKey = Object.keys(item)[0];
+          const valuesString = item[itemKey];
+  
+          // Split the values into an array
+          const values = valuesString.split(',');
+  
+          // Ensure there are enough fields before accessing them
+          if (values.length > 13) {
+              const line = new Line();
+              line.preOrderId = parseInt(id);
+              line.userId = user.id;
+              line.item_name = values[10]; // عنوان قلم خریدنی
+              line.qty = values[12];       // مقدار
+              line.uom = values[13];       // واحد
+              await line.save();
+          }
+  
+          return;
       });
+  
       return true;
-    } catch (e) {
-      console.log('create line by csv ', e)
+  } catch (e) {
+      console.log('create line by csv ', e);
       return false;
-    }
+  }
+  
 
   }
   
