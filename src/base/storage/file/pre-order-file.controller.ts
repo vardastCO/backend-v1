@@ -124,18 +124,18 @@ export class PreOrderFileController {
     const remainingRows = Math.max(0, 10 - items.length);
     const additionalRowsHTML = [...Array(remainingRows)].map(() => `
       <tr>
-        <td></td>
-        <td colspan="2"></td>
-        <td colspan="5"></td>
-        <td></td>
-        <td></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-        <td colspan="2"></td>
+        <td> </td>
+        <td colspan="2"> </td>
+        <td colspan="5"> </td>
+        <td> </td>
+        <td> </td>
+        <td colspan="2"> </td>
+        <td colspan="2"> </td>
+        <td colspan="2"> </td>
+        <td colspan="2"> </td>
+        <td colspan="2"> </td>
+        <td colspan="2"> </td>
+        <td colspan="2"> </td>
       </tr>`).join('');
 
     const fullItemsHTML = itemsHTML + additionalRowsHTML;
@@ -153,8 +153,8 @@ export class PreOrderFileController {
                    .replace('{{totalAmount}}', addCommas(totalAmount))
                    .replace('{{additions}}', additions)
                    .replace('{{discount}}', discount)
-                   .replace('{{buyerNationalId}}', '1111111')
-                   .replace('{{buyerPhone}}', '09124484707')
+                   .replace('{{buyerNationalId}}', '-')
+                   .replace('{{buyerPhone}}', '-')
                     .replace('{{grandTotal}}', grandTotal)
                     .replace('{{totalUOM}}', totalQty)
                     .replace('{{totalFi}}',  addCommas(totalFi))
