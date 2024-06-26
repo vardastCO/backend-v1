@@ -79,10 +79,7 @@ export class PreOrderResolver {
     return this.preOrderService.findPreOrderById(id,user,client);
   }
 
-
-
-  @Public()
-  // @Permission("gql.users.address.store")
+  @Permission("gql.users.address.store")
   @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
   findAll(
     @CurrentUser() currentUser?: User,
@@ -91,7 +88,6 @@ export class PreOrderResolver {
     indexPreOrderInput?: IndexPreOrderInput,
     @Context() context?: { req: Request }
   ) {
-    console.log('userrrrrrrrrrr',currentUser)
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
     let client = false 

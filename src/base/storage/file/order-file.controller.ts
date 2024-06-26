@@ -105,6 +105,8 @@ export class OrderFileController {
     const entities = await this.csvParser.parse(bufferStream, UserDto);
     try {
       entities.list.map(async item => {
+        console.log('ites', item)
+        console.log('ites0',item[0])
         const fields = item[ "شماره درخواست,تاریخ درخواست,واحد رمز/تامین,نوع قلم,مرکز درخواست کننده,درخواست کننده,نوع طرف مقابل,طرف مقابل,نوع درخواست خرید,کد قلم خریدنی,عنوان قلم خریدنی,مشخصه فنی,مقدار,واحد,تاریخ نیاز,مصرف کننده,فی,مبلغ,نوع خرید,روند خرید,مهلت استعلام,کارشناس خرید,رمز فوریت,توضیحات,وضعیت"].split(',');
         
         if (fields[10]) {
