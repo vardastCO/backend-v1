@@ -1,6 +1,5 @@
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
 import { PreOrderLineService } from './pre-order-line.service';
-import { CreateLineInput } from './dto/create-pre-order.input';
 import { User } from 'src/users/user/entities/user.entity';
 import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
 import { Permission } from 'src/users/authorization/permission.decorator';
@@ -8,6 +7,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { LineDTO } from './dto/lineDTO';
 import { PreOrder } from '../preOrder/entities/pre-order.entity';
 import { UpdateLineInput } from './dto/update-line-order.input';
+import { CreateLineInput } from './dto/create-line-order.input';
 
 
 @Resolver(() => LineDTO)
@@ -56,7 +56,7 @@ export class PreOrderLineResolver {
     @CurrentUser() user: User
   ) {
    
-    return this.preOrderLineService.creatline(addTempProduct,user);
+    return this.preOrderLineService.createline(addTempProduct,user);
   }
 
 }
