@@ -325,6 +325,9 @@ export class PreOrderService {
       const [clientOffers, sellerOffers, adminOffers,clientInvoiceOffers,clientSelfOffers] = await offersPromises;
  
       if (client) {
+        clientInvoiceOffers.map((offer) => {
+          return offer.request_name = 'کارشناس وردست'
+        })
         order.offers = [...clientInvoiceOffers,...clientSelfOffers];
       } else {
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
