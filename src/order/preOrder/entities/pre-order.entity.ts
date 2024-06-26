@@ -80,7 +80,7 @@ export class PreOrder extends BaseEntity {
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  need_date: string; 
+  need_date: Date; 
 
   @Field({ nullable: true })
   @Index()

@@ -19,7 +19,7 @@ export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
   status?: PreOrderStatus;
   
   @Field({ nullable: true })
-  need_date: string;
+  need_date: Date;
 
   @Field(() => ExpireTypes, {
     defaultValue: ExpireTypes.ONE_DAY,
