@@ -28,4 +28,11 @@ export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
   @IsNotEmpty()
   @IsEnum(ExpireTypes)
   expire_date?: ExpireTypes = ExpireTypes.ONE_DAY;
+
+  @Field(() => Int, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  categoryId?: number;
 }

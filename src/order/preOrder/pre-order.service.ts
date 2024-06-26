@@ -164,7 +164,9 @@ export class PreOrderService {
     preOrder.expire_time = updatePreOrderInput.expire_date
       ? this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" })
       : null
-    ; 
+      ; 
+    
+    preOrder.categoryId = updatePreOrderInput.categoryId ?? null
   
     let preOrderAddress = await preOrder.address;
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
