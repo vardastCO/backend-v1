@@ -391,7 +391,12 @@ export class PreOrderService {
         id: 'DESC'
       },
     });
-  
+    if (client) {
+      data.map(async (line) => {
+        (await line.user).fullName = 'کارشناس وردست'
+        return line
+      })
+    }
     return PaginationPreOrderResponse.make(indexPreOrderInput, total, data);
   }
   
