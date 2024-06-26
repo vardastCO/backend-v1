@@ -124,18 +124,18 @@ export class PreOrderFileController {
     const remainingRows = Math.max(0, 10 - items.length);
     const additionalRowsHTML = [...Array(remainingRows)].map(() => `
       <tr>
-        <td> </td>
-        <td colspan="2"> </td>
-        <td colspan="5"> </td>
-        <td> </td>
-        <td> </td>
-        <td colspan="2"> </td>
-        <td colspan="2"> </td>
-        <td colspan="2"> </td>
-        <td colspan="2"> </td>
-        <td colspan="2"> </td>
-        <td colspan="2"> </td>
-        <td colspan="2"> </td>
+        <td> <br/> </td>
+        <td colspan="2"> <br/> </td>
+        <td colspan="5"> <br/> </td>
+        <td> <br/></td>
+        <td>  <br/></td>
+        <td colspan="2"><br/> </td>
+        <td colspan="2"><br/> </td>
+        <td colspan="2"> <br/></td>
+        <td colspan="2"> <br/></td>
+        <td colspan="2"><br/> </td>
+        <td colspan="2"><br/> </td>
+        <td colspan="2"><br/> </td>
       </tr>`).join('');
 
     const fullItemsHTML = itemsHTML + additionalRowsHTML;
