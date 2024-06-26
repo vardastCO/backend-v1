@@ -85,8 +85,8 @@ export class PreOrderResolver {
   // @Permission("gql.users.address.store")
   @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
   findAll(
-    @CurrentUser() currentUser: User,
-    @IsRealUserType() isRealUserType: boolean,
+    @CurrentUser() currentUser?: User,
+    @IsRealUserType() isRealUserType?: boolean,
     @Args("indexPreOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
     indexPreOrderInput?: IndexPreOrderInput,
     @Context() context?: { req: Request }
