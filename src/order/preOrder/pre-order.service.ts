@@ -297,7 +297,7 @@ export class PreOrderService {
             }
           }),
           OfferOrder.find({ 
-            where: { preOrderId: order.id,status:OrderOfferStatuses.INVOICE },
+            where: { preOrderId: order.id,status:OrderOfferStatuses.INVOICE,type:TypeOrderOffer.CLIENT },
             relations: ["offerLine"],
             order: {
               offerLine: {

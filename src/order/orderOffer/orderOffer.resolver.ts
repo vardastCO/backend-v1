@@ -1,4 +1,4 @@
-import { Resolver } from '@nestjs/graphql';
+import { Context, Resolver } from '@nestjs/graphql';
 import { OrderOfferService } from './orderOffer.service';
 import { ValidationPipe } from "@nestjs/common";
 import { Args, Mutation ,Query} from '@nestjs/graphql';
@@ -30,9 +30,16 @@ export class OrderOfferResolver {
   @Mutation(() => OfferOrder)
   createOrderOffer(
     @Args("createOrderOfferInput") createOrderOfferInput: CreateOrderOfferInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
+    @Context() context?: { req: Request }
   ) {
-    return this.orderOfferService.createOffer(createOrderOfferInput,user);
+    const request = context?.req;
+    const referer = request.headers['origin'] ?? null;
+    let admin = false 
+    if (referer == 'https://admin.vardast.ir' || referer == 'https://admin.vardast.com') {
+      admin = true
+    }
+    return this.orderOfferService.createOffer(createOrderOfferInput,user,admin);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
