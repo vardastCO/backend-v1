@@ -81,7 +81,7 @@ export class PreOrderResolver {
 
 
 
-  // @Public()
+  @Public()
   @Permission("gql.users.address.store")
   @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
   findAll(
@@ -91,6 +91,7 @@ export class PreOrderResolver {
     indexPreOrderInput?: IndexPreOrderInput,
     @Context() context?: { req: Request }
   ) {
+    console.log('userrrrrrrrrrr',currentUser)
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
     let client = false 
