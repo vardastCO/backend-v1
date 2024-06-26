@@ -297,7 +297,19 @@ export class PreOrderService {
             }
           }),
           OfferOrder.find({ 
-            where: { preOrderId: order.id,status:OrderOfferStatuses.INVOICE,type:TypeOrderOffer.CLIENT },
+            where: { preOrderId: order.id,status:OrderOfferStatuses.INVOICE },
+            relations: ["offerLine"],
+            order: {
+              offerLine: {
+                line: {
+                  type: 'ASC',
+                  id: "DESC"
+                }
+              }
+            }
+          }),
+          OfferOrder.find({ 
+            where: { preOrderId: order.id,type:TypeOrderOffer.CLIENT },
             relations: ["offerLine"],
             order: {
               offerLine: {
@@ -310,10 +322,10 @@ export class PreOrderService {
           }),
         ]);
 
-      const [clientOffers, sellerOffers, adminOffers,clientInvoiceOffers] = await offersPromises;
+      const [clientOffers, sellerOffers, adminOffers,clientInvoiceOffers,clientSelfOffers] = await offersPromises;
  
       if (client) {
-        order.offers = [...clientInvoiceOffers];
+        order.offers = [...clientInvoiceOffers,...clientSelfOffers];
       } else {
         order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
       } 
