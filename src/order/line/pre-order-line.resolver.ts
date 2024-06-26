@@ -7,6 +7,7 @@ import { Permission } from 'src/users/authorization/permission.decorator';
 import { ValidationPipe } from "@nestjs/common";
 import { LineDTO } from './dto/lineDTO';
 import { PreOrder } from '../preOrder/entities/pre-order.entity';
+import { UpdateLineInput } from './dto/update-line-order.input';
 
 
 @Resolver(() => LineDTO)
@@ -22,7 +23,18 @@ export class PreOrderLineResolver {
     @CurrentUser() user: User
   ) {
    
-    return this.preOrderLineService.creatline(createLineInput,user);
+    return this.preOrderLineService.createline(createLineInput,user);
+  }
+
+  @Permission("gql.users.address.store")
+  @Mutation(() => PreOrder)
+  updateline(
+    @Args('updateLineInput', { type: () => UpdateLineInput, nullable: true }, new ValidationPipe({ transform: true }))
+    updateLineInput: UpdateLineInput,
+    @CurrentUser() user: User
+  ) {
+   
+    return this.preOrderLineService.updateline(updateLineInput.id,updateLineInput,user);
   }
 
   @Permission("gql.users.address.store")

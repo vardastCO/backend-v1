@@ -10,6 +10,7 @@ import { LineDTO } from './dto/lineDTO';
 import { Line } from './entities/order-line.entity';
 import { PreOrder } from '../preOrder/entities/pre-order.entity';
 import { PreOrderStatus } from '../enums/pre-order-states.enum';
+import { UpdateLineInput } from './dto/update-line-order.input';
 
 @Injectable()
 export class PreOrderLineService {
@@ -19,7 +20,7 @@ export class PreOrderLineService {
      
      { }
 
-     async creatline(createLineInput: CreateLineInput,user:User): Promise<PreOrder> {
+     async createline(createLineInput: CreateLineInput,user:User): Promise<PreOrder> {
        
        try {
         const line: Line = Line.create<Line>(createLineInput);
@@ -42,7 +43,32 @@ export class PreOrderLineService {
         
       }
     
+     }
+    async updateline(id:number,updateLineInput: UpdateLineInput,user:User): Promise<PreOrder> {
+       
+    try {
+  
+      const line: Line = await Line.preload({
+        id,
+        ...updateLineInput,
+      });
+      line.userId = user.id
+      await line.save();
+
+       const result =  await PreOrder.findOne({
+         where: { id: line.preOrderId},
+         relations: ["files","lines"],
+       })
+
+       return result
+       
+    } catch (error) {
+
+       console.log('update_line_order err',error)
+       
     }
+   
+   }
     async removeline(id: number,user:User): Promise<Boolean> {
        
       try {

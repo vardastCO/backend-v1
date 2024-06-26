@@ -30,7 +30,7 @@ export class PreOrderService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
-  async generateNumericUuid(length: number = 10): Promise<string> {
+  async generateNumericUuid(length: number = 5): Promise<string> {
       const min = Math.pow(10, length - 1);
       const max = Math.pow(10, length) - 1;
     return Math.floor(Math.random() * (max - min + 1) + min).toString();
