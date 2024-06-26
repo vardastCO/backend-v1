@@ -160,7 +160,9 @@ export class PreOrderService {
     }
   
     preOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-    preOrder.need_date = updatePreOrderInput.need_date ?? null
+    if (updatePreOrderInput.need_date) {
+      preOrder.need_date = updatePreOrderInput.need_date 
+    }
     preOrder.expire_time = updatePreOrderInput.expire_date
       ? this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" })
       : null
