@@ -82,7 +82,7 @@ export class PreOrderResolver {
 
 
   @Public()
-  @Permission("gql.users.address.store")
+  // @Permission("gql.users.address.store")
   @Query(() => PaginationPreOrderResponse, { name: "preOrders" })
   findAll(
     @CurrentUser() currentUser: User,
