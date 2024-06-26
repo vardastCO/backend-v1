@@ -105,13 +105,15 @@ export class OrderFileController {
     const entities = await this.csvParser.parse(bufferStream, UserDto);
     try {
       entities.list.map(async item => {
+        console.log('item',item)
           // Extract the key dynamically
-          const itemKey = Object.keys(item)[0];
+        const itemKey = Object.keys(item)[0];
+          console.log('kkk',itemKey)
           const valuesString = item[itemKey];
-  
+          console.log('valuesString',valuesString)
           // Split the values into an array
           const values = valuesString.split(',');
-  
+          console.log('values',values)
           // Ensure there are enough fields before accessing them
           if (values.length > 13) {
               const line = new Line();
