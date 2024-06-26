@@ -47,9 +47,11 @@ export class PreOrderFileController {
           projectId: (await offer.preOrder).projectId,
           type:UserTypeProject.MANAGER
         })
-        legal = await Legal.findOneBy({
-          ownerId:user_manager.userId
-        })
+        if (user_manager) {
+          legal = await Legal.findOneBy({
+            ownerId:user_manager.userId
+          })  
+        }
         if (legal !== null) {
           address_legal = await Address.findOneBy({
             relatedId:legal.id
