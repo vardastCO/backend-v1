@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty,IsOptional,IsEnum } from "class-validator";
+import { IsInt, IsNotEmpty,IsOptional,IsEnum,IsString,MaxLength } from "class-validator";
 import { InputType, Field, Int, PartialType } from "@nestjs/graphql";
 import { CreatePreOrderInput } from "./create-pre-order.input";
 import { ExpireTypes } from "../enum/expire-types.enum";
@@ -21,11 +21,18 @@ export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
   @Field({ nullable: true })
   need_date: Date;
 
-  @Field({ nullable: true })
-  expert_name: string;
+  @Field(() => String,{nullable:true}) 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  expert_name?: string;
 
-  @Field({ nullable: true })
-  applicant_name: string;
+  @Field(() => String,{nullable:true}) 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  applicant_name?: string;
+
 
   @Field(() => ExpireTypes, {
     defaultValue: ExpireTypes.ONE_DAY,
