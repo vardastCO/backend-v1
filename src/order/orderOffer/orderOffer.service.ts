@@ -104,7 +104,7 @@ export class OrderOfferService {
       
       
     }
-  async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User,admin:boolean): Promise<OfferOrder> {
+  async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User,admin:boolean,client:boolean): Promise<OfferOrder> {
 
       try {
         let order = await OfferOrder.findOne({
@@ -127,6 +127,9 @@ export class OrderOfferService {
         newOrder.userId = user.id
         if (admin) {
           newOrder.type = TypeOrderOffer.VARDAST
+        }
+        if (client) {
+          newOrder.type = TypeOrderOffer.CLIENT
         }
         newOrder.uuid = await this.generateNumericUuid();
         newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })

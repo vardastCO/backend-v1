@@ -39,7 +39,11 @@ export class OrderOfferResolver {
     if (referer == 'https://admin.vardast.ir' || referer == 'https://admin.vardast.com') {
       admin = true
     }
-    return this.orderOfferService.createOffer(createOrderOfferInput,user,admin);
+    let client = false 
+    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
+      client = true
+    }
+    return this.orderOfferService.createOffer(createOrderOfferInput,user,admin,client);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => OfferOrder)
