@@ -41,15 +41,15 @@ export class Project extends BaseEntity {
   uuid?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true,default:'0'})
   closedOrdersCount?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true,default:'0'})
   openOrdersCount?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true,default:'0'})
   totalOrdersCount?: string;
 
   @Field({ nullable: true })
