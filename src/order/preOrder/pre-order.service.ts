@@ -171,16 +171,16 @@ export class PreOrderService {
     if (updatePreOrderInput.categoryId) {
       preOrder.categoryId = updatePreOrderInput.categoryId
     }
-    console.log('update',updatePreOrderInput)
+ 
     if (updatePreOrderInput.applicant_name) {
      
       preOrder.applicant_name = updatePreOrderInput.applicant_name
-      console.log('applicant_name',preOrder.applicant_name)
+
     }
 
     if (updatePreOrderInput.expert_name) {
       preOrder.expert_name = updatePreOrderInput.expert_name
-      console.log('expert_name',preOrder.expert_name)
+
     }
   
     let preOrderAddress = await preOrder.address;
