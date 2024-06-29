@@ -168,7 +168,9 @@ export class PreOrderService {
       : null
       ; 
     
-    preOrder.categoryId = updatePreOrderInput.categoryId ?? null
+    if (updatePreOrderInput.categoryId) {
+      preOrder.categoryId = updatePreOrderInput.categoryId
+    }
   
     let preOrderAddress = await preOrder.address;
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
