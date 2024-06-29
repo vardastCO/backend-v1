@@ -21,6 +21,12 @@ export class UpdatePreOrderInput extends PartialType(CreatePreOrderInput) {
   @Field({ nullable: true })
   need_date: Date;
 
+  @Field({ nullable: true })
+  expert_name: string;
+
+  @Field({ nullable: true })
+  applicant_name: string;
+
   @Field(() => ExpireTypes, {
     defaultValue: ExpireTypes.ONE_DAY,
     nullable: true,
