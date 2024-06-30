@@ -163,6 +163,12 @@ export class PreOrderService {
     if (updatePreOrderInput.need_date) {
       preOrder.need_date = updatePreOrderInput.need_date 
     }
+    if (updatePreOrderInput.bid_start) {
+      preOrder.bid_start = updatePreOrderInput.bid_start 
+    }
+    if (updatePreOrderInput.bid_end) {
+      preOrder.bid_end = updatePreOrderInput.bid_end 
+    }
     preOrder.expire_time = updatePreOrderInput.expire_date
       ? this.calculateExpirationDate(updatePreOrderInput.expire_date).toLocaleString("en-US", { timeZone: "Asia/Tehran" })
       : null

@@ -27,6 +27,12 @@ export class CreatePreOrderInput {
   @Field({ nullable: true })
   need_date: Date;
 
+  @Field({ nullable: true })
+  bid_start: Date;
+
+  @Field({ nullable: true })
+  bid_end: Date;
+
   @Field(() => TypeOrder, {
     defaultValue: TypeOrder.REAL,
     nullable: true,
