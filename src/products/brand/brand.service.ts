@@ -183,10 +183,7 @@ export class BrandService {
   }
   private async incrementBrandViews(brand: Brand) {
     const info = await Brand.findOneBy({ id: brand.id });
-    console.log('kkkk', info.views); 
     info.views = info.views + 1 ?? 1; 
-
-    console.log('tttt', info.views); 
     await info.save(); 
   } 
   async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
