@@ -243,7 +243,6 @@ export class SellerService {
   
   async findOne(id: number): Promise<Seller> {
     try {
-      // this.logSellerView(id);
       const cacheKey = `seller_${JSON.stringify(id)}`;
   
       const cachedData = await this.cacheManager.get<Seller>(cacheKey);
@@ -259,13 +258,13 @@ export class SellerService {
         throw new NotFoundException();
       }
       try {
-        seller.contacts = await seller.contacts;
-        seller.addresses = await seller.addresses;
-        // const previousTotla = seller.total;
-        // seller.total = await this.getOfferLength(seller.id);
-        // if (previousTotla != seller.total) {
-        //   await seller.save();
-        // }
+        const [contacts, addresses] = await Promise.all([
+          seller.contacts,
+          seller.addresses, 
+        ]);
+    
+        seller.contacts = contacts;
+        seller.addresses = addresses;
         const jsonString = JSON.stringify(seller).replace(/__logoFile__/g, 'logoFile')
           .replace(/__bannerFile__/g, 'bannerFile')
           .replace(/__representatives__/g, 'representatives')
