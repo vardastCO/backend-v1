@@ -24,7 +24,7 @@ export class MemberResolver {
 
   @Permission("gql.products.seller_representative.store")
   @Mutation(() => Boolean)
-  createMmeber(
+  createMember(
     @Args("createMemberInput")
     createMemberInput: CreateMemberInput,
     @CurrentUser() user: User,
@@ -76,9 +76,9 @@ export class MemberResolver {
   //   );
   // }
 
-  // @Permission("gql.products.seller_representative.destroy")
-  // @Mutation(() => Member)
-  // removeSellerRepresentative(@Args("id", { type: () => Int }) id: number) {
-  //   return this.memberService.remove(id);
-  // }
+  @Permission("gql.products.seller_representative.destroy")
+  @Mutation(() => Boolean)
+  removeMember(@Args("id", { type: () => Int }) id: number) {
+    return this.memberService.remove(id);
+  }
 }

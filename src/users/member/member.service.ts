@@ -16,8 +16,8 @@ export class MemberService {
   async create(
     createMemberInput: CreateMemberInput,
     user: User,
-  ): Promise<Boolean> {
-    let findUser = await User.findOneBy({
+  ): Promise<boolean> {
+    const findUser = await User.findOneBy({
       cellphone:createMemberInput.cellphone
     })
     if (findUser) {
@@ -95,10 +95,16 @@ export class MemberService {
   //   return sellerRepresentative;
   // }
 
-  // async remove(id: number): Promise<Member> {
-  //   const sellerRepresentative: Member = await this.findOne(id);
-  //   await sellerRepresentative.remove();
-  //   sellerRepresentative.id = id;
-  //   return sellerRepresentative;
-  // }
+  async remove(id: number): Promise<boolean> {
+    try {
+      const member: Member = await Member.findOneBy({ id });
+      await member.remove();
+      member.id = id;
+      return true;
+    } catch (e) {
+      console.log('err in remove member', e)
+      return false;
+    }
+   
+  }
 }

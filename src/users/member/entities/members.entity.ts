@@ -53,6 +53,10 @@ export class Member extends BaseEntity {
   @Column("boolean", { default: true })
   isActive: boolean;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true  })
+  position?: string;
+
   @Field()
   @CreateDateColumn()
   createdAt: Date;
