@@ -236,7 +236,7 @@ export class BrandService {
   
       await Promise.all([
         this.updateTimestamps(brand),
-        this.incrementViews(brand),  
+        // this.incrementViews(brand),  
         this.cacheBrandData(this.cacheManager, cacheKey, brand),  
       ]);
   
