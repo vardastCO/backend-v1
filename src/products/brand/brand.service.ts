@@ -173,72 +173,143 @@ export class BrandService {
     }
    
   }
-  
-  async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
-    try {
-      // this.logBrandView(id,payload);
-      const cacheKey = `brand_${JSON.stringify(id)}`;
-  
-      const cachedData = await this.cacheManager.get<string>(cacheKey);
-    
-      if (cachedData) {
-        const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-        const parsedData: Brand = JSON.parse(decompressedData);
-        parsedData.createdAt = new Date();
-        parsedData.updatedAt = new Date();
-        const catalogFile = await parsedData.catalog;
-        if (catalogFile) {
-         
-          (await parsedData.catalog).createdAt = new Date(catalogFile.createdAt);
-          
-        }
 
-        const priceFile = await parsedData.priceList;
-
-        if (priceFile) {
-          // Now you can access the properties of the resolved File object
-          const priceCreatedAt = await priceFile.createdAt;
-        
-          if (priceCreatedAt) {
-            (await parsedData.priceList).createdAt = new Date(priceCreatedAt);
-          }
-        }
-        const desktopBannerFile = await parsedData.bannerDesktop;
-        if (desktopBannerFile) {
-          const desktopBannerFileCreatedAt = await desktopBannerFile.createdAt;
-        
-          if (desktopBannerFileCreatedAt) {
-            (await parsedData.bannerDesktop).createdAt = new Date(desktopBannerFileCreatedAt);
-          }
-        }
-      
-        return parsedData
+  async  updateTimestamps(brand: Brand): Promise<void> {
+    const now = new Date();
+    brand.createdAt = now;
+    brand.updatedAt = now;
+  
+    const updateFileTimestamp = async (filePromise) => {
+      const file = await filePromise;
+      if (file) {
+        file.createdAt = new Date(file.createdAt);
       }
+    };
+  
+    await Promise.all([
+      updateFileTimestamp(brand.catalog),
+      updateFileTimestamp(brand.priceList),
+      updateFileTimestamp(brand.bannerDesktop),
+    ]);
+  }
+  
+  async  getCachedBrand(cacheManager: Cache, cacheKey: string): Promise<Brand | null> {
+    const cachedData = await cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const parsedData: Brand = JSON.parse(decompressedData);
+      await Promise.all([
+        this.updateTimestamps(parsedData),
+        this.incrementViews(parsedData) 
+      ]);
+      return parsedData;
+    }
+    return null;
+  }
+  
+  async  cacheBrandData(cacheManager: Cache, cacheKey: string, brand: Brand): Promise<void> {
+    const jsonString = JSON.stringify(brand);
+    const compressedData = zlib.gzipSync(jsonString).toString('base64');
+    await cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+  }
+  
+  async  incrementViews(brand: Brand): Promise<void> {
+    brand.views += 1;
+    await Brand.update({ id: brand.id }, { views: brand.views });
+  }
+  
+  async  findOne(id: number, payload?: PayloadDto): Promise<Brand> {
+    try {
+      const cacheKey = `brand_${id}`;
+  
+      const cachedBrand = await this.getCachedBrand(this.cacheManager, cacheKey);
+      if (cachedBrand) {
+        return cachedBrand;
+      }
+  
       const brand = await Brand.findOneBy({ id });
       if (!brand) {
         throw new NotFoundException();
       }
-      try {
-        const jsonString = JSON.stringify(brand).replace(/__logoFile__/g, 'logoFile')
-        .replace(/__bannerFile__/g, 'bannerFile')
-        .replace(/__catalog__/g, 'catalog')
-        .replace(/__bannerDesktop__/g, 'bannerDesktop')
-        .replace(/__priceList__/g, 'priceList')
-      ;
   
-        const modifiedDataWithOutText = JSON.parse(jsonString);
-        const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
-        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
-      } catch (e) {
-          throw e
-      }
+      await Promise.all([
+        this.updateTimestamps(brand),
+        this.incrementViews(brand),  
+        this.cacheBrandData(this.cacheManager, cacheKey, brand),  
+      ]);
+  
+  
       return brand;
-        
     } catch (e) {
-      throw e
+      throw e;
     }
-    
   }
+  
+  // async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
+  //   try {
+  //     // this.logBrandView(id,payload);
+  //     const cacheKey = `brand_${JSON.stringify(id)}`;
+  
+  //     const cachedData = await this.cacheManager.get<string>(cacheKey);
+    
+  //     if (cachedData) {
+  //       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+  //       const parsedData: Brand = JSON.parse(decompressedData);
+  //       parsedData.createdAt = new Date();
+  //       parsedData.updatedAt = new Date();
+  //       const catalogFile = await parsedData.catalog;
+  //       if (catalogFile) {
+         
+  //         (await parsedData.catalog).createdAt = new Date(catalogFile.createdAt);
+          
+  //       }
+
+  //       const priceFile = await parsedData.priceList;
+
+  //       if (priceFile) {
+  //         // Now you can access the properties of the resolved File object
+  //         const priceCreatedAt = await priceFile.createdAt;
+        
+  //         if (priceCreatedAt) {
+  //           (await parsedData.priceList).createdAt = new Date(priceCreatedAt);
+  //         }
+  //       }
+  //       const desktopBannerFile = await parsedData.bannerDesktop;
+  //       if (desktopBannerFile) {
+  //         const desktopBannerFileCreatedAt = await desktopBannerFile.createdAt;
+        
+  //         if (desktopBannerFileCreatedAt) {
+  //           (await parsedData.bannerDesktop).createdAt = new Date(desktopBannerFileCreatedAt);
+  //         }
+  //       }
+      
+  //       return parsedData
+  //     }
+  //     const brand = await Brand.findOneBy({ id });
+  //     if (!brand) {
+  //       throw new NotFoundException();
+  //     }
+  //     try {
+  //       const jsonString = JSON.stringify(brand).replace(/__logoFile__/g, 'logoFile')
+  //       .replace(/__bannerFile__/g, 'bannerFile')
+  //       .replace(/__catalog__/g, 'catalog')
+  //       .replace(/__bannerDesktop__/g, 'bannerDesktop')
+  //       .replace(/__priceList__/g, 'priceList')
+  //     ;
+  
+  //       const modifiedDataWithOutText = JSON.parse(jsonString);
+  //       const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+  //       await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+  //     } catch (e) {
+  //         throw e
+  //     }
+  //     return brand;
+        
+  //   } catch (e) {
+  //     throw e
+  //   }
+    
+  // }
 
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
     try {

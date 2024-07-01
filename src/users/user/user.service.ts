@@ -29,6 +29,7 @@ import { UpdateProfileInput } from "./dto/update-profile.input";
 import { CompressionService } from "src/compression.service";
 import { DecompressionService } from "src/decompression.service";
 import { Legal } from "../legal/entities/legal.entity";
+import { Member } from "../member/entities/members.entity";
 
 @Injectable()
 export class UserService {
@@ -281,6 +282,13 @@ export class UserService {
         legal.createdById = user.id
         legal.ownerId = user.id
         await legal.save()
+
+        const member = new Member()
+        member.adminId = user.id
+        member.userId = user.id
+        member.position = 'مدیرعامل'
+        member.relatedId = legal.id
+        await member.save()
       } else {
         if (updateProfileInput.name_company) {
           legal.name_company = updateProfileInput.name_company
