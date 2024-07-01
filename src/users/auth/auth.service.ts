@@ -415,7 +415,7 @@ export class AuthService {
       id: member.relatedId
     });
     user.legal = legalData ?? null; 
-  
+    user.sessions = Promise.resolve([]);
     return user;
   }
   
