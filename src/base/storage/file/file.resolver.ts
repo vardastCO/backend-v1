@@ -114,6 +114,7 @@ export class FileResolver {
     }
     const response = await Banner.find({ take: 5 }); 
     console.log('banners with no cache')
+    console.log('resss',response)
     const compressedData = zlib.gzipSync(JSON.stringify(response));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
