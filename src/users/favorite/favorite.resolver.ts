@@ -12,6 +12,7 @@ import { Product } from "src/products/product/entities/product.entity";
 import { Brand } from "src/products/brand/entities/brand.entity";
 import { Seller } from "src/products/seller/entities/seller.entity";
 import { EntityTypeEnum } from "./enums/entity-type.enum";
+import { IsRealUserType } from "../auth/decorators/current-type.decorator";
 @Resolver(() => Favorite)
 export class FavoriteResolver {
   constructor(private readonly favoriteService: FavoriteService) {}
@@ -25,10 +26,12 @@ export class FavoriteResolver {
     )
     favoritesInput: EntityTypeInput,
     @CurrentUser() currentUser: User,
+    @IsRealUserType() isRealUserType?: boolean,
   ): Promise<FavoriteResponse> {
     const data : Product[] | Brand[] | Seller[] = await this.favoriteService.findFavorites(
       favoritesInput.type,
       currentUser,
+      isRealUserType
     );
     let responseData: { [key: string]: Product[] | Brand[] | Seller[] } = {};
 
@@ -50,11 +53,13 @@ export class FavoriteResolver {
   async isFavorite(
     @Args("updateFavoriteInput") updateFavoriteInput: UpdateFavoriteInput,
     @CurrentUser() currentUser: User,
+    @IsRealUserType() isRealUserType?: boolean,
   ): Promise<boolean> {
     return this.favoriteService.isFavorite(
       currentUser.id,
       updateFavoriteInput.entityId,
       updateFavoriteInput.type,
+      isRealUserType
     );
   }
 
@@ -67,12 +72,14 @@ export class FavoriteResolver {
     )
     updateFavoriteInput: UpdateFavoriteInput,
     @CurrentUser() currentUser: User,
+    @IsRealUserType() isRealUserType?: boolean,
   ): Promise<boolean> {
     try {
       return await this.favoriteService.updateFavorite(
         currentUser,
         updateFavoriteInput.entityId,
         updateFavoriteInput.type,
+        isRealUserType
       );
     } catch (e) {
       console.log('',e)

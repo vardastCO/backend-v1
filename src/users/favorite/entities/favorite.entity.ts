@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from "../../user/entities/user.entity";
+import { UserType } from "../enums/user-type.enum";
 
 // @Field(() => EntityTypeEnum, { nullable: true })
 // @IsEnum(EntityTypeEnum)
@@ -34,6 +35,13 @@ export class Favorite extends BaseEntity {
     nullable: true,
   })
   entityType: EntityTypeEnum;
+
+  @Field(() => UserType)
+  @Column("enum", {
+    enum: UserType,
+    default: UserType.REAL,
+  })
+  usertype: UserType;
 
   @Field(() => User)
   @ManyToOne(() => User, { nullable: true })

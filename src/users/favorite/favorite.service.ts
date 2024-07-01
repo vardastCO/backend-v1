@@ -7,16 +7,19 @@ import { In } from "typeorm";
 import { User } from "../user/entities/user.entity";
 import { Favorite } from "./entities/favorite.entity";
 import { EntityTypeEnum } from "./enums/entity-type.enum";
+import { UserType } from "./enums/user-type.enum";
 
 @Injectable()
 export class FavoriteService {
   async findFavorites(
     type: EntityTypeEnum,
     user: User,
+    isRealUserType:boolean
   ): Promise<Product[] | Brand[] | Seller[]> {
     const favorites: Favorite[] = await Favorite.findBy({
       entityType: type,
       userId: user.id,
+      usertype: isRealUserType ? UserType.REAL : UserType.LEGAL
     });
     const favoriteIds = favorites.map(favorite => favorite.entityId);
     if (type === EntityTypeEnum.PRODUCT) {
@@ -48,9 +51,10 @@ export class FavoriteService {
     userId: number,
     entityId: number,
     entityType: EntityTypeEnum,
+    isRealUserType:boolean
   ): Promise<boolean> {
     const count = await Favorite.count({
-      where: { userId, entityId, entityType },
+      where: { userId, entityId, entityType,usertype: isRealUserType ? UserType.REAL : UserType.LEGAL },
     });
 
     return count > 0;
@@ -60,6 +64,7 @@ export class FavoriteService {
     userData: User,
     entityId: number,
     entityType: EntityTypeEnum, // 'brand', 'seller', or 'product'
+    isRealUserType:boolean
   ) {
     try {
       const whatUserId = User.findOneBy({ id: userData.id })
@@ -69,6 +74,7 @@ export class FavoriteService {
         entityType,
         userId:id,
         entityId,
+        usertype: isRealUserType ? UserType.REAL : UserType.LEGAL
       });
       if (existFavorite) {
         await existFavorite.remove(); 
@@ -83,7 +89,7 @@ export class FavoriteService {
 
       userFavorite.user = Promise.resolve({ id: id } as User);
       userFavorite.entityId = entityId;
-      // Save the UserFavorite instance to the database
+      userFavorite.usertype = isRealUserType ? UserType.REAL : UserType.LEGAL
       await userFavorite.save();
       return true;
     } catch (error) {
