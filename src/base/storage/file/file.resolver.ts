@@ -114,8 +114,15 @@ export class FileResolver {
     }
     const response = await Banner.find({ take: 5 }); 
     console.log('banners with no cache')
-    console.log('resss',response)
-    const compressedData = zlib.gzipSync(JSON.stringify(response));
+    console.log('resss', response)
+    const jsonString = JSON.stringify(response).replace(/__small__:/g, 'small')
+        .replace(/__medium__:/g, 'medium')
+        .replace(/__large__:/g, 'large')
+        .replace(/__xlarge__:/g, 'xlarge')
+    ;
+  
+    const modifiedDataWithOutText = JSON.parse(jsonString);
+    const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
 
