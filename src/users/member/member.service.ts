@@ -30,11 +30,12 @@ export class MemberService {
           await this.i18n.translate("exceptions.FOUND_MEMBER_IN_LEGAL"),
         );
       }
-      const assign: Member = new Member();
-      assign.userId = await findUser.id
-      assign.adminId = user.id
-      assign.relatedId = createMemberInput.relatedId
-      await assign.save()
+      const member: Member = new Member();
+      member.userId = await findUser.id
+      member.position = createMemberInput.position
+      member.adminId = user.id
+      member.relatedId = createMemberInput.relatedId
+      await member.save()
       return true
     } else {
       return false

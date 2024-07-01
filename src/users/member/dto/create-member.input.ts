@@ -24,6 +24,12 @@ export class CreateMemberInput {
   @MaxLength(255)
   cellphone: string;
 
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(255)
+  position: string;
+
 
 
   @Field({ defaultValue: true })
