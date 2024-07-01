@@ -222,8 +222,11 @@ export class BrandService {
     } else {
       brand.views = 1;
     }
-    console.log('brands views', brand.views)
-    await Brand.update({ id: brand.id }, { views: brand.views });
+    const brandToUpdate = await Brand.findOneBy({ id: brand.id });
+    if (brandToUpdate) {
+      brandToUpdate.views = brand.views;
+      await brandToUpdate.save();
+    }
   }
   
   async  findOne(id: number, payload?: PayloadDto): Promise<Brand> {
