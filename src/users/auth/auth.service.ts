@@ -416,6 +416,7 @@ export class AuthService {
     });
     user.legal = legalData ?? null; 
     user.sessions = Promise.resolve([]);
+    user.country = null;
     return user;
   }
   
