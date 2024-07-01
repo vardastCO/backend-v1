@@ -5,7 +5,6 @@ export enum SortFieldProduct {
   TIME = 'createdAt',
   NAME = 'name',
   PRICE = 'price',
-  SOON = 'soon',
 }
 
 registerEnumType(SortFieldProduct, {

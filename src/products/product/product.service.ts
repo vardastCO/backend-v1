@@ -167,7 +167,7 @@ export class ProductService {
       cacheKey,
     );
     let isAlicePrice = false
-    if (sortField === SortFieldProduct.SOON) {
+    if (sortField === SortFieldProduct.PRICE) {
       isAlicePrice = true
     }
     if (cachedData && !admin && !isAlicePrice) {
@@ -233,7 +233,7 @@ export class ProductService {
   
       }
     }
-    if (sortField == SortFieldProduct.SOON) {
+    if (sortField == SortFieldProduct.PRICE) {
       const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
       whereConditions.prices = {
         createdAt:  MoreThan(fifteenMinutesAgo),
@@ -247,13 +247,12 @@ export class ProductService {
       case SortFieldProduct.NAME:
         order['name'] = sortDirection;
         break;
+      case SortFieldProduct.RATING:
+        order['rating'] = sortDirection;
+        break;
       case SortFieldProduct.PRICE:
-          if (sortDirection === 'ASC') {
-            order['prices.amount'] = 'ASC';
-          } else if (sortDirection === 'DESC') {
-            order['prices.amount'] = 'DESC';
-          }
-          break;
+        order['rating'] = sortDirection;
+        break
     }
     
     const [products, totalCount] = await Product.findAndCount({
