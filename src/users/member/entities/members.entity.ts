@@ -49,6 +49,12 @@ export class Member extends BaseEntity {
   @Column()
   userId: number;
 
+  @Field(() => User)
+  @ManyToOne(() => User, user => null)
+  admin: Promise<User>;
+  @Column()
+  adminId: number;
+
   @Field()
   @Column("boolean", { default: true })
   isActive: boolean;

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { I18n, I18nService } from "nestjs-i18n";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from "src/users/user/entities/user.entity";
@@ -22,9 +22,17 @@ export class MemberService {
     })
     if (findUser) {
       delete createMemberInput.cellphone
-
+      const hasMember = await Member.findOneBy({
+        relatedId:createMemberInput.relatedId
+      })
+      if (hasMember) {
+        throw new BadRequestException(
+          await this.i18n.translate("exceptions.FOUND_MEMBER_IN_LEGAL"),
+        );
+      }
       const assign: Member = new Member();
-      assign.userId = await user.id
+      assign.userId = await findUser.id
+      assign.adminId = user.id
       assign.relatedId = createMemberInput.relatedId
       await assign.save()
       return true
