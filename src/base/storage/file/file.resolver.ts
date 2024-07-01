@@ -112,19 +112,26 @@ export class FileResolver {
       return parsedData;
     }
     const response = await Banner.find({ take: 5 }); 
-    const jsonString = JSON.stringify(response).replace(/__small__:/g, 'small')
-        .replace(/__medium__:/g, 'medium')
-        .replace(/__large__:/g, 'large')
-        .replace(/__xlarge__:/g, 'xlarge')
-    ;
-  
-    const modifiedDataWithOutText = JSON.parse(jsonString);
-    console.log('llllllllllll',modifiedDataWithOutText)
-    const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+    const updatedData = this.replaceKeys(response);
+    console.log('jjjj',updatedData)
+    const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
 
   }
+  replaceKeys(data) {
+    return data.map(item => {
+        const { __small__, __medium__, __large__, __xlarge__, ...rest } = item;
+        return {
+            ...rest,
+            small: __small__,
+            medium: __medium__,
+            large: __large__,
+            xlarge: __xlarge__
+        };
+    });
+  }
+
 
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => File)
