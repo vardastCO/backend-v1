@@ -200,7 +200,7 @@ export class BrandService {
       const parsedData: Brand = JSON.parse(decompressedData);
       await Promise.all([
         this.updateTimestamps(parsedData),
-        this.incrementViews(parsedData) 
+        // this.incrementViews(parsedData) 
       ]);
       return parsedData;
     }
