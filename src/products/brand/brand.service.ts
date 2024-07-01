@@ -200,7 +200,7 @@ export class BrandService {
       const parsedData: Brand = JSON.parse(decompressedData);
       await Promise.all([
         this.updateTimestamps(parsedData),
-        // this.incrementViews(parsedData) 
+        this.incrementViews(parsedData) 
       ]);
       return parsedData;
     }
@@ -214,10 +214,11 @@ export class BrandService {
   }
   
   async incrementViews(brand: Brand): Promise<void> {
+    console.log('brand',brand)
     console.log('brands views', brand.views)
     brand.views += 1;
     console.log('brands views', brand.views)
-    await Brand.update({ id: brand.id }, { views: brand.views });
+    // await Brand.update({ id: brand.id }, { views: brand.views });
   }
   
   async  findOne(id: number, payload?: PayloadDto): Promise<Brand> {
@@ -236,7 +237,7 @@ export class BrandService {
   
       await Promise.all([
         this.updateTimestamps(brand),
-        // this.incrementViews(brand),  
+        this.incrementViews(brand),  
         this.cacheBrandData(this.cacheManager, cacheKey, brand),  
       ]);
   
