@@ -28,6 +28,7 @@ import {
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { Member } from "../member/entities/members.entity";
 
 
 @Injectable()
@@ -401,9 +402,17 @@ export class AuthService {
 
   async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
 
-    user.legal = null
+    const member = await Member.findOneBy({
+      userId: user.id,
+    });
+  
+    if (!member) {
+      user.legal = null; 
+      return user;
+    }
+
     const legalData = await Legal.findOneBy({
-      ownerId: user.id
+      id: member.relatedId
     });
     user.legal = legalData ?? null; 
   

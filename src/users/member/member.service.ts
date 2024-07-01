@@ -76,13 +76,15 @@ export class MemberService {
   //   );
   // }
 
-  // async findOne(id: number): Promise<Member> {
-  //   const sellerRepresentative = await Member.findOneBy({ id });
-  //   if (!sellerRepresentative) {
-  //     throw new NotFoundException();
-  //   }
-  //   return sellerRepresentative;
-  // }
+  async findOne(id: number): Promise<Member> {
+    const member = await Member.findOneBy({ id });
+    if (!member) {
+      throw new BadRequestException(
+        await this.i18n.translate("exceptions.NOT_FOUND"),
+      );
+    }
+    return member;
+  }
 
   
 

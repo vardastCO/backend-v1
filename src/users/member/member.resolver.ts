@@ -55,12 +55,11 @@ export class MemberResolver {
   //   );
   // }
 
-  // @Public()
-  // @Permission("gql.products.seller_representative.show")
-  // @Query(() => Member, { name: "sellerRepresentative" })
-  // findOne(@Args("id", { type: () => Int, nullable: true }) id: number) {
-  //   return this.memberService.findOne(id);
-  // }
+  @Permission("gql.products.seller_representative.show")
+  @Query(() => Member, { name: "findOneMember" })
+  findOneMember(@Args("id", { type: () => Int, nullable: true }) id: number) {
+    return this.memberService.findOne(id);
+  }
 
   // @Permission("gql.products.seller_representative.update")
   // @Mutation(() => Member)

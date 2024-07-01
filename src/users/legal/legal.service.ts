@@ -48,6 +48,14 @@ export class LegalService {
     legal.ownerId = id
     legal.createdById = userId
     await legal.save();
+
+    const member = new Member();
+    member.relatedId = legal.id
+    member.userId = userId
+    member.adminId = userId
+    member.position = 'مدیرعامل'
+    await member.save();
+    
     return legal;
 
   }
