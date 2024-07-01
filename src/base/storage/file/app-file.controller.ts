@@ -17,8 +17,7 @@ export class AppFileController {
     const cachedData = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedData) {
-      console.log('cache version')
-      return res.send(cachedData); // Return immediately after sending the cached data
+      return res.send(cachedData);
     }
 
     const appVersion = process.env.APP_VERSION || "1.0.0";
