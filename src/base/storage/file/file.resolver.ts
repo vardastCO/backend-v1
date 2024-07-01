@@ -106,15 +106,12 @@ export class FileResolver {
     const cacheKey = `banners_get_${JSON.stringify(IndexBannerInput)}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      console.log('banners with cache')
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: Banner[] = JSON.parse(decompressedData);
   
       return parsedData;
     }
     const response = await Banner.find({ take: 5 }); 
-    console.log('banners with no cache')
-    console.log('resss', response)
     const jsonString = JSON.stringify(response).replace(/__small__:/g, 'small')
         .replace(/__medium__:/g, 'medium')
         .replace(/__large__:/g, 'large')
