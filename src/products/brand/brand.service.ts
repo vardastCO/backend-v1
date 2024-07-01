@@ -173,7 +173,19 @@ export class BrandService {
     }
    
   }
-  
+  private async processFile(filePromise: Promise<any> | undefined) {
+    if (filePromise) {
+      const file = await filePromise;
+      if (file && file.createdAt) {
+        file.createdAt = new Date(file.createdAt);
+      }
+    }
+  }
+  private async incrementBrandViews(brand: Brand) {
+    // Increment the views and save the brand
+    brand.views = (brand.views || 0) + 1;
+    await brand.save();
+  }
   async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
     try {
       // this.logBrandView(id,payload);
@@ -186,31 +198,12 @@ export class BrandService {
         const parsedData: Brand = JSON.parse(decompressedData);
         parsedData.createdAt = new Date();
         parsedData.updatedAt = new Date();
-        const catalogFile = await parsedData.catalog;
-        if (catalogFile) {
-         
-          (await parsedData.catalog).createdAt = new Date(catalogFile.createdAt);
-          
-        }
-
-        const priceFile = await parsedData.priceList;
-
-        if (priceFile) {
-          // Now you can access the properties of the resolved File object
-          const priceCreatedAt = await priceFile.createdAt;
-        
-          if (priceCreatedAt) {
-            (await parsedData.priceList).createdAt = new Date(priceCreatedAt);
-          }
-        }
-        const desktopBannerFile = await parsedData.bannerDesktop;
-        if (desktopBannerFile) {
-          const desktopBannerFileCreatedAt = await desktopBannerFile.createdAt;
-        
-          if (desktopBannerFileCreatedAt) {
-            (await parsedData.bannerDesktop).createdAt = new Date(desktopBannerFileCreatedAt);
-          }
-        }
+        await Promise.all([
+          this.processFile(parsedData.catalog),
+          this.processFile(parsedData.priceList),
+          this.processFile(parsedData.bannerDesktop),
+          this.incrementBrandViews(parsedData)
+        ]);
       
         return parsedData
       }
