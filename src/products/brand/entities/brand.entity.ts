@@ -69,11 +69,6 @@ export class Brand extends BaseEntity {
 
   @Field(() => Int, { nullable: true })
   @Column( {nullable: true })
-  views?: number = 1;
-
-
-  @Field(() => Int, { nullable: true })
-  @Column( {nullable: true })
   sellersCount?: number = 0;
 
   
