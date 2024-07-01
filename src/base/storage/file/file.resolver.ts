@@ -119,6 +119,7 @@ export class FileResolver {
     ;
   
     const modifiedDataWithOutText = JSON.parse(jsonString);
+    console.log('llllllllllll',modifiedDataWithOutText)
     const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
