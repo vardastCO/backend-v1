@@ -138,4 +138,8 @@ export class Brand extends BaseEntity {
       this.name = this.name_fa;
     } 
   }
+
+  async saveBrand(): Promise<void> {
+    await this.save();
+}
 }

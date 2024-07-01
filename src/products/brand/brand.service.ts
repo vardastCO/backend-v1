@@ -220,7 +220,7 @@ export class BrandService {
     }
     brand.views = 1;
     console.log('brands views', brand.views)
-    await brand.save();
+    await brand.saveBrand();
   }
   
   async  findOne(id: number, payload?: PayloadDto): Promise<Brand> {
