@@ -215,16 +215,12 @@ export class BrandService {
   
   async incrementViews(brand: Brand): Promise<void> {
     console.log('brand views', brand.views)
-    if (brand.views) {
-      console.log('here brand views', brand.views)
-      brand.views = brand.views + 1;
-      console.log(' out here brand views', brand.views)
-    } else {
-      brand.views = 1;
-    }
+    const view = brand.views ?? 1
+    console.log('view',view)
     const brandToUpdate = await Brand.findOneBy({ id: brand.id });
     if (brandToUpdate) {
-      brandToUpdate.views = brand.views;
+      brandToUpdate.views = view + 1;
+      console.log('brandToUpdate',brandToUpdate)
       await brandToUpdate.save();
     }
   }
