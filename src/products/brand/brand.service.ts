@@ -213,8 +213,10 @@ export class BrandService {
     await cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
   }
   
-  async  incrementViews(brand: Brand): Promise<void> {
+  async incrementViews(brand: Brand): Promise<void> {
+    console.log('brands views', brand.views)
     brand.views += 1;
+    console.log('brands views', brand.views)
     await Brand.update({ id: brand.id }, { views: brand.views });
   }
   
