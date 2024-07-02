@@ -233,7 +233,6 @@ export class BrandService {
       const brand = brandsql[0]
       try {
        
-        console.log('bbbbb',brand)
         const [bannerDesktop,priceList,catalog,bannerFile,data] = await Promise.all([
           this.fetchFile(brand.bannerDesktopId),
           this.fetchFile(brand.priceListId),
@@ -255,11 +254,10 @@ export class BrandService {
   
         // const modifiedDataWithOutText = JSON.parse(jsonString);
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
-        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_MONTH);
       } catch (e) {
           throw e
       }
-      console.log('jjjjjjjjjjjjjjj',brand)
       return brand;
         
     } catch (e) {
