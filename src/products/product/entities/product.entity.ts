@@ -27,6 +27,7 @@ import { ParentProductEntity } from "./parent-product.entity";
 @ObjectType()
 @Entity("products")
 export class Product extends InfraEntity {
+  [x: string]: AttributeValue[];
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
@@ -169,4 +170,5 @@ export class Product extends InfraEntity {
     "title",
     "metaDescription",
   ];
+  product: AttributeValue[];
 }

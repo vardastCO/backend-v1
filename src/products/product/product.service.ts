@@ -339,45 +339,134 @@ export class ProductService {
   async findOne(id: number, slug?: string): Promise<Product> {
     const product = await Product.findOneBy({
       id, slug,
-      status : ThreeStateSupervisionStatuses.CONFIRMED
+      status: ThreeStateSupervisionStatuses.CONFIRMED,
     });
+  
     if (!product) {
       throw new NotFoundException();
     }
-    // product.attributeValues =    Promise.resolve([]);
-    // product.brand = null
-    // product.category = []
-    // product.highestPrice = null
-    // product.lowestPrice = null
-    // product.uom = null
-    // product.images = Promise.resolve([]);
-    // product.offers = Promise.resolve([]);
-    // product.publicOffers = null
-    // product.sameCategory = Promise.resolve([]);
-    // product.prices =    Promise.resolve([]);
-    // const [bannerDesktop,priceList,catalog,bannerFile,data] = await Promise.all([
-    //   this.fetchFile(brand.bannerDesktopId),
-    //   this.fetchFile(brand.priceListId),
-    //   this.fetchFile(brand.catalogId),
-    //   this.fetchFile(brand.bannerFileId),
-    //   this.incrementBrandViews(brand)
-    // ]);
-    // product.bannerDesktop = bannerDesktop;
-    // product.priceList = priceList;
-    // product.catalog = catalog;
-    // product.bannerFile = bannerFile;
-    // this.logProductView(id);
+  
+    // Optionally clear attributes if needed:
+    // product.highestPrice = null;
+    // product.lowestPrice = null;
+    // product.uom = null;
+    // product.images = [];
+    // product.offers = [];
+    // product.publicOffers = null;
+    // product.sameCategory = [];
+    // product.prices = [];
+  
+    const [attributeValues, brand, category, uom, images] = await Promise.all([
+      this.findAttributes(product.id),
+      this.findBrand(product.brandId),
+      this.findCategory(product.categoryId),
+      this.findUom(product.uomId),
+      this.findImages(product.id),
+    ]);
+  
+    product.attributeValues = attributeValues;
+    product.brand = brand;
+    product.category = category;
+    product.uom = uom;
+    product.images = images;
+  
     return product;
   }
-
+  
   async logProductView(productId: number): Promise<void> {
     const viewsKey = `product_views_${productId}`;
     const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
-
+  
     views.push({ timestamp: new Date().toISOString() });
-
+  
     await this.cacheManager.set(viewsKey, views);
   }
+  
+  async findAttributes(productId: number) {
+    const cacheKey = `product_attributes_find_${productId}`;
+  
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+  
+    const result = await AttributeValue.find({
+      where: { productId },
+    });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
+  }
+  
+  async findImages(productId: number) {
+    const cacheKey = `product_images_find_${productId}`;
+  
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+  
+    const result = await Image.find({
+      where: { productId },
+    });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
+  }
+  
+  async findBrand(brandId: number) {
+    const cacheKey = `product_brand_find_${brandId}`;
+    
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+  
+    const result = await Brand.findOne({
+      where: { id: brandId },
+    });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
+  }
+  
+  async findCategory(categoryId: number) {
+    const cacheKey = `product_category_find_${categoryId}`;
+    
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+  
+    const result = await Category.findOne({
+      where: { id: categoryId },
+    });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
+  }
+  
+  async findUom(uomId: number){
+    const cacheKey = `product_uom_find_${uomId}`;
+    
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+  
+    const result = await Uom.findOne({
+      where: { id: uomId },
+    });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
+  }
+  
 
   async getOffersPrice(indexOffersPrice: IndexOffersPrice): Promise<PaginationOfferResponse> {
   indexOffersPrice.boot();
