@@ -153,15 +153,15 @@ export class ProductService {
   async paginate(
     indexProductInput?: IndexProductInput,
     user?: User,
-    client ?: boolean
+    // client ?: boolean
   ): Promise<PaginationProductResponse> {
     indexProductInput.boot();
     const { sortField, sortDirection } = indexProductInput;
 
-    // let admin = false
-    // if (await this.authorizationService.setUser(user).hasRole("admin")) {
-    //   admin = true
-    // }
+    let admin = false
+    if (await this.authorizationService.setUser(user).hasRole("admin")) {
+      admin = true
+    }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
     const cachedData = await this.cacheManager.get<String>(
       cacheKey,
@@ -170,8 +170,8 @@ export class ProductService {
     if (sortField === SortFieldProduct.PRICE) {
       isAlicePrice = true
     }
-    console.log('client',client)
-    if (cachedData && client && !isAlicePrice) {
+    console.log('admin',admin)
+    if (cachedData && !admin && !isAlicePrice) {
       console.log('with cache')
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
@@ -260,7 +260,7 @@ export class ProductService {
 
     const productsPromise = Product.find({
       where: whereConditions,
-      relations: ["images", "prices"],
+      relations: ["prices"],
       order: {
         rating: 'DESC'
       },
@@ -306,7 +306,7 @@ export class ProductService {
     const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
     // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
 
-    if (client) {
+    if (!admin) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
       await this.cacheManager.set(cacheKey, compressedData,CacheTTL.THREE_HOURS);
     }
