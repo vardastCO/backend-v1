@@ -205,21 +205,21 @@ export class BrandService {
       const cachedData = await this.cacheManager.get<string>(cacheKey);
      
 
-      if (cachedData) {
-        console.log('brand with cache')
-        const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-        const parsedData: Brand = JSON.parse(decompressedData);
-        parsedData.createdAt = new Date();
-        parsedData.updatedAt = new Date();
-        await Promise.all([
-          this.processFile(parsedData.catalog),
-          this.processFile(parsedData.priceList),
-          this.processFile(parsedData.bannerDesktop),
-          this.incrementBrandViews(parsedData)
-        ]);
+      // if (cachedData) {
+      //   console.log('brand with cache')
+      //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      //   const parsedData: Brand = JSON.parse(decompressedData);
+      //   parsedData.createdAt = new Date();
+      //   parsedData.updatedAt = new Date();
+      //   await Promise.all([
+      //     this.processFile(parsedData.catalog),
+      //     this.processFile(parsedData.priceList),
+      //     this.processFile(parsedData.bannerDesktop),
+      //     this.incrementBrandViews(parsedData)
+      //   ]);
       
-        return parsedData
-      }
+      //   return parsedData
+      // }
       const query = `
       SELECT "id",name,name_en,name_fa,status,id,sum,views,slug,bio,"createdAt","updatedAt",
       "bannerDesktopId","priceListId","catalogId","bannerFileId"
