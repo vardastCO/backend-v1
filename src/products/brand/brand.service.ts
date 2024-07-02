@@ -114,18 +114,20 @@ export class BrandService {
     const whereConditions: any = {};
     const order: any = {}
 
-    switch (indexBrandInput.sortType) {
-      case SortBrandEnum.NEWEST:
-        order['createdAt'] = "DESC";
-        break;
-      case SortBrandEnum.RATING:
-        order['rating'] = "DESC";
-        break;
-      default:
-        order['sum'] = "DESC";
-        break;
-    }
-    
+    // switch (indexBrandInput.sortType) {
+    //   case SortBrandEnum.NEWEST:
+    //     order['createdAt'] = "DESC";
+    //     break;
+    //   case SortBrandEnum.RATING:
+    //     order['rating'] = "DESC";
+    //     break;
+    //   default:
+    //     order['sum'] = "DESC";
+    //     break;
+    // }
+    // order.bannerDesktop = {
+    //   id: "DESC"
+    // };
     
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
@@ -151,7 +153,11 @@ export class BrandService {
       skip,
       take,
       where: whereConditions,
-      order: order,
+      order: {
+        bannerDesktop: {
+          id:'DESC'
+        },
+      },
     });
 
     try {
