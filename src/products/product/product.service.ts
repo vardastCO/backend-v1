@@ -346,7 +346,7 @@ export class ProductService {
     }
     product.attributeValues =    Promise.resolve([]);
     product.brand = null
-    product.category = null
+    product.category =  Promise.resolve([]);
     product.highestPrice = null
     product.lowestPrice = null
     product.uom = null
