@@ -379,8 +379,11 @@ export class ProductService {
   
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      console.log('cachee',JSON.parse(cachedData))
-      return JSON.parse(cachedData);
+      const jsonString = JSON.stringify(cachedData).replace(/__attribute__:/g, 'attribute')
+      ;
+
+      const modifiedDataWithOutText = JSON.parse(jsonString);
+      return JSON.parse(modifiedDataWithOutText);
     }
   
     const result = await AttributeValue.find({
@@ -400,9 +403,7 @@ export class ProductService {
       const jsonString = JSON.stringify(cachedData).replace(/__file__/g, 'file')
       ;
 
-      // Parse the modified JSON back to objects
       const modifiedDataWithOutText = JSON.parse(jsonString);
-      console.log('cachee',JSON.parse(modifiedDataWithOutText))
       return JSON.parse(modifiedDataWithOutText);
     }
   
@@ -410,7 +411,6 @@ export class ProductService {
       where: { productId },
       relations:['file']
     });
-    console.log('no cachee',result)
     await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
   
     return result;
