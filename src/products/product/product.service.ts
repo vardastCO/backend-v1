@@ -344,6 +344,28 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException();
     }
+    product.attributeValues =    Promise.resolve([]);
+    product.brand = null
+    product.category = null
+    product.highestPrice = null
+    product.lowestPrice = null
+    product.uom = null
+    product.images = Promise.resolve([]);
+    product.offers = Promise.resolve([]);
+    product.publicOffers = null
+    product.sameCategory = Promise.resolve([]);
+    product.prices =    Promise.resolve([]);
+    // const [bannerDesktop,priceList,catalog,bannerFile,data] = await Promise.all([
+    //   this.fetchFile(brand.bannerDesktopId),
+    //   this.fetchFile(brand.priceListId),
+    //   this.fetchFile(brand.catalogId),
+    //   this.fetchFile(brand.bannerFileId),
+    //   this.incrementBrandViews(brand)
+    // ]);
+    // product.bannerDesktop = bannerDesktop;
+    // product.priceList = priceList;
+    // product.catalog = catalog;
+    // product.bannerFile = bannerFile;
     // this.logProductView(id);
     return product;
   }
