@@ -106,6 +106,7 @@ export class FileResolver {
     const cacheKey = `banners_get_${JSON.stringify(IndexBannerInput)}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
+      console.log('with cache')
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: Banner[] = JSON.parse(decompressedData);
   
@@ -113,6 +114,7 @@ export class FileResolver {
     }
     const response = await Banner.find({ take: 5 }); 
     const updatedData = this.replaceKeys(response);
+    console.log('no cache')
     const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_MINUTE);
     return response;
