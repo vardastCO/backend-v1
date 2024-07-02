@@ -402,6 +402,7 @@ export class ProductService {
   
     const result = await Image.find({
       where: { productId },
+      relations:['file']
     });
   
     await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
