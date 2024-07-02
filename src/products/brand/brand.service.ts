@@ -155,13 +155,7 @@ export class BrandService {
       take,
       where: whereConditions,
       order: {
-        bannerDesktop: {
-          id: Math.random() > 0.5 && skip == 0 ? 'ASC' : 'DESC'
-        },
-        sum:'DESC',
-        bannerFile: {
-          id: Math.random() > 0.5 && skip == 0 ? 'ASC' : 'DESC'
-        }
+        rating:'DESC',
       },
     });
 
