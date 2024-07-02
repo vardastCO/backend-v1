@@ -203,13 +203,7 @@ export class BrandService {
       const cacheKey = `brand_${JSON.stringify(id)}`;
   
       const cachedData = await this.cacheManager.get<string>(cacheKey);
-      const query = `
-      SELECT name,name_en,name_fa
-      FROM product_brands 
-      WHERE "id" = $1 
-     `;
-
-    const brandsql = await this.entityManager.query(query, [id]);
+     
 
     console.log('brnad',brandsql)
       if (cachedData) {
@@ -227,17 +221,23 @@ export class BrandService {
       
         return parsedData
       }
-      const brand = await Brand.findOneBy({ id });
+      const query = `
+      SELECT name,name_en,name_fa,status,id,sum,views,slug,bio,createdAt,updatedAt,
+      bannerDesktopId,priceListId,catalogId,bannerFileId
+      FROM product_brands 
+      WHERE "id" = $1 
+      `;
+      const brandsql = await this.entityManager.query(query, [id]);
 
-      if (!brand) {
+      if (!brandsql) {
         throw new NotFoundException();
       }
       try {
         console.log('no cache')
-        console.log('brand',brand)
-        // const [priceList] = await Promise.all([this.fetchFile(brand.price)]);
-        // brand.priceList = priceList;
-        const jsonString = JSON.stringify(brand).replace(/__logoFile__/g, 'logoFile')
+        console.log('brand',brandsql)
+        const [priceList] = await Promise.all([this.fetchFile(brandsql.id)]);
+        brandsql.priceList = priceList;
+        const jsonString = JSON.stringify(brandsql).replace(/__logoFile__/g, 'logoFile')
         .replace(/__bannerFile__/g, 'bannerFile')
         .replace(/__catalog__/g, 'catalog')
         .replace(/__bannerDesktop__/g, 'bannerDesktop')
@@ -250,7 +250,7 @@ export class BrandService {
       } catch (e) {
           throw e
       }
-      return brand;
+      return brandsql;
         
     } catch (e) {
       throw e
@@ -258,7 +258,7 @@ export class BrandService {
     
   }
   async fetchFile(id) {
-    return await File.findOneBy({id});
+    return await File.findOneBy({id,modelType:});
   }
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
     try {
