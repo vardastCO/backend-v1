@@ -258,7 +258,7 @@ export class ProductService {
 
     const productsPromise = Product.find({
       where: whereConditions,
-      relations: ["images", "prices"],
+      relations: ["images", "prices","category"],
       order: {
         rating: 'DESC'
       },
@@ -289,10 +289,10 @@ export class ProductService {
 
     console.log('product',products)
     const jsonString = JSON.stringify(productsWithRelations).replace(/__imageCategory__/g, 'imageCategory')
-      // .replace(/__uom__/g, 'uom')
+      .replace(/__uom__/g, 'uom')
       .replace(/__has_uom__/g, 'has_uom')
       .replace(/__has_category__/g, 'has_category')
-      // .replace(/__category__/g, 'category')
+      .replace(/__category__/g, 'category')
       .replace(/__file__/g, 'file')
       .replace(/__images__/g, 'images')
       ;
