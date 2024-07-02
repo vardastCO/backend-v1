@@ -380,6 +380,7 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException();
     }
+    console.log('cateeeegory',category)
     const compressedData = zlib.gzipSync(JSON.stringify(category));
     await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
     return category;
