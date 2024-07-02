@@ -63,7 +63,7 @@ export class SearchService {
     const result = {
       filters: attributes, // Make sure `attributes` is an array
     };
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
     return result;
   }
   async filterAdmin(

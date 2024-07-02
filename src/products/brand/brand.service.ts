@@ -81,7 +81,7 @@ export class BrandService {
       order: { id: "DESC" },
     });
 
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH); 
+    // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY); 
     
     return result
   }
@@ -122,7 +122,7 @@ export class BrandService {
         order['rating'] = "DESC";
         break;
       default:
-        order['sum'] = "DESC";
+        order['bannerDesktop'] = "DESC";
         break;
     }
     
@@ -164,7 +164,7 @@ export class BrandService {
       const response = PaginationBrandResponse.make(indexBrandInput, total, modifiedDataWithOutText);
       if (!admin) {
         const compressedData = zlib.gzipSync(JSON.stringify(response));
-        await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+        await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
       }
 
       return response;
@@ -221,7 +221,7 @@ export class BrandService {
   
         const modifiedDataWithOutText = JSON.parse(jsonString);
         const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
-        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_MONTH);
       } catch (e) {
           throw e
       }

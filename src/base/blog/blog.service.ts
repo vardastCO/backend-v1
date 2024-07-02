@@ -95,11 +95,11 @@ export class BlogService {
       );
       
       const compressedData = zlib.gzipSync(JSON.stringify(result));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.TWELVE_HOURS);
 
       return result;
     } catch (e) {
-      console.log("e", e);
+      console.log("err in blogs", e);
     }
   }
 

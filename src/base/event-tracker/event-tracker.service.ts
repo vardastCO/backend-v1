@@ -26,7 +26,7 @@ export class EventTrackerService {
     createEventTrackerInput.agent = request.headers["user-agent"] ?? "Unknown";
     const event: EventTracker = EventTracker.create<EventTracker>(createEventTrackerInput);
     try {
-      await this.cacheManager.set(cacheKey, JSON.stringify(event), CacheTTL.ONE_WEEK);
+      await this.cacheManager.set(cacheKey, JSON.stringify(event), CacheTTL.ONE_DAY);
   
     } catch (e) {
       console.log('event',e)
