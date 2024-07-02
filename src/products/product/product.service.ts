@@ -276,6 +276,8 @@ export class ProductService {
       where: { id: In(categoryResultId) }
     });
     const [uom, category] = await Promise.all([uomPromise, categoryPromise]);
+    console.log('kkkk', category)
+    console.log('uom',uom)
     const productsWithRelations = products.map(product => {
       return {
         ...product,
@@ -284,6 +286,7 @@ export class ProductService {
       };
     });
 
+    console.log('product',products)
     const jsonString = JSON.stringify(productsWithRelations).replace(/__imageCategory__/g, 'imageCategory')
       // .replace(/__uom__/g, 'uom')
       .replace(/__has_uom__/g, 'has_uom')
