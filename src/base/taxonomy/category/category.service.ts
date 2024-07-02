@@ -370,19 +370,18 @@ export class CategoryService {
 
     const cachedCategory = await this.cacheManager.get<string>(cacheKey);
 
-    // if (cachedCategory) {
-    //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
-    //   const parsedData: Category = JSON.parse(decompressedData);
+    if (cachedCategory) {
+      const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
+      const parsedData: Category = JSON.parse(decompressedData);
 
-    //   return parsedData;
-    // }
+      return parsedData;
+    }
     const category = await this.categoryRepository.findOneBy({ id, slug });
     if (!category) {
       throw new NotFoundException();
     }
-    console.log('cateeeegory',category)
     const compressedData = zlib.gzipSync(JSON.stringify(category));
-    // await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+    await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_MONTH);
     return category;
   }
 
