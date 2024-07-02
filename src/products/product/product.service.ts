@@ -345,7 +345,6 @@ export class ProductService {
       throw new NotFoundException();
     }
     // this.logProductView(id);
-    console.log('ppppp',product)
     return product;
   }
 
