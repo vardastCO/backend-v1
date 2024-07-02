@@ -158,10 +158,10 @@ export class ProductService {
     indexProductInput.boot();
     const { sortField, sortDirection } = indexProductInput;
 
-    let admin = false
-    if (await this.authorizationService.setUser(user).hasRole("admin")) {
-      admin = true
-    }
+    // let admin = false
+    // if (await this.authorizationService.setUser(user).hasRole("admin")) {
+    //   admin = true
+    // }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
     const cachedData = await this.cacheManager.get<String>(
       cacheKey,
@@ -170,7 +170,7 @@ export class ProductService {
     if (sortField === SortFieldProduct.PRICE) {
       isAlicePrice = true
     }
-    if (cachedData && !admin && !isAlicePrice) {
+    if (cachedData && client && !isAlicePrice) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
       return parsedData;
@@ -255,13 +255,15 @@ export class ProductService {
         break
     }
     
-    const [products, totalCount] = await Product.findAndCount({
+    const queryPromise = Product.findAndCount({
       where: whereConditions,
       relations: ["images", "prices", "uom", "category"],
       order: order,
       skip: skip,
       take: take,
     });
+  
+    const [products, totalCount] = await queryPromise;
     const jsonString = JSON.stringify(products).replace(/__imageCategory__/g, 'imageCategory')
       .replace(/__uom__/g, 'uom')
       .replace(/__has_uom__/g, 'has_uom')
@@ -279,13 +281,11 @@ export class ProductService {
     const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
     // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
 
-    if (!admin) {
+    if (client) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
       await this.cacheManager.set(cacheKey, compressedData,CacheTTL.THREE_HOURS);
     }
- 
 
-    // await this.productClient.emit('product.paginated', result);
     
     return result;
   }
