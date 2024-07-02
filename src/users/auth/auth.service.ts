@@ -285,6 +285,7 @@ export class AuthService {
     refreshInput: RefreshInput,
     user: User,
   ): Promise<RefreshResponse> {
+    console.log('refresh token api')
     const { accessToken, refreshToken } = refreshInput;
     let accessTokenPayload, refreshTokenPayload;
     // accessToken should be valid but expired
