@@ -231,11 +231,12 @@ export class BrandService {
         throw new NotFoundException();
       }
       try {
+        console.log('bbbbb',brandsql[0])
         const [bannerDesktop,priceList,catalog,bannerFile,data] = await Promise.all([
-          this.fetchFile(brandsql.bannerDesktopId),
-          this.fetchFile(brandsql.priceListId),
-          this.fetchFile(brandsql.catalogId),
-          this.fetchFile(brandsql.bannerFileId),
+          this.fetchFile(brandsql[0].bannerDesktopId),
+          this.fetchFile(brandsql[0].priceListId),
+          this.fetchFile(brandsql[0].catalogId),
+          this.fetchFile(brandsql[0].bannerFileId),
           this.incrementBrandViews(brandsql)
         ]);
         brandsql.bannerDesktop = bannerDesktop;
