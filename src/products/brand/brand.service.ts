@@ -205,7 +205,6 @@ export class BrandService {
       const cachedData = await this.cacheManager.get<string>(cacheKey);
      
 
-    console.log('brnad',brandsql)
       if (cachedData) {
         console.log('brand with cache')
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
@@ -266,7 +265,7 @@ export class BrandService {
     
   }
   async fetchFile(id) {
-    return await File.findOneBy({id,modelType:});
+    return await File.findOneBy({id});
   }
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
     try {
