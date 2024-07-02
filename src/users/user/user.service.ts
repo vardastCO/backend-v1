@@ -284,7 +284,7 @@ export class UserService {
         await legal.save()
 
         const member = new Member()
-        member.adminId = user.id
+        // member.adminId = user.id
         member.userId = user.id
         member.position = 'مدیرعامل'
         member.relatedId = legal.id

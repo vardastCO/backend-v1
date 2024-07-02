@@ -33,7 +33,7 @@ export class MemberService {
       const member: Member = new Member();
       member.userId = await findUser.id
       member.position = createMemberInput.position
-      member.adminId = user.id
+      // member.adminId = user.id
       member.relatedId = createMemberInput.relatedId
       await member.save()
       return true
