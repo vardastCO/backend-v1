@@ -377,16 +377,16 @@ export class ProductService {
   async findAttributes(productId: number) {
     const cacheKey = `product_attributes_find_${productId}`;
   
-    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    const cachedData = await this.cacheManager.get<AttributeValue[]>(cacheKey);
     if (cachedData) {
-      return JSON.parse(cachedData);
+      return cachedData;
     }
   
     const result = await AttributeValue.find({
       where: { productId },
     });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+     console.log('rrrr',result)
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
   
     return result;
   }
