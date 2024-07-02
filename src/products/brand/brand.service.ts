@@ -233,7 +233,8 @@ export class BrandService {
       }
       try {
         console.log('no cache')
-        console.log('brand',brandsql)
+        console.log('brand', brandsql)
+        console.log('brandsssssssssssssss',brandsql[0])
         const [bannerDesktop,priceList,catalog,bannerFile] = await Promise.all([
           this.fetchFile(brandsql.bannerDesktopId),
           this.fetchFile(brandsql.priceListId),
