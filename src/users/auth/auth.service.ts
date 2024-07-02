@@ -402,7 +402,7 @@ export class AuthService {
   }
 
   async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
-
+    console.log('who am i ')
     const cacheKey = `user_${user.id}`;
     const cachedData = await this.cacheManager.get<string>(
       cacheKey,
