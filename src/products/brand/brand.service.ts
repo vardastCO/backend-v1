@@ -235,8 +235,16 @@ export class BrandService {
       try {
         console.log('no cache')
         console.log('brand',brandsql)
-        const [priceList] = await Promise.all([this.fetchFile(brandsql.id)]);
+        const [bannerDesktop,priceList,catalog,bannerFile] = await Promise.all([
+          this.fetchFile(brandsql.bannerDesktopId),
+          this.fetchFile(brandsql.priceListId),
+          this.fetchFile(brandsql.catalogId),
+          this.fetchFile(brandsql.bannerFileId)
+        ]);
+        brandsql.bannerDesktop = bannerDesktop;
         brandsql.priceList = priceList;
+        brandsql.catalog = catalog;
+        brandsql.bannerFile = bannerFile;
         const jsonString = JSON.stringify(brandsql).replace(/__logoFile__/g, 'logoFile')
         .replace(/__bannerFile__/g, 'bannerFile')
         .replace(/__catalog__/g, 'catalog')
