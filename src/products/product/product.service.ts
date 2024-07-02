@@ -260,7 +260,7 @@ export class ProductService {
 
     const productsPromise = Product.find({
       where: whereConditions,
-      relations: ["images", "prices","category"],
+      relations: ["images", "prices"],
       order: {
         rating: 'DESC'
       },
@@ -274,23 +274,21 @@ export class ProductService {
     const uomPromise = Uom.find({
       where: { id: In(uomResultIds) }
     });
-  
+    const imagePromise = Image.find({
+      where: { id: In(productIds) }
+    });
     const categoryPromise = Category.find({
       where: { id: In(categoryResultId) }
     });
-    const [uom, category] = await Promise.all([uomPromise, categoryPromise]);
-    console.log('uim',uom)
+    const [uom, category,images] = await Promise.all([uomPromise, categoryPromise,imagePromise]);
     const productsWithRelations = products.map(product => {
-      console.log('hhhh',product)
-      console.log('pppp', uom.find(uom => uom.id === product.uomId))
       return {
         ...product,
         uom: uom.find(uom => uom.id === product.uomId),
-        // category: category.find(cat => cat.id === product.categoryId),
+        category: category.find(cat => cat.id === product.categoryId),
+        images: images.find(img => img.productId === product.id),
       };
     });
-
-    console.log('product',products)
     const jsonString = JSON.stringify(productsWithRelations).replace(/__imageCategory__/g, 'imageCategory')
       .replace(/__uom__/g, 'uom')
       .replace(/__has_uom__/g, 'has_uom')
