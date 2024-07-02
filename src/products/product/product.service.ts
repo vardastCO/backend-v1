@@ -379,7 +379,7 @@ export class ProductService {
   
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      const jsonString = JSON.stringify(cachedData).replace(/__attribute__:/g, 'attribute')
+      const jsonString = JSON.stringify(cachedData).replace(/__attribute__/g, 'attribute')
       ;
 
       const modifiedDataWithOutText = JSON.parse(jsonString);
