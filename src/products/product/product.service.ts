@@ -268,8 +268,9 @@ export class ProductService {
     const [totalCount, products] = await Promise.all([countPromise, productsPromise]);
     const productIds = products.map(product => product.id);
     const categoryResultId = products.map(product => product.categoryId);
-    const uomPromise = Image.find({
-      where: { productId: In(productIds) }
+    const uomResultIds = products.map(product => product.uomId);
+    const uomPromise = Uom.find({
+      where: { id: In(uomResultIds) }
     });
   
     const categoryPromise = Category.find({
