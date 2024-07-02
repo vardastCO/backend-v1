@@ -370,12 +370,12 @@ export class CategoryService {
 
     const cachedCategory = await this.cacheManager.get<string>(cacheKey);
 
-    if (cachedCategory) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
-      const parsedData: Category = JSON.parse(decompressedData);
+    // if (cachedCategory) {
+    //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
+    //   const parsedData: Category = JSON.parse(decompressedData);
 
-      return parsedData;
-    }
+    //   return parsedData;
+    // }
     const category = await this.categoryRepository.findOneBy({ id, slug });
     if (!category) {
       throw new NotFoundException();
