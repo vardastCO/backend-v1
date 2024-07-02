@@ -157,7 +157,7 @@ export class BrandService {
         bannerDesktop: {
           id: Math.random() > 0.5 && skip == 0 ? 'ASC' : 'DESC'
         },
-        sum: Math.random() > 0.5 && skip == 0 ? 'ASC' : 'DESC',
+        sum:'DESC',
         bannerFile: {
           id: Math.random() > 0.5 && skip == 0 ? 'ASC' : 'DESC'
         }
