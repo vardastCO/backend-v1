@@ -268,6 +268,8 @@ export class AuthService {
     await session.save();
 
     delete user.password;
+    user.sessions = Promise.resolve([]);
+    user.country = null;
     return {
       accessToken: this._generateNewAccessToken(user, session,type),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
