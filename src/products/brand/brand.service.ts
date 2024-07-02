@@ -222,6 +222,9 @@ export class BrandService {
         throw new NotFoundException();
       }
       try {
+        console.log('brand',brand)
+        // const [priceList] = await Promise.all([this.fetchFile(brand.price)]);
+        // brand.priceList = priceList;
         const jsonString = JSON.stringify(brand).replace(/__logoFile__/g, 'logoFile')
         .replace(/__bannerFile__/g, 'bannerFile')
         .replace(/__catalog__/g, 'catalog')
@@ -242,7 +245,9 @@ export class BrandService {
     }
     
   }
-
+  async fetchFile(id) {
+    return await File.findOneBy({id});
+  }
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
     try {
       const viewsKey = `brand_views_${brandId}`;
