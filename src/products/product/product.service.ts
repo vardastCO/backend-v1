@@ -239,31 +239,34 @@ export class ProductService {
         createdAt:  MoreThan(fifteenMinutesAgo),
       };
     }
-    const order: any = {}
-    switch (sortField) {
-      case SortFieldProduct.TIME:
-        order['id'] = sortDirection;
-        break;
-      case SortFieldProduct.NAME:
-        order['name'] = sortDirection;
-        break;
-      case SortFieldProduct.RATING:
-        order['rating'] = sortDirection;
-        break;
-      case SortFieldProduct.PRICE:
-        order['rating'] = sortDirection;
-        break
-    }
-    
-    const queryPromise = Product.findAndCount({
+    // const order: any = {}
+    // switch (sortField) {
+    //   case SortFieldProduct.TIME:
+    //     order['id'] = sortDirection;
+    //     break;
+    //   case SortFieldProduct.NAME:
+    //     order['name'] = sortDirection;
+    //     break;
+    //   case SortFieldProduct.RATING:
+    //     order['rating'] = sortDirection;
+    //     break;
+    //   case SortFieldProduct.PRICE:
+    //     order['rating'] = sortDirection;
+    //     break
+    // }
+    const countPromise = Product.count({ where: whereConditions });
+
+    const productsPromise = Product.find({
       where: whereConditions,
       relations: ["images", "prices", "uom", "category"],
-      order: order,
+      order: {
+        rating: 'DESC'
+      },
       skip: skip,
       take: take,
     });
   
-    const [products, totalCount] = await queryPromise;
+    const [totalCount, products] = await Promise.all([countPromise, productsPromise]);
     const jsonString = JSON.stringify(products).replace(/__imageCategory__/g, 'imageCategory')
       .replace(/__uom__/g, 'uom')
       .replace(/__has_uom__/g, 'has_uom')
