@@ -286,7 +286,7 @@ export class ProductService {
         ...product,
         uom: uom.find(uom => uom.id === product.uomId),
         category: category.find(cat => cat.id === product.categoryId),
-        images: images.find(img => img.productId === product.id),
+        images: [images.find(img => img.productId === product.id)],
       };
     });
     const jsonString = JSON.stringify(productsWithRelations).replace(/__imageCategory__/g, 'imageCategory')
