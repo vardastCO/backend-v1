@@ -10,7 +10,7 @@ import { AddressRelatedTypes } from "src/users/address/enums/address-related-typ
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { User } from "src/users/user/entities/user.entity";
-import { IsNull, Like, Not } from "typeorm";
+import { EntityManager, IsNull, Like, Not } from "typeorm";
 import { Product } from "../product/entities/product.entity";
 import { CreateBrandInput } from "./dto/create-brand.input";
 import { IndexBrandInput } from "./dto/index-brand.input";
@@ -29,6 +29,7 @@ export class BrandService {
   constructor(
     @I18n() protected readonly i18n: I18nService,
     private readonly fileService: FileService,
+    private readonly entityManager: EntityManager,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private authorizationService: AuthorizationService,
   ) {}
@@ -202,7 +203,15 @@ export class BrandService {
       const cacheKey = `brand_${JSON.stringify(id)}`;
   
       const cachedData = await this.cacheManager.get<string>(cacheKey);
-    
+      const query = `
+      SELECT name,name_en,name_fa
+      FROM product_brands 
+      WHERE "id" = $1 
+     `;
+
+    const brandsql = await this.entityManager.query(query, [id]);
+
+    console.log('brnad',brandsql)
       if (cachedData) {
         console.log('brand with cache')
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
@@ -218,10 +227,8 @@ export class BrandService {
       
         return parsedData
       }
-      const brand = await Brand.findOne({
-        where: { id },
-        select: ['name'],
-      });
+      const brand = await Brand.findOneBy({ id });
+
       if (!brand) {
         throw new NotFoundException();
       }
