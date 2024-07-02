@@ -397,8 +397,13 @@ export class ProductService {
   
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      console.log('cachee',JSON.parse(cachedData))
-      return JSON.parse(cachedData);
+      const jsonString = JSON.stringify(cachedData).replace(/__file__/g, 'file')
+      ;
+
+      // Parse the modified JSON back to objects
+      const modifiedDataWithOutText = JSON.parse(jsonString);
+      console.log('cachee',JSON.parse(modifiedDataWithOutText))
+      return JSON.parse(modifiedDataWithOutText);
     }
   
     const result = await Image.find({
