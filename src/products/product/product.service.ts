@@ -387,7 +387,7 @@ export class ProductService {
       where: { productId },
     });
     console.log('no cachee',result)
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
   
     return result;
   }
