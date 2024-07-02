@@ -258,20 +258,37 @@ export class ProductService {
 
     const productsPromise = Product.find({
       where: whereConditions,
-      relations: ["images", "prices", "uom", "category"],
+      relations: ["images", "prices"],
       order: {
         rating: 'DESC'
       },
       skip: skip,
       take: take,
     });
-  
     const [totalCount, products] = await Promise.all([countPromise, productsPromise]);
-    const jsonString = JSON.stringify(products).replace(/__imageCategory__/g, 'imageCategory')
-      .replace(/__uom__/g, 'uom')
+    const productIds = products.map(product => product.id);
+    const categoryResultId = products.map(product => product.categoryId);
+    const uomPromise = Image.find({
+      where: { productId: In(productIds) }
+    });
+  
+    const categoryPromise = Category.find({
+      where: { id: In(categoryResultId) }
+    });
+    const [uom, category] = await Promise.all([uomPromise, categoryPromise]);
+    const productsWithRelations = products.map(product => {
+      return {
+        ...product,
+        uom: uom.filter(uom => uom.id === product.uomId),
+        category: category.filter(cat => cat.id === product.categoryId),
+      };
+    });
+
+    const jsonString = JSON.stringify(productsWithRelations).replace(/__imageCategory__/g, 'imageCategory')
+      // .replace(/__uom__/g, 'uom')
       .replace(/__has_uom__/g, 'has_uom')
       .replace(/__has_category__/g, 'has_category')
-      .replace(/__category__/g, 'category')
+      // .replace(/__category__/g, 'category')
       .replace(/__file__/g, 'file')
       .replace(/__images__/g, 'images')
       ;
