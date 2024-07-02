@@ -230,19 +230,21 @@ export class BrandService {
       if (!brandsql) {
         throw new NotFoundException();
       }
+      const brand = brandsql[0]
       try {
-        console.log('bbbbb',brandsql[0])
+       
+        console.log('bbbbb',brand)
         const [bannerDesktop,priceList,catalog,bannerFile,data] = await Promise.all([
-          this.fetchFile(brandsql[0].bannerDesktopId),
-          this.fetchFile(brandsql[0].priceListId),
-          this.fetchFile(brandsql[0].catalogId),
-          this.fetchFile(brandsql[0].bannerFileId),
-          this.incrementBrandViews(brandsql)
+          this.fetchFile(brand.bannerDesktopId),
+          this.fetchFile(brand.priceListId),
+          this.fetchFile(brand.catalogId),
+          this.fetchFile(brand.bannerFileId),
+          this.incrementBrandViews(brand)
         ]);
-        brandsql.bannerDesktop = bannerDesktop;
-        brandsql.priceList = priceList;
-        brandsql.catalog = catalog;
-        brandsql.bannerFile = bannerFile;
+        brand.bannerDesktop = bannerDesktop;
+        brand.priceList = priceList;
+        brand.catalog = catalog;
+        brand.bannerFile = bannerFile;
 // ==
 //         const jsonString = JSON.stringify(brandsql).replace(/__logoFile__/g, 'logoFile')
 //         .replace(/__bannerFile__/g, 'bannerFile')
@@ -252,12 +254,13 @@ export class BrandService {
       ;
   
         // const modifiedDataWithOutText = JSON.parse(jsonString);
-        const compressedData = zlib.gzipSync(JSON.stringify(brandsql[0]));
+        const compressedData = zlib.gzipSync(JSON.stringify(brand));
         await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
       } catch (e) {
           throw e
       }
-      return brandsql[0];
+      console.log('jjjjjjjjjjjjjjj',brand)
+      return brand;
         
     } catch (e) {
       throw e
