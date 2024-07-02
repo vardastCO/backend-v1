@@ -379,13 +379,14 @@ export class ProductService {
   
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
+      console.log('cachee',JSON.parse(cachedData))
       return JSON.parse(cachedData);
     }
   
     const result = await AttributeValue.find({
       where: { productId },
     });
-     console.log('rrrr',result)
+    console.log('no cachee',result)
     await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
   
     return result;
