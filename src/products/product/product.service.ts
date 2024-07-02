@@ -276,13 +276,11 @@ export class ProductService {
       where: { id: In(categoryResultId) }
     });
     const [uom, category] = await Promise.all([uomPromise, categoryPromise]);
-    console.log('kkkk', category)
-    console.log('uom',uom)
     const productsWithRelations = products.map(product => {
       return {
         ...product,
-        uom: uom.filter(uom => uom.id === product.uomId),
-        category: category.filter(cat => cat.id === product.categoryId),
+        uom: uom.find(uom => uom.id === product.uomId),
+        category: category.find(cat => cat.id === product.categoryId),
       };
     });
 
