@@ -204,6 +204,7 @@ export class BrandService {
       const cachedData = await this.cacheManager.get<string>(cacheKey);
     
       if (cachedData) {
+        console.log('brand with cache')
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
         const parsedData: Brand = JSON.parse(decompressedData);
         parsedData.createdAt = new Date();
@@ -217,11 +218,15 @@ export class BrandService {
       
         return parsedData
       }
-      const brand = await Brand.findOneBy({ id });
+      const brand = await Brand.findOne({
+        where: { id },
+        select: ['name'],
+      });
       if (!brand) {
         throw new NotFoundException();
       }
       try {
+        console.log('no cache')
         console.log('brand',brand)
         // const [priceList] = await Promise.all([this.fetchFile(brand.price)]);
         // brand.priceList = priceList;
