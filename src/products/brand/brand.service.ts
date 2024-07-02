@@ -259,7 +259,7 @@ export class BrandService {
       } catch (e) {
           throw e
       }
-      return brandsql;
+      return brandsql[0];
         
     } catch (e) {
       throw e
