@@ -275,7 +275,7 @@ export class ProductService {
       where: { id: In(uomResultIds) }
     });
     const imagePromise = Image.find({
-      where: { id: In(productIds) }
+      where: { productId: In(productIds) }
     });
     const categoryPromise = Category.find({
       where: { id: In(categoryResultId) }
