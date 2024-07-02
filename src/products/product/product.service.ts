@@ -348,19 +348,19 @@ export class ProductService {
     }
   
   
-    const [attributeValues, brand, category, uom, images] = await Promise.all([
-      this.findAttributes(product.id),
+    const [ brand, category, uom] = await Promise.all([
+      // this.findAttributes(product.id),
       this.findBrand(product.brandId),
       this.findCategory(product.categoryId),
       this.findUom(product.uomId),
-      this.findImages(product.id),
+      // this.findImages(product.id),
     ]);
   
-    product.attributeValues = attributeValues;
+    // product.attributeValues = attributeValues;
     product.brand = brand;
     product.category = category;
     product.uom = uom;
-    product.images = images;
+    // product.images = images;
   
     return product;
   }
