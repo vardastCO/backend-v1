@@ -337,24 +337,16 @@ export class ProductService {
   }
 
   async findOne(id: number, slug?: string): Promise<Product> {
-    const product = await Product.findOneBy({
-      id, slug,
-      status: ThreeStateSupervisionStatuses.CONFIRMED,
+    const product = await Product.findOne({
+      where: {
+        id: id,
+      },
     });
   
     if (!product) {
       throw new NotFoundException();
     }
   
-    // Optionally clear attributes if needed:
-    // product.highestPrice = null;
-    // product.lowestPrice = null;
-    // product.uom = null;
-    // product.images = [];
-    // product.offers = [];
-    // product.publicOffers = null;
-    // product.sameCategory = [];
-    // product.prices = [];
   
     const [attributeValues, brand, category, uom, images] = await Promise.all([
       this.findAttributes(product.id),
