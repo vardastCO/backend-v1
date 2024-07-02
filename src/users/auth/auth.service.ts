@@ -430,7 +430,7 @@ export class AuthService {
       user.sessions = Promise.resolve([]);
       user.country = null;
     }
-    const compressedData = zlib.gzipSync(JSON.stringify(result));
+    const compressedData = zlib.gzipSync(JSON.stringify(user));
     await this.cacheManager.set(cacheKey, compressedData,CacheTTL.TWELVE_HOURS);
   
     return user;
