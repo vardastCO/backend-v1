@@ -344,17 +344,17 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException();
     }
-    product.attributeValues =    Promise.resolve([]);
-    product.brand = null
-    product.category =  Promise.resolve([]);
-    product.highestPrice = null
-    product.lowestPrice = null
-    product.uom = null
-    product.images = Promise.resolve([]);
-    product.offers = Promise.resolve([]);
-    product.publicOffers = null
-    product.sameCategory = Promise.resolve([]);
-    product.prices =    Promise.resolve([]);
+    // product.attributeValues =    Promise.resolve([]);
+    // product.brand = null
+    // product.category = []
+    // product.highestPrice = null
+    // product.lowestPrice = null
+    // product.uom = null
+    // product.images = Promise.resolve([]);
+    // product.offers = Promise.resolve([]);
+    // product.publicOffers = null
+    // product.sameCategory = Promise.resolve([]);
+    // product.prices =    Promise.resolve([]);
     // const [bannerDesktop,priceList,catalog,bannerFile,data] = await Promise.all([
     //   this.fetchFile(brand.bannerDesktopId),
     //   this.fetchFile(brand.priceListId),
