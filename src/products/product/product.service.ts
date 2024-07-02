@@ -241,77 +241,57 @@ export class ProductService {
         createdAt:  MoreThan(fifteenMinutesAgo),
       };
     }
-    // const order: any = {}
-    // switch (sortField) {
-    //   case SortFieldProduct.TIME:
-    //     order['id'] = sortDirection;
-    //     break;
-    //   case SortFieldProduct.NAME:
-    //     order['name'] = sortDirection;
-    //     break;
-    //   case SortFieldProduct.RATING:
-    //     order['rating'] = sortDirection;
-    //     break;
-    //   case SortFieldProduct.PRICE:
-    //     order['rating'] = sortDirection;
-    //     break
-    // }
-    const countPromise = Product.count({ where: whereConditions });
-
-    const productsPromise = Product.find({
-      where: whereConditions,
-      relations: ["prices"],
-      order: {
-        rating: 'DESC'
-      },
-      skip: skip,
-      take: take,
-    });
-    const [totalCount, products] = await Promise.all([countPromise, productsPromise]);
+    const [totalCount, products] = await Promise.all([
+      Product.count({ where: whereConditions }),
+      Product.find({
+        where: whereConditions,
+        relations: ["prices"],
+        order: { rating: 'DESC' },
+        skip,
+        take,
+      }),
+    ]);
+  
     const productIds = products.map(product => product.id);
     const categoryResultId = products.map(product => product.categoryId);
     const uomResultIds = products.map(product => product.uomId);
-    const uomPromise = Uom.find({
-      where: { id: In(uomResultIds) }
-    });
-    const imagePromise = Image.find({
-      where: { productId: In(productIds) }
-    });
-    const categoryPromise = Category.find({
-      where: { id: In(categoryResultId) }
-    });
-    const [uom, category,images] = await Promise.all([uomPromise, categoryPromise,imagePromise]);
+  
+    const [uom, category, images, price] = await Promise.all([
+      Uom.find({ where: { id: In(uomResultIds) } }),
+      Category.find({ where: { id: In(categoryResultId) } }),
+      Image.find({ where: { productId: In(productIds) } }),
+      Price.find({ where: { productId: In(productIds), deletedAt: IsNull() }, order: { createdAt: "DESC" } }),
+    ]);
+  
     const productsWithRelations = products.map(product => {
       return {
         ...product,
-        uom: uom.find(uom => uom.id === product.uomId),
+        uom: uom.find(u => u.id === product.uomId),
         category: category.find(cat => cat.id === product.categoryId),
         images: [images.find(img => img.productId === product.id)],
+        highestPrice: price.find(p => p.productId === product.id),
+        lowestPrice: price.find(p => p.productId === product.id),
       };
     });
-    const jsonString = JSON.stringify(productsWithRelations).replace(/__imageCategory__/g, 'imageCategory')
+  
+    const jsonString = JSON.stringify(productsWithRelations)
+      .replace(/__imageCategory__/g, 'imageCategory')
       .replace(/__uom__/g, 'uom')
       .replace(/__has_uom__/g, 'has_uom')
       .replace(/__has_category__/g, 'has_category')
       .replace(/__category__/g, 'category')
       .replace(/__file__/g, 'file')
-      .replace(/__images__/g, 'images')
-      ;
-
-      // Parse the modified JSON back to objects
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-
-    // console.log(totalCount,indexProductInput)
-    
-    const result = PaginationProductResponse.make(indexProductInput,totalCount, modifiedDataWithOutText);
-    // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_DAY);
-
+      .replace(/__images__/g, 'images');
+  
+    const modifiedDataWithOutText = JSON.parse(jsonString);
+  
+    const result = PaginationProductResponse.make(indexProductInput, totalCount, modifiedDataWithOutText);
+  
     if (!admin) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.THREE_HOURS);
+      await this.cacheManager.set(cacheKey, compressedData, CacheTTL.THREE_HOURS);
     }
-
-    
+  
     return result;
   }
 
