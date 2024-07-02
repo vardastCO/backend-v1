@@ -221,7 +221,7 @@ export class BrandService {
         return parsedData
       }
       const query = `
-      SELECT name,name_en,name_fa,status,id,sum,views,slug,bio,createdAt,updatedAt,
+      SELECT name,name_en,name_fa,status,id,sum,views,slug,bio,
       bannerDesktopId,priceListId,catalogId,bannerFileId
       FROM product_brands 
       WHERE "id" = $1 
