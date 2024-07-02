@@ -244,6 +244,7 @@ export class BrandService {
         brandsql.priceList = priceList;
         brandsql.catalog = catalog;
         brandsql.bannerFile = bannerFile;
+        console.log('finalll',brandsql)
         const jsonString = JSON.stringify(brandsql).replace(/__logoFile__/g, 'logoFile')
         .replace(/__bannerFile__/g, 'bannerFile')
         .replace(/__catalog__/g, 'catalog')
