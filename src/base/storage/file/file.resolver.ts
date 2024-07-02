@@ -114,7 +114,7 @@ export class FileResolver {
     const response = await Banner.find({ take: 5 }); 
     const updatedData = this.replaceKeys(response);
     const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_MINUTE);
     return response;
 
   }
