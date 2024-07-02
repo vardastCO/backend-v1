@@ -377,9 +377,9 @@ export class ProductService {
   async findAttributes(productId: number) {
     const cacheKey = `product_attributes_find_${productId}`;
   
-    const cachedData = await this.cacheManager.get<AttributeValue[]>(cacheKey);
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      return cachedData;
+      return JSON.parse(cachedData);
     }
   
     const result = await AttributeValue.find({
