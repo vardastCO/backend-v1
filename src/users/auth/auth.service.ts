@@ -23,7 +23,6 @@ import { RefreshResponse } from "./dto/refresh.response";
 import { UserType } from "./enums/type-user.enum";
 import { Legal } from "../legal/entities/legal.entity";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import * as zlib from 'zlib';
 import {
   Inject,
 } from "@nestjs/common";
@@ -285,7 +284,6 @@ export class AuthService {
     refreshInput: RefreshInput,
     user: User,
   ): Promise<RefreshResponse> {
-    console.log('refresh token api')
     const { accessToken, refreshToken } = refreshInput;
     let accessTokenPayload, refreshTokenPayload;
     // accessToken should be valid but expired
@@ -403,37 +401,22 @@ export class AuthService {
   }
 
   async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
-    console.log('who am i ')
-    const cacheKey = `user_${user.id}`;
-    const cachedData = await this.cacheManager.get<string>(
-      cacheKey,
-    );
-    
-    if (cachedData) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-      const parsedData = JSON.parse(decompressedData);
-      return parsedData;
-    }
+
+    const member = await Member.findOneBy({
+      userId: user.id,
+    });
   
-    // Fetch data concurrently
-    const [member, legalData] = await Promise.all([
-      Member.findOneBy({ userId: user.id }),
-      Member.findOneBy({ userId: user.id }).then(m => m ? Legal.findOneBy({ id: m.relatedId }) : null)
-    ]);
-  
-    // Update user object
     if (!member) {
       user.legal = null; 
-      user.sessions = Promise.resolve([]);
-      user.country = null;
-    } else {
-      user.legal = legalData ?? null;
-      user.sessions = Promise.resolve([]);
-      user.country = null;
+      return user;
     }
-    const compressedData = zlib.gzipSync(JSON.stringify(user));
-    await this.cacheManager.set(cacheKey, compressedData,CacheTTL.TWELVE_HOURS);
-  
+
+    const legalData = await Legal.findOneBy({
+      id: member.relatedId
+    });
+    user.legal = legalData ?? null; 
+    user.sessions = Promise.resolve([]);
+    user.country = null;
     return user;
   }
   
