@@ -170,9 +170,7 @@ export class ProductService {
     if (sortField === SortFieldProduct.PRICE) {
       isAlicePrice = true
     }
-    console.log('admin',admin)
     if (cachedData && !admin && !isAlicePrice) {
-      console.log('with cache')
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
       return parsedData;
@@ -207,7 +205,6 @@ export class ProductService {
       whereConditions.categoryId = In(categoryIds);
     }
     
-    console.log('no cache')
    
     if (sellerId) {
       whereConditions.offers = {
@@ -289,7 +286,7 @@ export class ProductService {
   
     if (!admin) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
-      await this.cacheManager.set(cacheKey, compressedData, CacheTTL.THREE_HOURS);
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.THREE_HOURS);
     }
   
     return result;
