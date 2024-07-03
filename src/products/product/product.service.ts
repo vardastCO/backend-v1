@@ -415,17 +415,21 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    const [brand, category, uom,images] = await Promise.all([
+    const [brand, category, uom,images,price] = await Promise.all([
       this.findBrand(product.brandId),
       this.findCategory(product.categoryId),
       this.findUom(product.uomId),
       this.findImages(product.id),
+      this.findPrice(product.id),
     ]);
 
     product.brand = brand;
     product.category = category;
     product.uom = uom;
     product.images = images;
+    product.highestPrice = price
+    product.lowestPrice = price
+    product.prices = Promise.all([price])
 
     return product;
   }
@@ -560,7 +564,27 @@ export class ProductService {
 
     return result;
   }
+  async findPrice(productId: number) {
+    const cacheKey = `product_price_find_${productId}`;
 
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+
+    const result =  await Price.find({
+      where: { productId, deletedAt: IsNull() },
+      order: { createdAt: "DESC" },
+    });
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_HOUR,
+    );
+
+    return result;
+  }
   async getOffersPrice(
     indexOffersPrice: IndexOffersPrice,
   ): Promise<PaginationOfferResponse> {
