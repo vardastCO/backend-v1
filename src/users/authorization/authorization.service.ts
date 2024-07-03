@@ -40,7 +40,7 @@ export class AuthorizationService {
 
   async hasRole(roleName: string): Promise<boolean> {
 
-    
+    console.log('yyyyyyyyy',this.user)
     if (!this.user) return false;
     const cacheKey = `hasRole_admin_{${JSON.stringify(this.user.id)}}`;
     const cachedData = await this.cacheManager.get<boolean>(
