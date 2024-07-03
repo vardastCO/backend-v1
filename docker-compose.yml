@@ -57,7 +57,7 @@ services:
     build: .
     restart: always
     ports:
-      - "3080:3080"
+      - "3081:3081"
     volumes:
       - .:/app
     networks:
