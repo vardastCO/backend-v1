@@ -922,6 +922,8 @@ export class ProductService {
           },
         });
   
+      
+      
         if (result) {
           const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
