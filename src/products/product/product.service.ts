@@ -761,7 +761,7 @@ export class ProductService {
 
   async getLowestPriceOf(product: Product) {
     try {
-      const cacheKey = `product_${product.id}_price`;
+      const cacheKey = `product_${product.id}_lowestPrice`;
   
       // // Try to get the result from cache
       const cachedResult = await this.cacheManager.get<string>(cacheKey);
@@ -769,21 +769,20 @@ export class ProductService {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
         const parsedData: Price = JSON.parse(decompressedData);
         if (parsedData) {
-          parsedData.discount = Promise.all([])
           parsedData.createdAt = new Date(parsedData.createdAt);
         }
-        // return parsedData;
+        return parsedData;
       }
-      const IDS = product.id;
-      const result = await Price.findOne({
-          select:['amount','createdAt','isPublic','type','discount'],
+        const IDS = product.id;
+        const result = await Price.findOne({
           where: { productId: IDS, deletedAt: IsNull() },
+          relations: ["seller"],
           order: {
             createdAt: "DESC"
           },
         });
-     
-      if (result) {
+  
+        if (result) {
           const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
           const modifiedDataWithOutText = JSON.parse(jsonString);
@@ -791,7 +790,7 @@ export class ProductService {
           await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
         }
       
-        return result ?? []
+        return result || null
         
       } catch (e) {
         console.log('eeeeeeeeeeee',e)
@@ -888,7 +887,9 @@ export class ProductService {
 
   async getHighestPriceOf(product: Product){
     try {
-      const cacheKey = `product_${product.id}_price`;
+      const cacheKey = `product_${product.id}_lowestPrice`;
+  
+      // // Try to get the result from cache
       const cachedResult = await this.cacheManager.get<string>(cacheKey);
       if (cachedResult) {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
@@ -896,18 +897,18 @@ export class ProductService {
         if (parsedData) {
           parsedData.createdAt = new Date(parsedData.createdAt);
         }
-        // return parsedData;
+        return parsedData;
       }
-      const IDS = product.id;
-      const result = await Price.findOne({
-          select:['amount','createdAt','isPublic','type','discount'],
+        const IDS = product.id;
+        const result = await Price.findOne({
           where: { productId: IDS, deletedAt: IsNull() },
+          relations: ["seller"],
           order: {
             createdAt: "DESC"
           },
         });
-     
-      if (result) {
+  
+        if (result) {
           const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
           const modifiedDataWithOutText = JSON.parse(jsonString);
@@ -915,11 +916,11 @@ export class ProductService {
           await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
         }
       
-        return result ?? []
+        return result || null
         
-    } catch (e) {
+      } catch (e) {
         console.log('eeeeeeeeeeee',e)
-    }
+      }
       
   }
 
