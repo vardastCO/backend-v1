@@ -427,7 +427,10 @@ export class ProductService {
     product.category = category;
     product.uom = uom;
     console.log('product immmm',images)
-    product.images = images;
+    product.images = JSON.parse(JSON.stringify(images)
+    .replace(/__file__/g, "file")
+      .replace(/__images__/g, "images"));
+      console.log('product kkkkkk',product.images)
     product.highestPrice = price
     product.lowestPrice = price
     product.prices = Promise.all([price])
