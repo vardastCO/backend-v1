@@ -282,7 +282,7 @@ export class ProductService {
     //   .replace(/__images__/g, 'images');
   
     // const modifiedDataWithOutText = JSON.parse(jsonString);
-  
+    console.log('hhhhhhhhhhhhhhh',products)
     const result = PaginationProductResponse.make(indexProductInput, totalCount, products);
   
     if (!admin) {
