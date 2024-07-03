@@ -174,7 +174,6 @@ export class ProductService {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData = JSON.parse(decompressedData);
       parsedData.prices = []
-      console.log('ggggggggggggggggg',parsedData)
       return parsedData;
     }
    
@@ -274,11 +273,6 @@ export class ProductService {
     });
 
     const jsonString = JSON.stringify(response)
-      .replace(/__imageCategory__/g, 'imageCategory')
-      .replace(/__uom__/g, 'uom')
-      .replace(/__has_uom__/g, 'has_uom')
-      .replace(/__has_category__/g, 'has_category')
-      .replace(/__category__/g, 'category')
       .replace(/__file__/g, 'file')
       .replace(/__images__/g, 'images');
   
