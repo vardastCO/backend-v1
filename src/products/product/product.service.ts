@@ -450,6 +450,7 @@ export class ProductService {
         /__attribute__/g,
         "attribute",
       );
+      console.log('jjjjjjjjjjjj',jsonString)
       return JSON.parse(jsonString);
     }
 
