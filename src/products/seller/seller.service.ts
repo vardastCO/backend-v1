@@ -268,7 +268,6 @@ export class SellerService {
           seller.contacts,
           seller.addresses, 
         ]);
-        seller.representatives = Promise.all([])
         seller.contacts = contacts;
         seller.addresses = addresses;
         const jsonString = JSON.stringify(seller).replace(/__logoFile__/g, 'logoFile')
