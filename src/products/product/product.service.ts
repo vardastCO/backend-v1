@@ -426,7 +426,7 @@ export class ProductService {
     product.brand = brand;
     product.category = category;
     product.uom = uom;
-    console.log('product',product.images,images)
+    console.log('product immmm',images)
     product.images = images;
     product.highestPrice = price
     product.lowestPrice = price
@@ -484,7 +484,6 @@ export class ProductService {
         "file",
       );
       const res: Image[] = JSON.parse(modifiedDataWithOutText) 
-      console.log('ffffffffffff',res)
       return res
     }
 
