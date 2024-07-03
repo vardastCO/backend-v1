@@ -417,23 +417,23 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    // const [brand, category, uom,images,price] = await Promise.all([
-    //   this.findBrand(product.brandId),
-    //   this.findCategory(product.categoryId),
-    //   this.findUom(product.uomId),
-    //   this.getImages([product.id]),
-    //   this.findPrice(product.id),
-    // ]);
+    const [images,price] = await Promise.all([
+      // this.findBrand(product.brandId),
+      // this.findCategory(product.categoryId),
+      // this.findUom(product.uomId),
+      this.getImages([product.id]),
+      this.findPrice(product.id),
+    ]);
 
     // product.brand = brand;
     // product.category = category;
     // product.uom = uom;
-    // product.images = JSON.parse(JSON.stringify(images)
-    // .replace(/__file__/g, "file")
-    //   .replace(/__images__/g, "images"));
-    // product.highestPrice = price
-    // product.lowestPrice = price
-    // product.prices = Promise.all([price])
+    product.images = JSON.parse(JSON.stringify(images)
+    .replace(/__file__/g, "file")
+      .replace(/__images__/g, "images"));
+    product.highestPrice = price
+    product.lowestPrice = price
+    product.prices = Promise.all([price])
 
     return product;
   }
@@ -568,7 +568,7 @@ export class ProductService {
     return result;
   }
   async findPrice(productId: number) {
-    const cacheKey = `product_price_find_${productId}`;
+    const cacheKey = `product_${productId}_lowestPrice`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
@@ -577,7 +577,7 @@ export class ProductService {
     }
 
     const result = await Price.find({
-      select:['amount','createdAt','isPublic','type','productId','sellerId'],
+      relations:['seller'],
       where: { productId, deletedAt: IsNull() },
       order: { createdAt: "DESC" },
     });
