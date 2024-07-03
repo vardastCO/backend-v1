@@ -253,36 +253,35 @@ export class ProductService {
     const categoryResultId = products.map(product => product.categoryId);
     const uomResultIds = products.map(product => product.uomId);
   
-    const [uom, category, images, price] = await Promise.all([
-      Uom.find({ where: { id: In(uomResultIds) } }),
-      Category.find({ where: { id: In(categoryResultId) } }),
-      Image.find({ where: { productId: In(productIds) } }),
-      Price.find({ where: { productId: In(productIds), deletedAt: IsNull() }, order: { createdAt: "DESC" } }),
+    const [uoms, categories, images, prices] = await Promise.all([
+      this.getUoms(uomResultIds),
+      this.getCategories(categoryResultId),
+      this.getImages(productIds),
+      this.getPrices(productIds),
     ]);
-    console.log('price count ',price.length)
-    const productsWithRelations = products.map(product => {
+     products.map(product => {
       return {
         ...product,
-        uom: uom.find(u => u.id === product.uomId),
-        category: category.find(cat => cat.id === product.categoryId),
+        uom: uoms.find(u => u.id === product.uomId),
+        category: categories.find(cat => cat.id === product.categoryId),
         images: [images.find(img => img.productId === product.id)],
-        highestPrice: price.find(p => p.productId === product.id),
-        lowestPrice: price.find(p => p.productId === product.id),
+        highestPrice: prices.find(p => p.productId === product.id),
+        lowestPrice: prices.find(p => p.productId === product.id),
       };
     });
   
-    const jsonString = JSON.stringify(productsWithRelations)
-      .replace(/__imageCategory__/g, 'imageCategory')
-      .replace(/__uom__/g, 'uom')
-      .replace(/__has_uom__/g, 'has_uom')
-      .replace(/__has_category__/g, 'has_category')
-      .replace(/__category__/g, 'category')
-      .replace(/__file__/g, 'file')
-      .replace(/__images__/g, 'images');
+    // const jsonString = JSON.stringify(productsWithRelations)
+    //   .replace(/__imageCategory__/g, 'imageCategory')
+    //   .replace(/__uom__/g, 'uom')
+    //   .replace(/__has_uom__/g, 'has_uom')
+    //   .replace(/__has_category__/g, 'has_category')
+    //   .replace(/__category__/g, 'category')
+    //   .replace(/__file__/g, 'file')
+    //   .replace(/__images__/g, 'images');
   
-    const modifiedDataWithOutText = JSON.parse(jsonString);
+    // const modifiedDataWithOutText = JSON.parse(productsWithRelations);
   
-    const result = PaginationProductResponse.make(indexProductInput, totalCount, modifiedDataWithOutText);
+    const result = PaginationProductResponse.make(indexProductInput, totalCount, products);
   
     if (!admin) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
@@ -291,7 +290,45 @@ export class ProductService {
   
     return result;
   }
+  async getUoms(uomResultIds: number[]): Promise<Uom[]> {
+    const cacheKey = `uoms-${uomResultIds.join('-')}`;
+    let uoms = await this.cacheManager.get<Uom[]>(cacheKey);
+    if (!uoms) {
+      uoms = await Uom.find({ where: { id: In(uomResultIds) } });
+      await this.cacheManager.set(cacheKey, uoms,CacheTTL.ONE_MONTH);
+    }
+    return uoms;
+  }
 
+  async getCategories(categoryResultId: number[]): Promise<Category[]> {
+    const cacheKey = `categories-${categoryResultId.join('-')}`;
+    let categories = await this.cacheManager.get<Category[]>(cacheKey);
+    if (!categories) {
+      categories = await Category.find({ where: { id: In(categoryResultId) } });
+      await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_MONTH);
+    }
+    return categories;
+  }
+
+  async getImages(productIds: number[]): Promise<Image[]> {
+    const cacheKey = `images-${productIds.join('-')}`;
+    let images = await this.cacheManager.get<Image[]>(cacheKey);
+    if (!images) {
+      images = await Image.find({ where: { productId: In(productIds) } });
+      await this.cacheManager.set(cacheKey, images, CacheTTL.ONE_MONTH);
+    }
+    return images;
+  }
+
+  async getPrices(productIds: number[]): Promise<Price[]> {
+    const cacheKey = `prices-${productIds.join('-')}`;
+    let prices = await this.cacheManager.get<Price[]>(cacheKey);
+    if (!prices) {
+      prices = await Price.find({ where: { productId: In(productIds), deletedAt: IsNull() }, order: { createdAt: 'DESC' } });
+      await this.cacheManager.set(cacheKey, prices, CacheTTL.ONE_HOUR);
+    }
+    return prices;
+  }
   async paginateV2(
     indexProductInput?: IndexProductInputV2,
   ): Promise<PaginationProductV2Response> {
