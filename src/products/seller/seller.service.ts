@@ -254,7 +254,7 @@ export class SellerService {
         //   .toString("utf-8");
         // console.log('with cahce selller', JSON.parse(decompressedData))
         // const parsedData: Seller = JSON.parse(decompressedData);
-        return cachedData;
+        // return cachedData;
       }
       const seller = await Seller.findOne({
         where: { id: id },
@@ -277,11 +277,8 @@ export class SellerService {
       ;
 
       // const compressedData = zlib.gzipSync(JSON.stringify(jsonString));
-      await this.cacheManager.set(
-        cacheKey,
-        JSON.stringify(jsonString),
-        CacheTTL.ONE_WEEK,
-      );
+      const modifiedDataWithOutText = JSON.parse(jsonString);
+      await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK);
       } catch (e) {
         console.log('err find one seller ',e)
       }
