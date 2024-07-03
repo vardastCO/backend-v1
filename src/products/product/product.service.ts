@@ -573,11 +573,11 @@ export class ProductService {
       return JSON.parse(cachedData);
     }
 
-    const result =  await Price.find({
+    const result = await Price.find({
+      select:['amount','createdAt','isPublic','type'],
       where: { productId, deletedAt: IsNull() },
       order: { createdAt: "DESC" },
     });
-
     await this.cacheManager.set(
       cacheKey,
       JSON.stringify(result),
