@@ -175,7 +175,7 @@ export class ProductService {
       const parsedData = JSON.parse(decompressedData);
       parsedData.prices = []
       console.log('ggggggggggggggggg',parsedData)
-      return parsedData;
+      // return parsedData;
     }
    
     const {
@@ -262,7 +262,10 @@ export class ProductService {
       this.getPrices(productIds),
     ]);
 
-     products.map(product => {
+    products.map(product => {
+      console.log('categoryissss', categories)
+      console.log('categoryissss[[[[[[[[0]]]]]]]', categories[0])
+      console.log(' categories.find(cat => cat.id === product.categoryId)', categories.find(cat => cat.id === product.categoryId))
       return {
         ...product,
         uom: uoms.find(u => u.id === product.uomId),
