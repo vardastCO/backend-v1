@@ -500,7 +500,7 @@ export class ProductService {
       modifiedDataWithOutText,
       CacheTTL.ONE_WEEK,
     );
-    return result;
+    return JSON.parse(modifiedDataWithOutText);
   }
 
   async findBrand(brandId: number) {
