@@ -257,7 +257,7 @@ export class SellerService {
       }
       const seller = await Seller.findOne({
         where: { id: id },
-        // relations: ['representatives'],
+        relations: ['representatives'],
       });
       if (!seller) {
         throw new NotFoundException();
