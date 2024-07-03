@@ -463,6 +463,7 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
+    console.log('dddd',result)
     const response = JSON.stringify(result).replace(
       /__attribute__/g,
       "attribute",
