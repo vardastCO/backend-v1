@@ -259,7 +259,7 @@ export class ProductService {
       this.getImages(productIds),
       this.getPrices(productIds),
     ]);
-    console.log('category',categories[0])
+
      products.map(product => {
       return {
         ...product,
@@ -270,7 +270,7 @@ export class ProductService {
         lowestPrice: prices.find(p => p.productId === product.id),
       };
     });
-  
+    console.log('products',products)
     // const jsonString = JSON.stringify(productsWithRelations)
     //   .replace(/__imageCategory__/g, 'imageCategory')
     //   .replace(/__uom__/g, 'uom')
@@ -312,7 +312,6 @@ export class ProductService {
     const cacheKey = `categories-${sortedCategoryResultId.join('-')}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      console.log('cacedate get categories' ,JSON.parse(cachedData))
       return JSON.parse(cachedData);
     }
     
