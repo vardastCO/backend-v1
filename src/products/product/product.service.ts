@@ -175,7 +175,7 @@ export class ProductService {
       const parsedData = JSON.parse(decompressedData);
       parsedData.prices = []
       console.log('ggggggggggggggggg',parsedData)
-      // return parsedData;
+      return parsedData;
     }
    
     const {
@@ -263,9 +263,6 @@ export class ProductService {
     ]);
 
     const response = products.map(product => {
-      
-      console.log('images.find(img => img.productId === product.id)',
-        images.find(img => img.productId === product.id))
       return {
         ...product,
         uom: uoms.find(u => u.id === product.uomId),
