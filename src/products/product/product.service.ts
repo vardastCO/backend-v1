@@ -163,18 +163,18 @@ export class ProductService {
       admin = true
     }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
-    const cachedData = await this.cacheManager.get<String>(
-      cacheKey,
-    );
+    // const cachedData = await this.cacheManager.get<String>(
+    //   cacheKey,
+    // );
     let isAlicePrice = false
     if (sortField === SortFieldProduct.PRICE) {
       isAlicePrice = true
     }
-    if (cachedData && !admin && !isAlicePrice) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
-      const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
-      return parsedData;
-    }
+    // if (cachedData && !admin && !isAlicePrice) {
+    //   const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+    //   const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
+    //   return parsedData;
+    // }
    
     const {
       take,
@@ -259,6 +259,7 @@ export class ProductService {
       this.getImages(productIds),
       this.getPrices(productIds),
     ]);
+    console.log('category',categories)
      products.map(product => {
       return {
         ...product,
@@ -311,9 +312,10 @@ export class ProductService {
     const cacheKey = `categories-${sortedCategoryResultId.join('-')}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
+      console.log('cacedate get categories' ,JSON.parse(cachedData))
       return JSON.parse(cachedData);
     }
-  
+    
     const result = await Category.find({ where: { id: In(categoryResultId) } });
   
     await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
