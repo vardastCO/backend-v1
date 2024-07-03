@@ -423,7 +423,7 @@ export class ProductService {
       // this.findImages(product.id),
     ]);
     console.log('lllllllll',attributeValues)
-    product.attributeValues = Promise.all([]);
+    product.attributeValues = attributeValues;
     product.brand = brand;
     product.category = category;
     product.uom = uom;
