@@ -173,6 +173,7 @@ export class ProductService {
     if (cachedData && !admin && !isAlicePrice) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
       const parsedData: PaginationProductResponse = JSON.parse(decompressedData);
+      console.log('ggggggggggggggggg',parsedData)
       return parsedData;
     }
    
