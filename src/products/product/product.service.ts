@@ -266,11 +266,10 @@ export class ProductService {
     });
 
     console.log('reeeeeee', response)
-    console.log('pppppppp',products)
 
-    const jsonString = JSON.stringify(response)
-      .replace(/__file__/g, "file")
-      .replace(/__images__/g, "images");
+    // const jsonString = JSON.stringify(response)
+    //   .replace(/__file__/g, "file")
+    //   .replace(/__images__/g, "images");
 
     // const modifiedDataWithOutText = JSON.parse(jsonString);
 
