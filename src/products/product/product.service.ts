@@ -461,8 +461,11 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
-
-    return result;
+    const response = JSON.stringify(result).replace(
+      /__attribute__/g,
+      "attribute",
+    );
+    return JSON.parse(response);
   }
 
   async findImages(productId: number) {
