@@ -237,7 +237,6 @@ export class ProductService {
       Product.count({ where: whereConditions }),
       Product.find({
         where: whereConditions,
-        relations: ["prices"],
         order: { rating: "DESC" },
         skip,
         take,
@@ -479,7 +478,6 @@ export class ProductService {
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      console.log('with cache iamges')
       const modifiedDataWithOutText = JSON.stringify(cachedData).replace(
         /__file__/g,
         "file",

@@ -14,9 +14,5 @@ export default new DataSource({
   database: configService.get("DB_NAME"),
   entities: ["dist/**/*.entity.js"],
   migrations: ["dist/src/migrations/*.js"],
-  extra: {
-    max: 10, // Maximum number of connections in the pool
-    min: 2,  // Minimum number of connections in the pool
-    connectionTimeoutMillis: 30000, // The maximum time, in milliseconds, that the pool will try to get connection before throwing an error
-  },
+  logging: true, 
 });
