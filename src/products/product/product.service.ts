@@ -415,19 +415,17 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    const [attributeValues,brand, category, uom] = await Promise.all([
-      this.findAttributes(product.id),
+    const [brand, category, uom,images] = await Promise.all([
       this.findBrand(product.brandId),
       this.findCategory(product.categoryId),
       this.findUom(product.uomId),
-      // this.findImages(product.id),
+      this.findImages(product.id),
     ]);
-    console.log('lllllllll',attributeValues)
-    // product.attributeValues = Promise.all([]);
+
     product.brand = brand;
     product.category = category;
     product.uom = uom;
-    // product.images = images;
+    product.images = [images];
 
     return product;
   }
@@ -441,35 +439,34 @@ export class ProductService {
     await this.cacheManager.set(viewsKey, views);
   }
 
-  async findAttributes(productId: number) {
-    const cacheKey = `product_attributes_find_${productId}`;
+  // async findAttributes(productId: number) {
+  //   const cacheKey = `product_attributes_find_${productId}`;
 
-    const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
-      const jsonString = JSON.stringify(cachedData).replace(
-        /__attribute__/g,
-        "attribute",
-      );
-      console.log('jjjjjjjjjjjj',jsonString)
-      return JSON.parse(jsonString);
-    }
+  //   const cachedData = await this.cacheManager.get<string>(cacheKey);
+  //   if (cachedData) {
+  //     const jsonString = JSON.stringify(cachedData).replace(
+  //       /__attribute__/g,
+  //       "attribute",
+  //     );
+  //     return JSON.parse(jsonString);
+  //   }
 
-    const result = await AttributeValue.find({
-      where: { productId },
-      relations:['attribute','attribute.values']
-    });
-    await this.cacheManager.set(
-      cacheKey,
-      JSON.stringify(result),
-      CacheTTL.ONE_WEEK,
-    );
-    console.log('dddd',result)
-    const response = JSON.stringify(result).replace(
-      /__attribute__/g,
-      "attribute",
-    );
-    return JSON.parse(response);
-  }
+  //   const result = await AttributeValue.find({
+  //     where: { productId },
+  //     relations:['attribute']
+  //   });
+  //   await this.cacheManager.set(
+  //     cacheKey,
+  //     JSON.stringify(result),
+  //     CacheTTL.ONE_WEEK,
+  //   );
+  //   console.log('dddd',result)
+  //   const response = JSON.stringify(result).replace(
+  //     /__attribute__/g,
+  //     "attribute",
+  //   );
+  //   return JSON.parse(response);
+  // }
 
   async findImages(productId: number) {
     const cacheKey = `product_images_find_${productId}`;
@@ -488,12 +485,16 @@ export class ProductService {
       where: { productId },
       relations: ["file"],
     });
+    const modifiedDataWithOutText = JSON.stringify(result).replace(
+      /__file__/g,
+      "file",
+    );
     await this.cacheManager.set(
       cacheKey,
-      JSON.stringify(result),
+      modifiedDataWithOutText,
       CacheTTL.ONE_WEEK,
     );
-
+    console.log('res',result)
     return result;
   }
 
