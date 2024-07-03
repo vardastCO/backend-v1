@@ -287,7 +287,7 @@ export class ProductService {
         CacheTTL.THREE_HOURS,
       );
     }
-    // console.log('result',result)
+    console.log('result',result)
     return result;
   }
   async getUoms(uomResultIds: number[]) {
