@@ -27,6 +27,7 @@ export class BlogService {
       );
 
       if (cachedData) {
+        console.log('with cache data blogs')
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
         const parsedData: PaginationBlogResponse = JSON.parse(decompressedData);
         return parsedData;
@@ -92,7 +93,8 @@ export class BlogService {
       );
       
       const compressedData = zlib.gzipSync(JSON.stringify(result));
-      
+      console.log('no cache data blogs')
+      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.TWELVE_HOURS);
 
       return result;
     } catch (e) {
