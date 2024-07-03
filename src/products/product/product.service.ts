@@ -417,23 +417,23 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    const [brand, category, uom,images,price] = await Promise.all([
-      this.findBrand(product.brandId),
-      this.findCategory(product.categoryId),
-      this.findUom(product.uomId),
-      this.getImages([product.id]),
-      this.findPrice(product.id),
-    ]);
+    // const [brand, category, uom,images,price] = await Promise.all([
+    //   this.findBrand(product.brandId),
+    //   this.findCategory(product.categoryId),
+    //   this.findUom(product.uomId),
+    //   this.getImages([product.id]),
+    //   this.findPrice(product.id),
+    // ]);
 
-    product.brand = brand;
-    product.category = category;
-    product.uom = uom;
-    product.images = JSON.parse(JSON.stringify(images)
-    .replace(/__file__/g, "file")
-      .replace(/__images__/g, "images"));
-    product.highestPrice = price
-    product.lowestPrice = price
-    product.prices = Promise.all([price])
+    // product.brand = brand;
+    // product.category = category;
+    // product.uom = uom;
+    // product.images = JSON.parse(JSON.stringify(images)
+    // .replace(/__file__/g, "file")
+    //   .replace(/__images__/g, "images"));
+    // product.highestPrice = price
+    // product.lowestPrice = price
+    // product.prices = Promise.all([price])
 
     return product;
   }
