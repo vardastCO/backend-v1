@@ -272,12 +272,12 @@ export class ProductService {
       .replace(/__file__/g, "file")
       .replace(/__images__/g, "images");
 
-    const modifiedDataWithOutText = JSON.parse(jsonString);
+    // const modifiedDataWithOutText = JSON.parse(jsonString);
 
     const result = PaginationProductResponse.make(
       indexProductInput,
       totalCount,
-      modifiedDataWithOutText,
+      response,
     );
 
     if (!admin) {
@@ -355,7 +355,7 @@ export class ProductService {
       return JSON.parse(cachedData);
     }
     const result = await await Price.find({
-      select:['amount','createdAt','isPublic','type'],
+      select:['amount','createdAt','isPublic','type','productId','sellerId'],
       where: { productId: In(productIds), deletedAt: IsNull() },
       order: { createdAt: "DESC" },
     });
@@ -578,7 +578,7 @@ export class ProductService {
     }
 
     const result = await Price.find({
-      select:['amount','createdAt','isPublic','type'],
+      select:['amount','createdAt','isPublic','type','productId','sellerId'],
       where: { productId, deletedAt: IsNull() },
       order: { createdAt: "DESC" },
     });
