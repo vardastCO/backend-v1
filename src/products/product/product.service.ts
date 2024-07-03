@@ -483,7 +483,7 @@ export class ProductService {
         /__file__/g,
         "file",
       );
-      console.log('gggg',modifiedDataWithOutText)
+      console.log('gggg',JSON.parse(modifiedDataWithOutText))
       // return JSON.parse(modifiedDataWithOutText);
     }
 
