@@ -283,7 +283,7 @@ export class SellerService {
         CacheTTL.ONE_WEEK,
       );
       } catch (e) {
-        throw e
+        console.log('err find one seller ',e)
       }
       console.log('no cahce selller',seller)
       return seller;
