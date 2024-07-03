@@ -259,7 +259,7 @@ export class ProductService {
       Image.find({ where: { productId: In(productIds) } }),
       Price.find({ where: { productId: In(productIds), deletedAt: IsNull() }, order: { createdAt: "DESC" } }),
     ]);
-  
+    console.log('price count ',price.length)
     const productsWithRelations = products.map(product => {
       return {
         ...product,
