@@ -569,6 +569,7 @@ export class ProductService {
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
+      console.log('with cache price')
       return JSON.parse(cachedData);
     }
 
