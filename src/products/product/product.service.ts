@@ -455,6 +455,7 @@ export class ProductService {
 
     const result = await AttributeValue.find({
       where: { productId },
+      relations:['attribute.values.options']
     });
     await this.cacheManager.set(
       cacheKey,
