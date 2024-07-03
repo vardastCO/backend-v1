@@ -34,7 +34,7 @@ import { SellerRepresentative } from "./entities/seller-representative.entity";
 import { Seller } from "./entities/seller.entity";
 import { SellerRepresentativeRoles } from "./enums/seller-representative-roles.enum";
 import { SellerType } from "./enums/seller-type.enum";
-
+import * as zlib from "zlib";
 @Injectable()
 export class SellerService {
   constructor(
@@ -245,14 +245,19 @@ export class SellerService {
     try {
       const cacheKey = `seller_${JSON.stringify(id)}`;
   
-      const cachedData = await this.cacheManager.get<Seller>(cacheKey);
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
     
       if (cachedData) {
-        return cachedData;
+
+        const decompressedData = zlib
+          .gunzipSync(Buffer.from(cachedData, "base64"))
+          .toString("utf-8");
+          console.log('with cahce selller', decompressedData)
+        return JSON.parse(decompressedData);
       }
       const seller = await Seller.findOne({
         where: { id: id },
-        relations: ['representatives'],
+        // relations: ['representatives'],
       });
       if (!seller) {
         throw new NotFoundException();
@@ -262,7 +267,7 @@ export class SellerService {
           seller.contacts,
           seller.addresses, 
         ]);
-    
+        seller.representatives = Promise.all([])
         seller.contacts = contacts;
         seller.addresses = addresses;
         const jsonString = JSON.stringify(seller).replace(/__logoFile__/g, 'logoFile')
@@ -270,15 +275,17 @@ export class SellerService {
           .replace(/__representatives__/g, 'representatives')
 
       ;
-  
-      // Parse the modified JSON back to objects
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-        await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK);
-      
 
+      const compressedData = zlib.gzipSync(JSON.stringify(jsonString));
+      await this.cacheManager.set(
+        cacheKey,
+        compressedData,
+        CacheTTL.ONE_WEEK,
+      );
       } catch (e) {
         throw e
       }
+      console.log('no cahce selller',seller)
       return seller;
 
     } catch (e) {
