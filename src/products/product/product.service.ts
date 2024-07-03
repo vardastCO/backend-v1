@@ -760,47 +760,47 @@ export class ProductService {
   }
 
   async getLowestPriceOf(product: Product): Promise<Price> {
-    // try {
-    //   const cacheKey = `product_${product.id}_lowestPrice`;
+    try {
+      const cacheKey = `product_${product.id}_lowestPrice`;
 
-    //   // // Try to get the result from cache
-    //   const cachedResult = await this.cacheManager.get<string>(cacheKey);
-    //   if (cachedResult) {
-    //     const decompressedData = zlib
-    //       .gunzipSync(Buffer.from(cachedResult, "base64"))
-    //       .toString("utf-8");
-    //     const parsedData: Price = JSON.parse(decompressedData);
-    //     if (parsedData) {
-    //       parsedData.createdAt = new Date(parsedData.createdAt);
-    //     }
-    //     return parsedData;
-    //   }
-    //   const IDS = product.id;
-    //   const result = await Price.findOne({
-    //     select:['amount','createdAt','isPublic','type'],
-    //     where: { productId: IDS, deletedAt: IsNull() },
-    //     relations: ["seller"],
-    //     order: {
-    //       createdAt: "DESC",
-    //     },
-    //   });
+      // // Try to get the result from cache
+      const cachedResult = await this.cacheManager.get<string>(cacheKey);
+      if (cachedResult) {
+        const decompressedData = zlib
+          .gunzipSync(Buffer.from(cachedResult, "base64"))
+          .toString("utf-8");
+        const parsedData: Price = JSON.parse(decompressedData);
+        if (parsedData) {
+          parsedData.createdAt = new Date(parsedData.createdAt);
+        }
+        return parsedData;
+      }
+      const IDS = product.id;
+      const result = await Price.findOne({
+        select:['amount','createdAt','isPublic','type'],
+        where: { productId: IDS, deletedAt: IsNull() },
+        relations: ["seller"],
+        order: {
+          createdAt: "DESC",
+        },
+      });
 
-    //   if (result) {
-    //     const jsonString = JSON.stringify(result)
-    //       .replace(/__seller__/g, "seller")
-    //       .replace(/__logoFile__/g, "logoFile");
-    //     const modifiedDataWithOutText = JSON.parse(jsonString);
-    //     const compressedData = zlib.gzipSync(
-    //       JSON.stringify(modifiedDataWithOutText),
-    //     );
-    //     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
-    //   }
+      if (result) {
+        const jsonString = JSON.stringify(result)
+          .replace(/__seller__/g, "seller")
+          .replace(/__logoFile__/g, "logoFile");
+        const modifiedDataWithOutText = JSON.parse(jsonString);
+        const compressedData = zlib.gzipSync(
+          JSON.stringify(modifiedDataWithOutText),
+        );
+        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
+      }
 
-    //   return result || null;
-    // } catch (e) {
-    //   console.log("eeeeeeeeeeee", e);
-    // }
-    return 
+      return result || null;
+    } catch (e) {
+      console.log("eeeeeeeeeeee", e);
+    }
+
   }
 
   async getMyPriceOf(product: Product, userId: number): Promise<Price | null> {
@@ -822,22 +822,21 @@ export class ProductService {
   }
 
   async getSameCategory(product: Product): Promise<Product[]> {
-    return
-    // const queryBuilder = Product.createQueryBuilder();
-    // const result = queryBuilder
-    //   .leftJoin(Image, "images", `images.productId = ${queryBuilder.alias}.id`)
-    //   .addSelect(["COUNT(images.id) AS image_count"])
-    //   .leftJoin(Price, "prices", `prices.productId = ${queryBuilder.alias}.id`)
-    //   .addSelect(["COUNT(prices.id) AS price_count"])
-    //   .groupBy(`${queryBuilder.alias}.id`)
-    //   .addOrderBy(
-    //     "CASE WHEN COUNT(images.id) > 0 AND COUNT(prices.id) > 0 THEN 1 WHEN COUNT(prices.id) > 0 AND COUNT(images.id) = 0 THEN 2 WHEN COUNT(prices.id) = 0 AND COUNT(images.id) > 0 THEN 3 ELSE 4 END",
-    //   )
-    //   .where({ categoryId: product.categoryId })
-    //   .limit(10)
-    //   .getMany();
+    const queryBuilder = Product.createQueryBuilder();
+    const result = queryBuilder
+      .leftJoin(Image, "images", `images.productId = ${queryBuilder.alias}.id`)
+      .addSelect(["COUNT(images.id) AS image_count"])
+      .leftJoin(Price, "prices", `prices.productId = ${queryBuilder.alias}.id`)
+      .addSelect(["COUNT(prices.id) AS price_count"])
+      .groupBy(`${queryBuilder.alias}.id`)
+      .addOrderBy(
+        "CASE WHEN COUNT(images.id) > 0 AND COUNT(prices.id) > 0 THEN 1 WHEN COUNT(prices.id) > 0 AND COUNT(images.id) = 0 THEN 2 WHEN COUNT(prices.id) = 0 AND COUNT(images.id) > 0 THEN 3 ELSE 4 END",
+      )
+      .where({ categoryId: product.categoryId })
+      .limit(10)
+      .getMany();
 
-    // return result;
+    return result;
   }
 
   async getSameCategoryV2(product: Product): Promise<Product[]> {

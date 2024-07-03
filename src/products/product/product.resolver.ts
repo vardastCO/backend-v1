@@ -203,77 +203,77 @@ export class ProductResolver {
     return this.productService.remove(id);
   }
 
-  // @ResolveField(() => Brand)
-  // brand(@Parent() product: Product): Promise<Brand> {
-  //   return this.productService.getBrandOf(product);
-  // }
+  @ResolveField(() => Brand)
+  brand(@Parent() product: Product): Promise<Brand> {
+    return this.productService.getBrandOf(product);
+  }
 
-  // @ResolveField(() => Category)
-  // category(@Parent() product: Product): Promise<Category> {
-  //   return this.productService.getCategoryOf(product);
-  // }
+  @ResolveField(() => Category)
+  category(@Parent() product: Product): Promise<Category> {
+    return this.productService.getCategoryOf(product);
+  }
 
-  // @ResolveField(() => Uom)
-  // uom(@Parent() product: Product): Promise<Uom> {
-  //   return this.productService.getUomOf(product);
-  // }
+  @ResolveField(() => Uom)
+  uom(@Parent() product: Product): Promise<Uom> {
+    return this.productService.getUomOf(product);
+  }
 
-  // @ResolveField(() => [Price])
-  // prices(@Parent() product: Product): Promise<Price[]> {
-  //   return this.productService.getPricesOf(product);
-  // }
+  @ResolveField(() => [Price])
+  prices(@Parent() product: Product): Promise<Price[]> {
+    return this.productService.getPricesOf(product);
+  }
 
-  // @ResolveField(() => [AttributeValue])
-  // attributeValues(@Parent() product: Product): Promise<AttributeValue[]> {
-  //   return this.productService.getAttributeValuesOf(product);
-  // }
+  @ResolveField(() => [AttributeValue])
+  attributeValues(@Parent() product: Product): Promise<AttributeValue[]> {
+    return this.productService.getAttributeValuesOf(product);
+  }
 
-  // @ResolveField(() => User)
-  // createdBy(@Parent() product: Product): Promise<User> {
-  //   return this.productService.getCreatedByOf(product);
-  // }
+  @ResolveField(() => User)
+  createdBy(@Parent() product: Product): Promise<User> {
+    return this.productService.getCreatedByOf(product);
+  }
 
-  // @ResolveField(() => [Offer])
-  // offers(
-  //   @Parent() product: Product,
-  //   @CurrentUser() user: User,
-  // ): Promise<Offer[]> {
-  //   return this.productService.getOffersOf(product, user);
-  // }
+  @ResolveField(() => [Offer])
+  offers(
+    @Parent() product: Product,
+    @CurrentUser() user: User,
+  ): Promise<Offer[]> {
+    return this.productService.getOffersOf(product, user);
+  }
 
-  // @ResolveField(() => [Offer])
-  // publicOffers(@Parent() product: Product): Promise<Offer[]> {
-  //   return this.productService.getPublicOffersOf(product);
-  // }
+  @ResolveField(() => [Offer])
+  publicOffers(@Parent() product: Product): Promise<Offer[]> {
+    return this.productService.getPublicOffersOf(product);
+  }
 
   
 
-  // @ResolveField(() => Price)
-  // lowestPrice(@Parent() product: Product): Promise<Price> {
-  //   return this.productService.getLowestPriceOf(product);
-  // }
+  @ResolveField(() => Price)
+  lowestPrice(@Parent() product: Product): Promise<Price> {
+    return this.productService.getLowestPriceOf(product);
+  }
 
-  // @ResolveField(() => Price, { nullable: true })
-  // myPrice(@Parent() product: Product,
-  //   @Context() context: any,
-  // ): Promise<Price| null> {
-  //   const user = context?.req?.user?.id
+  @ResolveField(() => Price, { nullable: true })
+  myPrice(@Parent() product: Product,
+    @Context() context: any,
+  ): Promise<Price| null> {
+    const user = context?.req?.user?.id
    
-  //   return this.productService.getMyPriceOf(product,user);
-  // }
+    return this.productService.getMyPriceOf(product,user);
+  }
 
-  // @ResolveField(() => [Product])
-  // sameCategory(@Parent() product: Product): Promise<Product[]> {
-  //   return this.productService.getSameCategory(product);
-  // } 
+  @ResolveField(() => [Product])
+  sameCategory(@Parent() product: Product): Promise<Product[]> {
+    return this.productService.getSameCategory(product);
+  } 
 
 
-  // @Public()
-  // // @Permission("gql.products.product.index")
-  // @Query(() => [Product], { name: "sameCategory2" })
-  // sameCategory2(@Args("productCategoryId", { type: () => Int }) productCategoryId: number): Promise<Product[]> {
-  //   return this.productService.getSameCategoryV2(productCategoryId);
-  // }
+  @Public()
+  // @Permission("gql.products.product.index")
+  @Query(() => [Product], { name: "sameCategory2" })
+  sameCategory2(@Args("productCategoryId", { type: () => Int }) productCategoryId: number): Promise<Product[]> {
+    return this.productService.getSameCategoryV2(productCategoryId);
+  }
 
 
   
