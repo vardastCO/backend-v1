@@ -14,5 +14,6 @@ export default new DataSource({
   database: configService.get("DB_NAME"),
   entities: ["dist/**/*.entity.js"],
   migrations: ["dist/src/migrations/*.js"],
-  logging: true, 
+  logging: configService.get("DB_QUERY_LOG", "false") === "true",
+  cache: true,
 });
