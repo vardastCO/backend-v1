@@ -252,8 +252,9 @@ export class SellerService {
         const decompressedData = zlib
           .gunzipSync(Buffer.from(cachedData, "base64"))
           .toString("utf-8");
-          console.log('with cahce selller', JSON.parse(decompressedData))
-        return JSON.parse(decompressedData);
+        console.log('with cahce selller', JSON.parse(decompressedData))
+        const parsedData: Seller = JSON.parse(decompressedData);
+        return parsedData;
       }
       const seller = await Seller.findOne({
         where: { id: id },
