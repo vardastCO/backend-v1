@@ -839,55 +839,55 @@ export class ProductService {
     return result;
   }
 
-  async getSameCategoryV2(product: Product): Promise<Product[]> {
-    const cacheKey = `product_same_category_${JSON.stringify(
-      product.categoryId,
-    )}`;
-    const cachedData = await this.cacheManager.get<Product[]>(cacheKey);
+  // async getSameCategoryV2(product: Product): Promise<Product[]> {
+  //   const cacheKey = `product_same_category_${JSON.stringify(
+  //     product.categoryId,
+  //   )}`;
+  //   const cachedData = await this.cacheManager.get<Product[]>(cacheKey);
 
-    if (cachedData) {
-      cachedData.forEach(product => {
-        product.createdAt = new Date(product.createdAt);
-        product.updatedAt = new Date(product.updatedAt);
-      });
-      return cachedData;
-    }
+  //   if (cachedData) {
+  //     cachedData.forEach(product => {
+  //       product.createdAt = new Date(product.createdAt);
+  //       product.updatedAt = new Date(product.updatedAt);
+  //     });
+  //     return cachedData;
+  //   }
 
-    const query = `
-      SELECT DISTINCT
-      p.*,
-      CASE
-          WHEN i."productId" IS NOT NULL AND pr."productId" IS NOT NULL THEN 1
-          WHEN i."productId" IS NOT NULL THEN 2
-          ELSE 3
-      END AS order_condition
-      FROM
-          products p
-      LEFT JOIN
-          product_images i ON i."productId" = p.id
-      LEFT JOIN
-          product_prices pr ON pr."productId" = p.id
-      WHERE
-          p."categoryId" = $1
-      ORDER BY
-          CASE
-              WHEN i."productId" IS NOT NULL AND pr."productId" IS NOT NULL THEN 1
-              WHEN i."productId" IS NOT NULL THEN 2
-              ELSE 3
-          END
-      LIMIT 5;
-    `;
-    const result = await this.entityManager.query(query, [product.categoryId]);
-    const products = result.map(product => {
-      delete product.order_condition;
-      const p = Product.create<Product>(product);
-      return p;
-    });
+  //   const query = `
+  //     SELECT DISTINCT
+  //     p.*,
+  //     CASE
+  //         WHEN i."productId" IS NOT NULL AND pr."productId" IS NOT NULL THEN 1
+  //         WHEN i."productId" IS NOT NULL THEN 2
+  //         ELSE 3
+  //     END AS order_condition
+  //     FROM
+  //         products p
+  //     LEFT JOIN
+  //         product_images i ON i."productId" = p.id
+  //     LEFT JOIN
+  //         product_prices pr ON pr."productId" = p.id
+  //     WHERE
+  //         p."categoryId" = $1
+  //     ORDER BY
+  //         CASE
+  //             WHEN i."productId" IS NOT NULL AND pr."productId" IS NOT NULL THEN 1
+  //             WHEN i."productId" IS NOT NULL THEN 2
+  //             ELSE 3
+  //         END
+  //     LIMIT 5;
+  //   `;
+  //   const result = await this.entityManager.query(query, [product.categoryId]);
+  //   const products = result.map(product => {
+  //     delete product.order_condition;
+  //     const p = Product.create<Product>(product);
+  //     return p;
+  //   });
 
-    await this.cacheManager.set(cacheKey, products, CacheTTL.ONE_WEEK);
+  //   await this.cacheManager.set(cacheKey, products, CacheTTL.ONE_WEEK);
 
-    return products;
-  }
+  //   return products;
+  // }
 
   async getHighestPriceOf(product: Product) {
     const cacheKey = `product_price_find_${product.id}`;

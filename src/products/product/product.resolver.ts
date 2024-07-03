@@ -268,12 +268,12 @@ export class ProductResolver {
   } 
 
 
-  @Public()
-  // @Permission("gql.products.product.index")
-  @Query(() => [Product], { name: "sameCategory2" })
-  sameCategory2(@Args("productCategoryId", { type: () => Int }) productCategoryId: number): Promise<Product[]> {
-    return this.productService.getSameCategoryV2(productCategoryId);
-  }
+  // @Public()
+  // // @Permission("gql.products.product.index")
+  // @Query(() => [Product], { name: "sameCategory2" })
+  // sameCategory2(@Args("productCategoryId", { type: () => Int }) productCategoryId: number): Promise<Product[]> {
+  //   return this.productService.getSameCategoryV2(productCategoryId);
+  // }
 
 
   
