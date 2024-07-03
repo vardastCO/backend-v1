@@ -890,6 +890,7 @@ export class ProductService {
   // }
 
   async getHighestPriceOf(product: Product): Promise<Price> {
+    return null
     const cacheKey = `highestPrice_${product.id}`;
 
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
