@@ -902,7 +902,7 @@ export class ProductService {
         const IDS = product.id;
         const result = await Price.findOne({
           where: { productId: IDS, deletedAt: IsNull() },
-          // relations: ["seller"],
+          relations: ["seller"],
           order: {
             createdAt: "DESC"
           },
