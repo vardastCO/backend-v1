@@ -27,7 +27,6 @@ export class BlogService {
       );
 
       if (cachedData) {
-        console.log('with cache data blogs')
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
         const parsedData: PaginationBlogResponse = JSON.parse(decompressedData);
         return parsedData;
@@ -82,8 +81,8 @@ export class BlogService {
   
 
       // Use createdBlogs directly for pagination
-      const startIndex = (indexBlogInput.page - 1) * indexBlogInput.perPage;
-      const endIndex = startIndex + indexBlogInput.perPage;
+      // const startIndex = (indexBlogInput.page - 1) * indexBlogInput.perPage;
+      // const endIndex = startIndex + indexBlogInput.perPage;
       const paginatedBlogs = createdBlogs.slice(0, 5);
 
       const result: PaginationBlogResponse = PaginationBlogResponse.make(
@@ -93,7 +92,7 @@ export class BlogService {
       );
       
       const compressedData = zlib.gzipSync(JSON.stringify(result));
-      console.log('no cache data blogs')
+
       await this.cacheManager.set(cacheKey, compressedData,CacheTTL.TWELVE_HOURS);
 
       return result;
