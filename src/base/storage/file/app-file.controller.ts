@@ -17,11 +17,11 @@ export class AppFileController {
     const cachedData = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedData) {
-      return res.send(cachedData);
+      return cachedData;
     }
 
     const appVersion = process.env.APP_VERSION || "1.0.0";
     await this.cacheManager.set(cacheKey, appVersion, CacheTTL.ONE_DAY);
-    return res.send(appVersion); // Send the version and return
+    return appVersion; // Send the version and return
   }
 }
