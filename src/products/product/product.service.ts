@@ -774,15 +774,17 @@ export class ProductService {
         return parsedData;
       }
         const IDS = product.id;
-        const result = await Price.findOne({
+      const result = await Price.findOne({
+          select:['amount','createdAt','isPublic','type'],
           where: { productId: IDS, deletedAt: IsNull() },
-          relations: ["seller"],
+          // relations: ["seller"],
           order: {
             createdAt: "DESC"
           },
         });
-  
-        if (result) {
+     
+      if (result) {
+          result.discount = Promise.all([])
           const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
           const modifiedDataWithOutText = JSON.parse(jsonString);
