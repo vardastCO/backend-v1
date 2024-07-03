@@ -477,6 +477,7 @@ export class ProductService {
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
+      console.log('with cache iamges')
       const modifiedDataWithOutText = JSON.stringify(cachedData).replace(
         /__file__/g,
         "file",
@@ -498,7 +499,6 @@ export class ProductService {
       modifiedDataWithOutText,
       CacheTTL.ONE_WEEK,
     );
-    console.log('res',result)
     return result;
   }
 
