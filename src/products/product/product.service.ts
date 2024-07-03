@@ -170,8 +170,8 @@ export class ProductService {
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
-      parsedData.prices = [];
-      // return parsedData;
+      // parsedData.prices = [];
+      return parsedData;
     }
 
     const {
@@ -247,11 +247,11 @@ export class ProductService {
     const categoryResultId = products.map(product => product.categoryId);
     const uomResultIds = products.map(product => product.uomId);
 
-    const [uoms, categories, images, prices] = await Promise.all([
+    const [uoms, categories, images] = await Promise.all([
       this.getUoms(uomResultIds),
       this.getCategories(categoryResultId),
       this.getImages(productIds),
-      this.getPrices(productIds),
+      // this.getPrices(productIds),
     ]);
 
     const response : any[] = products.map(product => {
@@ -260,23 +260,21 @@ export class ProductService {
         uom: uoms.find(u => u.id === product.uomId),
         category: categories.find(cat => cat.id === product.categoryId),
         images: [images.find(img => img.productId === product.id)] ?? [],
-        highestPrice: prices.find(p => p.productId === product.id) ,
-        lowestPrice: prices.find(p => p.productId === product.id),
+        // highestPrice: prices.find(p => p.productId === product.id) ,
+        // lowestPrice: prices.find(p => p.productId === product.id),
       };
     });
 
-    console.log('reeeeeee', response)
+    const jsonString = JSON.stringify(response)
+      .replace(/__file__/g, "file")
+      .replace(/__images__/g, "images");
 
-    // const jsonString = JSON.stringify(response)
-    //   .replace(/__file__/g, "file")
-    //   .replace(/__images__/g, "images");
-
-    // const modifiedDataWithOutText = JSON.parse(jsonString);
+    const modifiedDataWithOutText = JSON.parse(jsonString);
 
     const result = PaginationProductResponse.make(
       indexProductInput,
       totalCount,
-      response,
+      modifiedDataWithOutText,
     );
 
     if (!admin) {
@@ -287,7 +285,7 @@ export class ProductService {
         CacheTTL.THREE_HOURS,
       );
     }
-    console.log('result',result)
+
     return result;
   }
   async getUoms(uomResultIds: number[]) {
