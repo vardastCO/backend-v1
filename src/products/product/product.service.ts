@@ -290,44 +290,58 @@ export class ProductService {
   
     return result;
   }
-  async getUoms(uomResultIds: number[]): Promise<Uom[]> {
+  async getUoms(uomResultIds: number[]) {
     const cacheKey = `uoms-${uomResultIds.join('-')}`;
-    let uoms = await this.cacheManager.get<Uom[]>(cacheKey);
+    let uoms = await this.cacheManager.get<string>(cacheKey);
     if (!uoms) {
       uoms = await Uom.find({ where: { id: In(uomResultIds) } });
-      await this.cacheManager.set(cacheKey, uoms,CacheTTL.ONE_MONTH);
+      await this.cacheManager.set(cacheKey, JSON.stringify(uoms),CacheTTL.ONE_MONTH);
     }
-    return uoms;
+    return JSON.parse(uoms);
   }
 
-  async getCategories(categoryResultId: number[]): Promise<Category[]> {
-    const cacheKey = `categories-${categoryResultId.join('-')}`;
-    let categories = await this.cacheManager.get<Category[]>(cacheKey);
-    if (!categories) {
-      categories = await Category.find({ where: { id: In(categoryResultId) } });
-      await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_MONTH);
+  async getCategories(categoryResultId: number[]) {
+    const sortedCategoryResultId = categoryResultId.sort((a, b) => b - a);
+    const cacheKey = `categories-${sortedCategoryResultId.join('-')}`;
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
     }
-    return categories;
+  
+    const result = await Category.find({ where: { id: In(categoryResultId) } });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
+
   }
 
-  async getImages(productIds: number[]): Promise<Image[]> {
-    const cacheKey = `images-${productIds.join('-')}`;
-    let images = await this.cacheManager.get<Image[]>(cacheKey);
-    if (!images) {
-      images = await Image.find({ where: { productId: In(productIds) } });
-      await this.cacheManager.set(cacheKey, images, CacheTTL.ONE_MONTH);
+  async getImages(productIds: number[]) {
+    const sortedCategoryResultId = productIds.sort((a, b) => b - a);
+    const cacheKey = `images-${sortedCategoryResultId.join('-')}`;
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
     }
-    return images;
+    const result =  await Image.find({ where: { productId: In(productIds) } });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
   }
 
-  async getPrices(productIds: number[]): Promise<Price[]> {
-    const cacheKey = `prices-${productIds.join('-')}`;
-    let prices = await this.cacheManager.get<Price[]>(cacheKey);
-    if (!prices) {
-      prices = await Price.find({ where: { productId: In(productIds), deletedAt: IsNull() }, order: { createdAt: 'DESC' } });
-      await this.cacheManager.set(cacheKey, prices, CacheTTL.ONE_HOUR);
+  async getPrices(productIds: number[]) {
+    const sortedCategoryResultId = productIds.sort((a, b) => b - a);
+    const cacheKey = `price-${sortedCategoryResultId.join('-')}`;
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
     }
-    return prices;
+    const result =  await await Price.find({ where: { productId: In(productIds), deletedAt: IsNull() }, order: { createdAt: 'DESC' } });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_HOUR);
+  
+    return result;
   }
   async paginateV2(
     indexProductInput?: IndexProductInputV2,
@@ -419,8 +433,8 @@ export class ProductService {
       const jsonString = JSON.stringify(cachedData).replace(/__attribute__/g, 'attribute')
       ;
 
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-      return JSON.parse(modifiedDataWithOutText);
+      return JSON.parse(jsonString);
+
     }
   
     const result = await AttributeValue.find({
@@ -436,10 +450,8 @@ export class ProductService {
   
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      const jsonString = JSON.stringify(cachedData).replace(/__file__/g, 'file')
-      ;
+      const modifiedDataWithOutText = JSON.stringify(cachedData).replace(/__file__/g, 'file');
 
-      const modifiedDataWithOutText = JSON.parse(jsonString);
       return JSON.parse(modifiedDataWithOutText);
     }
   
