@@ -265,7 +265,7 @@ export class SellerService {
       await Promise.all([
         this.processFile(parsedData.logoFile),
       ]);
-
+      parsedData.representatives = Promise.all([])
       return parsedData;
       }
       const seller = await Seller.findOne({
