@@ -263,9 +263,9 @@ export class ProductService {
     ]);
 
     const response = products.map(product => {
-      console.log('categoryissss', categories)
-      console.log('categoryissss[[[[[[[[0]]]]]]]', categories[0])
-      console.log(' categories.find(cat => cat.id === product.categoryId)', categories.find(cat => cat.id === product.categoryId))
+      
+      console.log('images.find(img => img.productId === product.id)',
+        images.find(img => img.productId === product.id))
       return {
         ...product,
         uom: uoms.find(u => u.id === product.uomId),
@@ -286,7 +286,7 @@ export class ProductService {
       .replace(/__images__/g, 'images');
   
     const modifiedDataWithOutText = JSON.parse(jsonString);
-    console.log('hhhhhhhhhhhhhhh',modifiedDataWithOutText)
+
     const result = PaginationProductResponse.make(indexProductInput, totalCount, modifiedDataWithOutText);
   
     if (!admin) {
