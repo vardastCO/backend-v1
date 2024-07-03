@@ -759,7 +759,7 @@ export class ProductService {
     return offers;
   }
 
-  async getLowestPriceOf(product: Product): Promise<Price> {
+  async getLowestPriceOf(product: Product) {
     try {
       const cacheKey = `product_${product.id}_price`;
   
@@ -792,7 +792,7 @@ export class ProductService {
           await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
         }
       
-        return result || null
+        return result ?? []
         
       } catch (e) {
         console.log('eeeeeeeeeeee',e)
@@ -887,7 +887,7 @@ export class ProductService {
   //   return products;
   // }
 
-  async getHighestPriceOf(product: Product): Promise<Price> {
+  async getHighestPriceOf(product: Product){
     try {
       const cacheKey = `product_${product.id}_price`;
       const cachedResult = await this.cacheManager.get<string>(cacheKey);
@@ -918,7 +918,7 @@ export class ProductService {
           await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
         }
       
-        return result || null
+        return result ?? []
         
     } catch (e) {
         console.log('eeeeeeeeeeee',e)
