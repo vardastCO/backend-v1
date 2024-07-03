@@ -262,7 +262,7 @@ export class ProductService {
       this.getPrices(productIds),
     ]);
 
-    products.map(product => {
+    const response = products.map(product => {
       console.log('categoryissss', categories)
       console.log('categoryissss[[[[[[[[0]]]]]]]', categories[0])
       console.log(' categories.find(cat => cat.id === product.categoryId)', categories.find(cat => cat.id === product.categoryId))
@@ -276,18 +276,18 @@ export class ProductService {
       };
     });
 
-    // const jsonString = JSON.stringify(products)
-    //   .replace(/__imageCategory__/g, 'imageCategory')
-    //   .replace(/__uom__/g, 'uom')
-    //   .replace(/__has_uom__/g, 'has_uom')
-    //   .replace(/__has_category__/g, 'has_category')
-    //   .replace(/__category__/g, 'category')
-    //   .replace(/__file__/g, 'file')
-    //   .replace(/__images__/g, 'images');
+    const jsonString = JSON.stringify(response)
+      .replace(/__imageCategory__/g, 'imageCategory')
+      .replace(/__uom__/g, 'uom')
+      .replace(/__has_uom__/g, 'has_uom')
+      .replace(/__has_category__/g, 'has_category')
+      .replace(/__category__/g, 'category')
+      .replace(/__file__/g, 'file')
+      .replace(/__images__/g, 'images');
   
-    // const modifiedDataWithOutText = JSON.parse(jsonString);
-    console.log('hhhhhhhhhhhhhhh',products)
-    const result = PaginationProductResponse.make(indexProductInput, totalCount, products);
+    const modifiedDataWithOutText = JSON.parse(jsonString);
+    console.log('hhhhhhhhhhhhhhh',modifiedDataWithOutText)
+    const result = PaginationProductResponse.make(indexProductInput, totalCount, modifiedDataWithOutText);
   
     if (!admin) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
