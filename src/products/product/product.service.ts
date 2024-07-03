@@ -425,7 +425,7 @@ export class ProductService {
     product.brand = brand;
     product.category = category;
     product.uom = uom;
-    product.images = [images];
+    product.images = images;
 
     return product;
   }
