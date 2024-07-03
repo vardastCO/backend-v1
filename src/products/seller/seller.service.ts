@@ -298,7 +298,6 @@ export class SellerService {
       } catch (e) {
         console.log('err find one seller ',e)
       }
-      console.log('no cahce selller',seller)
       return seller;
 
     } catch (e) {
