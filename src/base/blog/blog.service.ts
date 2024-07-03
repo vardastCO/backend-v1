@@ -32,21 +32,18 @@ export class BlogService {
         return parsedData;
       }
 
-      const response_1 = await axios.get(
-        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=4`,
-      );
-      const response_2 = await axios.get(
-        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=3&_embed&categories=24`,
-      );
-      const response_3 = await axios.get(
-        `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=5`,
-      );
-
-      const data_1 = response_1.data?.slice(0, 1) || [];
-      const data_2 = response_2.data?.slice(0, 3) || [];
-      const data_3 = response_3.data?.slice(0, 1) || [];
-
-      const posts = [...data_1, ...data_2, ...data_3];
+      const [response_1, response_2, response_3] = await Promise.all([
+        axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=4'),
+        axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=3&_embed&categories=24'),
+        axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=5')
+      ]);
+  
+      const posts = [
+        ...(response_1.data?.slice(0, 1) || []),
+        ...(response_2.data?.slice(0, 3) || []),
+        ...(response_3.data?.slice(0, 1) || [])
+      ];
+  
       const sortedPosts = posts.sort((a, b) => {
         const modifiedDataA = new Date(a.date);
         const modifiedDataB = new Date(b.date);
