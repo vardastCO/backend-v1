@@ -135,7 +135,9 @@ export class Product extends InfraEntity {
   publicOffers: Offer[];
 
   @Field(() => Price, { nullable: true })
+  @OneToMany(() => Price, price => price.product)
   lowestPrice: Price;
+  
   @Field(() => Price, { nullable: true })
   highestPrice: Price;
 
