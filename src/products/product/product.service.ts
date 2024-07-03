@@ -291,13 +291,19 @@ export class ProductService {
     return result;
   }
   async getUoms(uomResultIds: number[]) {
-    const cacheKey = `uoms-${uomResultIds.join('-')}`;
-    let uoms = await this.cacheManager.get<string>(cacheKey);
-    if (!uoms) {
-      uoms = await Uom.find({ where: { id: In(uomResultIds) } });
-      await this.cacheManager.set(cacheKey, JSON.stringify(uoms),CacheTTL.ONE_MONTH);
+    const sortedCategoryResultId = uomResultIds.sort((a, b) => b - a);
+    const cacheKey = `uoms-${sortedCategoryResultId.join('-')}`;
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
     }
-    return JSON.parse(uoms);
+  
+    const result = await Uom.find({ where: { id: In(uomResultIds) } });
+  
+    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
+  
+    return result;
+  
   }
 
   async getCategories(categoryResultId: number[]) {
