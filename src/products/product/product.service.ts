@@ -771,13 +771,12 @@ export class ProductService {
         if (parsedData) {
           parsedData.createdAt = new Date(parsedData.createdAt);
         }
-        return parsedData;
+        // return parsedData;
       }
         const IDS = product.id;
       const result = await Price.findOne({
-          select:['amount','createdAt','isPublic','type','seller'],
+          select:['amount','createdAt','isPublic','type'],
           where: { productId: IDS, deletedAt: IsNull() },
-          relations: ["seller"],
           order: {
             createdAt: "DESC"
           },
