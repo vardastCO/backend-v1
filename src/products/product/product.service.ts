@@ -259,9 +259,9 @@ export class ProductService {
         ...product,
         uom: uoms.find(u => u.id === product.uomId),
         category: categories.find(cat => cat.id === product.categoryId),
-        images: [images.find(img => img.productId === product.id)],
-        highestPrice: prices.find(p => p.productId === product.id),
-        lowestPrice: prices.find(p => p.productId === product.id),
+        images: [images.find(img => img.productId === product.id)] ?? [],
+        highestPrice: prices.find(p => p.productId === product.id) ?? {},
+        lowestPrice: prices.find(p => p.productId === product.id) ?? {},
       };
     });
 
