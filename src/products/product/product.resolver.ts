@@ -228,10 +228,10 @@ export class ProductResolver {
   //   return this.productService.getAttributeValuesOf(product);
   // }
 
-  @ResolveField(() => User)
-  createdBy(@Parent() product: Product): Promise<User> {
-    return this.productService.getCreatedByOf(product);
-  }
+  // @ResolveField(() => User)
+  // createdBy(@Parent() product: Product): Promise<User> {
+  //   return this.productService.getCreatedByOf(product);
+  // }
 
   // @ResolveField(() => [Offer])
   // offers(
@@ -277,8 +277,8 @@ export class ProductResolver {
 
 
   
-  @ResolveField(() => Price)
-  highestPrice(@Parent() product: Product): Promise<Price> {
-    return ;
-  }
+  // @ResolveField(() => Price)
+  // highestPrice(@Parent() product: Product): Promise<Price> {
+  //   return this.productService.getHighestPriceOf(product);
+  // }
 }
