@@ -426,7 +426,8 @@ export class ProductService {
     product.brand = brand;
     product.category = category;
     product.uom = uom;
-    product.images = images;
+    console.log('product',product.images,images)
+    // product.images = images;
     product.highestPrice = price
     product.lowestPrice = price
     product.prices = Promise.all([price])
