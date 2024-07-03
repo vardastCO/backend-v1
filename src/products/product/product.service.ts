@@ -422,8 +422,8 @@ export class ProductService {
       this.findUom(product.uomId),
       // this.findImages(product.id),
     ]);
-
-    product.attributeValues = attributeValues;
+    console.log('lllllllll',attributeValues)
+    product.attributeValues = Promise.all([]);
     product.brand = brand;
     product.category = category;
     product.uom = uom;
