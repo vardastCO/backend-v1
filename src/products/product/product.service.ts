@@ -483,8 +483,9 @@ export class ProductService {
         /__file__/g,
         "file",
       );
-      console.log('gggg',JSON.parse(modifiedDataWithOutText))
-      // return JSON.parse(modifiedDataWithOutText);
+      const res: Image[] = JSON.parse(modifiedDataWithOutText) 
+      console.log('ffffffffffff',res)
+      return res
     }
 
     const result = await Image.find({
