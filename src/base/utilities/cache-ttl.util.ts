@@ -16,7 +16,6 @@ export class CacheTTL {
   public static THREE_DAYS = 258_200 * 1000;
 
   public static ONE_WEEK = 604_800 * 1000;
-  public static ONE_WEEK = 2_592_000 * 1000;
 
   public static tillTomorrowMidnight(): number {
     const tomorrowMidnight = new Date();
