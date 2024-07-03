@@ -899,7 +899,7 @@ export class ProductService {
 
       return parsedData;
     }
-    const result = await LastPrice.createQueryBuilder()
+    const result = await Price.createQueryBuilder()
       .where({ productId: product.id })
       .orderBy({ amount: "DESC" })
       .limit(1)
