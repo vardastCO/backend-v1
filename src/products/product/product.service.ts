@@ -419,7 +419,7 @@ export class ProductService {
       this.findBrand(product.brandId),
       this.findCategory(product.categoryId),
       this.findUom(product.uomId),
-      this.findImages(product.id),
+      this.getImages([product.id]),
       this.findPrice(product.id),
     ]);
 
