@@ -684,17 +684,17 @@ export class ProductService {
   }
 
   async getPricesOf(product: Product): Promise<Price[]> {
-    const latestPrices = await Price.find({
-      where: {
-        productId: product.id,
-      },
-      order: {
-        createdAt: "DESC",
-      },
-      take: 5,
-    });
+    // const latestPrices = await Price.find({
+    //   where: {
+    //     productId: product.id,
+    //   },
+    //   order: {
+    //     createdAt: "DESC",
+    //   },
+    //   take: 5,
+    // });
 
-    return latestPrices;
+    return [];
   }
 
   async getAttributeValuesOf(product: Product): Promise<AttributeValue[]> {
