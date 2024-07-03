@@ -775,9 +775,9 @@ export class ProductService {
       }
         const IDS = product.id;
       const result = await Price.findOne({
-          select:['amount','createdAt','isPublic','type'],
+          select:['amount','createdAt','isPublic','type','seller'],
           where: { productId: IDS, deletedAt: IsNull() },
-          // relations: ["seller"],
+          relations: ["seller"],
           order: {
             createdAt: "DESC"
           },
