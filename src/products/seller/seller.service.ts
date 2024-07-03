@@ -240,25 +240,37 @@ export class SellerService {
   
     return lastOffer ? [lastOffer] : [];
   }
-  
+  private async processFile(filePromise: Promise<any> | undefined) {
+    if (filePromise) {
+      const file = await filePromise;
+      if (file && file.createdAt) {
+        file.createdAt = new Date(file.createdAt);
+      }
+    }
+  }
   async findOne(id: number): Promise<Seller> {
     try {
       const cacheKey = `seller_${JSON.stringify(id)}`;
   
-      const cachedData = await this.cacheManager.get<Seller>(cacheKey);
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
     
       if (cachedData) {
 
-        // const decompressedData = zlib
-        //   .gunzipSync(Buffer.from(cachedData, "base64"))
-        //   .toString("utf-8");
-        // console.log('with cahce selller', JSON.parse(decompressedData))
-        // const parsedData: Seller = JSON.parse(decompressedData);
-        // return cachedData;
+        const decompressedData = zlib
+        .gunzipSync(Buffer.from(cachedData, "base64"))
+        .toString("utf-8");
+      const parsedData: Seller = JSON.parse(decompressedData);
+      parsedData.createdAt = new Date();
+      parsedData.updatedAt = new Date();
+      await Promise.all([
+        this.processFile(parsedData.logoFile),
+      ]);
+
+      return parsedData;
       }
       const seller = await Seller.findOne({
         where: { id: id },
-        relations: ['representatives'],
+        // relations: ['representatives'],
       });
       if (!seller) {
         throw new NotFoundException();
@@ -270,15 +282,19 @@ export class SellerService {
         ]);
         seller.contacts = contacts;
         seller.addresses = addresses;
+        seller.representatives = Promise.all([])
         const jsonString = JSON.stringify(seller).replace(/__logoFile__/g, 'logoFile')
           .replace(/__bannerFile__/g, 'bannerFile')
           .replace(/__representatives__/g, 'representatives')
 
       ;
 
-      // const compressedData = zlib.gzipSync(JSON.stringify(jsonString));
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-      await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK);
+      const compressedData = zlib.gzipSync(jsonString);
+      await this.cacheManager.set(
+        cacheKey,
+        compressedData,
+        CacheTTL.ONE_WEEK,
+      );
       } catch (e) {
         console.log('err find one seller ',e)
       }
