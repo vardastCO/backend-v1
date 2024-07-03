@@ -890,32 +890,27 @@ export class ProductService {
     return products;
   }
 
-  async getHighestPriceOf(product: Product): Promise<Price> {
-    return
-  //   const cacheKey = `highestPrice_${product.id}`;
+  async getHighestPriceOf(product: Product) {
+    const cacheKey = `product_price_find_${product.id}`;
 
-  //   const cachedResult = await this.cacheManager.get<string>(cacheKey);
-  //   if (cachedResult) {
-  //     const decompressedData = zlib
-  //       .gunzipSync(Buffer.from(cachedResult, "base64"))
-  //       .toString("utf-8");
-  //     const parsedData: Price = JSON.parse(decompressedData);
-  //     if (parsedData) {
-  //       parsedData.createdAt = new Date(parsedData.createdAt);
-  //     }
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
 
-  //     return parsedData;
-  //   }
-  //   const result = await Price.createQueryBuilder()
-  //     .where({ productId: product.id })
-  //     .orderBy({ amount: "DESC" })
-  //     .limit(1)
-  //     .getOne();
+      return JSON.parse(cachedData);
+    }
 
-  //   const compressedData = zlib.gzipSync(JSON.stringify(result));
-  //   await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
+    const result = await Price.find({
+      select:['amount','createdAt','isPublic','type','productId','sellerId'],
+      where: { productId:product.id, deletedAt: IsNull() },
+      order: { createdAt: "DESC" },
+    });
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_HOUR,
+    );
 
-  //   return result || null;
+    return result;
   }
 
   private async executeMainQuery(

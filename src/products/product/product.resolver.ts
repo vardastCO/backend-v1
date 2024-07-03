@@ -277,8 +277,8 @@ export class ProductResolver {
 
 
   
-  // @ResolveField(() => Price)
-  // highestPrice(@Parent() product: Product): Promise<Price> {
-  //   return this.productService.getHighestPriceOf(product);
-  // }
+  @ResolveField(() => Price)
+  highestPrice(@Parent() product: Product): Promise<Price> {
+    return this.productService.getHighestPriceOf(product);
+  }
 }
