@@ -245,16 +245,16 @@ export class SellerService {
     try {
       const cacheKey = `seller_${JSON.stringify(id)}`;
   
-      const cachedData = await this.cacheManager.get<string>(cacheKey);
+      const cachedData = await this.cacheManager.get<Seller>(cacheKey);
     
       if (cachedData) {
 
-        const decompressedData = zlib
-          .gunzipSync(Buffer.from(cachedData, "base64"))
-          .toString("utf-8");
-        console.log('with cahce selller', JSON.parse(decompressedData))
-        const parsedData: Seller = JSON.parse(decompressedData);
-        return parsedData;
+        // const decompressedData = zlib
+        //   .gunzipSync(Buffer.from(cachedData, "base64"))
+        //   .toString("utf-8");
+        // console.log('with cahce selller', JSON.parse(decompressedData))
+        // const parsedData: Seller = JSON.parse(decompressedData);
+        return cachedData;
       }
       const seller = await Seller.findOne({
         where: { id: id },
@@ -276,10 +276,10 @@ export class SellerService {
 
       ;
 
-      const compressedData = zlib.gzipSync(JSON.stringify(jsonString));
+      // const compressedData = zlib.gzipSync(JSON.stringify(jsonString));
       await this.cacheManager.set(
         cacheKey,
-        compressedData,
+        JSON.stringify(jsonString),
         CacheTTL.ONE_WEEK,
       );
       } catch (e) {
