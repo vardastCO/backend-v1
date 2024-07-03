@@ -352,6 +352,7 @@ export class ProductService {
       return JSON.parse(cachedData);
     }
     const result = await await Price.find({
+      select:['amount','createdAt','isPublic','type'],
       where: { productId: In(productIds), deletedAt: IsNull() },
       order: { createdAt: "DESC" },
     });
