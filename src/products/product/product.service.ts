@@ -254,7 +254,7 @@ export class ProductService {
       this.getPrices(productIds),
     ]);
 
-    const response = products.map(product => {
+    const response : any[] = products.map(product => {
       return {
         ...product,
         uom: uoms.find(u => u.id === product.uomId),
