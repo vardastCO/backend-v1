@@ -135,9 +135,9 @@ export class Product extends InfraEntity {
   publicOffers: Offer[];
 
   @Field(() => Price, { nullable: true })
-  lowestPrice: Promise<Price>;
+  lowestPrice: Price;
   @Field(() => Price, { nullable: true })
-  highestPrice: Promise<Price>;
+  highestPrice: Price;
 
   @Field(() => [Product], { nullable: "items" })
   sameCategory: Promise<Product[]>;

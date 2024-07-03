@@ -265,6 +265,9 @@ export class ProductService {
       };
     });
 
+    console.log('reeeeeee', response)
+    console.log('pppppppp',products)
+
     const jsonString = JSON.stringify(response)
       .replace(/__file__/g, "file")
       .replace(/__images__/g, "images");
@@ -285,7 +288,7 @@ export class ProductService {
         CacheTTL.THREE_HOURS,
       );
     }
-    console.log('result',result)
+    // console.log('result',result)
     return result;
   }
   async getUoms(uomResultIds: number[]) {
