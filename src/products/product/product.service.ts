@@ -171,6 +171,7 @@ export class ProductService {
         .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
       parsedData.prices = [];
+      console.log('cache for products')
       return parsedData;
     }
 
