@@ -8,13 +8,13 @@ import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Product } from "src/products/product/entities/product.entity";
 import { User } from "src/users/user/entities/user.entity";
 import { DataSource, EntityManager, IsNull, Repository } from "typeorm";
+import * as zlib from "zlib";
 import { createImageCategoryInput } from "./dto/create-category-image.input";
 import { IndexCategoryInput } from "./dto/index-category.input";
 import { PaginationCategoryResponse } from "./dto/pagination-category.response";
 import { UpdateCategoryInput } from "./dto/update-category.input";
 import { ImageCategory } from "./entities/category-image.entity";
 import { Category } from "./entities/category.entity";
-import * as zlib from 'zlib';
 @Injectable()
 export class CategoryService {
   constructor(
@@ -46,44 +46,45 @@ export class CategoryService {
 
     // Try to get the result from the cache
     const cachedResult = await this.cacheManager.get<Category[]>(cacheKey);
-  
+
     if (cachedResult) {
       return cachedResult;
     }
 
     // try {
-      const queryBuilder = Category.createQueryBuilder()
-      if (indexCatrInput.name) {
-        queryBuilder.andWhere("title ILIKE :query", { query: `%${indexCatrInput.name}%` });
-      }
-      
-      const result = await queryBuilder
-        .select([`${queryBuilder.alias}.id`, `${queryBuilder.alias}.title`])
-        .limit(20)
+    const queryBuilder = Category.createQueryBuilder();
+    if (indexCatrInput.name) {
+      queryBuilder.andWhere("title ILIKE :query", {
+        query: `%${indexCatrInput.name}%`,
+      });
+    }
+
+    const result = await queryBuilder
+      .select([`${queryBuilder.alias}.id`, `${queryBuilder.alias}.title`])
+      .limit(20)
       .getMany();
-    
-      
-      await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
 
-      return result;
-      // try {
-      //   const query = `
-      //   SELECT 
-      //     a.id, 
-      //     a.title
-      //   FROM 
-      //     base_taxonomy_categories a
-      // `;
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
 
-      //   const result = await this.entityManager.query(query);
-      //   const categories = result;
-      //   await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); // Set TTL as needed
+    return result;
+    // try {
+    //   const query = `
+    //   SELECT
+    //     a.id,
+    //     a.title
+    //   FROM
+    //     base_taxonomy_categories a
+    // `;
 
-      //   return categories;
-      // } catch (error) {
-      //   // Handle error appropriately (e.g., log it, throw a custom error)
-      //   console.error("Error fetching categories:", error);
-      // }
+    //   const result = await this.entityManager.query(query);
+    //   const categories = result;
+    //   await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); // Set TTL as needed
+
+    //   return categories;
+    // } catch (error) {
+    //   // Handle error appropriately (e.g., log it, throw a custom error)
+    //   console.error("Error fetching categories:", error);
+    // }
     // }
   }
 
@@ -181,13 +182,12 @@ export class CategoryService {
       return cachedCategories;
     }
     const category: number = await this.categoryRepository.count();
-    await this.cacheManager.set(cacheKey, category, CacheTTL.ONE_WEEK); 
+    await this.cacheManager.set(cacheKey, category, CacheTTL.ONE_WEEK);
 
     return category;
   }
 
   async findAll(indexCategoryInput?: IndexCategoryInput): Promise<Category[]> {
-
     const cacheKey = `categories_${JSON.stringify(indexCategoryInput)}`;
     const cachedCategories = await this.cacheManager.get<Category[]>(cacheKey);
     if (cachedCategories && Array.isArray(cachedCategories)) {
@@ -204,22 +204,21 @@ export class CategoryService {
       ? IsNull()
       : indexCategoryInput.parentCategoryId;
 
-    const queryBuilder = Category.createQueryBuilder()
-        queryBuilder
-        .leftJoinAndSelect(`${queryBuilder.alias}.imageCategory`, 'imageCategory') 
-        .leftJoinAndSelect('imageCategory.file', 'file')
-        .addSelect(['file.*'])
-        .skip(skip)
-        .take(take)
-        .where(
-          Object.fromEntries(
-            Object.entries({ parentCategoryId,vocabularyId, isActive }).filter(
-              ([_, v]) => v != null,
-            ),
+    const queryBuilder = Category.createQueryBuilder();
+    queryBuilder
+      .leftJoinAndSelect(`${queryBuilder.alias}.imageCategory`, "imageCategory")
+      .leftJoinAndSelect("imageCategory.file", "file")
+      .addSelect(["file.*"])
+      .skip(skip)
+      .take(take)
+      .where(
+        Object.fromEntries(
+          Object.entries({ parentCategoryId, vocabularyId, isActive }).filter(
+            ([_, v]) => v != null,
           ),
-        )
-        // .orderBy({ sort: "ASC" });
-      
+        ),
+      );
+    // .orderBy({ sort: "ASC" });
 
     if (brandId) {
       queryBuilder.andWhere(
@@ -235,30 +234,36 @@ export class CategoryService {
       );
     }
 
- 
     try {
-      const result = await queryBuilder.leftJoinAndSelect(`${queryBuilder.alias}.parentCategory`, 'parentCategory')
-        .orderBy(`${queryBuilder.alias}.sort`, 'ASC') 
-        .getMany(); 
-      const jsonString = JSON.stringify(result).replace(/__imageCategory__/g, 'imageCategory')
-        .replace(/__file__/g, 'file')
-        .replace(/__parentCategory__/g, 'parentCategory')
-      ;
-
+      const result = await queryBuilder
+        .leftJoinAndSelect(
+          `${queryBuilder.alias}.parentCategory`,
+          "parentCategory",
+        )
+        .orderBy(`${queryBuilder.alias}.sort`, "ASC")
+        .getMany();
+      const jsonString = JSON.stringify(result)
+        .replace(/__imageCategory__/g, "imageCategory")
+        .replace(/__file__/g, "file")
+        .replace(/__parentCategory__/g, "parentCategory");
       // Parse the modified JSON back to objects
       const modifiedDataWithOutText = JSON.parse(jsonString);
-      await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK); // Set TTL as needed
+      await this.cacheManager.set(
+        cacheKey,
+        modifiedDataWithOutText,
+        CacheTTL.ONE_WEEK,
+      ); // Set TTL as needed
 
       return result;
-
     } catch (error) {
       // Handle any database query errors here
       throw new Error("Failed to fetch categories: " + error.message);
     }
   }
 
-
-  async findPaginate(indexCategoryInput?: IndexCategoryInput): Promise<PaginationCategoryResponse> {
+  async findPaginate(
+    indexCategoryInput?: IndexCategoryInput,
+  ): Promise<PaginationCategoryResponse> {
     indexCategoryInput.boot();
     // const cacheKey = `categories_find_paginate_${JSON.stringify(indexCategoryInput)}`;
     // const cachedCategories = await this.cacheManager.get<PaginationCategoryResponse>(cacheKey);
@@ -276,22 +281,21 @@ export class CategoryService {
       ? IsNull()
       : indexCategoryInput.parentCategoryId;
 
-    const queryBuilder = Category.createQueryBuilder()
-        queryBuilder
-        .leftJoinAndSelect(`${queryBuilder.alias}.imageCategory`, 'imageCategory') 
-        .leftJoinAndSelect('imageCategory.file', 'file')
-        .addSelect(['file.*'])
-        .skip(skip)
-        .take(take)
-        .where(
-          Object.fromEntries(
-            Object.entries({ parentCategoryId,vocabularyId, isActive }).filter(
-              ([_, v]) => v != null,
-            ),
+    const queryBuilder = Category.createQueryBuilder();
+    queryBuilder
+      .leftJoinAndSelect(`${queryBuilder.alias}.imageCategory`, "imageCategory")
+      .leftJoinAndSelect("imageCategory.file", "file")
+      .addSelect(["file.*"])
+      .skip(skip)
+      .take(take)
+      .where(
+        Object.fromEntries(
+          Object.entries({ parentCategoryId, vocabularyId, isActive }).filter(
+            ([_, v]) => v != null,
           ),
-        )
-        // .orderBy({ sort: "ASC" });
-      
+        ),
+      );
+    // .orderBy({ sort: "ASC" });
 
     if (brandId) {
       queryBuilder.andWhere(
@@ -307,16 +311,18 @@ export class CategoryService {
       );
     }
 
- 
     try {
-      const result = await queryBuilder.leftJoinAndSelect(`${queryBuilder.alias}.parentCategory`, 'parentCategory')
-        .orderBy(`${queryBuilder.alias}.sort`, 'ASC') 
-        .getMany(); 
-      const jsonString = JSON.stringify(result).replace(/__imageCategory__/g, 'imageCategory')
-        .replace(/__file__/g, 'file')
-        .replace(/__parentCategory__/g, 'parentCategory')
-      ;
-
+      const result = await queryBuilder
+        .leftJoinAndSelect(
+          `${queryBuilder.alias}.parentCategory`,
+          "parentCategory",
+        )
+        .orderBy(`${queryBuilder.alias}.sort`, "ASC")
+        .getMany();
+      const jsonString = JSON.stringify(result)
+        .replace(/__imageCategory__/g, "imageCategory")
+        .replace(/__file__/g, "file")
+        .replace(/__parentCategory__/g, "parentCategory");
       // Parse the modified JSON back to objects
       const modifiedDataWithOutText = JSON.parse(jsonString);
       // await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK); // Set TTL as needed
@@ -324,7 +330,6 @@ export class CategoryService {
 
       return PaginationCategoryResponse.make(indexCategoryInput, total, data);
       // return result;
-
     } catch (error) {
       // Handle any database query errors here
       throw new Error("Failed to fetch categories: " + error.message);
@@ -366,12 +371,14 @@ export class CategoryService {
   }
 
   async findOne(id: number, slug?: string): Promise<Category> {
-    const cacheKey = `category:${id}:${slug || ''}`;
+    const cacheKey = `category:${id}:${slug || ""}`;
 
     const cachedCategory = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedCategory) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedCategory, 'base64')).toString('utf-8');
+      const decompressedData = zlib
+        .gunzipSync(Buffer.from(cachedCategory, "base64"))
+        .toString("utf-8");
       const parsedData: Category = JSON.parse(decompressedData);
 
       return parsedData;
@@ -381,7 +388,7 @@ export class CategoryService {
       throw new NotFoundException();
     }
     const compressedData = zlib.gzipSync(JSON.stringify(category));
-    await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_MONTH);
+    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return category;
   }
 

@@ -9,14 +9,14 @@ export class CacheTTL {
   public static THREE_HOURS = 10800 * 1000;
   public static FOUR_HOURS = 14400 * 1000;
   public static FIVE_HOURS = 18000 * 1000;
-  public static SIX_HOURS = 21_600 * 1000 ;
+  public static SIX_HOURS = 21_600 * 1000;
   public static TWELVE_HOURS = 43_200 * 1000;
 
   public static ONE_DAY = 86_400 * 1000;
   public static THREE_DAYS = 258_200 * 1000;
 
   public static ONE_WEEK = 604_800 * 1000;
-  public static ONE_MONTH = 2_592_000 * 1000;
+  public static ONE_WEEK = 2_592_000 * 1000;
 
   public static tillTomorrowMidnight(): number {
     const tomorrowMidnight = new Date();

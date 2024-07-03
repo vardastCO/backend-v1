@@ -10,6 +10,7 @@ import { ProductEntity } from "src/products/product/entities/product-service.ent
 import { Product } from "src/products/product/entities/product.entity";
 import { Seller } from "src/products/seller/entities/seller.entity";
 import { SellerType } from "src/products/seller/enums/seller-type.enum";
+import { Project } from "src/users/project/entities/project.entity";
 import { User } from "src/users/user/entities/user.entity";
 import { Like, SelectQueryBuilder } from "typeorm";
 import { Category } from "../taxonomy/category/entities/category.entity";
@@ -24,7 +25,6 @@ import { SuggestInput } from "./dto/suggest.input";
 import { SuggestResponse } from "./dto/suggest.response";
 import { SuggestResponseV2 } from "./dto/suggest.response-v2";
 import { TotalInfoResponse } from "./dto/totalInfo.output";
-import { Project } from "src/users/project/entities/project.entity";
 
 @Injectable()
 export class SearchService {
@@ -63,7 +63,7 @@ export class SearchService {
     const result = {
       filters: attributes, // Make sure `attributes` is an array
     };
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH);
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
     return result;
   }
   async filterAdmin(
@@ -120,7 +120,7 @@ export class SearchService {
 
   async suggest(suggestInput: SuggestInput): Promise<SuggestResponse> {
     let { query, cityId, SKU } = suggestInput;
-    query = query.replace(/ي/g, 'ی').replace(/ك/g, 'ک');
+    query = query.replace(/ي/g, "ی").replace(/ك/g, "ک");
     const productsQuery = this.getProductsSearchQuery(query);
     const categoriesQuery = this.getCategoriesSearchQuery(query);
     const sellerQuery = this.getSellerSearchQuery(query, cityId);
@@ -155,7 +155,7 @@ export class SearchService {
       where: {
         name: Like(`%${query}%`),
       },
-      take:suggestvalue,
+      take: suggestvalue,
     });
 
     return {
@@ -163,21 +163,19 @@ export class SearchService {
     };
   }
 
-
-  async totalInfo(): Promise<TotalInfoResponse>{
-    
+  async totalInfo(): Promise<TotalInfoResponse> {
     const [
-      countOfBrands ,
-      countOfSellers ,
+      countOfBrands,
+      countOfSellers,
       countOfSellersOnline,
       countOfSellersNormal,
       countOfSellersOffline,
       countOfSellersExtended,
-      countOfUsers ,
-      countOfProducts ,
+      countOfUsers,
+      countOfProducts,
       countOfCategories,
       countOfOrders,
-      countOfProjects
+      countOfProjects,
     ] = await Promise.all([
       this.getCountOfBrands(),
       this.getCountOfSellers(),
@@ -193,18 +191,18 @@ export class SearchService {
     ]);
 
     return {
-      countOfBrands ,
-      countOfSellers ,
+      countOfBrands,
+      countOfSellers,
       countOfSellersOnline,
       countOfSellersNormal,
       countOfSellersOffline,
       countOfSellersExtended,
-      countOfUsers ,
-      countOfProducts ,
+      countOfUsers,
+      countOfProducts,
       countOfCategories,
       countOfOrders,
-      countOfProjects
-    }
+      countOfProjects,
+    };
   }
 
   private async getCountOfBrands(): Promise<number> {
@@ -220,8 +218,8 @@ export class SearchService {
   private async getCountOfSellersOnline(): Promise<number> {
     const countOfSellersOnline = await Seller.count({
       where: {
-        sellerType: SellerType.ONLINE
-      }
+        sellerType: SellerType.ONLINE,
+      },
     });
     return countOfSellersOnline;
   }
@@ -229,8 +227,8 @@ export class SearchService {
   private async getCountOfSellersNormal(): Promise<number> {
     const countOfSellersNormal = await Seller.count({
       where: {
-        sellerType: SellerType.NORMAL
-      }
+        sellerType: SellerType.NORMAL,
+      },
     });
     return countOfSellersNormal;
   }
@@ -238,8 +236,8 @@ export class SearchService {
   private async getCountOfSellersOffline(): Promise<number> {
     const countOfSellersoffline = await Seller.count({
       where: {
-        sellerType: SellerType.OFFLINE
-      }
+        sellerType: SellerType.OFFLINE,
+      },
     });
     return countOfSellersoffline;
   }
@@ -247,8 +245,8 @@ export class SearchService {
   private async getCountOfSellersExtended(): Promise<number> {
     const countOfSellersoffline = await Seller.count({
       where: {
-        sellerType: SellerType.EXTENDED
-      }
+        sellerType: SellerType.EXTENDED,
+      },
     });
     return countOfSellersoffline;
   }
@@ -267,17 +265,15 @@ export class SearchService {
     return countOfCategories;
   }
 
-
   private async getCountOfOrders(): Promise<number> {
-    const countOfOrders = await OfferOrder.count()
+    const countOfOrders = await OfferOrder.count();
     return countOfOrders;
   }
 
   private async getCountOfProjects(): Promise<number> {
-    const countOfProjects = await Project.count()
+    const countOfProjects = await Project.count();
     return countOfProjects;
   }
-
 
   private getProductsSearchQuery(
     query: string,
@@ -325,7 +321,7 @@ export class SearchService {
     return Seller.createQueryBuilder()
       .where("name ILIKE :query", { query: `%${query}%` })
       .where({
-        sellerType : SellerType.ONLINE || SellerType.NORMAL
+        sellerType: SellerType.ONLINE || SellerType.NORMAL,
       })
       .orderBy(
         `ts_rank_cd(to_tsvector(${fieldsString}), websearch_to_tsquery(:query))`,

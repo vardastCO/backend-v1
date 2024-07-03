@@ -1,4 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Cache } from "cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Like } from "typeorm";
 import { Attribute } from "../attribute/entities/attribute.entity";
 import { Product } from "../product/entities/product.entity";
@@ -7,10 +10,6 @@ import { IndexUomInput } from "./dto/index-uom.input";
 import { PaginationUomResponse } from "./dto/pagination-uom.response";
 import { UpdateUomInput } from "./dto/update-uom.input";
 import { Uom } from "./entities/uom.entity";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Inject } from "@nestjs/common";
-import { CacheTTL } from "src/base/utilities/cache-ttl.util";
-import { Cache } from "cache-manager";
 @Injectable()
 export class UomService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
@@ -25,7 +24,7 @@ export class UomService {
 
     // Try to get the result from the cache
     const cachedResult = await this.cacheManager.get<Uom[]>(cacheKey);
-  
+
     if (cachedResult) {
       // Return the cached result if available
       return cachedResult;
@@ -39,13 +38,12 @@ export class UomService {
           : { isActive },
         order: { id: "DESC" },
       });
-  
+
       // Store the result in the cache with a defined TTL (time-to-live)
-      await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH); // Set a TTL of 60 seconds, adjust as needed
-  
+      await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set a TTL of 60 seconds, adjust as needed
+
       return result;
     }
-  
   }
 
   async paginate(

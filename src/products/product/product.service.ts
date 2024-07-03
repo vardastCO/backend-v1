@@ -1,22 +1,29 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy } from "@nestjs/microservices";
 import axios from "axios";
 import { Cache } from "cache-manager";
 import { Category } from "src/base/taxonomy/category/entities/category.entity";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { filterObject } from "src/base/utilities/helpers";
+import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from "src/users/user/entities/user.entity";
-import { Brackets, EntityManager, In, Like,IsNull, MoreThan } from 'typeorm';
+import { Brackets, EntityManager, In, IsNull, Like, MoreThan } from "typeorm";
+import { v4 as uuidv4 } from "uuid";
+import * as zlib from "zlib";
 import { AttributeValue } from "../attribute-value/entities/attribute-value.entity";
 import { Brand } from "../brand/entities/brand.entity";
 import { Image } from "../images/entities/image.entity";
+import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { Offer } from "../offer/entities/offer.entity";
 import { LastPrice } from "../price/entities/last-price.entity";
 import { Price } from "../price/entities/price.entity";
+import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { Uom } from "../uom/entities/uom.entity";
+import { CreateProductSellerInput } from "./dto/create-product-seller.input";
 import { CreateProductInput } from "./dto/create-product.input";
+import { IndexOffersPrice } from "./dto/index-price-offers.input";
 import { IndexProductInputV2 } from "./dto/index-product-v2.input";
 import { IndexProductInput } from "./dto/index-product.input";
 import { PaginationProductV2Response } from "./dto/pagination-product-v2.response";
@@ -25,14 +32,6 @@ import { UpdateProductInput } from "./dto/update-product.input";
 import { ProductEntity } from "./entities/product-service.entity";
 import { Product } from "./entities/product.entity";
 import { ProductSortablesEnum } from "./enums/product-sortables.enum";
-import { CreateProductSellerInput } from "./dto/create-product-seller.input";
-import { v4 as uuidv4 } from 'uuid';
-import { Seller } from "../seller/entities/seller.entity";
-import * as zlib from 'zlib';
-import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
-import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
-import { IndexOffersPrice } from "./dto/index-price-offers.input";
-import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { SortFieldProduct } from "./enums/sort-filed-product.enum";
 interface MainQueryResult {
   totalCount: number;
@@ -53,7 +52,6 @@ export class ProductService {
     //     queue: 'product_queue',
     //   },
     // });
-
   }
 
   async create(
@@ -66,34 +64,33 @@ export class ProductService {
     return product;
   }
 
-  
   async createFromSeller(
     createProductInput: CreateProductSellerInput,
     user: User,
   ): Promise<Product> {
     const product: Product = Product.create<Product>(createProductInput);
     product.createdBy = Promise.resolve(user);
-    product.sku = uuidv4()
+    product.sku = uuidv4();
     await product.save();
     return product;
   }
 
-   getOrderClause(orderBy: ProductSortablesEnum) {
+  getOrderClause(orderBy: ProductSortablesEnum) {
     switch (orderBy) {
       case ProductSortablesEnum.NEWEST:
-        return { rank : 'DESC' };
+        return { rank: "DESC" };
       case ProductSortablesEnum.OLDEST:
-        return { rank : 'DESC' };
+        return { rank: "DESC" };
       case ProductSortablesEnum.MOST_EXPENSIVE:
         return {
-          rank: 'DESC'
+          rank: "DESC",
         }; // Assuming 'prices.amount' is the correct path
       case ProductSortablesEnum.MOST_AFFORDABLE:
         return {
-          rank : 'DESC'
-        };  // Assuming 'prices.amount' is the correct path
+          rank: "DESC",
+        }; // Assuming 'prices.amount' is the correct path
       default:
-        return { createdAt: 'DESC' }; // Default sorting by rank in descending order
+        return { createdAt: "DESC" }; // Default sorting by rank in descending order
     }
   }
   async findAll(indexProductInput?: IndexProductInput): Promise<Product[]> {
@@ -158,25 +155,25 @@ export class ProductService {
     indexProductInput.boot();
     const { sortField, sortDirection } = indexProductInput;
 
-    let admin = false
+    let admin = false;
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
-      admin = true
+      admin = true;
     }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
-    const cachedData = await this.cacheManager.get<String>(
-      cacheKey,
-    );
-    let isAlicePrice = false
+    const cachedData = await this.cacheManager.get<String>(cacheKey);
+    let isAlicePrice = false;
     if (sortField === SortFieldProduct.PRICE) {
-      isAlicePrice = true
+      isAlicePrice = true;
     }
     if (cachedData && !admin && !isAlicePrice) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const decompressedData = zlib
+        .gunzipSync(Buffer.from(cachedData, "base64"))
+        .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
-      parsedData.prices = []
+      parsedData.prices = [];
       return parsedData;
     }
-   
+
     const {
       take,
       skip,
@@ -205,8 +202,7 @@ export class ProductService {
     if (categoryIds && categoryIds.length > 0) {
       whereConditions.categoryId = In(categoryIds);
     }
-    
-   
+
     if (sellerId) {
       whereConditions.offers = {
         sellerId: sellerId,
@@ -214,7 +210,7 @@ export class ProductService {
     }
 
     if (!hasPrice) {
-      whereConditions.rating = 1
+      whereConditions.rating = 1;
     }
 
     if (query) {
@@ -222,21 +218,19 @@ export class ProductService {
     }
 
     if (attributes !== undefined && attributes.length > 0) {
-
       for (const attribute of attributes) {
         attribute.value = JSON.stringify(attribute.value);
-    
+
         whereConditions.attributeValues = {
           attributeId: attribute.id,
           value: attribute.value,
         };
-  
       }
     }
     if (sortField == SortFieldProduct.PRICE) {
       const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
       whereConditions.prices = {
-        createdAt:  MoreThan(fifteenMinutesAgo),
+        createdAt: MoreThan(fifteenMinutesAgo),
       };
     }
     const [totalCount, products] = await Promise.all([
@@ -244,16 +238,16 @@ export class ProductService {
       Product.find({
         where: whereConditions,
         relations: ["prices"],
-        order: { rating: 'DESC' },
+        order: { rating: "DESC" },
         skip,
         take,
       }),
     ]);
-  
+
     const productIds = products.map(product => product.id);
     const categoryResultId = products.map(product => product.categoryId);
     const uomResultIds = products.map(product => product.uomId);
-  
+
     const [uoms, categories, images, prices] = await Promise.all([
       this.getUoms(uomResultIds),
       this.getCategories(categoryResultId),
@@ -273,97 +267,117 @@ export class ProductService {
     });
 
     const jsonString = JSON.stringify(response)
-      .replace(/__file__/g, 'file')
-      .replace(/__images__/g, 'images');
-  
+      .replace(/__file__/g, "file")
+      .replace(/__images__/g, "images");
+
     const modifiedDataWithOutText = JSON.parse(jsonString);
 
-    const result = PaginationProductResponse.make(indexProductInput, totalCount, modifiedDataWithOutText);
-  
+    const result = PaginationProductResponse.make(
+      indexProductInput,
+      totalCount,
+      modifiedDataWithOutText,
+    );
+
     if (!admin) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.THREE_HOURS);
+      await this.cacheManager.set(
+        cacheKey,
+        compressedData,
+        CacheTTL.THREE_HOURS,
+      );
     }
-  
+
     return result;
   }
   async getUoms(uomResultIds: number[]) {
     const sortedCategoryResultId = uomResultIds.sort((a, b) => b - a);
-    const cacheKey = `uoms-${sortedCategoryResultId.join('-')}`;
+    const cacheKey = `uoms-${sortedCategoryResultId.join("-")}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-  
+
     const result = await Uom.find({ where: { id: In(uomResultIds) } });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
     return result;
-  
   }
 
   async getCategories(categoryResultId: number[]) {
     const sortedCategoryResultId = categoryResultId.sort((a, b) => b - a);
-    const cacheKey = `categories-${sortedCategoryResultId.join('-')}`;
+    const cacheKey = `categories-${sortedCategoryResultId.join("-")}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-    
-    const result = await Category.find({ where: { id: In(categoryResultId) } });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
-    return result;
 
+    const result = await Category.find({ where: { id: In(categoryResultId) } });
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
+    return result;
   }
 
   async getImages(productIds: number[]) {
     const sortedCategoryResultId = productIds.sort((a, b) => b - a);
-    const cacheKey = `images-${sortedCategoryResultId.join('-')}`;
+    const cacheKey = `images-${sortedCategoryResultId.join("-")}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-    const result =  await Image.find({ where: { productId: In(productIds) } });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
+    const result = await Image.find({ where: { productId: In(productIds) } });
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
     return result;
   }
 
   async getPrices(productIds: number[]) {
     const sortedCategoryResultId = productIds.sort((a, b) => b - a);
-    const cacheKey = `price-${sortedCategoryResultId.join('-')}`;
+    const cacheKey = `price-${sortedCategoryResultId.join("-")}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-    const result =  await await Price.find({ where: { productId: In(productIds), deletedAt: IsNull() }, order: { createdAt: 'DESC' } });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_HOUR);
-  
+    const result = await await Price.find({
+      where: { productId: In(productIds), deletedAt: IsNull() },
+      order: { createdAt: "DESC" },
+    });
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_HOUR,
+    );
+
     return result;
   }
   async paginateV2(
     indexProductInput?: IndexProductInputV2,
   ): Promise<PaginationProductV2Response> {
     indexProductInput.boot();
-    const {
-      take,
-      skip,
-    } = indexProductInput || {};
+    const { take, skip } = indexProductInput || {};
     try {
-      
-      
       const [products, totalCount] = await ProductEntity.findAndCount({
         relations: [
-            "parent.brand",
-            "parent.uom",
-            "parent.category",
-            "parent.option.attribuite",
-            "parent.option.value",
+          "parent.brand",
+          "parent.uom",
+          "parent.category",
+          "parent.option.attribuite",
+          "parent.option.value",
         ],
         skip: skip,
         take: take,
@@ -371,11 +385,11 @@ export class ProductService {
           parent: {
             option: {
               attribuite: {
-                id : 'ASC'
-              }
-            }
-          }
-        }
+                id: "ASC",
+              },
+            },
+          },
+        },
       });
 
       const result = PaginationProductV2Response.make(
@@ -383,7 +397,7 @@ export class ProductService {
         totalCount,
         products,
       );
-      
+
       return result;
     } catch (e) {
       console.log("fffffff", e);
@@ -396,171 +410,189 @@ export class ProductService {
         id: id,
       },
     });
-  
+
     if (!product) {
       throw new NotFoundException();
     }
-  
-  
-    const [ brand, category, uom] = await Promise.all([
+
+    const [brand, category, uom] = await Promise.all([
       // this.findAttributes(product.id),
       this.findBrand(product.brandId),
       this.findCategory(product.categoryId),
       this.findUom(product.uomId),
       // this.findImages(product.id),
     ]);
-  
+
     // product.attributeValues = attributeValues;
     product.brand = brand;
     product.category = category;
     product.uom = uom;
     // product.images = images;
-  
+
     return product;
   }
-  
+
   async logProductView(productId: number): Promise<void> {
     const viewsKey = `product_views_${productId}`;
     const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
-  
+
     views.push({ timestamp: new Date().toISOString() });
-  
+
     await this.cacheManager.set(viewsKey, views);
   }
-  
+
   async findAttributes(productId: number) {
     const cacheKey = `product_attributes_find_${productId}`;
-  
+
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      const jsonString = JSON.stringify(cachedData).replace(/__attribute__/g, 'attribute')
-      ;
-
+      const jsonString = JSON.stringify(cachedData).replace(
+        /__attribute__/g,
+        "attribute",
+      );
       return JSON.parse(jsonString);
-
     }
-  
+
     const result = await AttributeValue.find({
       where: { productId },
     });
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
     return result;
   }
-  
+
   async findImages(productId: number) {
     const cacheKey = `product_images_find_${productId}`;
-  
+
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      const modifiedDataWithOutText = JSON.stringify(cachedData).replace(/__file__/g, 'file');
+      const modifiedDataWithOutText = JSON.stringify(cachedData).replace(
+        /__file__/g,
+        "file",
+      );
 
       return JSON.parse(modifiedDataWithOutText);
     }
-  
+
     const result = await Image.find({
       where: { productId },
-      relations:['file']
+      relations: ["file"],
     });
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
     return result;
   }
-  
+
   async findBrand(brandId: number) {
     const cacheKey = `product_brand_find_${brandId}`;
-    
+
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-  
+
     const result = await Brand.findOne({
       where: { id: brandId },
     });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
     return result;
   }
-  
+
   async findCategory(categoryId: number) {
     const cacheKey = `product_category_find_${categoryId}`;
-    
+
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-  
+
     const result = await Category.findOne({
       where: { id: categoryId },
     });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
     return result;
   }
-  
-  async findUom(uomId: number){
+
+  async findUom(uomId: number) {
     const cacheKey = `product_uom_find_${uomId}`;
-    
+
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       return JSON.parse(cachedData);
     }
-  
+
     const result = await Uom.findOne({
       where: { id: uomId },
     });
-  
-    await this.cacheManager.set(cacheKey, JSON.stringify(result), CacheTTL.ONE_MONTH);
-  
+
+    await this.cacheManager.set(
+      cacheKey,
+      JSON.stringify(result),
+      CacheTTL.ONE_WEEK,
+    );
+
     return result;
   }
-  
 
-  async getOffersPrice(indexOffersPrice: IndexOffersPrice): Promise<PaginationOfferResponse> {
-  indexOffersPrice.boot();
-  const { take, skip, productId } = indexOffersPrice || {};
+  async getOffersPrice(
+    indexOffersPrice: IndexOffersPrice,
+  ): Promise<PaginationOfferResponse> {
+    indexOffersPrice.boot();
+    const { take, skip, productId } = indexOffersPrice || {};
 
-
-  const lastPrice = await Price.find({
-    
-    where: { productId },
-    order: { createdAt: 'DESC' },
-     
-  });
-
-  // Step 2: Extract the seller IDs from the obtained price.
-  const sellerIds: number[] = [];
-  if (lastPrice) {
-    lastPrice.forEach(element => {
-      sellerIds.push(element.sellerId)
-      
+    const lastPrice = await Price.find({
+      where: { productId },
+      order: { createdAt: "DESC" },
     });
-  }
 
-  // Step 3: Remove duplicate seller IDs.
-  const uniqueSellerIds = Array.from(new Set(sellerIds));
-    
-
-  // Step 4: Use the unique seller IDs to filter offers.
-  const [data, total] = await Offer.findAndCount({
-    skip,
-    take,
-    where: {
-      productId,
-      sellerId: In(uniqueSellerIds), // Filter offers by unique seller IDs
-    },
-    order: {
-      lastPublicConsumerPrice : {
-        id : "DESC"
-      }
+    // Step 2: Extract the seller IDs from the obtained price.
+    const sellerIds: number[] = [];
+    if (lastPrice) {
+      lastPrice.forEach(element => {
+        sellerIds.push(element.sellerId);
+      });
     }
-  });
 
-  return PaginationOfferResponse.make(indexOffersPrice, total, data);
-}
+    // Step 3: Remove duplicate seller IDs.
+    const uniqueSellerIds = Array.from(new Set(sellerIds));
+
+    // Step 4: Use the unique seller IDs to filter offers.
+    const [data, total] = await Offer.findAndCount({
+      skip,
+      take,
+      where: {
+        productId,
+        sellerId: In(uniqueSellerIds), // Filter offers by unique seller IDs
+      },
+      order: {
+        lastPublicConsumerPrice: {
+          id: "DESC",
+        },
+      },
+    });
+
+    return PaginationOfferResponse.make(indexOffersPrice, total, data);
+  }
 
   async getProductViewCount(productId: number): Promise<number> {
     const index = "product_views";
@@ -603,7 +635,7 @@ export class ProductService {
     const product: Product = await this.findOne(id);
     product.deletedAt = new Date();
     // product.id = id;
-    await product.save()
+    await product.save();
     return product;
   }
 
@@ -620,14 +652,12 @@ export class ProductService {
   }
 
   async getPricesOf(product: Product): Promise<Price[]> {
-
-
     const latestPrices = await Price.find({
       where: {
         productId: product.id,
       },
       order: {
-        createdAt: 'DESC',
+        createdAt: "DESC",
       },
       take: 5,
     });
@@ -655,10 +685,9 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-
     // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
     // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
-  
+
     // if (cachedData) {
     //   // return cachedData;
     // }
@@ -679,17 +708,17 @@ export class ProductService {
             .groupBy('"Offer"."sellerId"'),
         "maxIds",
         '"Offer"."id" = "maxIds"."maxId"',
-    )
+      )
       // .take(5)
       // .orderBy(
       //   { createdAt: 'DESC' }
-         
+
       // )
       // .innerJoinAndSelect('Offer."lastPublicConsumerPrice"', 'lastPublicConsumerPrice') // Removed double quotes around "Offer"
       // .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
-      .orderBy('"Offer"."createdAt"', 'DESC') 
+      .orderBy('"Offer"."createdAt"', "DESC")
       .getMany();
-    
+
     // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
 
     return offers;
@@ -697,46 +726,49 @@ export class ProductService {
 
   async getLowestPriceOf(product: Product): Promise<Price> {
     try {
-    const cacheKey = `product_${product.id}_lowestPrice`;
+      const cacheKey = `product_${product.id}_lowestPrice`;
 
-    // // Try to get the result from cache
-    const cachedResult = await this.cacheManager.get<string>(cacheKey);
-    if (cachedResult) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-      const parsedData: Price = JSON.parse(decompressedData);
-      if (parsedData) {
-        parsedData.createdAt = new Date(parsedData.createdAt);
+      // // Try to get the result from cache
+      const cachedResult = await this.cacheManager.get<string>(cacheKey);
+      if (cachedResult) {
+        const decompressedData = zlib
+          .gunzipSync(Buffer.from(cachedResult, "base64"))
+          .toString("utf-8");
+        const parsedData: Price = JSON.parse(decompressedData);
+        if (parsedData) {
+          parsedData.createdAt = new Date(parsedData.createdAt);
+        }
+        return parsedData;
       }
-      return parsedData;
-    }
       const IDS = product.id;
       const result = await Price.findOne({
         where: { productId: IDS, deletedAt: IsNull() },
         relations: ["seller"],
         order: {
-          createdAt: "DESC"
+          createdAt: "DESC",
         },
       });
 
       if (result) {
-        const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
-        .replace(/__logoFile__/g, 'logoFile');
+        const jsonString = JSON.stringify(result)
+          .replace(/__seller__/g, "seller")
+          .replace(/__logoFile__/g, "logoFile");
         const modifiedDataWithOutText = JSON.parse(jsonString);
-        const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+        const compressedData = zlib.gzipSync(
+          JSON.stringify(modifiedDataWithOutText),
+        );
         await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
       }
-    
-      return result || null
-      
+
+      return result || null;
     } catch (e) {
-      console.log('eeeeeeeeeeee',e)
+      console.log("eeeeeeeeeeee", e);
     }
-    
   }
 
   async getMyPriceOf(product: Product, userId: number): Promise<Price | null> {
     const seller = await SellerRepresentative.findOneBy({ userId });
-    let price 
+    let price;
     if (seller) {
       price = await Price.findOne({
         where: {
@@ -744,17 +776,12 @@ export class ProductService {
           sellerId: (await seller).sellerId,
         },
         order: {
-          id: 'DESC'
-        }
-       
+          id: "DESC",
+        },
       });
-
-      
     }
 
-
     return price || null;
- 
   }
 
   async getSameCategory(product: Product): Promise<Product[]> {
@@ -771,17 +798,15 @@ export class ProductService {
       .where({ categoryId: product.categoryId })
       .limit(10)
       .getMany();
-    
-    return result
+
+    return result;
   }
 
-
   async getSameCategoryV2(product: Product): Promise<Product[]> {
-
-    const cacheKey = `product_same_category_${JSON.stringify(product.categoryId)}`;
-    const cachedData = await this.cacheManager.get<Product[]>(
-      cacheKey,
-    );
+    const cacheKey = `product_same_category_${JSON.stringify(
+      product.categoryId,
+    )}`;
+    const cachedData = await this.cacheManager.get<Product[]>(cacheKey);
 
     if (cachedData) {
       cachedData.forEach(product => {
@@ -814,15 +839,15 @@ export class ProductService {
               ELSE 3
           END
       LIMIT 5;
-    `
+    `;
     const result = await this.entityManager.query(query, [product.categoryId]);
-    const products = result.map((product) => {
-      delete product.order_condition
+    const products = result.map(product => {
+      delete product.order_condition;
       const p = Product.create<Product>(product);
-      return p
-    })
+      return p;
+    });
 
-    await this.cacheManager.set(cacheKey, products, CacheTTL.ONE_MONTH);
+    await this.cacheManager.set(cacheKey, products, CacheTTL.ONE_WEEK);
 
     return products;
   }
@@ -831,25 +856,27 @@ export class ProductService {
     const cacheKey = `highestPrice_${product.id}`;
 
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
-      if (cachedResult) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-        const parsedData: Price = JSON.parse(decompressedData);
+    if (cachedResult) {
+      const decompressedData = zlib
+        .gunzipSync(Buffer.from(cachedResult, "base64"))
+        .toString("utf-8");
+      const parsedData: Price = JSON.parse(decompressedData);
       if (parsedData) {
         parsedData.createdAt = new Date(parsedData.createdAt);
       }
-     
+
       return parsedData;
     }
-    const result =  await LastPrice.createQueryBuilder()
+    const result = await LastPrice.createQueryBuilder()
       .where({ productId: product.id })
       .orderBy({ amount: "DESC" })
       .limit(1)
       .getOne();
-    
+
     const compressedData = zlib.gzipSync(JSON.stringify(result));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
-    
-    return result || null
+
+    return result || null;
   }
 
   private async executeMainQuery(
@@ -860,7 +887,7 @@ export class ProductService {
     createdById: number,
     skip: number,
     take: number,
-): Promise<MainQueryResult> {
+  ): Promise<MainQueryResult> {
     const totalCountQuery = `
       SELECT COUNT(pv.id) AS total_count
       FROM products_varient pv 
@@ -888,12 +915,14 @@ export class ProductService {
     const totalCountResult = await this.entityManager.query(totalCountQuery);
     const totalCount = totalCountResult[0]?.total_count || 0;
 
-    const mainQueryResult = await this.entityManager.query(mainQuery, [skip, take]);
+    const mainQueryResult = await this.entityManager.query(mainQuery, [
+      skip,
+      take,
+    ]);
 
     // You can return both the total count and the paginated result if needed
     return { totalCount, data: mainQueryResult };
-}
-
+  }
 
   private async executeTotalCountQuery(
     sku: string,

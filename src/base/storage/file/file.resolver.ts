@@ -13,20 +13,22 @@ import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import { Permission } from "src/users/authorization/permission.decorator";
-import * as zlib from 'zlib';
+import * as zlib from "zlib";
 import { Directory } from "../directory/entities/directory.entity";
 import { BannerResponse } from "./dto/banner.response";
 import { IndexBannerInput } from "./dto/index-banner.input";
 import { IndexFileInput } from "./dto/index-file.input";
+import { PaginationFileResponse } from "./dto/pagination-file.response";
 import { PresignedUrlObject } from "./dto/presigned-url.response";
+import { Banner } from "./entities/banners.entity";
 import { File } from "./entities/file.entity";
 import { FileService } from "./file.service";
-import { PaginationFileResponse } from "./dto/pagination-file.response";
-import { Banner } from "./entities/banners.entity";
 @Resolver(() => File)
 export class FileResolver {
-  constructor(private readonly fileService: FileService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,) { }
+  constructor(
+    private readonly fileService: FileService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Permission("gql.base.storage.file.index")
   @Query(() => PaginationFileResponse, { name: "files" })
@@ -54,49 +56,50 @@ export class FileResolver {
     const cacheKey = `banners_${JSON.stringify(IndexBannerInput)}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const decompressedData = zlib
+        .gunzipSync(Buffer.from(cachedData, "base64"))
+        .toString("utf-8");
       const parsedData: BannerResponse = JSON.parse(decompressedData);
-  
+
       return parsedData;
     }
     const [small, medium, large, xlarge] = await Promise.all([
       File.find({
         where: {
           directory: { path: "banner/mobile" }, //it should be dynamic
-          modelType: 'SMALL',
+          modelType: "SMALL",
         },
       }),
       File.find({
         where: {
           directory: { path: "banner/mobile" }, //it should be dynamic
-          modelType: 'MEDIUM',
+          modelType: "MEDIUM",
         },
       }),
       File.find({
         where: {
           directory: { path: "banner/mobile" }, //it should be dynamic
-          modelType: 'LARGE',
+          modelType: "LARGE",
         },
       }),
       File.find({
         where: {
           directory: { path: "banner/mobile" }, //it should be dynamic
-          modelType: 'XLARGE',
+          modelType: "XLARGE",
         },
-      })
+      }),
     ]);
-  
+
     const response: BannerResponse = {
       small,
       medium,
       large,
-      xlarge
+      xlarge,
     };
-  
-    const compressedData = zlib.gzipSync(JSON.stringify(response));
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_MONTH);
-    return response;
 
+    const compressedData = zlib.gzipSync(JSON.stringify(response));
+    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+    return response;
   }
   @Public()
   @Query(() => [Banner])
@@ -106,31 +109,31 @@ export class FileResolver {
     const cacheKey = `banners_get_${JSON.stringify(IndexBannerInput)}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const decompressedData = zlib
+        .gunzipSync(Buffer.from(cachedData, "base64"))
+        .toString("utf-8");
       const parsedData: Banner[] = JSON.parse(decompressedData);
-  
+
       return parsedData;
     }
-    const response = await Banner.find({ take: 5 }); 
+    const response = await Banner.find({ take: 5 });
     const updatedData = this.replaceKeys(response);
     const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_MONTH);
+    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
-
   }
   replaceKeys(data) {
     return data.map(item => {
-        const { __small__, __medium__, __large__, __xlarge__, ...rest } = item;
-        return {
-            ...rest,
-            small: __small__,
-            medium: __medium__,
-            large: __large__,
-            xlarge: __xlarge__
-        };
+      const { __small__, __medium__, __large__, __xlarge__, ...rest } = item;
+      return {
+        ...rest,
+        small: __small__,
+        medium: __medium__,
+        large: __large__,
+        xlarge: __xlarge__,
+      };
     });
   }
-
 
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => File)

@@ -3,14 +3,17 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import axios from "axios";
 import { Cache } from "cache-manager";
 import { I18n, I18nService } from "nestjs-i18n";
+import { File } from "src/base/storage/file/entities/file.entity";
 import { FileService } from "src/base/storage/file/file.service";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
+import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { User } from "src/users/user/entities/user.entity";
 import { EntityManager, IsNull, Like, Not } from "typeorm";
+import * as zlib from "zlib";
 import { Product } from "../product/entities/product.entity";
 import { CreateBrandInput } from "./dto/create-brand.input";
 import { IndexBrandInput } from "./dto/index-brand.input";
@@ -18,11 +21,6 @@ import { PaginationBrandResponse } from "./dto/pagination-brand.response";
 import { PayloadDto } from "./dto/payload-brand";
 import { UpdateBrandInput } from "./dto/update-brand.input";
 import { Brand } from "./entities/brand.entity";
-import { SortBrandEnum } from "./enum/sort-types.enum";
-import * as zlib from 'zlib';
-import { File } from "src/base/storage/file/entities/file.entity";
-import { AuthorizationService } from "src/users/authorization/authorization.service";
-
 
 @Injectable()
 export class BrandService {
@@ -41,7 +39,7 @@ export class BrandService {
       brand.name = `${createBrandInput.name_fa} (${createBrandInput.name_en})`;
     } else if (createBrandInput.name_fa) {
       brand.name = createBrandInput.name_fa;
-    } 
+    }
 
     if (createBrandInput.logoFileUuid) {
       const file = await this.fileService.getNewlyUploadedFileOrFail(
@@ -58,7 +56,7 @@ export class BrandService {
 
       brand.logoFile = Promise.resolve(file);
     }
-    brand.sum = 0
+    brand.sum = 0;
     await brand.save();
     return brand;
   }
@@ -68,52 +66,63 @@ export class BrandService {
 
     // Try to get the result from the cache
     // const cachedResult = await this.cacheManager.get<Brand[]>(cacheKey);
-  
+
     // if (cachedResult) {
     //   // Return the cached result if available
     //   return cachedResult;
     // }
-    const {  skip, name } = indexBrandInput || {};
-    const  take = 50;
-    const result =  await Brand.find({
+    const { skip, name } = indexBrandInput || {};
+    const take = 50;
+    const result = await Brand.find({
       skip,
       take,
       where: name ? { name: Like(`%${name.replace(" ", "%")}%`) } : {},
       order: { id: "DESC" },
     });
 
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_MONTH); 
-    
-    return result
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
+
+    return result;
   }
 
-  async paginate(indexBrandInput?: IndexBrandInput,user?: User): Promise<PaginationBrandResponse> {
-    
+  async paginate(
+    indexBrandInput?: IndexBrandInput,
+    user?: User,
+  ): Promise<PaginationBrandResponse> {
     indexBrandInput?.boot();
-    
-    const { take, skip, name, hasLogoFile, hasBannerFile, hasCatalogeFile, hasPriceList } = indexBrandInput || {};
-    let admin = false
+
+    const {
+      take,
+      skip,
+      name,
+      hasLogoFile,
+      hasBannerFile,
+      hasCatalogeFile,
+      hasPriceList,
+    } = indexBrandInput || {};
+    let admin = false;
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
-      admin = true
+      admin = true;
     }
     const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
-  
+
     const cachedData = await this.cacheManager.get<string>(cacheKey);
-  
+
     if (cachedData && !admin) {
       // cachedData.data.forEach(category => {
       //   category.createdAt = new Date(category.createdAt);
       //   category.updatedAt = new Date(category.updatedAt);
       // })
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+      const decompressedData = zlib
+        .gunzipSync(Buffer.from(cachedData, "base64"))
+        .toString("utf-8");
       const parsedData: PaginationBrandResponse = JSON.parse(decompressedData);
 
       return parsedData;
-
     }
 
     const whereConditions: any = {};
-    const order: any = {}
+    const order: any = {};
 
     // switch (indexBrandInput.sortType) {
     //   case SortBrandEnum.NEWEST:
@@ -129,25 +138,33 @@ export class BrandService {
     // order.bannerDesktop = {
     //   id: "DESC"
     // };
-    
+
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
-    
+
     if (indexBrandInput.hasLogoFile !== undefined) {
-      whereConditions[`logoFile`] = indexBrandInput.hasLogoFile ? Not(IsNull()) : IsNull();
+      whereConditions[`logoFile`] = indexBrandInput.hasLogoFile
+        ? Not(IsNull())
+        : IsNull();
     }
-    
+
     if (indexBrandInput.hasCatalogeFile !== undefined) {
-      whereConditions[`catalog`] = indexBrandInput.hasCatalogeFile ? Not(IsNull()) : IsNull();
+      whereConditions[`catalog`] = indexBrandInput.hasCatalogeFile
+        ? Not(IsNull())
+        : IsNull();
     }
-    
+
     if (indexBrandInput.hasPriceList !== undefined) {
-      whereConditions[`priceList`] = indexBrandInput.hasPriceList ? Not(IsNull()) : IsNull();
+      whereConditions[`priceList`] = indexBrandInput.hasPriceList
+        ? Not(IsNull())
+        : IsNull();
     }
-    
+
     if (indexBrandInput.hasBannerFile !== undefined) {
-      whereConditions[`bannerDesktop`] = indexBrandInput.hasBannerFile ? Not(IsNull()) : IsNull();
+      whereConditions[`bannerDesktop`] = indexBrandInput.hasBannerFile
+        ? Not(IsNull())
+        : IsNull();
     }
     whereConditions[`id`] = Not(12269);
     const [data, total] = await Brand.findAndCount({
@@ -155,28 +172,35 @@ export class BrandService {
       take,
       where: whereConditions,
       order: {
-        rating:'DESC',
+        rating: "DESC",
       },
     });
 
     try {
-      const jsonString = JSON.stringify(data).replace(/__bannerDesktop__/g, 'bannerDesktop').replace(/__bannerFile__/g, 'bannerFile').replace(/__logoFile__/g, 'logoFile')
-        .replace(/__catalog__/g, 'catalog').replace(/__priceList__/g, 'priceList')
-      ;
-
+      const jsonString = JSON.stringify(data)
+        .replace(/__bannerDesktop__/g, "bannerDesktop")
+        .replace(/__bannerFile__/g, "bannerFile")
+        .replace(/__logoFile__/g, "logoFile")
+        .replace(/__catalog__/g, "catalog")
+        .replace(/__priceList__/g, "priceList");
       const modifiedDataWithOutText = JSON.parse(jsonString);
 
-      const response = PaginationBrandResponse.make(indexBrandInput, total, modifiedDataWithOutText);
+      const response = PaginationBrandResponse.make(
+        indexBrandInput,
+        total,
+        modifiedDataWithOutText,
+      );
       if (!admin) {
         const compressedData = zlib.gzipSync(JSON.stringify(response));
-        await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_WEEK);
+        await this.cacheManager.set(
+          cacheKey,
+          compressedData,
+          CacheTTL.ONE_WEEK,
+        );
       }
 
       return response;
-    } catch (e) {
-      
-    }
-   
+    } catch (e) {}
   }
   private async processFile(filePromise: Promise<any> | undefined) {
     if (filePromise) {
@@ -188,19 +212,20 @@ export class BrandService {
   }
   private async incrementBrandViews(brand: Brand) {
     const info = await Brand.findOneBy({ id: brand.id });
-    info.views = info.views + 1 ?? 1; 
-    await info.save(); 
-  } 
+    info.views = info.views + 1 ?? 1;
+    await info.save();
+  }
   async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
     try {
       // this.logBrandView(id,payload);
       const cacheKey = `brand_${JSON.stringify(id)}`;
-  
+
       const cachedData = await this.cacheManager.get<string>(cacheKey);
-     
 
       if (cachedData) {
-        const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+        const decompressedData = zlib
+          .gunzipSync(Buffer.from(cachedData, "base64"))
+          .toString("utf-8");
         const parsedData: Brand = JSON.parse(decompressedData);
         parsedData.createdAt = new Date();
         parsedData.updatedAt = new Date();
@@ -208,10 +233,10 @@ export class BrandService {
           this.processFile(parsedData.catalog),
           this.processFile(parsedData.priceList),
           this.processFile(parsedData.bannerDesktop),
-          this.incrementBrandViews(parsedData)
+          this.incrementBrandViews(parsedData),
         ]);
-      
-        return parsedData
+
+        return parsedData;
       }
       const query = `
       SELECT "id",name,name_en,name_fa,status,id,sum,views,slug,bio,"createdAt","updatedAt",
@@ -224,69 +249,67 @@ export class BrandService {
       if (!brandsql) {
         throw new NotFoundException();
       }
-      const brand = brandsql[0]
+      const brand = brandsql[0];
       try {
-       
-        const [bannerDesktop,priceList,catalog,bannerFile,data] = await Promise.all([
-          this.fetchFile(brand.bannerDesktopId),
-          this.fetchFile(brand.priceListId),
-          this.fetchFile(brand.catalogId),
-          this.fetchFile(brand.bannerFileId),
-          this.incrementBrandViews(brand)
-        ]);
+        const [bannerDesktop, priceList, catalog, bannerFile, data] =
+          await Promise.all([
+            this.fetchFile(brand.bannerDesktopId),
+            this.fetchFile(brand.priceListId),
+            this.fetchFile(brand.catalogId),
+            this.fetchFile(brand.bannerFileId),
+            this.incrementBrandViews(brand),
+          ]);
         brand.bannerDesktop = bannerDesktop;
         brand.priceList = priceList;
         brand.catalog = catalog;
         brand.bannerFile = bannerFile;
-// ==
-//         const jsonString = JSON.stringify(brandsql).replace(/__logoFile__/g, 'logoFile')
-//         .replace(/__bannerFile__/g, 'bannerFile')
-//         .replace(/__catalog__/g, 'catalog')
-//         .replace(/__bannerDesktop__/g, 'bannerDesktop')
-//         .replace(/__priceList__/g, 'priceList')
-      ;
-  
+        // ==
+        //         const jsonString = JSON.stringify(brandsql).replace(/__logoFile__/g, 'logoFile')
+        //         .replace(/__bannerFile__/g, 'bannerFile')
+        //         .replace(/__catalog__/g, 'catalog')
+        //         .replace(/__bannerDesktop__/g, 'bannerDesktop')
+        //         .replace(/__priceList__/g, 'priceList')
         // const modifiedDataWithOutText = JSON.parse(jsonString);
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
-        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_MONTH);
+        await this.cacheManager.set(
+          cacheKey,
+          compressedData,
+          CacheTTL.ONE_WEEK,
+        );
       } catch (e) {
-          throw e
+        throw e;
       }
       return brand;
-        
     } catch (e) {
-      throw e
+      throw e;
     }
-    
   }
   async fetchFile(id) {
-    return await File.findOneBy({id});
+    return await File.findOneBy({ id });
   }
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
     try {
       const viewsKey = `brand_views_${brandId}`;
 
       const views: any[] = (await this.cacheManager.get(viewsKey)) || [];
-  
+
       views.push(payload);
 
       await this.cacheManager.set(viewsKey, views);
-      
     } catch (e) {
-     console.log('logBrandView',e) 
+      console.log("logBrandView", e);
     }
- 
   }
 
   async getBrandViewCount(brandId: number): Promise<number> {
-    const index = 'brand_views';
+    const index = "brand_views";
 
     const query = {
       query: {
         term: { brandId },
       },
     };
-    const baseURL = 'http://elasticsearch:9200';
+    const baseURL = "http://elasticsearch:9200";
     const url = `${baseURL}/${index}/_search`;
 
     try {
@@ -294,7 +317,7 @@ export class BrandService {
       const count = response.data.hits.total.value;
       return count;
     } catch (error) {
-      console.error('Error retrieving brand view count:', error.message);
+      console.error("Error retrieving brand view count:", error.message);
       // Handle error as needed
       return 0;
     }
@@ -313,7 +336,7 @@ export class BrandService {
       brand.name = `${updateBrandInput.name_fa} (${updateBrandInput.name_en})`;
     } else if (updateBrandInput.name_fa) {
       brand.name = updateBrandInput.name_fa;
-    } 
+    }
     if (!brand) {
       throw new NotFoundException();
     }
@@ -324,7 +347,6 @@ export class BrandService {
     if (keyExists) {
       await this.cacheManager.del(cacheKey);
     }
-    
 
     if (updateBrandInput.logoFileUuid) {
       // const file = await this.fileService.getNewlyUploadedFileOrFail(
@@ -336,16 +358,14 @@ export class BrandService {
       //     args: { uuid: updateBrandInput.logoFileUuid },
       //   }),
       // );
-      const file = await  File.findOneBy({
-        uuid : updateBrandInput.logoFileUuid
-      })
+      const file = await File.findOneBy({
+        uuid: updateBrandInput.logoFileUuid,
+      });
 
       delete updateBrandInput.logoFileUuid;
       if (file) {
         brand.logoFile = Promise.resolve(file);
       }
-
-   
     }
 
     await brand.save();
@@ -353,29 +373,27 @@ export class BrandService {
   }
 
   async remove(id: number): Promise<Brand> {
-    const brand: Brand = await Brand.findOneBy({id});
+    const brand: Brand = await Brand.findOneBy({ id });
     await brand.remove();
     brand.id = id;
     return brand;
   }
 
-  async removeBrandFile(id: number,fileId:number): Promise<Brand> {
-    const brand: Brand = await Brand.findOneBy({id});
+  async removeBrandFile(id: number, fileId: number): Promise<Brand> {
+    const brand: Brand = await Brand.findOneBy({ id });
     const bannerFile = await brand.bannerFile;
     const logoFile = await brand.logoFile;
     const bannerDesktop = await brand.bannerDesktop;
 
     if (bannerFile?.id === fileId) {
-        brand.bannerFile = null;
+      brand.bannerFile = null;
     }
     if (bannerDesktop?.id === fileId) {
       brand.bannerDesktop = null;
-    }
-    else if (logoFile?.id === fileId) {
-        brand.logoFile = null;
-    }
-    else {
-        throw new Error(`File with id ${fileId} not found in the brand's files`);
+    } else if (logoFile?.id === fileId) {
+      brand.logoFile = null;
+    } else {
+      throw new Error(`File with id ${fileId} not found in the brand's files`);
     }
     await brand.save();
     return brand;
@@ -404,7 +422,7 @@ export class BrandService {
       .getMany();
   }
   async getOfferLength(id): Promise<number> {
-    const products = await Product.findBy({ brandId :id});
+    const products = await Product.findBy({ brandId: id });
     return products.length;
   }
 }
