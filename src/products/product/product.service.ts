@@ -171,7 +171,7 @@ export class ProductService {
         .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
       parsedData.prices = [];
-      return parsedData;
+      // return parsedData;
     }
 
     const {
@@ -285,7 +285,7 @@ export class ProductService {
         CacheTTL.THREE_HOURS,
       );
     }
-
+    console.log('result',result)
     return result;
   }
   async getUoms(uomResultIds: number[]) {
