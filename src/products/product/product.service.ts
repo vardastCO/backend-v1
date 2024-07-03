@@ -784,7 +784,6 @@ export class ProductService {
         });
      
       if (result) {
-          result.discount = Promise.all([])
           const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
           const modifiedDataWithOutText = JSON.parse(jsonString);
@@ -895,7 +894,6 @@ export class ProductService {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
         const parsedData: Price = JSON.parse(decompressedData);
         if (parsedData) {
-          parsedData.discount = Promise.all([])
           parsedData.createdAt = new Date(parsedData.createdAt);
         }
         // return parsedData;
@@ -910,7 +908,6 @@ export class ProductService {
         });
      
       if (result) {
-          result.discount = Promise.all([])
           const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
           const modifiedDataWithOutText = JSON.parse(jsonString);
