@@ -259,7 +259,7 @@ export class ProductService {
       this.getImages(productIds),
       this.getPrices(productIds),
     ]);
-    console.log('category',categories)
+    console.log('category',categories[0])
      products.map(product => {
       return {
         ...product,
