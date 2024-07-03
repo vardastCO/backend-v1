@@ -371,6 +371,7 @@ export class ProductService {
   
     views.push({ timestamp: new Date().toISOString() });
   
+    
     await this.cacheManager.set(viewsKey, views);
   }
   
