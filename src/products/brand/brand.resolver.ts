@@ -74,17 +74,7 @@ export class BrandResolver {
     @Context() context: any,
   ): Promise<Brand> {
 
-  // Extract user phone number from context.user if available
-  const userPhone = context.user ? context.user.phone : null;
-
-  // Create the payload with IP and phone if available
-  const payload : PayloadDto = {
-    ip: context.req.headers['x-real-ip'],
-    clientIp: context.req.connection.remoteAddress,
-    phone: userPhone,
-    timestamp: new Date().toISOString(),
-  };
-    return this.brandService.findOne(id,payload);
+    return this.brandService.findOne(id);
   }
   @Permission("gql.products.brand.update")
   @Mutation(() => Brand)

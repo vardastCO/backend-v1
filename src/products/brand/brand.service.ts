@@ -109,10 +109,7 @@ export class BrandService {
     const cachedData = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedData && !admin) {
-      // cachedData.data.forEach(category => {
-      //   category.createdAt = new Date(category.createdAt);
-      //   category.updatedAt = new Date(category.updatedAt);
-      // })
+
       const decompressedData = zlib
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
@@ -172,7 +169,7 @@ export class BrandService {
       take,
       where: whereConditions,
       order: {
-        rating: "DESC",
+        sum: "DESC",
       },
     });
 
@@ -215,9 +212,8 @@ export class BrandService {
     info.views = info.views + 1 ?? 1;
     await info.save();
   }
-  async findOne(id: number, payload?: PayloadDto): Promise<Brand> {
+  async findOne(id: number): Promise<Brand> {
     try {
-      // this.logBrandView(id,payload);
       const cacheKey = `brand_${JSON.stringify(id)}`;
 
       const cachedData = await this.cacheManager.get<string>(cacheKey);
@@ -263,13 +259,6 @@ export class BrandService {
         brand.priceList = priceList;
         brand.catalog = catalog;
         brand.bannerFile = bannerFile;
-        // ==
-        //         const jsonString = JSON.stringify(brandsql).replace(/__logoFile__/g, 'logoFile')
-        //         .replace(/__bannerFile__/g, 'bannerFile')
-        //         .replace(/__catalog__/g, 'catalog')
-        //         .replace(/__bannerDesktop__/g, 'bannerDesktop')
-        //         .replace(/__priceList__/g, 'priceList')
-        // const modifiedDataWithOutText = JSON.parse(jsonString);
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
         await this.cacheManager.set(
           cacheKey,
