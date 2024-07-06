@@ -7,12 +7,13 @@ import { User } from 'src/users/user/entities/user.entity';
 import { CreatePreOrderInput } from './dto/create-pre-order.input';
 import { IndexPreOrderInput } from './dto/index-preOrder.input';
 import { PaginationPreOrderResponse } from './dto/pagination-preOrder.responde';
-import { PreOrderDTO } from './dto/preOrderDTO';
+import { PreOrderDTO, PublicPreOrderDTO } from './dto/preOrderDTO';
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
 import { PreOrderService } from './pre-order.service';
 import { IsRealUserType } from "src/users/auth/decorators/current-type.decorator";
 import { PaymentResponse } from "./dto/payment.responde";
+import { IndexPublicOrderInput } from "./dto/index-public-order.input";
 
 
 @Resolver(() => Boolean)
@@ -99,6 +100,14 @@ export class PreOrderResolver {
       seller = true
     }
     return this.preOrderService.paginate(currentUser, indexPreOrderInput,client,seller,isRealUserType);
+  }
+  @Public()
+  @Query(() => [PublicPreOrderDTO], { name: "publicOrders" })
+  publicOrders(
+    @Args("indexPublicOrderInput", { nullable: true },new ValidationPipe({ transform: true }),)
+    indexPublicOrderInput?: IndexPublicOrderInput,
+  ) {
+    return this.preOrderService.publicOrders(indexPublicOrderInput);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Boolean)

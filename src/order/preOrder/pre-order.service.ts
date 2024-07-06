@@ -22,6 +22,9 @@ import { Project } from "src/users/project/entities/project.entity";
 import { TypeProject } from "src/users/project/enums/type-project.enum";
 import { UserProject } from "src/users/project/entities/user-project.entity";
 import { PaymentResponse } from "./dto/payment.responde";
+import { IndexPublicOrderInput } from "./dto/index-public-order.input";
+import { OrderDTO, PublicPreOrderDTO } from "./dto/preOrderDTO";
+import { Category } from "src/base/taxonomy/category/entities/category.entity";
 
 @Injectable()
 export class PreOrderService {
@@ -361,7 +364,40 @@ export class PreOrderService {
     }
   
   }
-   
+  async publicOrders(indexPublicOrderInput: IndexPublicOrderInput): Promise<PublicPreOrderDTO[]> {
+
+    const categories = await Category.find({
+      select: ['title', 'id'],
+      where: { parentCategory: null },
+    });
+  
+    const publicPreOrderDTOs: PublicPreOrderDTO[] = [];
+  
+    for (const category of categories) {
+
+      const orders = await PreOrder.find({
+        where: { categoryId: category.id },
+        take: 2, 
+        relations: ['lines'], 
+      });
+  
+      const orderDTOs: OrderDTO[] = await Promise.all(
+        orders.map(async (order) => ({
+          id: order.id,
+          need_date: order.need_date,
+          lines: Promise.resolve(order.lines) 
+        }))
+      );
+  
+      publicPreOrderDTOs.push({
+        categoryName: category.title,
+        orders: orderDTOs,
+        categoryId: category.id,
+      });
+    }
+  
+    return publicPreOrderDTOs;
+  }
   async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean, seller: boolean, isRealUserType: boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
     const { take, skip, projectId, customerName, hasFile, projectName, status } = indexPreOrderInput || {};
