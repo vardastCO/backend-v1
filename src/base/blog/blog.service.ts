@@ -25,25 +25,36 @@ export class BlogService {
       const cachedData = await this.cacheManager.get<string>(
         cacheKey,
       );
-
+      let posts 
       if (cachedData) {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
         const parsedData: PaginationBlogResponse = JSON.parse(decompressedData);
         return parsedData;
       }
+      if (indexBlogInput.categoryId) {
+        const categoriesParam = this.getCategoryMapping(indexBlogInput.categoryId);
+        console.log('dddddd',categoriesParam)
+        const [response_1] = await Promise.all([
+          axios.get(`https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=${categoriesParam}`),
+        ]);
+    
+        posts = [
+          ...(response_1.data?.slice(0, 1) || []),
+        ];
+      } else {
+        const [response_1, response_2, response_3] = await Promise.all([
+          axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=4'),
+          axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=3&_embed&categories=24'),
+          axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=5')
+        ]);
+    
+        posts = [
+          ...(response_1.data?.slice(0, 1) || []),
+          ...(response_2.data?.slice(0, 3) || []),
+          ...(response_3.data?.slice(0, 1) || [])
+        ];
+      }
 
-      const [response_1, response_2, response_3] = await Promise.all([
-        axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=4'),
-        axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=3&_embed&categories=24'),
-        axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=5')
-      ]);
-  
-      const posts = [
-        ...(response_1.data?.slice(0, 1) || []),
-        ...(response_2.data?.slice(0, 3) || []),
-        ...(response_3.data?.slice(0, 1) || [])
-      ];
-  
       const sortedPosts = posts.sort((a, b) => {
         const modifiedDataA = new Date(a.date);
         const modifiedDataB = new Date(b.date);
@@ -79,10 +90,6 @@ export class BlogService {
         }),
       );
   
-
-      // Use createdBlogs directly for pagination
-      // const startIndex = (indexBlogInput.page - 1) * indexBlogInput.perPage;
-      // const endIndex = startIndex + indexBlogInput.perPage;
       const paginatedBlogs = createdBlogs.slice(0, 5);
 
       const result: PaginationBlogResponse = PaginationBlogResponse.make(
@@ -99,6 +106,28 @@ export class BlogService {
     } catch (e) {
       console.log("err in blogs", e);
     }
+  }
+
+  getCategoryMapping(categoryId) {
+ 
+    const mapping = {
+        139: 15,
+        134: 16,
+        106: 8,
+        96: 7,
+        61: 9,
+        69: 10,
+        805: 12,
+        102: 11,
+        117: 14,
+        373: 18,
+        394: 13,
+        1005: 19,
+        1: 6,
+        789: 17,
+    };
+    
+    return mapping[categoryId] || categoryId;
   }
 
   async createBlog(
