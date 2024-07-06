@@ -129,13 +129,22 @@ export class OrderFileController {
               const tehranTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
               const currentDate = new Date(tehranTime);
               
-              const currentMonth = currentDate.getMonth() + 1;
-              const shamsiMonthString = currentMonth.toString();
+              // Convert the date to Persian date format
+              const persianDate = currentDate.toLocaleDateString('fa-IR');
+              
+              // Split the Persian date string to extract year, month, and day
+              const [persianYear, persianMonth, persianDay] = persianDate.split('/');
+              
+              // Get the month number (already in Persian calendar format)
+              const persianMonthNumber = parseInt(persianMonth, 10);
+              
+              // Use the month number as needed
+              const shamsiMonthString = persianMonthNumber.toString();
               const valueString = values[0].toString();
-
+              
               const concatenatedString = '3' + shamsiMonthString + valueString;
               pre_order.uuid = concatenatedString;
-              await pre_order.save()
+              await pre_order.save();
           }
   
           return;
