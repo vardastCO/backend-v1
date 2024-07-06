@@ -931,11 +931,11 @@ export class ProductService {
           const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
           await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
         }
-        console.log('result',result)
+
         return result || null
         
       } catch (e) {
-        console.log('eeeeeeeeeeee',e)
+        console.log('err in price api',e)
       }
       
   }
