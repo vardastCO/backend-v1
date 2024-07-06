@@ -330,7 +330,7 @@ export class PreOrderService {
             }
           }),
           OfferOrder.find({ 
-            where: { preOrderId: order.id,type:TypeOrderOffer.CLIENT },
+            where: { preOrderId: order.id,type:TypeOrderOffer.CLIENT, total: Not('0') },
             relations: ["offerLine"],
             order: {
               offerLine: {
