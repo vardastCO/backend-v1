@@ -33,13 +33,12 @@ export class BlogService {
       }
       if (indexBlogInput.categoryId) {
         const categoriesParam = this.getCategoryMapping(indexBlogInput.categoryId);
-        console.log('dddddd',categoriesParam)
         const [response_1] = await Promise.all([
-          axios.get(`https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=${categoriesParam}`),
+          axios.get(`https://blog.vardast.com/wp-json/wp/v2/posts?per_page=5&_embed&categories=${categoriesParam}`),
         ]);
     
         posts = [
-          ...(response_1.data?.slice(0, 1) || []),
+          ...(response_1.data?.slice(0, 5) || []),
         ];
       } else {
         const [response_1, response_2, response_3] = await Promise.all([
