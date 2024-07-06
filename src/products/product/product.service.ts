@@ -146,7 +146,47 @@ export class ProductService {
 
     return await queryBuilder.getMany();
   }
+  async getAllCategoryIds(categoryIds: number[]): Promise<number[]> {
+    const cacheKey = `categoryIds_child_${JSON.stringify(categoryIds)}`;
+    
+    const cachedCategoryIds = await this.cacheManager.get<number[]>(cacheKey);
+    if (cachedCategoryIds) {
+      return cachedCategoryIds;
+    }
+  
+    const allCategoryIds: Set<number> = new Set(categoryIds);
+  
+    const fetchDescendants = async (categoryId: number) => {
+      const childCategories = await Category.find({
+        select: ['id'],
+        where: { parentCategoryId: categoryId },
+      });
+      
+      const childCategoryIds = childCategories.map(child => child.id);
+  
+      // Add new category IDs to the set
+      childCategoryIds.forEach(id => {
+        if (!allCategoryIds.has(id)) {
+          allCategoryIds.add(id);
+        }
+      });
 
+      return Promise.all(
+        childCategoryIds.map(id => fetchDescendants(id))
+      );
+    };
+  
+    await Promise.all(categoryIds.map(id => fetchDescendants(id)));
+  
+    const result = Array.from(allCategoryIds);
+  
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); 
+    
+    return result;
+  }
+  
+  
+  
   async paginate(
     indexProductInput?: IndexProductInput,
     user?: User,
@@ -200,7 +240,8 @@ export class ProductService {
     whereConditions.deletedAt = IsNull();
 
     if (categoryIds && categoryIds.length > 0) {
-      whereConditions.categoryId = In(categoryIds);
+      const allCategoryIds = await this.getAllCategoryIds(categoryIds);
+      whereConditions.categoryId = In(allCategoryIds);
     }
 
     if (sellerId) {
