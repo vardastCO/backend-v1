@@ -385,6 +385,7 @@ export class PreOrderService {
       const orderDTOs: PreOrderDTO[] = await Promise.all(
         orders.map(async (order) => ({
           id: order.id,
+          uuid : order.uuid,
           need_date: order.need_date,
           lines: Promise.resolve(order.lines) 
         }))
