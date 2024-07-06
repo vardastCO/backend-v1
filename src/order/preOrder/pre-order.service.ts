@@ -23,8 +23,9 @@ import { TypeProject } from "src/users/project/enums/type-project.enum";
 import { UserProject } from "src/users/project/entities/user-project.entity";
 import { PaymentResponse } from "./dto/payment.responde";
 import { IndexPublicOrderInput } from "./dto/index-public-order.input";
-import { OrderDTO, PublicPreOrderDTO } from "./dto/preOrderDTO";
 import { Category } from "src/base/taxonomy/category/entities/category.entity";
+import { PublicPreOrderDTO } from "./dto/publicPreOrderDTO";
+import { PreOrderDTO } from "./dto/preOrderDTO";
 
 @Injectable()
 export class PreOrderService {
@@ -381,7 +382,7 @@ export class PreOrderService {
         relations: ['lines'], 
       });
   
-      const orderDTOs: OrderDTO[] = await Promise.all(
+      const orderDTOs: PreOrderDTO[] = await Promise.all(
         orders.map(async (order) => ({
           id: order.id,
           need_date: order.need_date,
