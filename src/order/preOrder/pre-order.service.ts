@@ -366,11 +366,32 @@ export class PreOrderService {
   
   }
   async publicOrders(indexPublicOrderInput: IndexPublicOrderInput): Promise<PublicPreOrderDTO[]> {
+    const { categoryId } = indexPublicOrderInput;
 
-    const categories = await Category.find({
-      select: ['title', 'id'],
-      where: { parentCategory: IsNull() },
-    });
+    let categories;
+    if (categoryId) {
+
+      const category = await Category.findOne({
+        select: ['title', 'id'],
+        where: { id: categoryId },
+      });
+  
+      if (!category) {
+        throw new Error(`Category with ID ${categoryId} not found.`);
+      }
+  
+      categories = [category];
+    } else {
+
+      categories = await Category.find({
+        select: ['title', 'id'],
+        where: { parentCategory: IsNull() },
+      });
+    }
+    // const categories = await Category.find({
+    //   select: ['title', 'id'],
+    //   where: { parentCategory: IsNull() },
+    // });
   
     const publicPreOrderDTOs: PublicPreOrderDTO[] = [];
   
