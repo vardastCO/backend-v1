@@ -123,6 +123,19 @@ export class OrderFileController {
               line.qty = values[12];       // مقدار
               line.uom = values[13];       // واحد
               await line.save();
+              const pre_order = await PreOrder.findOneBy({
+                id:parseInt(id)
+              })
+              const tehranTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
+              const currentDate = new Date(tehranTime);
+              
+              const currentMonth = currentDate.getMonth() + 1;
+              const shamsiMonthString = currentMonth.toString();
+              const valueString = values[0].toString();
+
+              const concatenatedString = '3' + shamsiMonthString + valueString;
+              pre_order.uuid = concatenatedString;
+              await pre_order.save()
           }
   
           return;
