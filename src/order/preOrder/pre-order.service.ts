@@ -369,7 +369,7 @@ export class PreOrderService {
 
     const categories = await Category.find({
       select: ['title', 'id'],
-      where: { parentCategory: null },
+      where: { parentCategory: IsNull() },
     });
   
     const publicPreOrderDTOs: PublicPreOrderDTO[] = [];

@@ -16,11 +16,6 @@ import { UpdateOrderOfferInput } from './dto/update-order-offer.input';
 import { PaginationOrderOfferResponse } from './dto/pagination-order-offer.responde';
 import { IndexPreOrderOfferInput } from './dto/index-preOrder-offer.input';
 
-interface PriceOfferDto {
-  fi_price: string;
-  tax_price: string;
-  total_price: string;
-}
 
 @Resolver(() => Boolean)
 export class OrderOfferResolver {
