@@ -7,13 +7,13 @@ import { User } from 'src/users/user/entities/user.entity';
 import { CreatePreOrderInput } from './dto/create-pre-order.input';
 import { IndexPreOrderInput } from './dto/index-preOrder.input';
 import { PaginationPreOrderResponse } from './dto/pagination-preOrder.responde';
-import { PreOrderDTO, PublicPreOrderDTO } from './dto/preOrderDTO';
 import { UpdatePreOrderInput } from './dto/update-pre-order.input';
 import { PreOrder } from './entities/pre-order.entity';
 import { PreOrderService } from './pre-order.service';
 import { IsRealUserType } from "src/users/auth/decorators/current-type.decorator";
 import { PaymentResponse } from "./dto/payment.responde";
 import { IndexPublicOrderInput } from "./dto/index-public-order.input";
+import { PublicPreOrderDTO } from "./dto/publicPreOrderDTO";
 
 
 @Resolver(() => Boolean)
