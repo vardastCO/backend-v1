@@ -914,13 +914,13 @@ export class ProductService {
           order: {
               createdAt: "DESC"
           },
-          select: [
-              "id", 
-              "type", 
-              "amount", 
-              "isPublic", 
-              "discount"
-          ]
+          // select: [
+          //     "id", 
+          //     "type", 
+          //     "amount", 
+          //     "isPublic", 
+          //     "discount"
+          // ]
       });
   
       if (result) {
