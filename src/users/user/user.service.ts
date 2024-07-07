@@ -324,21 +324,21 @@ export class UserService {
   }
 
   async getCountry(user: User): Promise<Country> {
-    // const cacheKey = `getCountry`;
-    // const cachedData = await this.cacheManager.get<string>(
-    //   cacheKey,
-    // );
-    // if (cachedData) {
+    const cacheKey = `getCountry`;
+    const cachedData = await this.cacheManager.get<string>(
+      cacheKey,
+    );
+    if (cachedData) {
 
-    //   return this.decompressionService.decompressData(cachedData)
-    // }
-    return this.countryService.findOne(user.countryId);;
-    // await this.cacheManager.set(
-    //   cacheKey,
-    //   this.compressionService.compressData(roleNames),
-    //   CacheTTL.ONE_DAY,
-    // );
-    // return roleNames;
+      return this.decompressionService.decompressData(cachedData)
+    }
+    const result =  this.countryService.findOne(user.countryId);;
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(result),
+      CacheTTL.ONE_DAY,
+    );
+    return result;
 
   }
 
@@ -393,14 +393,25 @@ export class UserService {
   
 
   async getSellerRecordOf(user: User): Promise<Seller> {
-    return await Seller.createQueryBuilder()
-      .where(
-        'id = (select "sellerId" from product_seller_representatives where "userId" = :userId and role = :role order by id asc limit 1)',
-        {
-          userId: user.id,
-          role: SellerRepresentativeRoles.ADMIN,
-        },
-      )
-      .getOne();
+    const cacheKey = `seller_${user.id}_${SellerRepresentativeRoles.ADMIN}`;
+    let seller = await this.cacheManager.get<Seller>(cacheKey);
+
+    if (!seller) {
+      seller = await Seller.createQueryBuilder()
+        .where(
+          'id = (select "sellerId" from product_seller_representatives where "userId" = :userId and role = :role order by id asc limit 1)',
+          {
+            userId: user.id,
+            role: SellerRepresentativeRoles.ADMIN,
+          },
+        )
+        .getOne();
+
+      if (seller) {
+        await this.cacheManager.set(cacheKey, seller, CacheTTL.ONE_DAY);
+      }
+    }
+
+    return seller;
   }
 }
