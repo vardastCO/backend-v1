@@ -394,6 +394,7 @@ export class PreOrderService {
     for (const category of categories) {
 
       const orders = await PreOrder.find({
+        select:['id','uuid','request_date','need_date','bid_start','bid_end','lines','categoryId','category'],
         where: { categoryId: category.id },
         take: 2, 
         relations: ['lines'], 
