@@ -35,6 +35,7 @@ import { Seller } from "../seller/entities/seller.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { IndexOffersPrice } from "./dto/index-price-offers.input";
 import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
+import { PriceTypesEnum } from "../price/enums/price-types.enum";
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -279,20 +280,13 @@ export class ProductResolver {
   
   @ResolveField(() => Price)
   highestPrice(@Parent() product: Product) {
-    return { 'amount'
-      : 
-      627000,
-      'discount'
-      : 
-      null,
-      'id'
-      : 
-      1045505,
-      'isPublic'
-      : 
-      true,
-      'type': 
-      "CONSUMER"}
+    return {
+      'amount': 627000,
+      'discount' : null,
+      'id': 1045505,
+      'isPublic':  true,
+      'type': PriceTypesEnum.CONSUMER
+    }
     return this.productService.getHighestPriceOf(product);
   }
 }
