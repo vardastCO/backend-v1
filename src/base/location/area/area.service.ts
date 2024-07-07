@@ -14,7 +14,7 @@ import { Cache } from "cache-manager";
 export class AreaService {
   constructor(
     @InjectRepository(Area)
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private areaRepository: Repository<Area>,
   ) {}
 
@@ -27,17 +27,17 @@ export class AreaService {
     
     const cacheKey = `find-all-area-${cityId}-${take}-${skip}`;
 
-    const cachedResult = await this.cacheManager.get<any[]>(cacheKey);
-    if (cachedResult) {
-      return cachedResult;
-    }
+    // const cachedResult = await this.cacheManager.get<any[]>(cacheKey);
+    // if (cachedResult) {
+    //   return cachedResult;
+    // }
     const result = await this.areaRepository.find({
       take,
       skip,
       where: { cityId },
     });
 
-    await this.cacheManager.set(cacheKey, result,CacheTTL.TWO_WEEK); 
+    // await this.cacheManager.set(cacheKey, result,CacheTTL.TWO_WEEK); 
 
     return result;
   }
@@ -88,16 +88,16 @@ export class AreaService {
     const { cityId } = indexAreaInput || {};
     const cacheKey = `count-${cityId}-city-id`;
 
-    const cachedCount = await this.cacheManager.get<number>(cacheKey);
-    if (cachedCount !== undefined) {
-      return cachedCount;
-    }
+    // const cachedCount = await this.cacheManager.get<number>(cacheKey);
+    // if (cachedCount !== undefined) {
+    //   return cachedCount;
+    // }
 
     const count = await this.areaRepository.count({
       where: { cityId },
     });
 
-    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+    // await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
 
     return count;
   }
