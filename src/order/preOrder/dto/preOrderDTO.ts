@@ -9,8 +9,17 @@ export class PreOrderDTO {
   @Field(() => String)
   uuid: string;
 
+  @Field(() => String,{nullable: true})
+  destination: string;
+
   @Field(() => Date,{nullable: true})
   need_date?: Date;
+
+  @Field(() => Date,{nullable: true})
+  bid_start?: Date;
+
+  @Field(() => Date,{nullable: true})
+  bid_end?: Date;
 
   @Field(() => [Line], { nullable: true })
   lines: Promise<Line[]>;
