@@ -475,7 +475,15 @@ export class CategoryService {
   }
 
   async count(indexCategoryInput: IndexCategoryInput): Promise<number> {
-    return await this.categoryRepository.count({ where: indexCategoryInput });
+    const cacheKey = `category-count-${JSON.stringify(indexCategoryInput)}`;
+    let count = await this.cacheManager.get<number>(cacheKey);
+
+    if (count === undefined) {
+      count = await this.categoryRepository.count({ where: indexCategoryInput });
+      await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK);
+    }
+
+    return count;
   }
 
   async getParentCategoryOf(category: Category): Promise<Category> {
