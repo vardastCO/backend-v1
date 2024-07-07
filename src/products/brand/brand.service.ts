@@ -257,7 +257,7 @@ export class BrandService {
             this.fetchFile(brand.bannerDesktopId),
             this.fetchFile(brand.priceListId),
             this.fetchFile(brand.catalogId),
-            this.fetchFile(brand.logofileId),
+            this.fetchFile(brand.logoFileId),
             this.fetchFile(brand.bannerFileId),
             this.incrementBrandViews(brand),
           ]);
@@ -272,7 +272,6 @@ export class BrandService {
           compressedData,
           CacheTTL.ONE_WEEK,
         );
-        console.log('brand',brand)
         return brand;
       } catch (e) {
         console.log('err in find one brand ',e)
