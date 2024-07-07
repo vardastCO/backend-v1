@@ -129,13 +129,13 @@ export class BrandService {
       case SortBrandEnum.RATING:
         order['rating'] = "DESC";
         break;
+      case SortBrandEnum.VIEW:
+          order['views'] = "DESC";
+          break;
       default:
         order['sum'] = "DESC";
         break;
     }
-    // order.bannerDesktop = {
-    //   id: "DESC"
-    // };
 
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
@@ -283,7 +283,6 @@ export class BrandService {
     }
   }
   async fetchFile(id) {
-    console.log('id',id)
     return await File.findOneBy({ id });
   }
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
