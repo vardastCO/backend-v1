@@ -19,6 +19,7 @@ export class ProvinceService {
   }
 
   async findAll(indexProvinceInput?: IndexProvinceInput): Promise<Province[]> {
+    
     const { take, skip, countryId } = indexProvinceInput || {};
     return await this.provinceRepository.find({
       skip,

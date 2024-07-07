@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateAreaInput } from "./dto/create-area.input";
@@ -6,11 +6,15 @@ import { IndexAreaInput } from "./dto/index-area.input";
 import { PaginationAreaResponse } from "./dto/pagination-area.response";
 import { UpdateAreaInput } from "./dto/update-area.input";
 import { Area } from "./entities/area.entity";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class AreaService {
   constructor(
     @InjectRepository(Area)
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private areaRepository: Repository<Area>,
   ) {}
 
@@ -20,11 +24,22 @@ export class AreaService {
 
   async findAll(indexAreaInput?: IndexAreaInput): Promise<Area[]> {
     const { take, skip, cityId } = indexAreaInput || {};
-    return await this.areaRepository.find({
+    
+    const cacheKey = `find-all-area-${cityId}-${take}-${skip}`;
+
+    const cachedResult = await this.cacheManager.get<any[]>(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
+    const result = await this.areaRepository.find({
       take,
       skip,
       where: { cityId },
     });
+
+    await this.cacheManager.set(cacheKey, result,CacheTTL.TWO_WEEK); 
+
+    return result;
   }
 
   async paginate(
@@ -71,8 +86,19 @@ export class AreaService {
 
   async count(indexAreaInput?: IndexAreaInput): Promise<number> {
     const { cityId } = indexAreaInput || {};
-    return await this.areaRepository.count({
+    const cacheKey = `count-${cityId}-city-id`;
+
+    const cachedCount = await this.cacheManager.get<number>(cacheKey);
+    if (cachedCount !== undefined) {
+      return cachedCount;
+    }
+
+    const count = await this.areaRepository.count({
       where: { cityId },
     });
+
+    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+
+    return count;
   }
 }
