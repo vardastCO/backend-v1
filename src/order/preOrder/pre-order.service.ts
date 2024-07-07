@@ -388,10 +388,6 @@ export class PreOrderService {
         where: { parentCategory: IsNull() },
       });
     }
-    // const categories = await Category.find({
-    //   select: ['title', 'id'],
-    //   where: { parentCategory: IsNull() },
-    // });
   
     const publicPreOrderDTOs: PublicPreOrderDTO[] = [];
   
@@ -402,21 +398,22 @@ export class PreOrderService {
         take: 2, 
         relations: ['lines'], 
       });
+      if (orders.length >= 2) {
+        const orderDTOs: PreOrderDTO[] = await Promise.all(
+          orders.map(async (order) => ({
+            id: order.id,
+            uuid: order.uuid,
+            need_date: order.need_date,
+            lines: Promise.resolve(order.lines)
+          }))
+        );
   
-      const orderDTOs: PreOrderDTO[] = await Promise.all(
-        orders.map(async (order) => ({
-          id: order.id,
-          uuid : order.uuid,
-          need_date: order.need_date,
-          lines: Promise.resolve(order.lines) 
-        }))
-      );
-  
-      publicPreOrderDTOs.push({
-        categoryName: category.title,
-        orders: orderDTOs,
-        categoryId: category.id,
-      });
+        publicPreOrderDTOs.push({
+          categoryName: category.title,
+          orders: orderDTOs,
+          categoryId: category.id,
+        });
+      }
     }
   
     return publicPreOrderDTOs;
