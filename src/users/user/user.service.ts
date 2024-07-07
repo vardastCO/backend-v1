@@ -330,7 +330,7 @@ export class UserService {
     );
     if (cachedData) {
 
-      return this.decompressionService.decompressData(cachedData)
+      // return this.decompressionService.decompressData(cachedData)
     }
     const result =  this.countryService.findOne(user.countryId);;
     await this.cacheManager.set(
