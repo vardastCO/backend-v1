@@ -279,7 +279,20 @@ export class ProductResolver {
   
   @ResolveField(() => Price)
   highestPrice(@Parent() product: Product) {
-    return null
+    return { 'amount'
+      : 
+      627000,
+      'discount'
+      : 
+      null,
+      'id'
+      : 
+      1045505,
+      'isPublic'
+      : 
+      true,
+      'type': 
+      "CONSUMER"}
     return this.productService.getHighestPriceOf(product);
   }
 }
