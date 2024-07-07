@@ -285,7 +285,8 @@ export class ProductResolver {
       'discount' : null,
       'id': 1045505,
       'isPublic':  true,
-      'type': PriceTypesEnum.CONSUMER
+      'type': PriceTypesEnum.CONSUMER,
+      'createdAt' :"2024-07-01T21:56:02.590Z"
     }
     return this.productService.getHighestPriceOf(product);
   }
