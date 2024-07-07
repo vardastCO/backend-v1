@@ -324,21 +324,21 @@ export class UserService {
   }
 
   async getCountry(user: User): Promise<Country> {
-    const cacheKey = `getCountry`;
-    const cachedData = await this.cacheManager.get<string>(
-      cacheKey,
-    );
-    if (cachedData) {
+    // const cacheKey = `getCountry`;
+    // const cachedData = await this.cacheManager.get<string>(
+    //   cacheKey,
+    // );
+    // if (cachedData) {
 
-      return this.decompressionService.decompressData(cachedData)
-    }
-    const roleNames = this.countryService.findOne(user.countryId);;
-    await this.cacheManager.set(
-      cacheKey,
-      this.compressionService.compressData(roleNames),
-      CacheTTL.ONE_DAY,
-    );
-    return roleNames;
+    //   return this.decompressionService.decompressData(cachedData)
+    // }
+    return this.countryService.findOne(user.countryId);;
+    // await this.cacheManager.set(
+    //   cacheKey,
+    //   this.compressionService.compressData(roleNames),
+    //   CacheTTL.ONE_DAY,
+    // );
+    // return roleNames;
 
   }
 
