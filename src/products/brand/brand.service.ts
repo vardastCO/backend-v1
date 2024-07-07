@@ -235,7 +235,7 @@ export class BrandService {
           this.processFile(parsedData.bannerDesktop),
           this.incrementBrandViews(parsedData),
         ]);
-
+        console.log('pares',parsedData)
         return parsedData;
       }
       const query = `
@@ -269,12 +269,14 @@ export class BrandService {
           compressedData,
           CacheTTL.ONE_WEEK,
         );
+        console.log('brand',brand)
+        return brand;
       } catch (e) {
         console.log('err in find one brand ',e)
       }
-      return brand;
+
     } catch (e) {
-      throw e;
+      console.log('err in find one brand out',e)
     }
   }
   async fetchFile(id) {
