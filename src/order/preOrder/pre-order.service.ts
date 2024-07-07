@@ -484,10 +484,14 @@ export class PreOrderService {
       },
     });
     if (client) {
-      data.map(async (line) => {
-        (await line.user).fullName = 'کارشناس وردست'
-        return line
-      })
+        await Promise.all(
+        data.map(async (pre_order) => {
+          pre_order.lineDetail = (await pre_order.lines).map((line) => line.item_name + ' - ').join('');
+          const user = await pre_order.user;
+          user.fullName = 'کارشناس وردست';
+          return pre_order;
+        })
+      );
     }
     return PaginationPreOrderResponse.make(indexPreOrderInput, total, data);
   }

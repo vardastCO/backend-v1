@@ -137,6 +137,10 @@ export class PreOrder extends BaseEntity {
   @OneToMany(() => Line, line => line.preOrder) 
   lines: Promise<Line[]>;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true})
+  lineDetail?: string;
+
   @Field(() => [PreOrderFile], { nullable: "items" })
   @OneToMany(() => PreOrderFile, file => file.preOrder) 
   files: Promise<PreOrderFile[]>;
