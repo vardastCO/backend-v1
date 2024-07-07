@@ -411,24 +411,44 @@ export class SellerService {
   }
 
   async getContactInfosOf(seller: Seller): Promise<ContactInfo[]> {
-    return []
-    // return ContactInfo.createQueryBuilder()
-    //   .limit(10)
-    //   .where({
-    //     relatedType: ContactInfoRelatedTypes.SELLER,
-    //     relatedId: seller.id,
-    //   })
-    //   .orderBy({ sort: "ASC" })
-    //   .getMany();
+    const cacheKey = `contactInfos:${seller.id}`;
+    const cachedData = await this.cacheManager.get(cacheKey);
+
+    if (cachedData) {
+      return cachedData as ContactInfo[];
+    }
+
+    const contactInfos = await ContactInfo.createQueryBuilder()
+      .limit(10)
+      .where({
+        relatedType: ContactInfoRelatedTypes.SELLER,
+        relatedId: seller.id,
+      })
+      .orderBy({ sort: "ASC" })
+      .getMany();
+
+    await this.cacheManager.set(cacheKey, contactInfos,CacheTTL.ONE_WEEK);
+
+    return contactInfos;
   }
 
   async getAddressesOf(seller: Seller): Promise<Address[]> {
-    return []
-    return Address.createQueryBuilder()
+    const cacheKey = `addresses:${seller.id}`;
+    const cachedData = await this.cacheManager.get(cacheKey);
+
+    if (cachedData) {
+      return cachedData as Address[];
+    }
+
+    const addresses = await Address.createQueryBuilder()
       .limit(10)
       .where({ relatedType: Seller.name, relatedId: seller.id })
       .orderBy({ sort: "ASC" })
       .getMany();
+
+    await this.cacheManager.set(cacheKey, addresses,CacheTTL.ONE_WEEK);
+
+    return addresses;
   }
 
   async getBrandsOfSeller(
