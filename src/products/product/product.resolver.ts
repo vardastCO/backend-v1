@@ -279,6 +279,7 @@ export class ProductResolver {
   
   @ResolveField(() => Price)
   highestPrice(@Parent() product: Product) {
+    return {}
     return this.productService.getHighestPriceOf(product);
   }
 }

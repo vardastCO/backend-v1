@@ -287,11 +287,11 @@ export class ProductService {
     const categoryResultId = products.map(product => product.categoryId);
     const uomResultIds = products.map(product => product.uomId);
 
-    const [uoms, categories, images] = await Promise.all([
+    const [uoms, categories, images,prices] = await Promise.all([
       this.getUoms(uomResultIds),
       this.getCategories(categoryResultId),
       this.getImages(productIds),
-      // this.getPrices(productIds),
+      this.getPrices(productIds),
     ]);
 
     const response : any[] = products.map(product => {
@@ -300,7 +300,7 @@ export class ProductService {
         uom: uoms.find(u => u.id === product.uomId),
         category: categories.find(cat => cat.id === product.categoryId),
         images: [images.find(img => img.productId === product.id)] ?? [],
-        // highestPrice: prices.find(p => p.productId === product.id) ,
+        highestPrice: prices.find(p => p.productId === product.id) ,
         // lowestPrice: prices.find(p => p.productId === product.id),
       };
     });
