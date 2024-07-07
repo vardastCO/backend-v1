@@ -853,97 +853,13 @@ export class ProductService {
 
   // }
 
-  // async getMyPriceOf(product: Product, userId: number): Promise<Price | null> {
-  //   const seller = await SellerRepresentative.findOneBy({ userId });
-  //   let price;
-  //   if (seller) {
-  //     price = await Price.findOne({
-  //       where: {
-  //         productId: product.id,
-  //         sellerId: (await seller).sellerId,
-  //       },
-  //       order: {
-  //         id: "DESC",
-  //       },
-  //     });
-  //   }
 
-  //   return price || null;
-  // }
 
-  // async getSameCategory(product: Product): Promise<Product[]> {
-  //   const queryBuilder = Product.createQueryBuilder();
-  //   const result = queryBuilder
-  //     .leftJoin(Image, "images", `images.productId = ${queryBuilder.alias}.id`)
-  //     .addSelect(["COUNT(images.id) AS image_count"])
-  //     .leftJoin(Price, "prices", `prices.productId = ${queryBuilder.alias}.id`)
-  //     .addSelect(["COUNT(prices.id) AS price_count"])
-  //     .groupBy(`${queryBuilder.alias}.id`)
-  //     .addOrderBy(
-  //       "CASE WHEN COUNT(images.id) > 0 AND COUNT(prices.id) > 0 THEN 1 WHEN COUNT(prices.id) > 0 AND COUNT(images.id) = 0 THEN 2 WHEN COUNT(prices.id) = 0 AND COUNT(images.id) > 0 THEN 3 ELSE 4 END",
-  //     )
-  //     .where({ categoryId: product.categoryId })
-  //     .limit(10)
-  //     .getMany();
-
-  //   return result;
-  // }
-
-  // // async getSameCategoryV2(product: Product): Promise<Product[]> {
-  // //   const cacheKey = `product_same_category_${JSON.stringify(
-  // //     product.categoryId,
-  // //   )}`;
-  // //   const cachedData = await this.cacheManager.get<Product[]>(cacheKey);
-
-  // //   if (cachedData) {
-  // //     cachedData.forEach(product => {
-  // //       product.createdAt = new Date(product.createdAt);
-  // //       product.updatedAt = new Date(product.updatedAt);
-  // //     });
-  // //     return cachedData;
-  // //   }
-
-  // //   const query = `
-  // //     SELECT DISTINCT
-  // //     p.*,
-  // //     CASE
-  // //         WHEN i."productId" IS NOT NULL AND pr."productId" IS NOT NULL THEN 1
-  // //         WHEN i."productId" IS NOT NULL THEN 2
-  // //         ELSE 3
-  // //     END AS order_condition
-  // //     FROM
-  // //         products p
-  // //     LEFT JOIN
-  // //         product_images i ON i."productId" = p.id
-  // //     LEFT JOIN
-  // //         product_prices pr ON pr."productId" = p.id
-  // //     WHERE
-  // //         p."categoryId" = $1
-  // //     ORDER BY
-  // //         CASE
-  // //             WHEN i."productId" IS NOT NULL AND pr."productId" IS NOT NULL THEN 1
-  // //             WHEN i."productId" IS NOT NULL THEN 2
-  // //             ELSE 3
-  // //         END
-  // //     LIMIT 5;
-  // //   `;
-  // //   const result = await this.entityManager.query(query, [product.categoryId]);
-  // //   const products = result.map(product => {
-  // //     delete product.order_condition;
-  // //     const p = Product.create<Product>(product);
-  // //     return p;
-  // //   });
-
-  // //   await this.cacheManager.set(cacheKey, products, CacheTTL.ONE_WEEK);
-
-  // //   return products;
-  // // }
 
   async getHighestPriceOf(product: Product){
     try {
       const cacheKey = `product_${product.id}_lowestPrice`;
   
-      // // Try to get the result from cache
       const cachedResult = await this.cacheManager.get<string>(cacheKey);
       if (cachedResult) {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
@@ -957,14 +873,11 @@ export class ProductService {
       const result = await Price.findOne({
           select:['amount','discount','createdAt','id','isPublic','type'],
           where: { productId: IDS, deletedAt: IsNull() },
-          // relations: ["seller"],
           order: {
             createdAt: "DESC"
           },
         });
   
-      
-      
         if (result) {
           const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
@@ -982,39 +895,91 @@ export class ProductService {
   }
   async getLowestPriceOf(product: Product): Promise<Price> {
     try {
-    const cacheKey = `product_${product.id}_lowestPrice`;
-
-    const cachedResult = await this.cacheManager.get<string>(cacheKey);
-    if (cachedResult) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-      const parsedData: Price = JSON.parse(decompressedData);
-      if (parsedData) {
-        parsedData.createdAt = new Date(parsedData.createdAt);
+      const cacheKey = `product_${product.id}_lowestPrice`;
+  
+      const cachedResult = await this.cacheManager.get<string>(cacheKey);
+      if (cachedResult) {
+          const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
+          const parsedData = JSON.parse(decompressedData);
+          if (parsedData) {
+              parsedData.createdAt = new Date(parsedData.createdAt);
+          }
+          return parsedData;
       }
-      return parsedData;
-    }
+  
       const IDS = product.id;
       const result = await Price.findOne({
-        where: { productId: IDS, deletedAt: IsNull() },
-        relations: ["seller"],
-        order: {
-          createdAt: "DESC"
-        },
+          where: { productId: IDS, deletedAt: IsNull() },
+          relations: ["seller", "seller.logoFile", "seller.contacts", "seller.contacts.country"],
+          order: {
+              createdAt: "DESC"
+          },
+          select: [
+              "id", 
+              "type", 
+              "amount", 
+              "isPublic", 
+              "discount"
+          ]
       });
-
+  
       if (result) {
-        const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
-        .replace(/__logoFile__/g, 'logoFile');
-        const modifiedDataWithOutText = JSON.parse(jsonString);
-        const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
-        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
+          // Manually map the nested seller data
+          const resultWithSellerData = {
+              ...result,
+              seller: {
+                  rating: (await result.seller).rating,
+                  id: (await result.seller).id,
+                  name: (await result.seller).name,
+                  logoFile: {
+                      presignedUrl: {
+                          url: (await (await result.seller).logoFile).presignedUrl.url
+                      }
+                  },
+                  contacts:(await result.seller).contacts.map(async contact => ({
+                      id: contact.id,
+                      relatedType: contact.relatedType,
+                      relatedId: contact.relatedId,
+                      title: contact.title,
+                      code: contact.code,
+                      number: contact.number,
+                      ext: contact.ext,
+                      type: contact.type,
+                      sort: contact.sort,
+                      isPublic: contact.isPublic,
+                      status: contact.status,
+                      rejectionReason: contact.rejectionReason,
+                      country: {
+                          id: (await contact.country).id,
+                          name: (await contact.country).name,
+                          nameEn:(await contact.country).nameEn,
+                          slug: (await contact.country).slug,
+                          alphaTwo: (await contact.country).alphaTwo,
+                          iso:(await contact.country).iso,
+                          phonePrefix: (await contact.country).phonePrefix,
+                          sort: (await contact.country).sort,
+                          isActive: (await contact.country).isActive,
+                          latitude: (await contact.country).latitude,
+                          longitude: (await contact.country).longitude,
+                          flagEmoji: (await contact.country).flagEmoji,
+                          provincesCount: 2
+                      }
+                  })),
+                  addresses: (await result.seller).addresses
+              }
+          };
+  
+          const jsonString = JSON.stringify(resultWithSellerData);
+          const compressedData = zlib.gzipSync(jsonString);
+          await this.cacheManager.set(cacheKey, compressedData.toString('base64'), CacheTTL.ONE_DAY);
       }
-    
-      return result || null
-      
-    } catch (e) {
-      console.log('eeeeeeeeeeee',e)
-    }
+  
+      return result || null;
+  
+  } catch (e) {
+      console.log('eeeeeeeeeeee', e);
+  }
+  
     
   }
 
