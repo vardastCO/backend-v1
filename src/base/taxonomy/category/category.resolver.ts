@@ -1,4 +1,4 @@
-import { ValidationPipe } from "@nestjs/common";
+import { Inject, ValidationPipe } from "@nestjs/common";
 import {
   Args,
   Int,
@@ -23,12 +23,15 @@ import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
 import {ImageCategory} from "./entities/category-image.entity";
 import { AllCategoryInput } from "./dto/input-category-all.input";
 import { PaginationCategoryResponse } from "./dto/pagination-category.response";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Resolver(() => Category)
 export class CategoryResolver {
   constructor(
     private readonly categoryService: CategoryService,
-
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -157,7 +160,15 @@ export class CategoryResolver {
 
   @ResolveField(returns => Int)
   async productsCount(@Parent() category: Category): Promise<number> {
-    return this.categoryService.productsCountOf(category);
+    const cacheKey = `category-products-count-${category.id}`;
+    let count = await this.cacheManager.get<number>(cacheKey);
+
+    if (count === undefined) {
+      count = await this.categoryService.productsCountOf(category);
+      await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+    }
+
+    return count;
   }
 
   @Mutation(() => ImageCategory)

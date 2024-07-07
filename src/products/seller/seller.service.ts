@@ -411,7 +411,7 @@ export class SellerService {
   }
 
   async getContactInfosOf(seller: Seller): Promise<ContactInfo[]> {
-    const cacheKey = `contactInfos:${seller.id}`;
+    const cacheKey = `contactInfos:${seller.id}:seller`;
     const cachedData = await this.cacheManager.get(cacheKey);
 
     if (cachedData) {
@@ -433,7 +433,7 @@ export class SellerService {
   }
 
   async getAddressesOf(seller: Seller): Promise<Address[]> {
-    const cacheKey = `addresses:${seller.id}`;
+    const cacheKey = `addresses:${seller.id}:seller`;
     const cachedData = await this.cacheManager.get(cacheKey);
 
     if (cachedData) {

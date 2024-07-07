@@ -402,7 +402,14 @@ export class BrandService {
   }
 
   async getContactInfosOf(brand: Brand): Promise<ContactInfo[]> {
-    return ContactInfo.createQueryBuilder()
+    const cacheKey = `contactInfos:${brand.id}:brand`;
+    const cachedData = await this.cacheManager.get(cacheKey);
+
+    if (cachedData) {
+      return cachedData as ContactInfo[];
+    }
+
+    const contactInfos = await ContactInfo.createQueryBuilder()
       .limit(10)
       .where({
         relatedType: ContactInfoRelatedTypes.BRAND,
@@ -410,14 +417,29 @@ export class BrandService {
       })
       .orderBy({ sort: "ASC" })
       .getMany();
+
+    await this.cacheManager.set(cacheKey, contactInfos,CacheTTL.ONE_WEEK);
+
+    return contactInfos;
   }
 
   async getAddressesOf(brand: Brand): Promise<Address[]> {
-    return Address.createQueryBuilder()
+    const cacheKey = `addresses:${brand.id}:brand`;
+    const cachedData = await this.cacheManager.get(cacheKey);
+
+    if (cachedData) {
+      return cachedData as Address[];
+    }
+
+    const addresses = await Address.createQueryBuilder()
       .limit(10)
       .where({ relatedType: AddressRelatedTypes.BRAND, relatedId: brand.id })
       .orderBy({ sort: "ASC" })
       .getMany();
+
+    await this.cacheManager.set(cacheKey, addresses,CacheTTL.ONE_WEEK);
+
+    return addresses;
   }
   async getOfferLength(id): Promise<number> {
     const products = await Product.findBy({ brandId: id });

@@ -483,24 +483,42 @@ export class CategoryService {
   }
 
   async getParentsChainOf(category: Category): Promise<Category[]> {
-    return (
-      await Category.createQueryBuilder()
-        .innerJoin(
-          `(select parent_category_ids(${category.id}))`,
-          "x",
-          "x.parent_category_ids = id",
-        )
-        .where(`id != ${category.id}`)
-        .getMany()
-    ).reverse();
+    const cacheKey = `category-parents-chain-${category.id}`;
+    let parentsChain = await this.cacheManager.get<Category[]>(cacheKey);
+
+    if (parentsChain === undefined) {
+      parentsChain = (
+        await Category.createQueryBuilder()
+          .innerJoin(
+            `(select parent_category_ids(${category.id}))`,
+            "x",
+            "x.parent_category_ids = id",
+          )
+          .where(`id != ${category.id}`)
+          .getMany()
+      ).reverse();
+
+      await this.cacheManager.set(cacheKey, parentsChain,CacheTTL.ONE_WEEK); 
+    }
+
+    return parentsChain;
   }
 
   async productsCountOf(category: Category): Promise<number> {
-    return await Product.createQueryBuilder()
-      .where(`"categoryId" in (select child_category_ids(:category_id))`, {
-        category_id: category.id,
-      })
-      .getCount();
+    const cacheKey = `category-products-count-${category.id}`;
+    let count = await this.cacheManager.get<number>(cacheKey);
+    if (count === undefined) {
+      count = await Product.createQueryBuilder()
+        .where(`"categoryId" IN (SELECT child_category_ids(:category_id))`, {
+          category_id: category.id,
+        })
+        .getCount();
+
+      await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK);
+    }
+
+    return count;
+  
   }
   async createImage(
     createImageCategoryInput: createImageCategoryInput,
