@@ -1,4 +1,4 @@
-import { ValidationPipe } from "@nestjs/common";
+import {  ValidationPipe } from "@nestjs/common";
 import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Permission } from "src/users/authorization/permission.decorator";
 import { AreaService } from "./area.service";
@@ -10,7 +10,8 @@ import { Area } from "./entities/area.entity";
 
 @Resolver(() => Area)
 export class AreaResolver {
-  constructor(private readonly areaService: AreaService) {}
+  constructor(private readonly areaService: AreaService,
+  ) {}
 
   @Permission("gql.base.location.area.store")
   @Mutation(() => Area)

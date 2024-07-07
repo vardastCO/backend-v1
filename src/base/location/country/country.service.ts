@@ -6,12 +6,18 @@ import { IndexCountryInput } from "./dto/index-country.input";
 import { UpdateCountryInput } from "./dto/update-country.input";
 import { Country } from "./entities/country.entity";
 import { PaginationCountryResponse } from "./dto/pagination-country.response";
-
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import {
+  Inject,
+} from "@nestjs/common";
+import { Cache } from "cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 @Injectable()
 export class CountryService {
   constructor(
     @InjectRepository(Country)
     private readonly countryRepository: Repository<Country>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async create(createCountryInput: CreateCountryInput) {

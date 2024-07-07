@@ -6,12 +6,18 @@ import { IndexCityInput } from "./dto/index-city.input";
 import { UpdateCityInput } from "./dto/update-city.input";
 import { City } from "./entities/city.entity";
 import { PaginationCityResponse } from "./dto/pagination-city.response";
-
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import {
+  Inject,
+} from "@nestjs/common";
+import { Cache } from "cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 @Injectable()
 export class CityService {
   constructor(
     @InjectRepository(City)
     private cityRepository: Repository<City>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async create(createCityInput: CreateCityInput): Promise<City> {
@@ -21,12 +27,27 @@ export class CityService {
 
   async findAll(indexCityInput?: IndexCityInput): Promise<City[]> {
     const { take, skip, provinceId, parentCityId } = indexCityInput || {};
-    return await this.cityRepository.find({
+
+    // Generate a unique cache key based on the input parameters
+    const cacheKey = `city_findAll_${JSON.stringify({ take, skip, provinceId, parentCityId })}`;
+
+    const cachedCities = await this.cacheManager.get<City[]>(cacheKey);
+
+    if (cachedCities !== undefined) {
+      return cachedCities;
+    }
+
+    const cities = await this.cityRepository.find({
       take,
       skip,
       where: { provinceId, parentCityId },
-      order: { sort: "ASC", id: "DESC" },
+      order: { sort: 'ASC', id: 'DESC' },
     });
+
+    await this.cacheManager.set(cacheKey, cities,CacheTTL.TWO_WEEK); 
+
+    // Return the result
+    return cities;
   }
 
   async paginate(
@@ -73,9 +94,22 @@ export class CityService {
 
   async count(indexCityInput?: IndexCityInput): Promise<number> {
     const { provinceId, parentCityId } = indexCityInput || {};
-    return await this.cityRepository.count({
+    const cacheKey = `city_count_${provinceId}_${parentCityId}`;
+
+    const cachedCount = await this.cacheManager.get<number>(cacheKey);
+
+    if (cachedCount !== undefined) {
+
+      return cachedCount;
+    }
+
+    const count = await this.cityRepository.count({
       where: { provinceId, parentCityId },
       order: { sort: "ASC" },
     });
+
+    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+
+    return count;
   }
 }

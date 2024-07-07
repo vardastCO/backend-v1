@@ -1,4 +1,3 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateAreaInput } from "./dto/create-area.input";
@@ -6,16 +5,22 @@ import { IndexAreaInput } from "./dto/index-area.input";
 import { PaginationAreaResponse } from "./dto/pagination-area.response";
 import { UpdateAreaInput } from "./dto/update-area.input";
 import { Area } from "./entities/area.entity";
-import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import {
+  Injectable,
+  NotFoundException,
+  Inject,
+} from "@nestjs/common";
 import { Cache } from "cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+
 
 @Injectable()
 export class AreaService {
   constructor(
     @InjectRepository(Area)
-    // @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private areaRepository: Repository<Area>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   async create(createAreaInput: CreateAreaInput): Promise<Area> {
@@ -27,17 +32,17 @@ export class AreaService {
     
     const cacheKey = `find-all-area-${cityId}-${take}-${skip}`;
 
-    // const cachedResult = await this.cacheManager.get<any[]>(cacheKey);
-    // if (cachedResult) {
-    //   return cachedResult;
-    // }
+    const cachedResult = await this.cacheManager.get<any[]>(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
     const result = await this.areaRepository.find({
       take,
       skip,
       where: { cityId },
     });
 
-    // await this.cacheManager.set(cacheKey, result,CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey, result,CacheTTL.TWO_WEEK); 
 
     return result;
   }
@@ -88,16 +93,16 @@ export class AreaService {
     const { cityId } = indexAreaInput || {};
     const cacheKey = `count-${cityId}-city-id`;
 
-    // const cachedCount = await this.cacheManager.get<number>(cacheKey);
-    // if (cachedCount !== undefined) {
-    //   return cachedCount;
-    // }
+    const cachedCount = await this.cacheManager.get<number>(cacheKey);
+    if (cachedCount !== undefined) {
+      return cachedCount;
+    }
 
     const count = await this.areaRepository.count({
       where: { cityId },
     });
 
-    // await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
 
     return count;
   }

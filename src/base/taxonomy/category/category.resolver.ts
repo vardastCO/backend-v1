@@ -33,7 +33,7 @@ export class CategoryResolver {
     private readonly categoryService: CategoryService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   @Permission("gql.base.taxonomy.category.store")
   @Mutation(() => Category)
@@ -41,10 +41,10 @@ export class CategoryResolver {
     @Args("createCategoryInput") createCategoryInput: CreateCategoryInput,
     @CurrentUser() user: User
   ) {
-    return this.categoryService.create(createCategoryInput,user);
+    return this.categoryService.create(createCategoryInput, user);
   }
   @Public()
-    // @Permission("gql.base.taxonomy.category.store")
+  // @Permission("gql.base.taxonomy.category.store")
   @Query(() => Int, { name: "countDataCategoryAdmin" })
   async countDataAdmin(): Promise<number> {
     return await this.categoryService.countCategories();
@@ -59,7 +59,7 @@ export class CategoryResolver {
       new ValidationPipe({ transform: true }),
     )
     indexCategoryInput?: IndexCategoryInput,
-  ) : Promise<PaginationCategoryResponse> {
+  ): Promise<PaginationCategoryResponse> {
   
     return this.categoryService.findPaginate(indexCategoryInput);
   }
@@ -119,7 +119,7 @@ export class CategoryResolver {
   ) {
     return this.categoryService.update(
       updateCategoryInput.id,
-      updateCategoryInput,user
+      updateCategoryInput, user
     );
   }
 
@@ -143,14 +143,46 @@ export class CategoryResolver {
 
   @ResolveField(returns => Int)
   async childrenCount(@Parent() category: Category): Promise<number> {
-    return this.categoryService.count({ parentCategoryId: category.id });
+    const { id: parentCategoryId } = category;
+
+    const cacheKey = `category_childrenCount_${parentCategoryId}`;
+
+    const cachedCount = await this.cacheManager.get<number>(cacheKey);
+
+    if (cachedCount !== undefined) {
+      return cachedCount;
+    }
+
+    const count = await this.categoryService.count({ parentCategoryId });
+
+    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK);
+
+    return count;
   }
 
   @ResolveField(returns => Vocabulary)
   async vocabulary(@Parent() category: Category): Promise<Vocabulary> {
-    return this.dataSource
+    const { vocabularyId } = category;
+  
+    const cacheKey = `vocabulary_${vocabularyId}`;
+  
+    const cachedVocabulary = await this.cacheManager.get<Vocabulary>(cacheKey);
+  
+    if (cachedVocabulary !== undefined) {
+
+      return cachedVocabulary;
+    }
+  
+    // If not cached, query the database
+    const vocabulary = await this.dataSource
       .getRepository(Vocabulary)
-      .findOneBy({ id: category.vocabularyId });
+      .findOneBy({ id: vocabularyId });
+  
+    if (vocabulary) {
+      
+      await this.cacheManager.set(cacheKey, vocabulary, CacheTTL.TWO_WEEK)
+    }
+    return vocabulary;
   }
 
   @ResolveField(returns => [Category])
