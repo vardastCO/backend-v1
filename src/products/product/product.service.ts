@@ -904,7 +904,7 @@ export class ProductService {
           if (parsedData) {
               parsedData.createdAt = new Date(parsedData.createdAt);
           }
-          return parsedData;
+          // return parsedData;
       }
   
       const IDS = product.id;
@@ -930,7 +930,7 @@ export class ProductService {
         const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
         await this.cacheManager.set(cacheKey, compressedData, CacheTTL.TWO_WEEK);
       }
-      
+      console.log('result',result)
   
       return result || null;
   
