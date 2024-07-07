@@ -411,17 +411,19 @@ export class SellerService {
   }
 
   async getContactInfosOf(seller: Seller): Promise<ContactInfo[]> {
-    return ContactInfo.createQueryBuilder()
-      .limit(10)
-      .where({
-        relatedType: ContactInfoRelatedTypes.SELLER,
-        relatedId: seller.id,
-      })
-      .orderBy({ sort: "ASC" })
-      .getMany();
+    return []
+    // return ContactInfo.createQueryBuilder()
+    //   .limit(10)
+    //   .where({
+    //     relatedType: ContactInfoRelatedTypes.SELLER,
+    //     relatedId: seller.id,
+    //   })
+    //   .orderBy({ sort: "ASC" })
+    //   .getMany();
   }
 
   async getAddressesOf(seller: Seller): Promise<Address[]> {
+    return []
     return Address.createQueryBuilder()
       .limit(10)
       .where({ relatedType: Seller.name, relatedId: seller.id })
