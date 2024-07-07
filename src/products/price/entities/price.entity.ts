@@ -34,10 +34,6 @@ export class Price extends BaseEntity {
   @Column()
   productId: number;
 
-  // @ManyToOne(() => ProductEntity, product => product.prices, { nullable: true })
-  // @JoinColumn({ name: 'productEntityId' })
-  // @Index()
-  // productEntity: Promise<ProductEntity>;
 
   @Field(() => PriceTypesEnum)
   @Column("enum", { enum: PriceTypesEnum , default : PriceTypesEnum.CONSUMER})
