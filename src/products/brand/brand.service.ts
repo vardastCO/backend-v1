@@ -199,12 +199,17 @@ export class BrandService {
     } catch (e) {}
   }
   private async processFile(filePromise: Promise<any> | undefined) {
-    if (filePromise) {
-      const file = await filePromise;
-      if (file && file.createdAt) {
-        file.createdAt = new Date(file.createdAt);
+    try {
+      if (filePromise) {
+        const file = await filePromise;
+        if (file && file.createdAt) {
+          file.createdAt = new Date(file.createdAt);
+        }
       }
+    } catch (e) {
+      console.log('err in processFile ',e)
     }
+   
   }
   private async incrementBrandViews(brand: Brand) {
     const info = await Brand.findOneBy({ id: brand.id });
@@ -265,7 +270,7 @@ export class BrandService {
           CacheTTL.ONE_WEEK,
         );
       } catch (e) {
-        throw e;
+        console.log('err in find one brand ',e)
       }
       return brand;
     } catch (e) {

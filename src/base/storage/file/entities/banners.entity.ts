@@ -52,4 +52,8 @@ export class Banner extends BaseEntity {
   @Column()
   xlargeId: number;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  url: string;
+
 }

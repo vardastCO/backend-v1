@@ -164,7 +164,6 @@ export class ProductService {
       
       const childCategoryIds = childCategories.map(child => child.id);
   
-      // Add new category IDs to the set
       childCategoryIds.forEach(id => {
         if (!allCategoryIds.has(id)) {
           allCategoryIds.add(id);
