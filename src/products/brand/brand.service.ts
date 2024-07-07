@@ -236,7 +236,7 @@ export class BrandService {
           this.processFile(parsedData.logoFile),
           this.incrementBrandViews(parsedData),
         ]);
-        console.log('pares',parsedData)
+        console.log('oooo',parsedData.logoFile)
         return parsedData;
       }
       const query = `
@@ -266,6 +266,7 @@ export class BrandService {
         brand.catalog = catalog;
         brand.logoFile = logo;
         brand.bannerFile = bannerFile;
+        console.log('kkkk',brand.logoFile)
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
         await this.cacheManager.set(
           cacheKey,
@@ -282,6 +283,7 @@ export class BrandService {
     }
   }
   async fetchFile(id) {
+    console.log('id',id)
     return await File.findOneBy({ id });
   }
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
