@@ -329,7 +329,6 @@ export class UserService {
       cacheKey,
     );
     if (cachedData) {
-      console.log('country with cache',this.decompressionService.decompressData(cachedData))
       return await this.decompressionService.decompressData(cachedData)
     }
     const result = await this.countryService.findOne(user.countryId);;
@@ -338,17 +337,42 @@ export class UserService {
       this.compressionService.compressData(result),
       CacheTTL.ONE_DAY,
     );
-    console.log('country with no cache',result)
     return result;
 
   }
 
   async getRoles(user: User): Promise<Role[]> {
-    return await user.roles;
+    const cacheKey = `user:roles_${user.id}`;
+    const cachedRoles = await this.cacheManager.get<string>(cacheKey);
+
+    if (cachedRoles) {
+      return this.decompressionService.decompressData(cachedRoles);
+    }
+
+    const roles = await user.roles; 
+    await this.cacheManager.set(cacheKey,
+      this.compressionService.compressData(roles),
+      CacheTTL.ONE_DAY)
+    ; 
+
+    return roles;
   }
 
   async getPermissions(user: User): Promise<Permission[]> {
-    return await user.permissions;
+    const cacheKey = `user:permissions_${user.id}`;
+    const cachedRoles = await this.cacheManager.get<string>(cacheKey);
+
+    if (cachedRoles) {
+      return this.decompressionService.decompressData(cachedRoles);
+    }
+
+    const result = await user.permissions; 
+    await this.cacheManager.set(cacheKey,
+      this.compressionService.compressData(result),
+      CacheTTL.ONE_DAY)
+    ; 
+
+    return result;
   }
 
   async cacheRolesOf(user: User): Promise<string[]> {
