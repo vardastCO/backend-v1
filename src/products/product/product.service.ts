@@ -897,6 +897,7 @@ export class ProductService {
     try {
     const cacheKey = `product_${product.id}_lowestPrice`;
 
+    // // Try to get the result from cache
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
     if (cachedResult) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
@@ -904,7 +905,7 @@ export class ProductService {
       if (parsedData) {
         parsedData.createdAt = new Date(parsedData.createdAt);
       }
-      // return parsedData;
+      return parsedData;
     }
       const IDS = product.id;
       const result = await Price.findOne({
@@ -922,7 +923,7 @@ export class ProductService {
         const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
         await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
       }
-      console.log('res',result)
+    
       return result || null
       
     } catch (e) {
