@@ -236,12 +236,12 @@ export class BrandService {
           this.processFile(parsedData.logoFile),
           this.incrementBrandViews(parsedData),
         ]);
-        console.log('oooo',parsedData.logoFile)
+
         return parsedData;
       }
       const query = `
       SELECT "id",name,name_en,name_fa,status,id,sum,views,slug,bio,"createdAt","updatedAt",
-      "bannerDesktopId","priceListId","catalogId","bannerFileId"
+      "bannerDesktopId","priceListId","catalogId","bannerFileId","logoFileId"
       FROM product_brands 
       WHERE "id" = $1 
       `;
@@ -266,7 +266,7 @@ export class BrandService {
         brand.catalog = catalog;
         brand.logoFile = logo;
         brand.bannerFile = bannerFile;
-        console.log('kkkk',brand.logoFile)
+
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
         await this.cacheManager.set(
           cacheKey,
