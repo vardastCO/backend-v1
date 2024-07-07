@@ -233,6 +233,7 @@ export class BrandService {
           this.processFile(parsedData.catalog),
           this.processFile(parsedData.priceList),
           this.processFile(parsedData.bannerDesktop),
+          this.processFile(parsedData.logoFile),
           this.incrementBrandViews(parsedData),
         ]);
         console.log('pares',parsedData)
@@ -251,17 +252,19 @@ export class BrandService {
       }
       const brand = brandsql[0];
       try {
-        const [bannerDesktop, priceList, catalog, bannerFile, data] =
+        const [bannerDesktop, priceList, catalog,logo, bannerFile, data] =
           await Promise.all([
             this.fetchFile(brand.bannerDesktopId),
             this.fetchFile(brand.priceListId),
             this.fetchFile(brand.catalogId),
+            this.fetchFile(brand.logofileId),
             this.fetchFile(brand.bannerFileId),
             this.incrementBrandViews(brand),
           ]);
         brand.bannerDesktop = bannerDesktop;
         brand.priceList = priceList;
         brand.catalog = catalog;
+        brand.logoFile = logo;
         brand.bannerFile = bannerFile;
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
         await this.cacheManager.set(
