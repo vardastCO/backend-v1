@@ -939,52 +939,51 @@ export class ProductService {
   // //   return products;
   // // }
 
-  // async getHighestPriceOf(product: Product){
-  //   try {
-  //     const cacheKey = `product_${product.id}_lowestPrice`;
+  async getHighestPriceOf(product: Product){
+    try {
+      const cacheKey = `product_${product.id}_lowestPrice`;
   
-  //     // // Try to get the result from cache
-  //     const cachedResult = await this.cacheManager.get<string>(cacheKey);
-  //     if (cachedResult) {
-  //       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-  //       const parsedData: Price = JSON.parse(decompressedData);
-  //       if (parsedData) {
-  //         parsedData.createdAt = new Date(parsedData.createdAt);
-  //       }
-  //       return parsedData;
-  //     }
-  //       const IDS = product.id;
-  //     const result = await Price.findOne({
-  //         select:['amount','discount','createdAt','id','isPublic','type'],
-  //         where: { productId: IDS, deletedAt: IsNull() },
-  //         // relations: ["seller"],
-  //         order: {
-  //           createdAt: "DESC"
-  //         },
-  //       });
+      // // Try to get the result from cache
+      const cachedResult = await this.cacheManager.get<string>(cacheKey);
+      if (cachedResult) {
+        const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
+        const parsedData: Price = JSON.parse(decompressedData);
+        if (parsedData) {
+          parsedData.createdAt = new Date(parsedData.createdAt);
+        }
+        return parsedData;
+      }
+        const IDS = product.id;
+      const result = await Price.findOne({
+          select:['amount','discount','createdAt','id','isPublic','type'],
+          where: { productId: IDS, deletedAt: IsNull() },
+          // relations: ["seller"],
+          order: {
+            createdAt: "DESC"
+          },
+        });
   
       
       
-  //       if (result) {
-  //         const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
-  //         .replace(/__logoFile__/g, 'logoFile');
-  //         const modifiedDataWithOutText = JSON.parse(jsonString);
-  //         const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
-  //         await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
-  //       }
+        if (result) {
+          const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
+          .replace(/__logoFile__/g, 'logoFile');
+          const modifiedDataWithOutText = JSON.parse(jsonString);
+          const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+          await this.cacheManager.set(cacheKey, compressedData, CacheTTL.TWO_WEEK);
+        }
 
-  //       return result || null
+        return result || null
         
-  //     } catch (e) {
-  //       console.log('err in price api',e)
-  //     }
+      } catch (e) {
+        console.log('err in price api',e)
+      }
       
-  // }
+  }
   async getLowestPriceOf(product: Product): Promise<Price> {
     try {
     const cacheKey = `product_${product.id}_lowestPrice`;
 
-    // // Try to get the result from cache
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
     if (cachedResult) {
       const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
@@ -1112,30 +1111,30 @@ export class ProductService {
     return products;
   }
 
-  async getHighestPriceOf(product: Product): Promise<Price> {
-    const cacheKey = `highestPrice_${product.id}`;
+  // async getHighestPriceOf(product: Product): Promise<Price> {
+  //   const cacheKey = `highestPrice_${product.id}`;
 
-    const cachedResult = await this.cacheManager.get<string>(cacheKey);
-      if (cachedResult) {
-      const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
-        const parsedData: Price = JSON.parse(decompressedData);
-      if (parsedData) {
-        parsedData.createdAt = new Date(parsedData.createdAt);
-      }
+  //   const cachedResult = await this.cacheManager.get<string>(cacheKey);
+  //     if (cachedResult) {
+  //     const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
+  //       const parsedData: Price = JSON.parse(decompressedData);
+  //     if (parsedData) {
+  //       parsedData.createdAt = new Date(parsedData.createdAt);
+  //     }
      
-      return parsedData;
-    }
-    const result =  await LastPrice.createQueryBuilder()
-      .where({ productId: product.id })
-      .orderBy({ amount: "DESC" })
-      .limit(1)
-      .getOne();
+  //     return parsedData;
+  //   }
+  //   const result =  await LastPrice.createQueryBuilder()
+  //     .where({ productId: product.id })
+  //     .orderBy({ amount: "DESC" })
+  //     .limit(1)
+  //     .getOne();
     
-    const compressedData = zlib.gzipSync(JSON.stringify(result));
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
+  //   const compressedData = zlib.gzipSync(JSON.stringify(result));
+  //   await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
     
-    return result || null
-  }
+  //   return result || null
+  // }
 
 
   private async executeMainQuery(
