@@ -816,6 +816,8 @@ export class ProductService {
   async getLowestPriceOf(product: Product) {
     try {
       const cacheKey = `product_${product.id}_lowestPrice`;
+  
+      // // Try to get the result from cache
       const cachedResult = await this.cacheManager.get<string>(cacheKey);
       if (cachedResult) {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
@@ -823,12 +825,10 @@ export class ProductService {
         if (parsedData) {
           parsedData.createdAt = new Date(parsedData.createdAt);
         }
-        console.log('dddd',parsedData)
         // return parsedData;
       }
         const IDS = product.id;
-         const result = await Price.findOne({
-          // select:['amount','discount','createdAt','id','isPublic','type','seller'],
+        const result = await Price.findOne({
           where: { productId: IDS, deletedAt: IsNull() },
           relations: ["seller"],
           order: {
