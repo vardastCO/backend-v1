@@ -924,55 +924,13 @@ export class ProductService {
       });
   
       if (result) {
-          // Manually map the nested seller data
-          const resultWithSellerData = {
-              ...result,
-              seller: {
-                  rating: (await result.seller).rating,
-                  id: (await result.seller).id,
-                  name: (await result.seller).name,
-                  logoFile: {
-                      presignedUrl: {
-                          url: (await (await result.seller).logoFile).presignedUrl.url
-                      }
-                  },
-                  contacts:(await result.seller).contacts.map(async contact => ({
-                      id: contact.id,
-                      relatedType: contact.relatedType,
-                      relatedId: contact.relatedId,
-                      title: contact.title,
-                      code: contact.code,
-                      number: contact.number,
-                      ext: contact.ext,
-                      type: contact.type,
-                      sort: contact.sort,
-                      isPublic: contact.isPublic,
-                      status: contact.status,
-                      rejectionReason: contact.rejectionReason,
-                      country: {
-                          id: (await contact.country).id,
-                          name: (await contact.country).name,
-                          nameEn:(await contact.country).nameEn,
-                          slug: (await contact.country).slug,
-                          alphaTwo: (await contact.country).alphaTwo,
-                          iso:(await contact.country).iso,
-                          phonePrefix: (await contact.country).phonePrefix,
-                          sort: (await contact.country).sort,
-                          isActive: (await contact.country).isActive,
-                          latitude: (await contact.country).latitude,
-                          longitude: (await contact.country).longitude,
-                          flagEmoji: (await contact.country).flagEmoji,
-                          provincesCount: 2
-                      }
-                  })),
-                  addresses: (await result.seller).addresses
-              }
-          };
-  
-          const jsonString = JSON.stringify(resultWithSellerData);
-          const compressedData = zlib.gzipSync(jsonString);
-          await this.cacheManager.set(cacheKey, compressedData.toString('base64'), CacheTTL.ONE_DAY);
+        const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
+        .replace(/__logoFile__/g, 'logoFile');
+        const modifiedDataWithOutText = JSON.parse(jsonString);
+        const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.TWO_WEEK);
       }
+      
   
       return result || null;
   
