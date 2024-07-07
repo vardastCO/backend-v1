@@ -15,6 +15,8 @@ import { PaginationCategoryResponse } from "./dto/pagination-category.response";
 import { UpdateCategoryInput } from "./dto/update-category.input";
 import { ImageCategory } from "./entities/category-image.entity";
 import { Category } from "./entities/category.entity";
+import { DecompressionService } from "src/decompression.service";
+import { CompressionService } from "src/compression.service";
 @Injectable()
 export class CategoryService {
   constructor(
@@ -25,6 +27,8 @@ export class CategoryService {
     private readonly fileService: FileService,
     private readonly entityManager: EntityManager,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly compressionService: CompressionService,
+    private readonly decompressionService: DecompressionService,
   ) {}
   async findAdmin() {
     try {

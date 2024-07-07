@@ -13,14 +13,16 @@ import {
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
-
-
+import { CompressionService } from "src/compression.service";
+import { DecompressionService } from "src/decompression.service";
 @Injectable()
 export class AreaService {
   constructor(
     @InjectRepository(Area)
     private areaRepository: Repository<Area>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly compressionService: CompressionService,
+    private readonly decompressionService: DecompressionService,
   ) {}
 
   async create(createAreaInput: CreateAreaInput): Promise<Area> {
@@ -32,9 +34,9 @@ export class AreaService {
     
     const cacheKey = `find-all-area-${cityId}-${take}-${skip}`;
 
-    const cachedResult = await this.cacheManager.get<any[]>(cacheKey);
+    const cachedResult = await this.cacheManager.get<string>(cacheKey);
     if (cachedResult) {
-      return cachedResult;
+      return this.decompressionService.decompressData(cachedResult);
     }
     const result = await this.areaRepository.find({
       take,
@@ -42,7 +44,7 @@ export class AreaService {
       where: { cityId },
     });
 
-    await this.cacheManager.set(cacheKey, result,CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey,this.compressionService.compressData(result),CacheTTL.TWO_WEEK); 
 
     return result;
   }
@@ -93,16 +95,15 @@ export class AreaService {
     const { cityId } = indexAreaInput || {};
     const cacheKey = `count-${cityId}-city-id`;
 
-    const cachedCount = await this.cacheManager.get<number>(cacheKey);
+    const cachedCount = await this.cacheManager.get<string>(cacheKey);
     if (cachedCount !== undefined) {
-      return cachedCount;
+      return this.decompressionService.decompressData(cachedCount);
     }
 
     const count = await this.areaRepository.count({
       where: { cityId },
     });
-
-    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey,this.compressionService.compressData(count),CacheTTL.TWO_WEEK); 
 
     return count;
   }

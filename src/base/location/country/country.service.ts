@@ -11,7 +11,6 @@ import {
   Inject,
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
-import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 @Injectable()
 export class CountryService {
   constructor(

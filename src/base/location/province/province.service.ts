@@ -12,12 +12,16 @@ import {
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { DecompressionService } from "src/decompression.service";
+import { CompressionService } from "src/compression.service";
 @Injectable()
 export class ProvinceService {
   constructor(
     @InjectRepository(Province)
     private provinceRepository: Repository<Province>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly compressionService: CompressionService,
+    private readonly decompressionService: DecompressionService,
   ) {}
 
   async create(createProvinceInput: CreateProvinceInput): Promise<Province> {
@@ -30,10 +34,10 @@ export class ProvinceService {
 
     const cacheKey = `province_find_${take}_${skip}_${countryId}`;
 
-    const cachedProvinces = await this.cacheManager.get<any[]>(cacheKey);
+    const cachedProvinces = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedProvinces !== undefined) {
-      return cachedProvinces;
+      return this.decompressionService.decompressData(cachedProvinces);
     }
 
     const provinces = await this.provinceRepository.find({
@@ -43,7 +47,7 @@ export class ProvinceService {
       order: { sort: 'ASC', id: 'DESC' },
     });
 
-    await this.cacheManager.set(cacheKey, provinces,CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey,this.compressionService.compressData(provinces),CacheTTL.TWO_WEEK); 
 
     return provinces;
   }
@@ -96,15 +100,15 @@ export class ProvinceService {
   async count(indexProvinceInput: IndexProvinceInput): Promise<number> {
     const cacheKey = `province_count_${JSON.stringify(indexProvinceInput)}_service`;
 
-    const cachedCount = await this.cacheManager.get<number>(cacheKey);
+    const cachedCount = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedCount !== undefined) {
-      return cachedCount;
+      return this.decompressionService.decompressData(cachedCount);
     }
 
     const count = await this.provinceRepository.count({ where: indexProvinceInput });
 
-    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey,this.compressionService.compressData(count), CacheTTL.TWO_WEEK); 
 
     return count;
   }

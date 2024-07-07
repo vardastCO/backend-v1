@@ -12,12 +12,16 @@ import {
 } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { CompressionService } from "src/compression.service";
+import { DecompressionService } from "src/decompression.service";
 @Injectable()
 export class CityService {
   constructor(
     @InjectRepository(City)
     private cityRepository: Repository<City>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly compressionService: CompressionService,
+    private readonly decompressionService: DecompressionService,
   ) {}
 
   async create(createCityInput: CreateCityInput): Promise<City> {
@@ -31,10 +35,10 @@ export class CityService {
     // Generate a unique cache key based on the input parameters
     const cacheKey = `city_findAll_${JSON.stringify({ take, skip, provinceId, parentCityId })}`;
 
-    const cachedCities = await this.cacheManager.get<City[]>(cacheKey);
+    const cachedCities = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedCities !== undefined) {
-      return cachedCities;
+      return this.decompressionService.decompressData(cachedCities);
     }
 
     const cities = await this.cityRepository.find({
@@ -44,9 +48,8 @@ export class CityService {
       order: { sort: 'ASC', id: 'DESC' },
     });
 
-    await this.cacheManager.set(cacheKey, cities,CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey,this.compressionService.compressData(cities),CacheTTL.TWO_WEEK); 
 
-    // Return the result
     return cities;
   }
 
@@ -96,11 +99,11 @@ export class CityService {
     const { provinceId, parentCityId } = indexCityInput || {};
     const cacheKey = `city_count_${provinceId}_${parentCityId}`;
 
-    const cachedCount = await this.cacheManager.get<number>(cacheKey);
+    const cachedCount = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedCount !== undefined) {
 
-      return cachedCount;
+      return this.decompressionService.decompressData(cachedCount);
     }
 
     const count = await this.cityRepository.count({
@@ -108,7 +111,7 @@ export class CityService {
       order: { sort: "ASC" },
     });
 
-    await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(cacheKey,this.compressionService.compressData(count), CacheTTL.TWO_WEEK); 
 
     return count;
   }
