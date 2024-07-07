@@ -393,14 +393,25 @@ export class UserService {
   
 
   async getSellerRecordOf(user: User): Promise<Seller> {
-    return await Seller.createQueryBuilder()
-    .where(
-      'id = (select "sellerId" from product_seller_representatives where "userId" = :userId and role = :role order by id asc limit 1)',
-      {
-        userId: user.id,
-        role: SellerRepresentativeRoles.ADMIN,
-      },
-    )
-    .getOne();
+    const cacheKey = `seller_${user.id}_${SellerRepresentativeRoles.ADMIN}`;
+    let seller = await this.cacheManager.get<Seller>(cacheKey);
+
+    if (!seller) {
+      seller = await Seller.createQueryBuilder()
+        .where(
+          'id = (select "sellerId" from product_seller_representatives where "userId" = :userId and role = :role order by id asc limit 1)',
+          {
+            userId: user.id,
+            role: SellerRepresentativeRoles.ADMIN,
+          },
+        )
+        .getOne();
+
+      if (seller) {
+        await this.cacheManager.set(cacheKey, seller, CacheTTL.ONE_DAY);
+      }
+    }
+
+    return seller;
   }
 }
