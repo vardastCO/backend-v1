@@ -403,6 +403,7 @@ export class PreOrderService {
           orders.map(async (order) => ({
             id: order.id,
             uuid: order.uuid,
+            request_date : order.request_date,
             destination : (await (await (await (await order.project).address).at(0).address).city).name,
             need_date: order.need_date,
             bid_start: order.bid_start ,

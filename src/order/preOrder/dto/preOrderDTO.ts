@@ -12,6 +12,9 @@ export class PreOrderDTO {
   @Field(() => String,{nullable: true})
   destination: string;
 
+  @Field(() => String,{nullable: true})
+  request_date: string;
+
   @Field(() => Date,{nullable: true})
   need_date?: Date;
 
