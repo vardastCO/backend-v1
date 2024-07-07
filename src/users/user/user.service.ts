@@ -329,7 +329,7 @@ export class UserService {
       cacheKey,
     );
     if (cachedData) {
-
+      console.log('country with cache',this.decompressionService.decompressData(cachedData))
       // return this.decompressionService.decompressData(cachedData)
     }
     const result =  this.countryService.findOne(user.countryId);;
@@ -338,6 +338,7 @@ export class UserService {
       this.compressionService.compressData(result),
       CacheTTL.ONE_DAY,
     );
+    console.log('country with no cache',result)
     return result;
 
   }
