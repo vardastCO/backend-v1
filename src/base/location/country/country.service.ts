@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {  Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateCountryInput } from "./dto/create-country.input";
@@ -7,6 +7,7 @@ import { UpdateCountryInput } from "./dto/update-country.input";
 import { Country } from "./entities/country.entity";
 import { PaginationCountryResponse } from "./dto/pagination-country.response";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import {
   Inject,
 } from "@nestjs/common";
@@ -52,11 +53,8 @@ export class CountryService {
   }
 
   async findOne(id: number, slug?: string): Promise<Country> {
-    const country = await this.countryRepository.findOneBy({ id, slug });
-    if (!country) {
-      throw new NotFoundException();
-    }
-    return country;
+    const cacheKey = `country-${id}-${slug}`;
+    return this.countryRepository.findOneBy({ id, slug });
   }
 
   async update(

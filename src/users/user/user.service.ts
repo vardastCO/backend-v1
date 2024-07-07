@@ -330,9 +330,9 @@ export class UserService {
     );
     if (cachedData) {
       console.log('country with cache',this.decompressionService.decompressData(cachedData))
-      // return this.decompressionService.decompressData(cachedData)
+      return await this.decompressionService.decompressData(cachedData)
     }
-    const result =  this.countryService.findOne(user.countryId);;
+    const result = await this.countryService.findOne(user.countryId);;
     await this.cacheManager.set(
       cacheKey,
       this.compressionService.compressData(result),
