@@ -823,6 +823,7 @@ export class ProductService {
         if (parsedData) {
           parsedData.createdAt = new Date(parsedData.createdAt);
         }
+        console.log('dddd',parsedData)
         // return parsedData;
       }
         const IDS = product.id;
@@ -950,7 +951,6 @@ export class ProductService {
         if (parsedData) {
           parsedData.createdAt = new Date(parsedData.createdAt);
         }
-        console.log('dddd',parsedData)
         return parsedData;
       }
         const IDS = product.id;
