@@ -393,7 +393,7 @@ export class PreOrderService {
   
     const cachedData = await this.cacheManager.get<PublicPreOrderDTO[]>(cacheKey);
     if (cachedData) {
-      return cachedData;
+      // return cachedData;
     }
   
     let categories;
@@ -446,11 +446,14 @@ export class PreOrderService {
             
           }))
         );
-        console.log('categoryImage',(await image.presignedUrl).url)
+     
+        const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
+        const url = `${baseUrl}${image.name}`
+        console.log('url', url)
         publicPreOrderDTOs.push({
           categoryName: category.title,
           orders: orderDTOs,
-          categoryImage:(await image.presignedUrl).url,
+          categoryImage:url,
           categoryId: category.id,
         });
       }
