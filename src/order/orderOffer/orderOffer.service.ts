@@ -210,7 +210,7 @@ export class OrderOfferService {
       offerOrderId: createLineOfferInput.offerId,
       lineId: createLineOfferInput.lineId
     };
-  
+    console.log('hhhh', userAuth.hasRole("admin"))
     if (!userAuth.hasRole("admin")) {
       findOptions['userId'] = user.id;
     }
