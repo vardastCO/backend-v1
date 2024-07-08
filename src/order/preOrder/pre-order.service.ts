@@ -425,7 +425,7 @@ export class PreOrderService {
       const imageCategory = await category.imageCategory;
     
       console.log('kkkkkkkk33333333', imageCategory);
-      console.log('kkkk', imageCategory);
+      console.log('kkkk', imageCategory[0]);
       
       const fileId = imageCategory.fileId;
 
