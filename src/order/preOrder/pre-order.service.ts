@@ -426,7 +426,7 @@ export class PreOrderService {
         take: typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2,
         relations: ['lines'],
       });
-      console.log('lllll',category)
+      console.log('(await category.imageCategory).fileId',(await category.imageCategory).fileId)
       const image = await File.findOneBy({
        id: (await category.imageCategory).fileId
       })
