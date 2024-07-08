@@ -422,7 +422,7 @@ export class PreOrderService {
             bid_start: order.bid_start ,
             bid_end: order.bid_end ,
             lines: Promise.resolve(order.lines),
-            lineDetail : (await order.lines).map((line) => line.item_name + ' - ').join('')
+            lineDetail : (await order.lines).map(line => line.item_name + ' - ').join('').slice(0, -3)
             
           }))
         );
