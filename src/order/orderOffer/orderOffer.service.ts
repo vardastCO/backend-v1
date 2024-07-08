@@ -23,11 +23,13 @@ import { PaginationOrderOfferResponse } from "./dto/pagination-order-offer.respo
 import { IndexPreOrderInput } from "../preOrder/dto/index-preOrder.input";
 import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
+import { AuthorizationService } from "src/users/authorization/authorization.service";
 
 @Injectable()
 export class OrderOfferService {
   constructor( 
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private authorizationService: AuthorizationService,
     @InjectDataSource() private readonly dataSource: DataSource)
      { }
 
@@ -93,7 +95,6 @@ export class OrderOfferService {
     
      
       offer.type = TypeOrderOffer.SELLER
-      offer.status = OrderOfferStatuses.INVOICE
     
       await offer.save()
 
@@ -203,60 +204,75 @@ export class OrderOfferService {
       };
     }
   }
+  async  findOfferLine(createLineOfferInput: CreateLineOfferInput, user: User): Promise<OfferLine | null> {
+    const userAuth = await this.authorizationService.setUser(user);
+    const findOptions = {
+      offerOrderId: createLineOfferInput.offerId,
+      lineId: createLineOfferInput.lineId
+    };
   
+    if (!userAuth.hasRole("admin")) {
+      findOptions['userId'] = user.id;
+    }
+  
+    return OfferLine.findOneBy(findOptions);
+  }
+  async  updateOfferLineAndOrder(offer: OfferOrder, offerLine: OfferLine, createLineOfferInput: CreateLineOfferInput): Promise<void> {
+    const { id, total_price: lastTotal, fi_price: lastFi, tax_price: lastTax } = offerLine;
+  
+    const newOfferLineData = {
+      id,
+      ...createLineOfferInput,
+    };
+  
+    const updatedOfferLine = await OfferLine.preload(newOfferLineData);
+  
+    offer.total = (
+      parseInt(offer.total) +
+      parseInt(createLineOfferInput.total_price) -
+      parseInt(lastTotal)
+    ).toString();
+  
+    offer.total_tax = (
+      parseInt(offer.total_tax) +
+      parseInt(createLineOfferInput.tax_price) -
+      parseInt(lastTax)
+    ).toString();
+  
+    offer.total_fi = (
+      parseInt(offer.total_fi) +
+      parseInt(createLineOfferInput.fi_price) -
+      parseInt(lastFi)
+    ).toString();
+  
+    await Promise.all([offer.save(), updatedOfferLine.save()]);
+  }
   async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
   
     try {
-        const offer: OfferOrder = await OfferOrder.findOne({
-          where: { id: createLineOfferInput.offerId },
-          relations: ['offerLine'],
-          order: {
-            id: 'DESC'
-          }
-        });
-        const offerline = await OfferLine.findOneBy({
-          offerOrderId: createLineOfferInput.offerId,
-          lineId : createLineOfferInput.lineId
-        })
-
-        
-        if (offerline) {
-          const id = offerline.id
-          const lastTotal = offerline.total_price
-          const lastFi    = offerline.fi_price
-          const lastTax   = offerline.tax_price
-
-          const newOfferLine: OfferLine = await OfferLine.preload({
-            id,
-            ...createLineOfferInput,
-          });
-          offer.total =
-            ( parseInt(offer.total) + 
-              parseInt(createLineOfferInput.total_price) -
-              parseInt(lastTotal)).toString()
-      
-          offer.total_tax =
-            ( parseInt(offer.total_tax) + 
-              parseInt(createLineOfferInput.tax_price) -
-              parseInt(lastTax)).toString()
-
-          offer.total_fi =
-            ( parseInt(offer.total_fi) + 
-              parseInt(createLineOfferInput.fi_price) -
-              parseInt(lastFi)).toString()
- 
-          await offer.save()
-          
-          await newOfferLine.save()
-          
-        } 
-
-        return offer
-      } catch (error) {
-
-        console.log('createOffer err',error)
-        
+      // Check user role and find the appropriate OfferLine
+      const offerLine = await this.findOfferLine(createLineOfferInput, user);
+  
+      // Fetch the OfferOrder
+      const offer = await OfferOrder.findOne({
+        where: { id: createLineOfferInput.offerId },
+        relations: ['offerLine'],
+        order: { id: 'DESC' }
+      });
+  
+      if (!offer) {
+        throw new Error(`OfferOrder with ID ${createLineOfferInput.offerId} not found`);
       }
+  
+      if (offerLine) {
+        await this.updateOfferLineAndOrder(offer, offerLine, createLineOfferInput);
+      }
+  
+      return offer;
+    } catch (error) {
+      console.error('createOffer error:', error);
+      throw error;
+    }
     
   }
 

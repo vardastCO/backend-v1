@@ -13,6 +13,7 @@ import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 import { Seller } from "src/products/seller/entities/seller.entity";
 import { OrderOfferStatuses } from "../enums/order-offer-statuses";
 import { OfferLine } from "./offer-line.entity";
+import { ModelOffer } from "src/order/enums/model-offer.enum";
 
 
 @ObjectType()
@@ -69,6 +70,15 @@ export class OfferOrder extends BaseEntity {
     default: TypeOrderOffer.CLIENT,
   })
   type: TypeOrderOffer;
+
+
+  @Field(() => ModelOffer)
+  @Index()
+  @Column("enum", {
+    enum: ModelOffer,
+    default: ModelOffer.Quotation,
+  })
+  model: ModelOffer;
   
   @Field(() => [OfferLine],{nullable:"items"})
   @OneToMany(() => OfferLine, offerLine => offerLine.offerOrder)
