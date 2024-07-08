@@ -212,6 +212,7 @@ export class BrandService {
    
   }
   private async incrementBrandViews(brand: Brand) {
+    console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkk')
     const info = await Brand.findOneBy({ id: brand.id });
     info.views = info.views + 1 ?? 1;
     await info.save();
@@ -250,8 +251,11 @@ export class BrandService {
       if (!brandsql) {
         throw new NotFoundException();
       }
+      console.log('ffff',brandsql)
       const brand = brandsql[0];
+      console.log('ppppp',brand)
       try {
+        console.log('gggggggg',brand.bannerDesktopId,brand.priceListId,brand.logoFileId,brand.bannerFileId)
         const [bannerDesktop, priceList, catalog,logo, bannerFile, data] =
           await Promise.all([
             this.fetchFile(brand.bannerDesktopId),
@@ -266,7 +270,7 @@ export class BrandService {
         brand.catalog = catalog;
         brand.logoFile = logo;
         brand.bannerFile = bannerFile;
-
+        console.log('llll',brand)
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
         await this.cacheManager.set(
           cacheKey,
@@ -283,7 +287,7 @@ export class BrandService {
     }
   }
   async fetchFile(id) {
-    return await File.findOneBy({ id });
+    return id ? await this.fetchFile(id) : null;
   }
   async logBrandView(brandId: number, payload: PayloadDto): Promise<void> {
     try {

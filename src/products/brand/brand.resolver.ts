@@ -71,7 +71,6 @@ export class BrandResolver {
   @Query(() => Brand, { name: "brand" })
   findOne(
     @Args("id", { type: () => Int }) id: number,
-    @Context() context: any,
   ): Promise<Brand> {
 
     return this.brandService.findOne(id);
