@@ -372,11 +372,12 @@ export class PreOrderService {
   }
   async publicOrders(indexPublicOrderInput: IndexPublicOrderInput): Promise<PublicPreOrderDTO[]> {
     const { categoryId , number} = indexPublicOrderInput;
-    const cacheKey = `publicOrders-${categoryId || 'all'}`;
+    const cacheKey = `publicOrders-${JSON.stringify(indexPublicOrderInput)}`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-        return this.decompressionService.decompressData(cachedData);
+      console.log(this.decompressionService.decompressData(cachedData))
+        // return this.decompressionService.decompressData(cachedData);
     }
 
     let categories;
