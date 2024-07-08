@@ -214,9 +214,10 @@ export class OrderOfferService {
     if (!userAuth.hasRole("admin")) {
       findOptions['userId'] = user.id;
     }
-    console.log('jjjj',findOptions)
+    console.log('jjjj', findOptions)
+    console.log('gggg',await OfferLine.findOneBy(findOptions))
   
-    return OfferLine.findOneBy(findOptions);
+    return await OfferLine.findOneBy(findOptions);
   }
   async  updateOfferLineAndOrder(offer: OfferOrder, offerLine: OfferLine, createLineOfferInput: CreateLineOfferInput): Promise<void> {
     const { id, total_price: lastTotal, fi_price: lastFi, tax_price: lastTax } = offerLine;
