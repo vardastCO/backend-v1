@@ -422,10 +422,14 @@ export class PreOrderService {
     for (const category of categories) {
       console.log('kkkkkkkk', category)
       console.log('kkkkkkkk33333333', (await category.imageCategory))
-      const imageCategory = category.imageCategory
-      console.log('kkkk', imageCategory)
-      const fileId = imageCategory.fileId
-      console.log('fileId', fileId)
+      const imageCategory = await category.imageCategory;
+    
+      console.log('kkkkkkkk33333333', imageCategory);
+      console.log('kkkk', imageCategory);
+      
+      const fileId = imageCategory.fileId;
+
+      console.log('fileId', fileId);
       const orders = await PreOrder.find({
         select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
         where: { categoryId: category.id },
