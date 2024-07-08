@@ -414,8 +414,7 @@ export class PreOrderService {
             id: order.id,
             uuid: order.uuid,
             request_date : order.request_date,
-            destination:
-              (await (await (await (await order.project).address).at(0).address).city).name ?? 'تهران',
+            destination: 'تهران',
             need_date: order.need_date,
             bid_start: order.bid_start ,
             bid_end: order.bid_end ,
@@ -507,7 +506,7 @@ export class PreOrderService {
     if (client) {
         await Promise.all(
         data.map(async (pre_order) => {
-          pre_order.lineDetail = (await pre_order.lines).map((line) => line.item_name + ' - ').join('');
+          pre_order.lineDetail = (await pre_order.lines).map(line => line.item_name + ' - ').join('').slice(0, -3);
           const user = await pre_order.user;
           user.fullName = 'کارشناس وردست';
           return pre_order;
