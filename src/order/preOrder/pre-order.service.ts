@@ -407,7 +407,7 @@ export class PreOrderService {
       const orders = await PreOrder.find({
         select:['id','uuid','request_date','need_date','bid_start','bid_end','lines','categoryId','category'],
         where: { categoryId: category.id },
-        take: number ?? 2, 
+        take: typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2,
         relations: ['lines'], 
       });
       if (orders.length >= 2) {
