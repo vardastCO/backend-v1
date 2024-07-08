@@ -374,9 +374,9 @@ export class PreOrderService {
     const { categoryId , number} = indexPublicOrderInput;
     const cacheKey = `publicOrders-${JSON.stringify(indexPublicOrderInput)}`;
 
-    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    const cachedData = await this.cacheManager.get<PublicPreOrderDTO[]>(cacheKey);
     if (cachedData) {
-      console.log(this.decompressionService.decompressData(cachedData))
+      console.log(cachedData)
         // return this.decompressionService.decompressData(cachedData);
     }
 
@@ -436,7 +436,7 @@ export class PreOrderService {
       }
     }
     await this.cacheManager.set(cacheKey,
-      this.compressionService.compressData(publicPreOrderDTOs),
+      publicPreOrderDTOs,
       CacheTTL.ONE_HOUR)
     ;
     return publicPreOrderDTOs;
