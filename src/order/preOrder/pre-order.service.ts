@@ -354,14 +354,30 @@ export class PreOrderService {
 
       const [clientOffers, sellerOffers, adminOffers,clientInvoiceOffers,clientSelfOffers] = await offersPromises;
  
+
+      const uniqueOffers = new Map();
+
+      const addOffersToMap = (offers) => {
+        offers.forEach(offer => {
+          if (!uniqueOffers.has(offer.id)) {
+            uniqueOffers.set(offer.id, offer);
+          }
+        });
+      };
+    
       if (client) {
-        clientInvoiceOffers.map((offer) => {
-          return offer.request_name = 'کارشناس وردست'
-        })
-        order.offers = [...clientInvoiceOffers,...clientSelfOffers];
+        clientInvoiceOffers.forEach(offer => {
+          offer.request_name = 'کارشناس وردست';
+        });
+        addOffersToMap(clientInvoiceOffers);
+        addOffersToMap(clientSelfOffers);
       } else {
-        order.offers = [...clientOffers, ...sellerOffers, ...adminOffers];
-      } 
+        addOffersToMap(clientOffers);
+        addOffersToMap(sellerOffers);
+        addOffersToMap(adminOffers);
+      }
+    
+      order.offers = Array.from(uniqueOffers.values());
       return order
     } catch (error) {
  

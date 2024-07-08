@@ -212,12 +212,6 @@ export class OrderOfferService {
     if (!await this.authorizationService.setUser(user).hasRole("admin")) {
       findOptions['userId'] = user.id;
     }
-    console.log('await this.authorizationService.setUser(user).hasRole("admin")',
-      await this.authorizationService.setUser(user).hasRole("admin")
-    )
-    console.log('jjjj', findOptions)
-    console.log('gggg',await OfferLine.findOneBy(findOptions))
-  
     return await OfferLine.findOneBy(findOptions);
   }
   async  updateOfferLineAndOrder(offer: OfferOrder, offerLine: OfferLine, createLineOfferInput: CreateLineOfferInput): Promise<void> {
