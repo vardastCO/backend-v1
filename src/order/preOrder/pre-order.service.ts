@@ -427,10 +427,10 @@ export class PreOrderService {
         relations: ['lines'],
       });
       console.log('lllll',category)
-      // const image = await File.findOneBy({
-
-      // })
-  
+      const image = await File.findOneBy({
+       id: (await category.imageCategory).fileId
+      })
+      console.log('image',image)
       if (orders.length >= 2) {
         const orderDTOs: PreOrderDTO[] = await Promise.all(
           orders.map(async (order) => ({
@@ -446,11 +446,11 @@ export class PreOrderService {
             
           }))
         );
-  
+        console.log('categoryImage',(await image.presignedUrl).url)
         publicPreOrderDTOs.push({
           categoryName: category.title,
           orders: orderDTOs,
-          categoryImage:"",
+          categoryImage:(await image.presignedUrl).url,
           categoryId: category.id,
         });
       }
