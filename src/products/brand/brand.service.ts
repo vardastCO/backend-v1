@@ -96,7 +96,7 @@ export class BrandService {
       take,
       skip,
       name,
-      hasLogoFile,
+      categoryId,
       hasBannerFile,
       hasCatalogeFile,
       hasPriceList,
@@ -139,6 +139,10 @@ export class BrandService {
 
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
+    }
+
+    if (categoryId) {
+      whereConditions[`categoryId`] = categoryId;
     }
 
     if (indexBrandInput.hasLogoFile !== undefined) {

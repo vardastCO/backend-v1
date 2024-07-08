@@ -12,6 +12,7 @@ import {
   JoinColumn,
   OneToMany,
   OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   BeforeInsert,
@@ -43,10 +44,14 @@ export class Brand extends BaseEntity {
   @Column({ nullable: true })
   name_fa?: string;
 
+
   @Field(() => Category, { nullable: true })
-  @OneToOne(() => Category, category => null, { eager: true, nullable: true })
-  @JoinColumn()
-  category: Promise<Category>;
+  @ManyToOne(() => Category, { nullable: true })
+  category: Promise<Category | null>;
+
+  @Index()
+  @Column({ nullable: true })
+  categoryId: number | null;
 
   @Field(() => ThreeStateSupervisionStatuses)
   @Column("enum", {
