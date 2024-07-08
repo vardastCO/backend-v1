@@ -212,8 +212,6 @@ export class BrandService {
    
   }
   private async incrementBrandViews(brand: Brand) {
-    console.log('Incrementing brand views');
-
     const info = await Brand.findOne({
       select: ['id', 'views'],
       where: { id: brand.id }
