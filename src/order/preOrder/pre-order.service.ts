@@ -26,13 +26,18 @@ import { IndexPublicOrderInput } from "./dto/index-public-order.input";
 import { Category } from "src/base/taxonomy/category/entities/category.entity";
 import { PublicPreOrderDTO } from "./dto/publicPreOrderDTO";
 import { PreOrderDTO } from "./dto/preOrderDTO";
+import { DecompressionService } from "src/decompression.service";
+import { CompressionService } from "src/compression.service";
+import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 
 @Injectable()
 export class PreOrderService {
   constructor( 
     private authorizationService: AuthorizationService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    @InjectDataSource() private readonly dataSource: DataSource)
+    @InjectDataSource() private readonly dataSource: DataSource,
+    private readonly compressionService: CompressionService,
+    private readonly decompressionService: DecompressionService,)
      { }
   async generateNumericUuid(length: number = 5): Promise<string> {
       const min = Math.pow(10, length - 1);
@@ -366,7 +371,13 @@ export class PreOrderService {
   
   }
   async publicOrders(indexPublicOrderInput: IndexPublicOrderInput): Promise<PublicPreOrderDTO[]> {
-    const { categoryId } = indexPublicOrderInput;
+    const { categoryId , number} = indexPublicOrderInput;
+    const cacheKey = `publicOrders-${categoryId || 'all'}`;
+
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
+    if (cachedData) {
+        return this.decompressionService.decompressData(cachedData);
+    }
 
     let categories;
     if (categoryId) {
@@ -396,7 +407,7 @@ export class PreOrderService {
       const orders = await PreOrder.find({
         select:['id','uuid','request_date','need_date','bid_start','bid_end','lines','categoryId','category'],
         where: { categoryId: category.id },
-        take: 2, 
+        take: number ?? 2, 
         relations: ['lines'], 
       });
       if (orders.length >= 2) {
@@ -405,11 +416,14 @@ export class PreOrderService {
             id: order.id,
             uuid: order.uuid,
             request_date : order.request_date,
-            destination : (await (await (await (await order.project).address).at(0).address).city).name,
+            destination:
+              (await (await (await (await order.project).address).at(0).address).city).name ?? 'تهران',
             need_date: order.need_date,
             bid_start: order.bid_start ,
             bid_end: order.bid_end ,
-            lines: Promise.resolve(order.lines)
+            lines: Promise.resolve(order.lines),
+            lineDetail : (await order.lines).map((line) => line.item_name + ' - ').join('')
+            
           }))
         );
   
@@ -420,7 +434,10 @@ export class PreOrderService {
         });
       }
     }
-  
+    await this.cacheManager.set(cacheKey,
+      this.compressionService.compressData(publicPreOrderDTOs),
+      CacheTTL.ONE_HOUR)
+    ;
     return publicPreOrderDTOs;
   }
   async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean, seller: boolean, isRealUserType: boolean): Promise<PaginationPreOrderResponse> {
