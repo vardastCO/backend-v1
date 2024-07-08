@@ -427,7 +427,7 @@ export class PreOrderService {
       console.log('kkkkkkkk33333333', imageCategory);
       console.log('kkkk', imageCategory[0]);
       
-      const fileId = imageCategory.fileId;
+      const fileId = imageCategory[0].fileId;
 
       console.log('fileId', fileId);
       const orders = await PreOrder.find({
@@ -438,7 +438,7 @@ export class PreOrderService {
       });
       console.log('(await category.imageCategory).fileId',category.imageCategory.fileId)
       const image = await File.findOneBy({
-       id: category.imageCategory.fileId
+       id: fileId
       })
       console.log('image',image)
       if (orders.length >= 2) {
