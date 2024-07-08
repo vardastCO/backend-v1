@@ -393,7 +393,7 @@ export class PreOrderService {
   
     const cachedData = await this.cacheManager.get<PublicPreOrderDTO[]>(cacheKey);
     if (cachedData) {
-      // return cachedData;
+      return cachedData;
     }
   
     let categories;
@@ -420,27 +420,22 @@ export class PreOrderService {
     const publicPreOrderDTOs: PublicPreOrderDTO[] = [];
   
     for (const category of categories) {
-      console.log('kkkkkkkk', category)
-      console.log('kkkkkkkk33333333', (await category.imageCategory))
+
       const imageCategory = await category.imageCategory;
     
-      console.log('kkkkkkkk33333333', imageCategory);
-      console.log('kkkk', imageCategory[0]);
       
       const fileId = imageCategory[0].fileId;
 
-      console.log('fileId', fileId);
       const orders = await PreOrder.find({
         select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
         where: { categoryId: category.id },
         take: typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2,
         relations: ['lines'],
       });
-      console.log('(await category.imageCategory).fileId',category.imageCategory.fileId)
+
       const image = await File.findOneBy({
        id: fileId
       })
-      console.log('image',image)
       if (orders.length >= 2) {
         const orderDTOs: PreOrderDTO[] = await Promise.all(
           orders.map(async (order) => ({
@@ -459,7 +454,7 @@ export class PreOrderService {
      
         const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
         const url = `${baseUrl}${image.name}`
-        console.log('url', url)
+ 
         publicPreOrderDTOs.push({
           categoryName: category.title,
           orders: orderDTOs,
