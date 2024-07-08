@@ -371,18 +371,16 @@ export class PreOrderService {
   
   }
   async publicOrders(indexPublicOrderInput: IndexPublicOrderInput): Promise<PublicPreOrderDTO[]> {
-    const { categoryId , number} = indexPublicOrderInput;
+    const { categoryId, number } = indexPublicOrderInput;
     const cacheKey = `publicOrders-${JSON.stringify(indexPublicOrderInput)}`;
-
+  
     const cachedData = await this.cacheManager.get<PublicPreOrderDTO[]>(cacheKey);
     if (cachedData) {
-      console.log(cachedData)
-        // return this.decompressionService.decompressData(cachedData);
+      return cachedData;
     }
-
+  
     let categories;
     if (categoryId) {
-
       const category = await Category.findOne({
         select: ['title', 'id'],
         where: { id: categoryId },
@@ -394,7 +392,6 @@ export class PreOrderService {
   
       categories = [category];
     } else {
-
       categories = await Category.find({
         select: ['title', 'id'],
         where: { parentCategory: IsNull() },
@@ -404,13 +401,13 @@ export class PreOrderService {
     const publicPreOrderDTOs: PublicPreOrderDTO[] = [];
   
     for (const category of categories) {
-
       const orders = await PreOrder.find({
-        select:['id','uuid','request_date','need_date','bid_start','bid_end','lines','categoryId','category'],
+        select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
         where: { categoryId: category.id },
         take: typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2,
-        relations: ['lines'], 
+        relations: ['lines'],
       });
+  
       if (orders.length >= 2) {
         const orderDTOs: PreOrderDTO[] = await Promise.all(
           orders.map(async (order) => ({
@@ -435,12 +432,13 @@ export class PreOrderService {
         });
       }
     }
-    await this.cacheManager.set(cacheKey,
-      publicPreOrderDTOs,
-      CacheTTL.ONE_HOUR)
-    ;
+  
+    await this.cacheManager.set(cacheKey, publicPreOrderDTOs, CacheTTL.ONE_HOUR);
+
+  
     return publicPreOrderDTOs;
   }
+  
   async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean, seller: boolean, isRealUserType: boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
     const { take, skip, projectId, customerName, hasFile, projectName, status } = indexPreOrderInput || {};
