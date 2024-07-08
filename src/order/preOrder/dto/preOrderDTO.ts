@@ -26,6 +26,9 @@ export class PreOrderDTO {
 
   @Field(() => [Line], { nullable: true })
   lines: Promise<Line[]>;
+
+  @Field({ nullable: true })
+  lineDetail?: string;
 }
 
 
