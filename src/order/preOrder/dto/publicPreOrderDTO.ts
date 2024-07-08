@@ -7,6 +7,9 @@ export class PublicPreOrderDTO {
   @Field()
   categoryName: string;
 
+  @Field()
+  categoryImage: string;
+
   @Field(type => [PreOrderDTO])
   orders: PreOrderDTO[];
 

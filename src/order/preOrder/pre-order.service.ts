@@ -29,6 +29,7 @@ import { PreOrderDTO } from "./dto/preOrderDTO";
 import { DecompressionService } from "src/decompression.service";
 import { CompressionService } from "src/compression.service";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { File } from "src/base/storage/file/entities/file.entity";
 
 @Injectable()
 export class PreOrderService {
@@ -398,8 +399,9 @@ export class PreOrderService {
     let categories;
     if (categoryId) {
       const category = await Category.findOne({
-        select: ['title', 'id'],
+        select: ['title', 'id','imageCategory'],
         where: { id: categoryId },
+        relations:['imageCategory']
       });
   
       if (!category) {
@@ -409,8 +411,9 @@ export class PreOrderService {
       categories = [category];
     } else {
       categories = await Category.find({
-        select: ['title', 'id'],
+        select: ['title', 'id','imageCategory'],
         where: { parentCategory: IsNull() },
+        relations:['imageCategory']
       });
     }
   
@@ -423,6 +426,10 @@ export class PreOrderService {
         take: typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2,
         relations: ['lines'],
       });
+      console.log('lllll',category)
+      // const image = await File.findOneBy({
+
+      // })
   
       if (orders.length >= 2) {
         const orderDTOs: PreOrderDTO[] = await Promise.all(
@@ -443,6 +450,7 @@ export class PreOrderService {
         publicPreOrderDTOs.push({
           categoryName: category.title,
           orders: orderDTOs,
+          categoryImage:"",
           categoryId: category.id,
         });
       }
