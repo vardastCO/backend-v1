@@ -214,6 +214,7 @@ export class OrderOfferService {
     if (!userAuth.hasRole("admin")) {
       findOptions['userId'] = user.id;
     }
+    console.log('jjjj',findOptions)
   
     return OfferLine.findOneBy(findOptions);
   }
@@ -250,10 +251,8 @@ export class OrderOfferService {
   async createOrderOfferLine(createLineOfferInput:CreateLineOfferInput,user:User): Promise<OfferOrder> {
   
     try {
-      // Check user role and find the appropriate OfferLine
       const offerLine = await this.findOfferLine(createLineOfferInput, user);
   
-      // Fetch the OfferOrder
       const offer = await OfferOrder.findOne({
         where: { id: createLineOfferInput.offerId },
         relations: ['offerLine'],
