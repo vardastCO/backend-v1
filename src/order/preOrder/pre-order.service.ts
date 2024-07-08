@@ -422,16 +422,16 @@ export class PreOrderService {
     for (const category of categories) {
       console.log('kkkkkkkk', category)
       console.log('kkkkkkkk33333333', (await category.imageCategory))
-      console.log('kkkkkkkk355553', category.imageCategory)
+      console.log('kkkkkkkk355553', category.imageCategory.fileId)
       const orders = await PreOrder.find({
         select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
         where: { categoryId: category.id },
         take: typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2,
         relations: ['lines'],
       });
-      console.log('(await category.imageCategory).fileId',(await category.imageCategory).fileId)
+      console.log('(await category.imageCategory).fileId',category.imageCategory.fileId)
       const image = await File.findOneBy({
-       id: (await category.imageCategory).fileId
+       id: category.imageCategory.fileId
       })
       console.log('image',image)
       if (orders.length >= 2) {
