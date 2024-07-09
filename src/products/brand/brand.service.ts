@@ -215,20 +215,20 @@ export class BrandService {
     }
    
   }
-  private async incrementBrandViews(brand: Brand) {
-    const info = await Brand.findOne({
-      select: ['id', 'views'],
-      where: { id: brand.id }
-    });
+  // private async incrementBrandViews(brand: Brand) {
+  //   const info = await Brand.findOne({
+  //     select: ['id', 'views'],
+  //     where: { id: brand.id }
+  //   });
   
-    if (info) {
-      info.views = info.views + 1 ?? 1;
+  //   if (info) {
+  //     info.views = info.views + 1 ?? 1;
       
-      await Brand.save(info);
-    } else {
-      console.error('Brand not found');
-    }
-  }
+  //     await Brand.save(info);
+  //   } else {
+  //     console.error('Brand not found');
+  //   }
+  // }
   async findOne(id: number): Promise<Brand> {
     try {
       const cacheKey = `brand_${JSON.stringify(id)}`;
@@ -247,7 +247,7 @@ export class BrandService {
           this.processFile(parsedData.priceList),
           this.processFile(parsedData.bannerDesktop),
           this.processFile(parsedData.logoFile),
-          this.incrementBrandViews(parsedData),
+          // this.incrementBrandViews(parsedData),
         ]);
 
         return parsedData;
@@ -272,7 +272,7 @@ export class BrandService {
             this.fetchFile(brand.catalogId),
             this.fetchFile(brand.logoFileId),
             this.fetchFile(brand.bannerFileId),
-            this.incrementBrandViews(brand),
+            // this.incrementBrandViews(brand),
           ]);
         brand.bannerDesktop = bannerDesktop;
         brand.priceList = priceList;
