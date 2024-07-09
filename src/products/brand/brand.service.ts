@@ -265,7 +265,7 @@ export class BrandService {
       }
       const brand = brandsql[0];
       try {
-        const [bannerDesktop, priceList, catalog,logo, bannerFile, data] =
+        const [bannerDesktop, priceList, catalog,logo, bannerFile] =
           await Promise.all([
             this.fetchFile(brand.bannerDesktopId),
             this.fetchFile(brand.priceListId),
