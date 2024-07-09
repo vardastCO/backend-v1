@@ -218,7 +218,7 @@ export class BrandService {
   private async incrementBrandViews(brand: Brand) {
     try {
       await this.entityManager.query(
-        `UPDATE brand SET views = views + 1 WHERE id = $1`,
+        `UPDATE product_brands SET views = views + 1 WHERE id = $1`,
         [brand.id]
       );
     } catch (error) {
