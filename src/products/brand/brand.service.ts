@@ -222,6 +222,7 @@ export class BrandService {
         [brand.id]
       );
     } catch (error) {
+      console.log('err in incrementBrandViews',error)
     }
   }
   async findOne(id: number): Promise<Brand> {
