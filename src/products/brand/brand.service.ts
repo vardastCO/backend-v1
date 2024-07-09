@@ -243,8 +243,8 @@ export class BrandService {
           this.processFile(parsedData.priceList),
           this.processFile(parsedData.bannerDesktop),
           this.processFile(parsedData.logoFile),
+          this.incrementBrandViews(parsedData)
         ]);
-        await this.incrementBrandViews(parsedData)
         return parsedData;
       }
       const query = `
@@ -267,9 +267,9 @@ export class BrandService {
             this.fetchFile(brand.catalogId),
             this.fetchFile(brand.logoFileId),
             this.fetchFile(brand.bannerFileId),
+            this.incrementBrandViews(brand)
    
           ]);
-        await this.incrementBrandViews(brand),
         brand.bannerDesktop = bannerDesktop;
         brand.priceList = priceList;
         brand.catalog = catalog;

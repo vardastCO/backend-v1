@@ -444,17 +444,13 @@ export class ProductService {
     }
   }
   private async incrementProductViews(product: Product) {
-    const info = await Product.findOne({
-      select: ['id', 'views'],
-      where: { id: product.id }
-    });
-  
-    if (info) {
-      info.views = info.views + 1 ?? 1;
-      
-      await Product.save(info);
-    } else {
-      console.error('Product not found');
+    try {
+      await this.entityManager.query(
+        `UPDATE products SET views = views + 1 WHERE id = $1`,
+        [product.id]
+      );
+    } catch (error) {
+      console.log('err in incrementProductViews',error)
     }
   }
   async findOne(id: number, slug?: string): Promise<Product> {
@@ -472,12 +468,11 @@ export class ProductService {
       // this.findBrand(product.brandId),
       // this.findCategory(product.categoryId),
       // this.findUom(product.uomId),
-      
+      this.incrementProductViews(product),
       this.getImages([product.id]),
       this.findPrice(product.id),
      
     ]);
-    await this.incrementProductViews(product),
     // product.brand = brand;
     // product.category = category;
     // product.uom = uom;
