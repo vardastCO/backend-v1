@@ -468,16 +468,16 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    const [images,price,data] = await Promise.all([
+    const [images,price] = await Promise.all([
       // this.findBrand(product.brandId),
       // this.findCategory(product.categoryId),
       // this.findUom(product.uomId),
       
       this.getImages([product.id]),
       this.findPrice(product.id),
-      this.incrementProductViews(product),
+     
     ]);
-
+    await this.incrementProductViews(product),
     // product.brand = brand;
     // product.category = category;
     // product.uom = uom;
