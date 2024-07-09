@@ -443,7 +443,20 @@ export class ProductService {
       console.log("fffffff", e);
     }
   }
-
+  private async incrementProductViews(product: Product) {
+    const info = await Product.findOne({
+      select: ['id', 'views'],
+      where: { id: product.id }
+    });
+  
+    if (info) {
+      info.views = info.views + 1 ?? 1;
+      
+      await Product.save(info);
+    } else {
+      console.error('Product not found');
+    }
+  }
   async findOne(id: number, slug?: string): Promise<Product> {
     const product = await Product.findOne({
       where: {
@@ -455,12 +468,14 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    const [images,price] = await Promise.all([
+    const [images,price,data] = await Promise.all([
       // this.findBrand(product.brandId),
       // this.findCategory(product.categoryId),
       // this.findUom(product.uomId),
+      
       this.getImages([product.id]),
       this.findPrice(product.id),
+      this.incrementProductViews(product),
     ]);
 
     // product.brand = brand;

@@ -42,6 +42,10 @@ export class Product extends InfraEntity {
   @Field()
   @Column({ unique: true })
   name: string;
+
+  @Field(() => Int, { nullable: true, defaultValue: 1 })
+  @Column({ type: 'int', nullable: true, default: 1 })
+  views?: number;
   
 
   @Field()
