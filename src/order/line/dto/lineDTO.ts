@@ -6,8 +6,8 @@ export class LineDTO {
   @Field(() => Int)
   id: number;
 
-  @Field(() => Int)
-  pre_order_id: number;
+  @Field(() => String)
+  pre_order_uuid: string;
 
   @Field(() => String)
   project_name: string;
