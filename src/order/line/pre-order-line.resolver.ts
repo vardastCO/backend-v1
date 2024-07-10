@@ -8,6 +8,8 @@ import { LineDTO } from './dto/lineDTO';
 import { PreOrder } from '../preOrder/entities/pre-order.entity';
 import { UpdateLineInput } from './dto/update-line-order.input';
 import { CreateLineInput } from './dto/create-line-order.input';
+import { IndexLineInput } from './dto/index-line.input';
+import { PaginationLinesResponse } from './dto/pagination-lines.responde';
 
 
 @Resolver(() => LineDTO)
@@ -35,6 +37,17 @@ export class PreOrderLineResolver {
   ) {
    
     return this.preOrderLineService.updateline(updateLineInput.id,updateLineInput,user);
+  }
+
+  @Permission("gql.users.address.store")
+  @Query(() => PaginationLinesResponse, { name: "Orderlines" })
+  Orderlines(
+    @Args('indexLineInput', { type: () => IndexLineInput, nullable: true }, new ValidationPipe({ transform: true }))
+    indexLineInput: IndexLineInput,
+    @CurrentUser() user: User
+  ) {
+   
+    return this.preOrderLineService.orderlines(indexLineInput);
   }
 
   @Permission("gql.users.address.store")

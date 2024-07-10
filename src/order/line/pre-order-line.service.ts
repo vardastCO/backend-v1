@@ -11,6 +11,8 @@ import { PreOrder } from '../preOrder/entities/pre-order.entity';
 import { PreOrderStatus } from '../enums/pre-order-states.enum';
 import { UpdateLineInput } from './dto/update-line-order.input';
 import { CreateLineInput } from './dto/create-line-order.input';
+import { IndexLineInput } from './dto/index-line.input';
+import { PaginationLinesResponse } from './dto/pagination-lines.responde';
 
 @Injectable()
 export class PreOrderLineService {
@@ -44,6 +46,42 @@ export class PreOrderLineService {
       }
     
      }
+     async orderlines(indexLineInput: IndexLineInput) {
+      indexLineInput?.boot();
+      const { take, skip } = indexLineInput || {};
+      const [data, total] = await Line.findAndCount({
+        skip,
+        take,
+        relations: ['preOrder'],
+        order: {
+          id: 'DESC'
+        },
+      });
+    
+      const lineDto: LineDTO[] = await Promise.all(data.map(async (line) => {
+        const preOrder = await line.preOrder;
+        const project = await preOrder.project;
+        return {
+          id: line.id,
+          pre_order_id: preOrder.id,
+          project_name: project.name,
+          expert_name: preOrder.expert_name,
+          applicant_name: preOrder.applicant_name,
+          need_date: preOrder.need_date,
+          item_name: line.item_name,
+          attribuite: line.attribuite,
+          uom: line.uom,
+          brand: line.brand,
+          qty: line.qty,
+          descriptions: line.descriptions,
+          type: line.type,
+          created_at: line.created_at,
+        } as LineDTO;
+      }));
+    
+      return PaginationLinesResponse.make(indexLineInput, total, lineDto);
+    }
+    
     async updateline(id:number,updateLineInput: UpdateLineInput,user:User): Promise<PreOrder> {
        
     try {
