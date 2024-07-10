@@ -29,7 +29,7 @@ export class PaginationResponse {
   static make(
     paginationInput: PaginationInput,
     total: number,
-    data: BaseEntity[],
+    data: LineDTO[],
   ): PaginationResponse {
     const { page, perPage } = paginationInput;
     const lastPage = Math.ceil(total / perPage);

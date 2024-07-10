@@ -12,7 +12,8 @@ import { PreOrderStatus } from '../enums/pre-order-states.enum';
 import { UpdateLineInput } from './dto/update-line-order.input';
 import { CreateLineInput } from './dto/create-line-order.input';
 import { IndexLineInput } from './dto/index-line.input';
-import { PaginationLinesResponse } from './dto/pagination-lines.responde';
+import { PaginationLineResponse } from './dto/pagination-lines.responde';
+
 
 @Injectable()
 export class PreOrderLineService {
@@ -79,7 +80,7 @@ export class PreOrderLineService {
         } as LineDTO;
       }));
     
-      return PaginationLinesResponse.make(indexLineInput, total, lineDto);
+      return PaginationLineResponse.make(indexLineInput, total, lineDto);
     }
     
     async updateline(id:number,updateLineInput: UpdateLineInput,user:User): Promise<PreOrder> {
