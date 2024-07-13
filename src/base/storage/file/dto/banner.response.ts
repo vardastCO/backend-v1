@@ -14,5 +14,4 @@ export class BannerResponse {
   
     @Field(() => [File])
     xlarge: File[];
-  
 }
