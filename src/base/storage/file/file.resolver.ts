@@ -10,6 +10,7 @@ import {
   Resolver
 } from "@nestjs/graphql";
 
+
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Public } from "src/users/auth/decorators/public.decorator";
@@ -25,6 +26,7 @@ import { PresignedUrlObject } from "./dto/presigned-url.response";
 import { Banner } from "./entities/banners.entity";
 import { File } from "./entities/file.entity";
 import { FileService } from "./file.service";
+import { UpdateBanerInput } from "./dto/updateBannerInput.dto";
 
 
 
@@ -130,7 +132,6 @@ export class FileResolver {
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
   }
-
   replaceKeys(data) {
     return data.map(item => {
       const { __small__, __medium__, __large__, __xlarge__, ...rest } = item;
@@ -144,6 +145,21 @@ export class FileResolver {
     });
   }
 
+
+  @Permission("gql.base.storage.file.destroy")
+  @Mutation(() => Banner)
+  removeBanner(@Args("id", { type: () => Int }) id: number) {
+    return this.fileService.removeBanner(id);
+  }
+
+  @Permission("gql.base.storage.file.destroy")
+  @Mutation(() => Banner)
+  async updateBanner(
+    @Args("updateBannerInput") updateBannerInput: UpdateBanerInput
+  ) {
+    return this.fileService.updateBanner(updateBannerInput.id, updateBannerInput);
+  }
+  
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => Banner)
   async createBanner(
