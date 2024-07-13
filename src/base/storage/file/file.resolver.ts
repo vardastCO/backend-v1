@@ -7,8 +7,9 @@ import {
   Parent,
   Query,
   ResolveField,
-  Resolver,
+  Resolver
 } from "@nestjs/graphql";
+
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Public } from "src/users/auth/decorators/public.decorator";
@@ -16,6 +17,7 @@ import { Permission } from "src/users/authorization/permission.decorator";
 import * as zlib from "zlib";
 import { Directory } from "../directory/entities/directory.entity";
 import { BannerResponse } from "./dto/banner.response";
+import { CreateBannerInput } from "./dto/createBannerInput.dto";
 import { IndexBannerInput } from "./dto/index-banner.input";
 import { IndexFileInput } from "./dto/index-file.input";
 import { PaginationFileResponse } from "./dto/pagination-file.response";
@@ -23,6 +25,10 @@ import { PresignedUrlObject } from "./dto/presigned-url.response";
 import { Banner } from "./entities/banners.entity";
 import { File } from "./entities/file.entity";
 import { FileService } from "./file.service";
+
+
+
+
 @Resolver(() => File)
 export class FileResolver {
   constructor(
@@ -48,6 +54,7 @@ export class FileResolver {
   findOne(@Args("id", { type: () => Int }) id: number) {
     return this.fileService.findOne(id);
   }
+
   @Public()
   @Query(() => BannerResponse)
   async getBannerHomePage(
@@ -101,6 +108,7 @@ export class FileResolver {
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
   }
+
   @Public()
   @Query(() => [Banner])
   async getBanners(
@@ -122,6 +130,7 @@ export class FileResolver {
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
   }
+
   replaceKeys(data) {
     return data.map(item => {
       const { __small__, __medium__, __large__, __xlarge__, ...rest } = item;
@@ -133,6 +142,14 @@ export class FileResolver {
         xlarge: __xlarge__,
       };
     });
+  }
+
+  @Permission("gql.base.storage.file.destroy")
+  @Mutation(() => Banner)
+  async createBanner(
+    @Args("createBannerInput") createBannerInput: CreateBannerInput
+  ) {
+    return this.fileService.createBanner(createBannerInput);
   }
 
   @Permission("gql.base.storage.file.destroy")

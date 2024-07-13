@@ -9,10 +9,12 @@ import { I18n, I18nService } from "nestjs-i18n";
 import { InjectMinio } from "nestjs-minio";
 import { DeleteResult } from "typeorm";
 import { Directory } from "../directory/entities/directory.entity";
+import { CreateBannerInput } from "./dto/createBannerInput.dto";
 import { IndexFileInput } from "./dto/index-file.input";
-import { PresignedUrlObject } from "./dto/presigned-url.response";
-import { File } from "./entities/file.entity";
 import { PaginationFileResponse } from "./dto/pagination-file.response";
+import { PresignedUrlObject } from "./dto/presigned-url.response";
+import { Banner } from "./entities/banners.entity";
+import { File } from "./entities/file.entity";
 
 @Injectable()
 export class FileService {
@@ -74,6 +76,64 @@ export class FileService {
 
   async getDirectoryOf(file: File): Promise<Directory> {
     return await file.directory;
+  }
+
+  async createBanner(createBannerInput: CreateBannerInput): Promise<Banner>{
+    try {
+      const {
+        small_uuid,
+        large_uuid,
+        medium_uuid,
+        xlarge_uuid,
+        link_url
+      } = createBannerInput;
+
+      const [small, medium, large, xlarge] = await Promise.all([
+        File.findOne({
+          where: {
+            uuid: small_uuid,
+          },
+        }),
+        File.findOne({
+          where: {
+            uuid: medium_uuid,
+          },
+        }),
+        File.findOne({
+          where: {
+            uuid: large_uuid,
+          },
+        }),
+        File.findOne({
+          where: {
+            uuid: xlarge_uuid,
+          },
+        }),
+    ]);
+
+      
+      if (!(small && medium && large && xlarge)) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.NOT_FOUND")),
+        );
+      }
+      
+      const input = {
+        smallId :  small.id,
+        mediumId :  medium.id,
+        largeId :  large.id,
+        xlargeId :  xlarge.id
+      }
+
+
+      const banner: Banner =  Banner.create<Banner>(input);
+
+      
+      await banner.save();
+      return banner;
+    } catch (error) {
+      console.log("Failed to create banner. Error : " , error);
+    }
   }
 
   async getPresignedUrlOf(file: File): Promise<PresignedUrlObject> {
