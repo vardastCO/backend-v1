@@ -204,7 +204,7 @@ export class ProductService {
     if (sortField === SortFieldProduct.PRICE) {
       isAlicePrice = true;
     }
-    if (cachedData && !admin && !isAlicePrice) {
+    if (cachedData && !admin) {
       const decompressedData = zlib
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
@@ -268,7 +268,7 @@ export class ProductService {
       }
     }
     if (sortField == SortFieldProduct.PRICE) {
-      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 );
+      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 1000 );
       whereConditions.prices = {
         createdAt: MoreThan(fifteenMinutesAgo),
       };
@@ -322,7 +322,7 @@ export class ProductService {
       await this.cacheManager.set(
         cacheKey,
         compressedData,
-        CacheTTL.THREE_HOURS,
+        isAlicePrice ? CacheTTL.FIFTEEN_MINUTES : CacheTTL.THREE_HOURS,
       );
     }
 
