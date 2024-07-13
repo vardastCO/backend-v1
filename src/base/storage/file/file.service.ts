@@ -7,13 +7,13 @@ import { ConfigService } from "@nestjs/config";
 import { Client } from "minio";
 import { I18n, I18nService } from "nestjs-i18n";
 import { InjectMinio } from "nestjs-minio";
-import { DeleteResult } from "typeorm";
+import { DeleteResult, In } from "typeorm";
 import { Directory } from "../directory/entities/directory.entity";
 import { CreateBannerInput } from "./dto/createBannerInput.dto";
 import { IndexFileInput } from "./dto/index-file.input";
 import { PaginationFileResponse } from "./dto/pagination-file.response";
 import { PresignedUrlObject } from "./dto/presigned-url.response";
-import { UpdateBanerInput } from "./dto/updateBannerInput.dto";
+import {  UpdateBannerInput } from "./dto/updateBannerInput.dto";
 import { Banner } from "./entities/banners.entity";
 import { File } from "./entities/file.entity";
 
@@ -146,6 +146,7 @@ export class FileService {
           (await this.i18n.translate("exceptions.NOT_FOUND")),
         );
       }
+      banner.id = id;
       await banner.remove();
       return banner;
     } catch (error) {
@@ -154,85 +155,46 @@ export class FileService {
   }
 
 
-  async updateBanner(id: number, updateBannerInput: UpdateBanerInput): Promise<Banner>{
+  async updateBanner(id: number, updateBannerInput: UpdateBannerInput): Promise<Banner> {
     try {
-      
-      const banner: Banner = await Banner.findOne({
-        where: { id: updateBannerInput.id },
-      });
 
+      const banner = await Banner.findOne({ where: { id } });
       if (!banner) {
-        throw new BadRequestException(
-          (await this.i18n.translate("exceptions.NOT_FOUND")),
-        );
+        throw new BadRequestException(await this.i18n.translate("exceptions.NOT_FOUND"));
       }
-
-      const {
-        small_uuid,
-        large_uuid,
-        medium_uuid,
-        xlarge_uuid,
-        link_url
-      } = updateBannerInput;
-      
-
-      console.log("smaill uuid: ", small_uuid);
-      // if (small_uuid) {
-      //   const file = await File.findOne({
-      //     where: { uuid: small_uuid }
-      //   });
-      //   console.log("Smal File: ", file);
-      //   if (file) {
-      //     // banner.smallId = file.id
-      //     banner.small = Promise.resolve(file);
-      //     console.log("Smal banner: ", banner);
-      //     await banner.save();
   
-      //   }
-      // }
-      // console.log("new banner: ", banner);
-      // if (medium_uuid) {
-      //   const file = await File.findOne({
-      //     where: { uuid: medium_uuid }
-      //   });
-        
-      //   if (file) {
-      //     banner.medium =  Promise.resolve(file);
-      //   }
-      // }
-
-      // if (large_uuid) {
-      //   const file = await File.findOne({
-      //     where: { uuid: large_uuid }
-      //   });
-        
-      //   if (file) {
-      //     banner.large = Promise.resolve(file);
-      //   }
-      // }
-
-      // if (xlarge_uuid) {
-      //   const file = await File.findOne({
-      //     where: { uuid: xlarge_uuid }
-      //   });
-        
-      //   if (file) {
-      //     banner.xlarge = Promise.resolve(file);
-      //   }
-      // }
-
-      // if (link_url) {
-      //   banner.url = link_url;
-      // }
-
-      // console.log("Banner Before Save:", banner);
-    
-    
+      const { small_uuid, large_uuid, medium_uuid, xlarge_uuid, link_url } = updateBannerInput;
+  
+      const files = await File.find({
+        where: { uuid: In([small_uuid, medium_uuid, large_uuid, xlarge_uuid]) }
+      });
+  
+      const fileMap = new Map(files.map(file => [file.uuid, file]));
+  
+      if (small_uuid && fileMap.has(small_uuid)) {
+        banner.smallId = fileMap.get(small_uuid)?.id;
+      }
+      if (medium_uuid && fileMap.has(medium_uuid)) {
+        banner.mediumId = fileMap.get(medium_uuid)?.id;
+      }
+      if (large_uuid && fileMap.has(large_uuid)) {
+        banner.largeId = fileMap.get(large_uuid)?.id;
+      }
+      if (xlarge_uuid && fileMap.has(xlarge_uuid)) {
+        banner.xlargeId = fileMap.get(xlarge_uuid)?.id;
+      }
+      if (link_url) {
+        banner.url = link_url;
+      }
+  
+      await banner.save();
+  
       return banner;
     } catch (error) {
-      console.log("Failed to update Banner. Error: ", error);
+      console.error("Failed to update Banner. Error: ", error);
     }
   }
+  
   
   
   async getPresignedUrlOf(file: File): Promise<PresignedUrlObject> {

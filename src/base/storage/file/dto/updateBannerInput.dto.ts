@@ -1,9 +1,8 @@
 import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
 import { IsInt, IsNotEmpty, IsString, IsOptional } from "class-validator";
-import { CreateBannerInput } from "./createBannerInput.dto";
 
 @InputType()
-export class UpdateBanerInput {
+export class UpdateBannerInput {
     @Field(() => Int)
     @IsNotEmpty()
     @IsInt()

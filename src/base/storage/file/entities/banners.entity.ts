@@ -20,7 +20,7 @@ export class Banner extends BaseEntity {
   id: number;
 
   @Field(() => File)
-  @OneToOne(() => File, file => null, { eager: true })
+  @OneToOne(() => File)
   @JoinColumn()
   small: Promise<File>;
   @Index()
@@ -28,7 +28,7 @@ export class Banner extends BaseEntity {
   smallId: number;
 
   @Field(() => File)
-  @OneToOne(() => File, file => null, { eager: true })
+  @OneToOne(() => File)
   @JoinColumn()
   medium: Promise<File>;
   @Index()
@@ -37,7 +37,7 @@ export class Banner extends BaseEntity {
 
 
   @Field(() => File)
-  @OneToOne(() => File, file => null, { eager: true })
+  @OneToOne(() => File)
   @JoinColumn()
   large: Promise<File>;
   @Index()
@@ -45,7 +45,7 @@ export class Banner extends BaseEntity {
   largeId: number;
 
   @Field(() => File)
-  @OneToOne(() => File, file => null, { eager: true })
+  @OneToOne(() => File)
   @JoinColumn()
   xlarge: Promise<File>;
   @Index()

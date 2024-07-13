@@ -26,7 +26,7 @@ import { PresignedUrlObject } from "./dto/presigned-url.response";
 import { Banner } from "./entities/banners.entity";
 import { File } from "./entities/file.entity";
 import { FileService } from "./file.service";
-import { UpdateBanerInput } from "./dto/updateBannerInput.dto";
+import { UpdateBannerInput } from "./dto/updateBannerInput.dto";
 
 
 
@@ -155,7 +155,7 @@ export class FileResolver {
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => Banner)
   async updateBanner(
-    @Args("updateBannerInput") updateBannerInput: UpdateBanerInput
+    @Args("updateBannerInput") updateBannerInput: UpdateBannerInput
   ) {
     return this.fileService.updateBanner(updateBannerInput.id, updateBannerInput);
   }
