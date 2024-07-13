@@ -268,7 +268,7 @@ export class ProductService {
       }
     }
     if (sortField == SortFieldProduct.PRICE) {
-      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 * 1000 );
+      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 );
       whereConditions.prices = {
         createdAt: MoreThan(fifteenMinutesAgo),
       };
@@ -284,23 +284,23 @@ export class ProductService {
     ]);
 
     const productIds = products.map(product => product.id);
-    const categoryResultId = products.map(product => product.categoryId);
-    const uomResultIds = products.map(product => product.uomId);
+    // const categoryResultId = products.map(product => product.categoryId);
+    // const uomResultIds = products.map(product => product.uomId);
 
-    const [uoms, categories, images,prices] = await Promise.all([
-      this.getUoms(uomResultIds),
-      this.getCategories(categoryResultId),
+    const [images] = await Promise.all([
+      // this.getUoms(uomResultIds),
+      // this.getCategories(categoryResultId),
       this.getImages(productIds),
-      this.getPrices(productIds),
+      // this.getPrices(productIds),
     ]);
 
     const response : any[] = products.map(product => {
       return {
         ...product,
-        uom: uoms.find(u => u.id === product.uomId),
-        category: categories.find(cat => cat.id === product.categoryId),
+        // uom: uoms.find(u => u.id === product.uomId),
+        // category: categories.find(cat => cat.id === product.categoryId),
         images: [images.find(img => img.productId === product.id)] ?? [],
-        highestPrice: prices.find(p => p.productId === product.id) ,
+        // highestPrice: prices.find(p => p.productId === product.id) ,
         // lowestPrice: prices.find(p => p.productId === product.id),
       };
     });
