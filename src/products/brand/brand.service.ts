@@ -179,6 +179,7 @@ export class BrandService {
     try {
       const jsonString = JSON.stringify(data)
         .replace(/__bannerDesktop__/g, "bannerDesktop")
+        .replace(/__bannerMobile__/g, "bannerMobile")
         .replace(/__bannerFile__/g, "bannerFile")
         .replace(/__logoFile__/g, "logoFile")
         .replace(/__catalog__/g, "catalog")
@@ -249,7 +250,7 @@ export class BrandService {
       }
       const query = `
       SELECT "id",name,name_en,name_fa,status,id,sum,views,slug,bio,"createdAt","updatedAt",
-      "bannerDesktopId","priceListId","catalogId","bannerFileId","logoFileId"
+      "bannerDesktopId","bannerMobileId","priceListId","catalogId","bannerFileId","logoFileId"
       FROM product_brands 
       WHERE "id" = $1 
       `;
@@ -260,9 +261,10 @@ export class BrandService {
       }
       const brand = brandsql[0];
       try {
-        const [bannerDesktop, priceList, catalog,logo, bannerFile] =
+        const [bannerDesktop,bannerMobile, priceList, catalog,logo, bannerFile] =
           await Promise.all([
             this.fetchFile(brand.bannerDesktopId),
+            this.fetchFile(brand.bannerMobileId),
             this.fetchFile(brand.priceListId),
             this.fetchFile(brand.catalogId),
             this.fetchFile(brand.logoFileId),
@@ -271,6 +273,7 @@ export class BrandService {
    
           ]);
         brand.bannerDesktop = bannerDesktop;
+        brand.bannerMobile = bannerMobile;
         brand.priceList = priceList;
         brand.catalog = catalog;
         brand.logoFile = logo;
