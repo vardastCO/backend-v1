@@ -393,7 +393,7 @@ export class PreOrderService {
   
     const cachedData = await this.cacheManager.get<PublicPreOrderDTO[]>(cacheKey);
     if (cachedData) {
-      return cachedData;
+       return cachedData;
     }
   
     let categories;
@@ -418,55 +418,48 @@ export class PreOrderService {
     }
   
     const publicPreOrderDTOs: PublicPreOrderDTO[] = [];
+    const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
+    const maxNumber = typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2;
   
-    for (const category of categories) {
-
-      const imageCategory = await category.imageCategory;
-    
-      
-      const fileId = imageCategory[0].fileId;
-
-      const orders = await PreOrder.find({
-        select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
-        where: { categoryId: category.id },
-        take: typeof number === 'number' ? Math.min(Math.max(number, 2), 15) : 2,
-        relations: ['lines'],
-      });
-
-      const image = await File.findOneBy({
-       id: fileId
-      })
-      if (orders.length >= 2) {
-        const orderDTOs: PreOrderDTO[] = await Promise.all(
-          orders.map(async (order) => ({
-            id: order.id,
-            uuid: order.uuid,
-            request_date : order.request_date,
-            destination: 'تهران',
-            need_date: order.need_date,
-            bid_start: order.bid_start ,
-            bid_end: order.bid_end ,
-            lines: Promise.resolve(order.lines),
-            lineDetail : (await order.lines).map(line => line.item_name + ' - ').join('').slice(0, -3)
-            
-          }))
-        );
-     
-        const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
-        const url = `${baseUrl}${image.name}`
- 
-        publicPreOrderDTOs.push({
-          categoryName: category.title,
-          orders: orderDTOs,
-          categoryImage:url,
-          categoryId: category.id,
-        });
-      }
-    }
+    await Promise.all(categories.map(async (category) => {
+        const imageCategory = await category.imageCategory;
+        const fileId = imageCategory[0].fileId;
   
-    await this.cacheManager.set(cacheKey, publicPreOrderDTOs, CacheTTL.ONE_HOUR);
-
+        const [orders, image] = await Promise.all([
+            PreOrder.find({
+                select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
+                where: { categoryId: category.id },
+                take: maxNumber,
+                relations: ['lines'],
+            }),
+            File.findOneBy({ id: fileId })
+        ]);
   
+        if (orders.length >= 2) {
+            const orderDTOs: PreOrderDTO[] = await Promise.all(
+                orders.map(async (order) => ({
+                    id: order.id,
+                    uuid: order.uuid,
+                    request_date: order.request_date,
+                    destination: 'تهران',
+                    need_date: order.need_date,
+                    bid_start: order.bid_start,
+                    bid_end: order.bid_end,
+                    lines: order.lines,
+                    lineDetail: (await order.lines).map(line => line.item_name).join(' - ')
+                }))
+            );
+  
+            publicPreOrderDTOs.push({
+                categoryName: category.title,
+                orders: orderDTOs,
+                categoryImage: `${baseUrl}${image.name}`,
+                categoryId: category.id,
+            });
+        }
+    }));
+  
+    await this.cacheManager.set(cacheKey, publicPreOrderDTOs, CacheTTL.SIX_HOURS);
     return publicPreOrderDTOs;
   }
   
