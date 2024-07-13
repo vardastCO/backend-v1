@@ -181,7 +181,8 @@ export class PublicFileService {
   async uploadBanner(
     file: Express.Multer.File,
     user: User,
-    brandId: number
+    brandId: number,
+    type:string
   ) {
 
     const brand: Brand = await Brand.findOneBy({id: brandId});
@@ -226,12 +227,13 @@ export class PublicFileService {
         },
       );
     });
-
-    brand.bannerDesktop = Promise.resolve(fileRecord);
-    // console.log('brand', await brand.catalog)
+    if (type == 'desktop') {
+      brand.bannerDesktop = Promise.resolve(fileRecord);
+    } else {
+      brand.bannerMobile = Promise.resolve(fileRecord);
+    }
     try {
-
-         await brand.save();
+      await brand.save();
     } catch (e) {
       console.log('eee',e)
     }

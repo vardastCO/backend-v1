@@ -87,9 +87,13 @@ export class PublicFileController {
         .build({ fileIsRequired: true }),
     )
     file: Express.Multer.File,
+    @Body('type') type: string,
     @CurrentUser() user: User,
   ) {
-    return this.fileService.uploadBanner(file, user, brandId);
+    if (!type) {
+      type = 'desktop';
+    }
+    return this.fileService.uploadBanner(file, user, brandId,type);
   }
 
   @Post("/brand/banner/mobile/:id")
