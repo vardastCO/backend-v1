@@ -210,7 +210,7 @@ export class ProductService {
         .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
       // parsedData.prices = [];
-      // return parsedData;
+      return parsedData;
     }
 
     const {
