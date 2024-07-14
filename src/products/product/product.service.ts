@@ -9,7 +9,7 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import { filterObject } from "src/base/utilities/helpers";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from "src/users/user/entities/user.entity";
-import { Brackets, EntityManager, In, IsNull, Like, MoreThan } from "typeorm";
+import { Brackets, EntityManager, In, IsNull, Like, MoreThan, Not } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 import * as zlib from "zlib";
 import { AttributeValue } from "../attribute-value/entities/attribute-value.entity";
@@ -277,7 +277,7 @@ export class ProductService {
     if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
       order = { prices: { amount : "ASC" } };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
-      order = { prices: { amount: "DESC" , id: "ASC"} };
+      order = { prices: { amount: "DESC" , id:Not(null)} };
     } else {
       order = { rating: "DESC" }; 
     }
