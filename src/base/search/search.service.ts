@@ -282,7 +282,7 @@ export class SearchService {
   ): SelectQueryBuilder<Product> {
     return Product.createQueryBuilder()
       .where(
-        `to_tsvector('english', COALESCE(name, '')) @@ websearch_to_tsquery(:query)`,
+        `to_tsvector('english', COALESCE(name, '')) @@ websearch_to_tsquery(:query) AND 'deletedAt' IS NULL`,
         {
           query,
         },
