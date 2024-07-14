@@ -275,9 +275,9 @@ export class ProductService {
     }
     let order: any;
     if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
-      order = { price: { amount : "ASC"} };
+      order = { prices: { amount : "ASC"} };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
-      order =  { price: { amount : "DESC"}};
+      order = { prices: { amount: "DESC" } };
     } else {
       order = { rating: "DESC" }; 
     }
@@ -286,6 +286,7 @@ export class ProductService {
       Product.count({ where: whereConditions }),
       Product.find({
         where: whereConditions,
+        relations:['prices'],
         order,
         skip,
         take,
