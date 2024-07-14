@@ -123,11 +123,12 @@ export class FileResolver {
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
       const parsedData: Banner[] = JSON.parse(decompressedData);
-
+      console.log('with cache',parsedData)
       return parsedData;
     }
     const response = await Banner.find({ take: 5 });
     const updatedData = this.replaceKeys(response);
+    console.log('no cache',updatedData)
     const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return response;
