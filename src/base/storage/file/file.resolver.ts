@@ -124,9 +124,9 @@ export class FileResolver {
         .toString("utf-8");
       const parsedData: Banner[] = JSON.parse(decompressedData);
       console.log('with cache',parsedData)
-      return parsedData;
+      // return parsedData;
     }
-    const response = await Banner.find({ take: 5 });
+    const response = await Banner.find({ take: 5,relations:['small','medium','large','xlarge'] });
     const updatedData = this.replaceKeys(response);
     console.log('no cache',updatedData)
     const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
