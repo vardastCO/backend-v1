@@ -273,16 +273,31 @@ export class ProductService {
         createdAt: MoreThan(fifteenMinutesAgo),
       };
     }
+    let order: any;
+    if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
+      order = { "prices.amount": "ASC" };
+    } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
+      order = { "prices.amount": "DESC" };
+    } else {
+      order = { rating: "DESC" }; // Default sorting
+    }
+  
     const [totalCount, products] = await Promise.all([
       Product.count({ where: whereConditions }),
       Product.find({
         where: whereConditions,
-        order: { rating: "DESC" },
+        join: {
+          alias: "product",
+          leftJoinAndSelect: {
+            prices: "product.prices",
+          },
+        },
+        order,
         skip,
         take,
       }),
     ]);
-
+  
     const productIds = products.map(product => product.id);
     const categoryResultId = products.map(product => product.categoryId);
     const uomResultIds = products.map(product => product.uomId);
