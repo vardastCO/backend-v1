@@ -275,23 +275,17 @@ export class ProductService {
     }
     let order: any;
     if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
-      order = { "prices.amount": "ASC" };
+      order = { price: { amount : "ASC"} };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
-      order = { "prices.amount": "DESC" };
+      order =  { price: { amount : "DESC"}};
     } else {
-      order = { rating: "DESC" }; // Default sorting
+      order = { rating: "DESC" }; 
     }
   
     const [totalCount, products] = await Promise.all([
       Product.count({ where: whereConditions }),
       Product.find({
         where: whereConditions,
-        join: {
-          alias: "product",
-          leftJoinAndSelect: {
-            prices: "product.prices",
-          },
-        },
         order,
         skip,
         take,
