@@ -320,7 +320,7 @@ export class SearchService {
     const fieldsString = `COALESCE(name, '') || ' '`;
     return Seller.createQueryBuilder()
       .where("name ILIKE :query", { query: `%${query}%` })
-      .where({
+      .andWhere({
         sellerType: SellerType.ONLINE || SellerType.NORMAL,
       })
       .orderBy(
