@@ -277,7 +277,7 @@ export class ProductService {
     if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
       order = { prices: { amount : "ASC" } };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
-      order = { prices: { amount: "DESC" , id: "DESC"} };
+      order = { prices: { amount: "DESC" , id: "ASC"} };
     } else {
       order = { rating: "DESC" }; 
     }
