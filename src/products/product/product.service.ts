@@ -275,9 +275,9 @@ export class ProductService {
     }
     let order: any;
     if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
-      order = { prices: { amount : "ASC"} };
+      order = { prices: { amount : "ASC" } };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
-      order = { prices: { amount: "DESC" } };
+      order = { prices: { amount: "DESC" , id: "DESC"} };
     } else {
       order = { rating: "DESC" }; 
     }
