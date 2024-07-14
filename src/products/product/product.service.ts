@@ -210,7 +210,7 @@ export class ProductService {
         .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
       // parsedData.prices = [];
-      return parsedData;
+      // return parsedData;
     }
 
     const {
@@ -277,7 +277,7 @@ export class ProductService {
     if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
       order = { prices: { amount : "ASC" } };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
-      order = { prices: { amount: "DESC" , id:Not(null)} };
+      order = { prices: { id: 'ASC',amount: "DESC" } };
     } else {
       order = { rating: "DESC" }; 
     }
