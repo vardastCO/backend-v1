@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { File } from "./file.entity";
-import { ThreeStateSupervisionStatuses } from "src/order/enums/three-state-supervision-statuses.enum";
+import { ThreeBannerStatuses } from "../enums/three-banner-statuses.enum";
 
 
 
@@ -61,12 +61,12 @@ export class Banner extends BaseEntity {
   @Column({ nullable: true })
   url: string;
 
-  @Field(() => ThreeStateSupervisionStatuses)
+  @Field(() => ThreeBannerStatuses)
   @Index()
   @Column("enum", {
-    enum: ThreeStateSupervisionStatuses,
-    default: ThreeStateSupervisionStatuses.CONFIRMED,
+    enum: ThreeBannerStatuses,
+    default: ThreeBannerStatuses.CONFIRMED,
   })
-  status: ThreeStateSupervisionStatuses;
+  status: ThreeBannerStatuses;
 
 }
