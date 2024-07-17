@@ -116,7 +116,7 @@ export class FileResolver {
   async getBanners(
     @Args("IndexBannerInput") IndexBannerInput: IndexBannerInput,
   ): Promise<Banner[]> {
-    const cacheKey = `banners_get_${JSON.stringify(IndexBannerInput)}`;
+    const cacheKey = `get_banners`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
       const decompressedData = zlib
@@ -147,7 +147,9 @@ export class FileResolver {
 
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => Banner)
-  removeBanner(@Args("id", { type: () => Int }) id: number) {
+  async removeBanner(@Args("id", { type: () => Int }) id: number) {
+    const cacheKey = `get_banners`;
+    await this.cacheManager.del(cacheKey);
     return this.fileService.removeBanner(id);
   }
 
@@ -156,6 +158,8 @@ export class FileResolver {
   async updateBanner(
     @Args("updateBannerInput") updateBannerInput: UpdateBannerInput
   ) {
+    const cacheKey = `get_banners`;
+    await this.cacheManager.del(cacheKey);
     return this.fileService.updateBanner(updateBannerInput.id, updateBannerInput);
   }
   

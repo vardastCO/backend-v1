@@ -41,7 +41,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
     "برند": "brand",
     "دسته‌بندی": "category",
     "واحد اندازه‌گیری": "uom",
-    "قیمت (تومان)": "price",
+    "قیمت (ریال)": "price",
     "توضیحات": "description",
     "خصوصیات / ویژگی‌ها": "csvAttributes",
   };

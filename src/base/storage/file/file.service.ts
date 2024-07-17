@@ -66,8 +66,6 @@ export class FileService {
 
   async remove(id: number): Promise<File> {
     const file: File = await this.findOne(id);
-    // TODO: Check to see if file can be removed
-
     await this.minioClient.removeObject(file.bucketName, file.name);
     await file.remove();
 
@@ -86,7 +84,8 @@ export class FileService {
         large_uuid,
         medium_uuid,
         xlarge_uuid,
-        link_url
+        link_url,
+        name
       } = createBannerInput;
 
       const [small, medium, large, xlarge] = await Promise.all([
@@ -123,12 +122,15 @@ export class FileService {
         smallId :  small.id,
         mediumId :  medium.id,
         largeId :  large.id,
-        xlargeId :  xlarge.id
+        xlargeId: xlarge.id,
+        name : name
       }
 
 
       const banner: Banner =  Banner.create<Banner>(input);
-
+      if (link_url) {
+        banner.url = link_url
+      }
       
       await banner.save();
       return banner;
@@ -163,7 +165,7 @@ export class FileService {
         throw new BadRequestException(await this.i18n.translate("exceptions.NOT_FOUND"));
       }
   
-      const { small_uuid, large_uuid, medium_uuid, xlarge_uuid, link_url } = updateBannerInput;
+      const { small_uuid, large_uuid, medium_uuid, xlarge_uuid, link_url,name } = updateBannerInput;
   
       const files = await File.find({
         where: { uuid: In([small_uuid, medium_uuid, large_uuid, xlarge_uuid]) }
@@ -185,6 +187,10 @@ export class FileService {
       }
       if (link_url) {
         banner.url = link_url;
+      }
+
+      if (name) {
+        banner.name = name;
       }
   
       await banner.save();

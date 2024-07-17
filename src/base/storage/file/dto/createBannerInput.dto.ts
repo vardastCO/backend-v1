@@ -12,6 +12,11 @@ export class CreateBannerInput {
   @IsNotEmpty()
   @IsString()
   small_uuid: string;
+
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  name: string;
     
   @Field()
   @IsNotEmpty()

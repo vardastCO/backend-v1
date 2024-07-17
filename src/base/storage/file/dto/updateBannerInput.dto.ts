@@ -8,6 +8,12 @@ export class UpdateBannerInput {
     @IsInt()
     id: number;
 
+    
+    @Field({ nullable: true })
+    @IsOptional()
+    @IsString()
+    name?: string;
+
     @Field({ nullable: true })
     @IsOptional()
     @IsString()
