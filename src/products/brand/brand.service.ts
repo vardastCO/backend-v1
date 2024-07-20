@@ -174,7 +174,6 @@ export class BrandService {
       where: whereConditions,
       order: order
     });
-    console.log('total,',total)
     try {
       const jsonString = JSON.stringify(data)
         .replace(/__bannerDesktop__/g, "bannerDesktop")
