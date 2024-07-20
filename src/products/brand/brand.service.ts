@@ -141,9 +141,6 @@ export class BrandService {
     }
 
     if (categoryId) {
-      console.log('categoryId', categoryId)
-      console.log('categoryId================')
-      console.log(' this.findTopMostParent(categoryId)', await this.findTopMostParent(categoryId))
       whereConditions[`categoryId`] = await this.findTopMostParent(categoryId);
     }
 
