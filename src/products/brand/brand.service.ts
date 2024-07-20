@@ -115,7 +115,7 @@ export class BrandService {
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
       const parsedData: PaginationBrandResponse = JSON.parse(decompressedData);
-
+      console.log('with cache,',parsedData)
       return parsedData;
     }
 
@@ -168,6 +168,7 @@ export class BrandService {
         ? Not(IsNull())
         : IsNull();
     }
+    console.log('whereConditions,',whereConditions)
     whereConditions[`id`] = Not(12269);
     const [data, total] = await Brand.findAndCount({
       skip,
@@ -175,7 +176,7 @@ export class BrandService {
       where: whereConditions,
       order: order
     });
-
+    console.log('total,',total)
     try {
       const jsonString = JSON.stringify(data)
         .replace(/__bannerDesktop__/g, "bannerDesktop")
