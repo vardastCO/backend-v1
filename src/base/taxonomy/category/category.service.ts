@@ -98,54 +98,82 @@ export class CategoryService {
     const cachedCategories = await this.cacheManager.get<Category[]>(cacheKey);
 
     if (cachedCategories && Array.isArray(cachedCategories)) {
-      // return cachedCategories;
+        // return cachedCategories;
     }
 
     try {
-      const query = `
-        SELECT 
-          a.id, 
-          a.title AS level1,
-          b.title AS level2,
-          c.title AS level3,
-          d.title AS level4,
-          e.title AS level5
-        FROM 
-          base_taxonomy_categories a
-        LEFT JOIN 
-          base_taxonomy_categories b ON a.id = b."parentCategoryId"
-        LEFT JOIN 
-          base_taxonomy_categories c ON b.id = c."parentCategoryId"
-        LEFT JOIN 
-          base_taxonomy_categories d ON c.id = d."parentCategoryId"
-        LEFT JOIN 
-          base_taxonomy_categories e ON d.id = e."parentCategoryId"
-        WHERE 
-          a."parentCategoryId" IS NULL
-      `;
+        const query = `
+            SELECT 
+                a.id AS level1_id, a.title AS level1_title,
+                b.id AS level2_id, b.title AS level2_title,
+                c.id AS level3_id, c.title AS level3_title,
+                d.id AS level4_id, d.title AS level4_title,
+                e.id AS level5_id, e.title AS level5_title
+            FROM 
+                base_taxonomy_categories a
+            LEFT JOIN 
+                base_taxonomy_categories b ON a.id = b."parentCategoryId"
+            LEFT JOIN 
+                base_taxonomy_categories c ON b.id = c."parentCategoryId"
+            LEFT JOIN 
+                base_taxonomy_categories d ON c.id = d."parentCategoryId"
+            LEFT JOIN 
+                base_taxonomy_categories e ON d.id = e."parentCategoryId"
+            WHERE 
+                a."parentCategoryId" IS NULL
+        `;
 
-      // if (searchTerm) {
-      //   query += `
-      //     AND (
-      //       a.title = $1
-      //       OR b.title = $1
-      //       OR c.title = $1
-      //       OR d.title = $1
-      //       OR e.title = $1
-      //     )
-      //   `;
-      // }
-      // const result = await this.entityManager.query(query, [searchTerm]);
-      const result = await this.entityManager.query(query);
-      const categories = result;
-      await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); // Set TTL as needed
-      console.log('categories',categories)
-      return categories;
+        const result = await this.entityManager.query(query);
+
+        // Helper function to build the hierarchy
+        function buildHierarchy(rows) {
+            const map = {};
+            const roots = [];
+
+            for (const row of rows) {
+                const {
+                    level1_id, level1_title,
+                    level2_id, level2_title,
+                    level3_id, level3_title,
+                    level4_id, level4_title,
+                    level5_id, level5_title
+                } = row;
+
+                // Helper to add a category if it doesn't exist
+                function addCategory(id, title, parent) {
+                    if (!id) return;
+                    if (!map[id]) {
+                        map[id] = { id, title, children: [] };
+                        if (parent) {
+                            parent.children.push(map[id]);
+                        } else {
+                            roots.push(map[id]);
+                        }
+                    }
+                }
+
+                // Add categories and build hierarchy
+                addCategory(level1_id, level1_title, null);
+                addCategory(level2_id, level2_title, map[level1_id]);
+                addCategory(level3_id, level3_title, map[level2_id]);
+                addCategory(level4_id, level4_title, map[level3_id]);
+                addCategory(level5_id, level5_title, map[level4_id]);
+            }
+
+            return roots;
+        }
+
+        const categories = buildHierarchy(result);
+
+        await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); // Set TTL as needed
+        console.log('categories', categories);
+        return categories;
     } catch (error) {
-      // Handle error appropriately (e.g., log it, throw a custom error)
-      console.error("Error fetching categories:", error);
+        // Handle error appropriately (e.g., log it, throw a custom error)
+        console.error("Error fetching categories:", error);
     }
-  }
+}
+
   async create(createCategoryInput, User): Promise<Category> {
     const cacheKey = "categories:*"; // Match all keys starting with 'categories:'
     await this.cacheManager.del(cacheKey);
