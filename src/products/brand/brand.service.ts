@@ -139,10 +139,12 @@ export class BrandService {
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
-    console.log('categoryId',categoryId)
+
     if (categoryId) {
-      console.log(' this.findTopMostParent(categoryId)', this.findTopMostParent(categoryId))
-      whereConditions[`categoryId`] = this.findTopMostParent(categoryId);
+      console.log('categoryId', categoryId)
+      console.log('categoryId================')
+      console.log(' this.findTopMostParent(categoryId)', await this.findTopMostParent(categoryId))
+      whereConditions[`categoryId`] = await this.findTopMostParent(categoryId);
     }
 
     if (indexBrandInput.hasLogoFile !== undefined) {
