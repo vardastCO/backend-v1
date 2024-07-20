@@ -12,7 +12,7 @@ import { AuthorizationService } from "src/users/authorization/authorization.serv
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { User } from "src/users/user/entities/user.entity";
-import { EntityManager, IsNull, Like, Not } from "typeorm";
+import { EntityManager, IsNull, Like, MoreThanOrEqual, Not } from "typeorm";
 import * as zlib from "zlib";
 import { Product } from "../product/entities/product.entity";
 import { CreateBrandInput } from "./dto/create-brand.input";
@@ -97,6 +97,7 @@ export class BrandService {
       skip,
       name,
       categoryId,
+      rating,
       hasBannerFile,
       hasCatalogeFile,
       hasPriceList,
@@ -130,9 +131,12 @@ export class BrandService {
         break;
       case SortBrandEnum.VIEW:
           order['views'] = "DESC";
-          break;
+        break;
+      case SortBrandEnum.SUM:
+          order['sum'] = "DESC";
+        break;
       default:
-        order['sum'] = "DESC";
+        order['rating'] = "DESC";
         break;
     }
 
@@ -144,6 +148,9 @@ export class BrandService {
       whereConditions[`categoryId`] = await this.findTopMostParent(categoryId);
     }
 
+    if (rating) {
+      whereConditions[`rating`] = MoreThanOrEqual(rating);
+    }
     if (indexBrandInput.hasLogoFile !== undefined) {
       whereConditions[`logoFile`] = indexBrandInput.hasLogoFile
         ? Not(IsNull())
@@ -194,7 +201,7 @@ export class BrandService {
         await this.cacheManager.set(
           cacheKey,
           compressedData,
-          CacheTTL.ONE_WEEK,
+          CacheTTL.ONE_DAY,
         );
       }
 

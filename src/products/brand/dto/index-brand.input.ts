@@ -10,6 +10,10 @@ export class IndexBrandInput extends IndexInput {
   @IsOptional()
   name?: string;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  rating?: number;
+
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
   hasLogoFile?: boolean ;
