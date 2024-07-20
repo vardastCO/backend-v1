@@ -151,10 +151,10 @@ export class RegistrationService {
       };
     }
 
-    console.log('ggggg')
+    console.log('validate otp;')
 
     if (!(await lastUnexpiredOtp.doesTokenMatches(validateOtpInput.token))) {
-      console.log('uuuuuuuuuuuuuu')
+      console.log('wrong password')
       throw new BadRequestException("رمز یکبار مصرف وارد شده اشتباه است.");
     }
 
@@ -170,7 +170,6 @@ export class RegistrationService {
       validateOtpInput.validationType == ValidationTypes.SIGNUP &&
       anyUsersExists
     ) {
-      console.log('start',validateOtpInput.validationType,anyUsersExists)
       return {
         nextState: AuthStates.LOGIN,
         message: "لطفا وارد حساب کاربری خود شوید.",
@@ -179,15 +178,12 @@ export class RegistrationService {
       validateOtpInput.validationType == ValidationTypes.PASSWORD_RESET &&
       !anyUsersExists
     ) {
-      console.log('start46456456')
       return {
         
         nextState: AuthStates.VALIDATE_CELLPHONE,
         message: "خطایی در فرآیند رخ داده، لطفا فرآیند را از ابتدا شروع کنید.",
       };
     }
-
-    console.log('end',validateOtpInput.validationKey)
 
     return {
       validationKey: validateOtpInput.validationKey,

@@ -144,7 +144,7 @@ export class AuthService {
       newUser,
     );
 
-    console.log('new user')
+    console.log('new user',newUser.cellphone)
   
     // await User.update(
     //   { id: newUser.id },
