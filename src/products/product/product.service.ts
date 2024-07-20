@@ -794,12 +794,6 @@ export class ProductService {
     return await product.offers;
   }
   async getPublicOffersOf(product: Product): Promise<Offer[]> {
-    // const cacheKey = `public_offers_${JSON.stringify(product.id)}`;
-    // const cachedData = await this.cacheManager.get<Offer[]>(cacheKey);
-
-    // if (cachedData) {
-    //   // return cachedData;
-    // }
 
     const offers = await Offer.createQueryBuilder()
       .innerJoin(
@@ -818,17 +812,9 @@ export class ProductService {
         "maxIds",
         '"Offer"."id" = "maxIds"."maxId"',
       )
-      // .take(5)
-      // .orderBy(
-      //   { createdAt: 'DESC' }
-
-      // )
-      // .innerJoinAndSelect('Offer."lastPublicConsumerPrice"', 'lastPublicConsumerPrice') // Removed double quotes around "Offer"
-      // .orderBy('lastPublicConsumerPrice.createdAt', 'DESC')
       .orderBy('"Offer"."createdAt"', "DESC")
+      .take(5)
       .getMany();
-
-    // await this.cacheManager.set(cacheKey,offers,CacheTTL.ONE_DAY)
 
     return offers;
   }

@@ -415,7 +415,12 @@ export class BrandService {
   }
   async findTopMostParent(categoryId: number): Promise<number> {
     try {
-      console.log('category INSIDE',categoryId)
+      const cacheKey = `findTopMostParent:${categoryId}:categories`;
+      const cachedData = await this.cacheManager.get<number>(cacheKey);
+  
+      if (cachedData) {
+        return cachedData ;
+      }
       let currentCategoryId = categoryId;
       let parentCategoryId = null;
       let loopCounter = 0;
@@ -425,7 +430,6 @@ export class BrandService {
               'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
               [currentCategoryId]
           );
-          console.log('result INSIDE',result)
           if (result.length === 0) {
               break;
           }
@@ -438,10 +442,9 @@ export class BrandService {
           }
     
         currentCategoryId = parentCategoryId;
-        console.log('loopCounter INSIDE',loopCounter)
-          loopCounter++;
+        loopCounter++;
       }
-    
+      await this.cacheManager.set(cacheKey,currentCategoryId,CacheTTL.TWO_WEEK)
       return currentCategoryId;
     } catch (error) {
       console.log('err in findTopMostParent',error)
