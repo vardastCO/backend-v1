@@ -813,7 +813,7 @@ export class ProductService {
         '"Offer"."id" = "maxIds"."maxId"',
       )
       .orderBy('"Offer"."createdAt"', "DESC")
-      .take(5)
+      // .take(5)
       .getMany();
 
     return offers;
