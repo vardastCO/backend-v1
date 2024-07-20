@@ -98,7 +98,7 @@ export class CategoryService {
     const cachedCategories = await this.cacheManager.get<Category[]>(cacheKey);
 
     if (cachedCategories && Array.isArray(cachedCategories)) {
-      return cachedCategories;
+      // return cachedCategories;
     }
 
     try {
@@ -139,7 +139,7 @@ export class CategoryService {
       const result = await this.entityManager.query(query);
       const categories = result;
       await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); // Set TTL as needed
-
+      console.log('categories',categories)
       return categories;
     } catch (error) {
       // Handle error appropriately (e.g., log it, throw a custom error)
