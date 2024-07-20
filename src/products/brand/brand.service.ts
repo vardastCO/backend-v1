@@ -411,32 +411,37 @@ export class BrandService {
     return await brand.products;
   }
   async findTopMostParent(categoryId: number): Promise<number> {
-    let currentCategoryId = categoryId;
-    let parentCategoryId = null;
-    let loopCounter = 0;
-
-    while (currentCategoryId !== null && loopCounter < 4) {
-        const result = await this.entityManager.query(
-            'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
-            [currentCategoryId]
-        );
-
-        if (result.length === 0) {
-            break;
-        }
-
-        const category = result[0];
-        parentCategoryId = category.parentCategoryId;
-        
-        if (parentCategoryId === null) {
-            return category.id;
-        }
-
-        currentCategoryId = parentCategoryId;
-        loopCounter++;
+    try {
+      let currentCategoryId = categoryId;
+      let parentCategoryId = null;
+      let loopCounter = 0;
+    
+      while (currentCategoryId !== null && loopCounter < 4) {
+          const result = await this.entityManager.query(
+              'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
+              [currentCategoryId]
+          );
+    
+          if (result.length === 0) {
+              break;
+          }
+    
+          const category = result[0];
+          parentCategoryId = category.parentCategoryId;
+          
+          if (parentCategoryId === null) {
+              return category.id;
+          }
+    
+          currentCategoryId = parentCategoryId;
+          loopCounter++;
+      }
+    
+      return currentCategoryId;
+    } catch (error) {
+      console.log('err in findTopMostParent',error)
     }
-
-    return currentCategoryId;
+ 
 }
   async getContactInfosOf(brand: Brand): Promise<ContactInfo[]> {
     const cacheKey = `contactInfos:${brand.id}:brand`;
