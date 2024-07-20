@@ -139,8 +139,9 @@ export class BrandService {
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
-
+    console.log('categoryId',categoryId)
     if (categoryId) {
+      console.log(' this.findTopMostParent(categoryId)', this.findTopMostParent(categoryId))
       whereConditions[`categoryId`] = this.findTopMostParent(categoryId);
     }
 
@@ -412,6 +413,7 @@ export class BrandService {
   }
   async findTopMostParent(categoryId: number): Promise<number> {
     try {
+      console.log('category INSIDE',categoryId)
       let currentCategoryId = categoryId;
       let parentCategoryId = null;
       let loopCounter = 0;
@@ -421,7 +423,7 @@ export class BrandService {
               'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
               [currentCategoryId]
           );
-    
+          console.log('result INSIDE',result)
           if (result.length === 0) {
               break;
           }
@@ -433,7 +435,8 @@ export class BrandService {
               return category.id;
           }
     
-          currentCategoryId = parentCategoryId;
+        currentCategoryId = parentCategoryId;
+        console.log('loopCounter INSIDE',loopCounter)
           loopCounter++;
       }
     
