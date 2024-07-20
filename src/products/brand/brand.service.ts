@@ -417,7 +417,7 @@ export class BrandService {
 
     while (currentCategoryId !== null && loopCounter < 4) {
         const result = await this.entityManager.query(
-            'SELECT id, parentCategoryId FROM base_taxonomy_categories WHERE id = $1',
+            'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
             [currentCategoryId]
         );
 
