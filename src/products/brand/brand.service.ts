@@ -115,7 +115,6 @@ export class BrandService {
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
       const parsedData: PaginationBrandResponse = JSON.parse(decompressedData);
-      console.log('with cache,',parsedData)
       return parsedData;
     }
 
@@ -142,7 +141,7 @@ export class BrandService {
     }
 
     if (categoryId) {
-      whereConditions[`categoryId`] = categoryId;
+      whereConditions[`categoryId`] = this.findTopMostParent(categoryId);
     }
 
     if (indexBrandInput.hasLogoFile !== undefined) {
@@ -168,7 +167,6 @@ export class BrandService {
         ? Not(IsNull())
         : IsNull();
     }
-    console.log('whereConditions,',whereConditions)
     whereConditions[`id`] = Not(12269);
     const [data, total] = await Brand.findAndCount({
       skip,
@@ -413,7 +411,34 @@ export class BrandService {
   async getProductsOf(brand: Brand): Promise<Product[]> {
     return await brand.products;
   }
+  async findTopMostParent(categoryId: number): Promise<number> {
+    let currentCategoryId = categoryId;
+    let parentCategoryId = null;
+    let loopCounter = 0;
 
+    while (currentCategoryId !== null && loopCounter < 4) {
+        const result = await this.entityManager.query(
+            'SELECT id, parentCategoryId FROM base_taxonomy_categories WHERE id = $1',
+            [currentCategoryId]
+        );
+
+        if (result.length === 0) {
+            break;
+        }
+
+        const category = result[0];
+        parentCategoryId = category.parentCategoryId;
+        
+        if (parentCategoryId === null) {
+            return category.id;
+        }
+
+        currentCategoryId = parentCategoryId;
+        loopCounter++;
+    }
+
+    return currentCategoryId;
+}
   async getContactInfosOf(brand: Brand): Promise<ContactInfo[]> {
     const cacheKey = `contactInfos:${brand.id}:brand`;
     const cachedData = await this.cacheManager.get(cacheKey);
