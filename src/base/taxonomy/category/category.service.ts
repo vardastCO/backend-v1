@@ -147,6 +147,7 @@ export class CategoryService {
                         map[id] = new CategoryDTO();
                         map[id].id = id;
                         map[id].title = title;
+                        map[id].children = []; 
                         if (parent) {
                             parent.children.push(map[id]);
                         } else {
