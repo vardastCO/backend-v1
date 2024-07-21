@@ -26,6 +26,7 @@ import { PaginationCategoryResponse } from "./dto/pagination-category.response";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
+import { CategoryDTO } from "./dto/category-dto";
 
 @Resolver(() => Category)
 export class CategoryResolver {
@@ -91,7 +92,7 @@ export class CategoryResolver {
   }
 
   @Public()
-  @Query(() => [Category], { name: "allCategories" })
+  @Query(() => [CategoryDTO], { name: "allCategories" })
   allCategories() {
     return this.categoryService.getCategories();
   }

@@ -17,6 +17,7 @@ import { ImageCategory } from "./entities/category-image.entity";
 import { Category } from "./entities/category.entity";
 import { DecompressionService } from "src/decompression.service";
 import { CompressionService } from "src/compression.service";
+import { CategoryDTO } from "./dto/category-dto";
 @Injectable()
 export class CategoryService {
   constructor(
@@ -92,15 +93,15 @@ export class CategoryService {
     // }
   }
 
-  async getCategories(searchTerm = null): Promise<Category[]> {
+  async getCategories(searchTerm = null): Promise<CategoryDTO[]> {
     const cacheKey = `category_v3`;
-
-    const cachedCategories = await this.cacheManager.get<Category[]>(cacheKey);
-
+  
+    const cachedCategories = await this.cacheManager.get<CategoryDTO[]>(cacheKey);
+  
     if (cachedCategories && Array.isArray(cachedCategories)) {
         // return cachedCategories;
     }
-
+  
     try {
         const query = `
             SELECT 
@@ -122,14 +123,14 @@ export class CategoryService {
             WHERE 
                 a."parentCategoryId" IS NULL
         `;
-
+  
         const result = await this.entityManager.query(query);
-
+  
         // Helper function to build the hierarchy
         function buildHierarchy(rows) {
             const map = {};
             const roots = [];
-
+  
             for (const row of rows) {
                 const {
                     level1_id, level1_title,
@@ -138,12 +139,14 @@ export class CategoryService {
                     level4_id, level4_title,
                     level5_id, level5_title
                 } = row;
-
+  
                 // Helper to add a category if it doesn't exist
                 function addCategory(id, title, parent) {
                     if (!id) return;
                     if (!map[id]) {
-                        map[id] = { id, title, children: [] };
+                        map[id] = new CategoryDTO();
+                        map[id].id = id;
+                        map[id].title = title;
                         if (parent) {
                             parent.children.push(map[id]);
                         } else {
@@ -152,27 +155,25 @@ export class CategoryService {
                     }
                 }
 
-                // Add categories and build hierarchy
                 addCategory(level1_id, level1_title, null);
                 addCategory(level2_id, level2_title, map[level1_id]);
                 addCategory(level3_id, level3_title, map[level2_id]);
                 addCategory(level4_id, level4_title, map[level3_id]);
                 addCategory(level5_id, level5_title, map[level4_id]);
             }
-
+  
             return roots;
         }
-
+  
         const categories = buildHierarchy(result);
-
-        await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); // Set TTL as needed
-        console.log('categories', categories);
+  
+        await this.cacheManager.set(cacheKey, categories,CacheTTL.ONE_WEEK); 
         return categories;
     } catch (error) {
-        // Handle error appropriately (e.g., log it, throw a custom error)
         console.error("Error fetching categories:", error);
     }
-}
+  }
+  
 
   async create(createCategoryInput, User): Promise<Category> {
     const cacheKey = "categories:*"; // Match all keys starting with 'categories:'
