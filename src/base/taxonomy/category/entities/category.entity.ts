@@ -32,6 +32,10 @@ export class Category extends BaseEntity {
   @Column()
   vocabularyId: number;
 
+  @Field(() => Int, { nullable: true, defaultValue: 1 })
+  @Column({ type: 'int', nullable: true, default: 1 })
+  views?: number;
+
   @Field(() => Category, { nullable: true })
   @ManyToOne(() => Category, category => category?.children, { nullable: true })
   parentCategory?: Promise<Category>;

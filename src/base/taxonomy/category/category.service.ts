@@ -444,26 +444,39 @@ export class CategoryService {
 
   async findOne(id: number, slug?: string): Promise<Category> {
     const cacheKey = `category:${id}:${slug || ""}`;
+  
 
-    const cachedCategory = await this.cacheManager.get<string>(cacheKey);
-
+    const [cachedCategory, categoryFromDB] = await Promise.all([
+      this.cacheManager.get<string>(cacheKey),
+      this.categoryRepository.findOneBy({ id, slug })
+    ]);
+  
     if (cachedCategory) {
       const decompressedData = zlib
         .gunzipSync(Buffer.from(cachedCategory, "base64"))
         .toString("utf-8");
       const parsedData: Category = JSON.parse(decompressedData);
-      console.log('id category cache',id)
+  
+      const incrementViewsPromise = this.incrementCategoryViews(parsedData);
+      await incrementViewsPromise;
+  
       return parsedData;
     }
-    const category = await this.categoryRepository.findOneBy({ id, slug });
-    if (!category) {
+  
+    if (!categoryFromDB) {
       throw new NotFoundException();
     }
-    const compressedData = zlib.gzipSync(JSON.stringify(category));
-    console.log('id category no cache',id)
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
-    return category;
+  
+    const compressedData = zlib.gzipSync(JSON.stringify(categoryFromDB));
+    const cachePromise = this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
+    
+    const incrementViewsPromise = this.incrementCategoryViews(categoryFromDB);
+    
+    await Promise.all([cachePromise, incrementViewsPromise]);
+  
+    return categoryFromDB;
   }
+  
 
   async findOneAttribuite(id: number, slug?: string): Promise<Category> {
     const category = await this.categoryRepository.findOneBy({ id, slug });
@@ -472,14 +485,23 @@ export class CategoryService {
     }
     return category;
   }
-
+  private async incrementCategoryViews(brand: Category) {
+    try {
+      await this.entityManager.query(
+        `UPDATE base_taxonomy_categories SET views = views + 1 WHERE id = $1`,
+        [brand.id]
+      );
+    } catch (error) {
+      console.log('err in incrementCategoryViews',error)
+    }
+  }
   async update(
     id: number,
     updateCategoryInput: UpdateCategoryInput,
     user: User,
   ): Promise<Category> {
     try {
-      const cacheKey = "categories:*"; // Match all keys starting with 'categories:'
+      const cacheKey = "categories:*";
       await this.cacheManager.del(cacheKey);
       const category: Category = await Category.findOne({
         where: { id: updateCategoryInput.id },
