@@ -401,7 +401,7 @@ export class PreOrderService {
       const category = await Category.findOne({
         select: ['title', 'id','imageCategory'],
         where: { id: categoryId },
-        relations:['imageCategory']
+        relations: ['imageCategory']
       });
   
       if (!category) {

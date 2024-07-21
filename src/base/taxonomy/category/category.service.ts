@@ -18,6 +18,7 @@ import { Category } from "./entities/category.entity";
 import { DecompressionService } from "src/decompression.service";
 import { CompressionService } from "src/compression.service";
 import { CategoryDTO } from "./dto/category-dto";
+import { File } from "src/base/storage/file/entities/file.entity";
 @Injectable()
 export class CategoryService {
   constructor(
@@ -95,13 +96,13 @@ export class CategoryService {
 
   async getCategories(searchTerm = null): Promise<CategoryDTO[]> {
     const cacheKey = `category_v3`;
-  
+
     const cachedCategories = await this.cacheManager.get<CategoryDTO[]>(cacheKey);
-  
+
     if (cachedCategories && Array.isArray(cachedCategories)) {
         // return cachedCategories;
     }
-  
+
     try {
         const query = `
             SELECT 
@@ -123,14 +124,14 @@ export class CategoryService {
             WHERE 
                 a."parentCategoryId" IS NULL
         `;
-  
+
         const result = await this.entityManager.query(query);
-  
-        // Helper function to build the hierarchy
-        function buildHierarchy(rows) {
+
+        async function buildHierarchy(rows): Promise<CategoryDTO[]> {
             const map = {};
             const roots = [];
-  
+            const levelOnePromises = [];
+
             for (const row of rows) {
                 const {
                     level1_id, level1_title,
@@ -139,15 +140,14 @@ export class CategoryService {
                     level4_id, level4_title,
                     level5_id, level5_title
                 } = row;
-  
-                // Helper to add a category if it doesn't exist
+
                 function addCategory(id, title, parent) {
                     if (!id) return;
                     if (!map[id]) {
                         map[id] = new CategoryDTO();
                         map[id].id = id;
                         map[id].title = title;
-                        map[id].children = []; 
+                        map[id].children = [];
                         if (parent) {
                             parent.children.push(map[id]);
                         } else {
@@ -161,14 +161,34 @@ export class CategoryService {
                 addCategory(level3_id, level3_title, map[level2_id]);
                 addCategory(level4_id, level4_title, map[level3_id]);
                 addCategory(level5_id, level5_title, map[level4_id]);
+
+                const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
+                if (level1_id) {
+                    levelOnePromises.push(
+                        Category.findOne({
+                            select: ['id', 'imageCategory'],
+                            where: { id: level1_id },
+                            relations: ['imageCategory']
+                        }).then(async category => {
+                            if (category && category.imageCategory && (await category.imageCategory).length > 0) {
+                                return File.findOneBy({ id: category.imageCategory[0].fileId }).then(image => {
+                                    if (image) {
+                                        map[level1_id].imageUrl = `${baseUrl}${image.name}`; 
+                                    }
+                                });
+                            }
+                        })
+                    );
+                }
             }
-  
+
+            await Promise.all(levelOnePromises);
             return roots;
         }
-  
-        const categories = buildHierarchy(result);
-  
-        await this.cacheManager.set(cacheKey, categories,CacheTTL.ONE_WEEK); 
+
+        const categories = await buildHierarchy(result);
+
+        await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); 
         return categories;
     } catch (error) {
         console.error("Error fetching categories:", error);
