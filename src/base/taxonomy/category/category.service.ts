@@ -171,11 +171,15 @@ export class CategoryService {
                             relations: ['imageCategory']
                         }).then(async category => {
                             if (category && category.imageCategory && (await category.imageCategory).length > 0) {
+                              const fileId = category.imageCategory[0]?.fileId;
+                              console.log('category',category,category.imageCategory[0])
+                              if (fileId) {
                                 return File.findOneBy({ id: category.imageCategory[0].fileId }).then(image => {
                                     if (image) {
                                         map[level1_id].imageUrl = `${baseUrl}${image.name}`; 
                                     }
                                 });
+                              }
                             }
                         })
                     );
