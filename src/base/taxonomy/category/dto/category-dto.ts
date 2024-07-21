@@ -1,10 +1,13 @@
-import { InputType } from "@nestjs/graphql";
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 
-
-@InputType()
+@ObjectType()
 export class CategoryDTO {
-  id: string;
-  title: string;
-  children: CategoryDTO[] = [];
-}
+    @Field(type => Int)
+    id: number;
 
+    @Field()
+    title: string;
+
+    @Field(type => [CategoryDTO], { nullable: true })
+    children?: CategoryDTO[];
+}
