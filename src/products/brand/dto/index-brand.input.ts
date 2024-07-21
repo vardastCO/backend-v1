@@ -31,12 +31,12 @@ export class IndexBrandInput extends IndexInput {
   hasPriceList?: boolean ;
   
   @Field(() => SortBrandEnum, {
-    defaultValue: SortBrandEnum.SUM,
+    defaultValue: SortBrandEnum.RATING,
     nullable: true,
   })
   @IsNotEmpty()
   @IsEnum(SortBrandEnum)
-  sortType?: SortBrandEnum = SortBrandEnum.SUM;
+  sortType?: SortBrandEnum = SortBrandEnum.RATING;
 
   @Field(() => Int, {
     nullable: true,
