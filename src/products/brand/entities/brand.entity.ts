@@ -68,6 +68,11 @@ export class Brand extends BaseEntity {
   @Column({ type: 'int', nullable: true, default: 1 })
   views?: number;
 
+
+  @Field(() => Int, { nullable: true })
+  @Column( {nullable: true })
+  cityId?: number;
+
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   slug?: string;

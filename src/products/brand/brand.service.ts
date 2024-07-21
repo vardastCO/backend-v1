@@ -98,6 +98,7 @@ export class BrandService {
       name,
       categoryId,
       rating,
+      cityId,
       hasBannerFile,
       hasCatalogeFile,
       hasPriceList,
@@ -148,8 +149,12 @@ export class BrandService {
       whereConditions[`categoryId`] = await this.findTopMostParent(categoryId);
     }
 
+    if (cityId) {
+      whereConditions[`cityId`] = cityId;
+    }
+
     if (rating) {
-      whereConditions[`rating`] = MoreThanOrEqual(rating);
+      whereConditions[`rating`] = rating;
     }
     if (indexBrandInput.hasLogoFile !== undefined) {
       whereConditions[`logoFile`] = indexBrandInput.hasLogoFile

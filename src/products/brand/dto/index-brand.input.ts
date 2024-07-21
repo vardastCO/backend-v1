@@ -44,4 +44,11 @@ export class IndexBrandInput extends IndexInput {
   @IsOptional()
   @IsInt()
   categoryId?: number;
+
+  @Field(() => Int, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  cityId?: number;
 }
