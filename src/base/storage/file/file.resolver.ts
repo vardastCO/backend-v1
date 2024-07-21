@@ -136,20 +136,7 @@ export class FileResolver {
   async findOneBanner(
     @Args("id") id: number,
   ): Promise<Banner> {
-    const cacheKey = `get_banner_${id}`;
-    const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
-      const decompressedData = zlib
-        .gunzipSync(Buffer.from(cachedData, "base64"))
-        .toString("utf-8");
-      const parsedData: Banner = JSON.parse(decompressedData);
-      return parsedData;
-    }
-    const response = await Banner.findOne({ where: {id},relations:['small','medium','large','xlarge'] });
-    const updatedData = this.replaceKeys(response);
-    const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
-    await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
-    return response;
+    return await Banner.findOne({ where: {id},relations:['small','medium','large','xlarge'] });
   }
   replaceKeys(data) {
     return data.map(item => {
