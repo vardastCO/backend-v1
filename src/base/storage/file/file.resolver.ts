@@ -125,7 +125,7 @@ export class FileResolver {
       const parsedData: Banner[] = JSON.parse(decompressedData);
       return parsedData;
     }
-    const response = await Banner.find({ take: 5,relations:['small','medium','large','xlarge'] });
+    const response = await Banner.find({ take: 15,relations:['small','medium','large','xlarge'] });
     const updatedData = this.replaceKeys(response);
     const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
