@@ -452,7 +452,7 @@ export class CategoryService {
         .gunzipSync(Buffer.from(cachedCategory, "base64"))
         .toString("utf-8");
       const parsedData: Category = JSON.parse(decompressedData);
-
+      console.log('id category cache',id)
       return parsedData;
     }
     const category = await this.categoryRepository.findOneBy({ id, slug });
@@ -460,6 +460,7 @@ export class CategoryService {
       throw new NotFoundException();
     }
     const compressedData = zlib.gzipSync(JSON.stringify(category));
+    console.log('id category no cache',id)
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
     return category;
   }
