@@ -95,12 +95,12 @@ export class CategoryService {
   }
 
   async getCategories(searchTerm = null): Promise<CategoryDTO[]> {
-    const cacheKey = `category_v3`;
+    const cacheKey = `category_mega_menu`;
 
     const cachedCategories = await this.cacheManager.get<CategoryDTO[]>(cacheKey);
 
     if (cachedCategories && Array.isArray(cachedCategories)) {
-        // return cachedCategories;
+        return cachedCategories;
     }
 
     try {
@@ -130,7 +130,7 @@ export class CategoryService {
         async function buildHierarchy(rows): Promise<CategoryDTO[]> {
             const map = {};
             const roots = [];
-            const levelOnePromises = [];
+            const levelOneIds = new Set();
 
             for (const row of rows) {
                 const {
@@ -162,31 +162,45 @@ export class CategoryService {
                 addCategory(level4_id, level4_title, map[level3_id]);
                 addCategory(level5_id, level5_title, map[level4_id]);
 
-                const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
-                if (level1_id) {
-                    levelOnePromises.push(
-                        Category.findOne({
-                            select: ['id', 'imageCategory'],
-                            where: { id: level1_id },
-                            relations: ['imageCategory']
-                        }).then(async category => {
-                            if (category && category.imageCategory && (await category.imageCategory).length > 0) {
-                              const fileId = category.imageCategory[0]?.fileId;
-                              console.log('category',category,category.imageCategory[0])
-                              if (fileId) {
-                                return File.findOneBy({ id: category.imageCategory[0].fileId }).then(image => {
-                                    if (image) {
-                                        map[level1_id].imageUrl = `${baseUrl}${image.name}`; 
-                                    }
-                                });
-                              }
-                            }
-                        })
-                    );
-                }
+                levelOneIds.add(level1_id);
             }
 
-            await Promise.all(levelOnePromises);
+            const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
+            const processedCategories = {};
+            const processCategory = async (level1_id) => {
+                if (level1_id in processedCategories) {
+                    return;
+                }
+
+                processedCategories[level1_id] = true;
+                
+                try {
+                    const category = await Category.findOne({
+                        select: ['id', 'imageCategory'],
+                        where: { id: level1_id },
+                        relations: ['imageCategory']
+                    });
+
+                  if (category) {
+                        const imageCategories = await category.imageCategory || [];
+                        if (imageCategories.length > 0) {
+                            const fileId = imageCategories[0]?.fileId;
+  
+                            if (fileId) {
+                                const image = await File.findOneBy({ id: fileId });
+               
+                                if (image) {
+                                    map[level1_id].image_url = `${baseUrl}${image.name}`;
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error processing category with ID ${level1_id}:`, error);
+                }
+            };
+            await Promise.all(Array.from(levelOneIds).map(id => processCategory(id)));
+
             return roots;
         }
 
@@ -196,9 +210,9 @@ export class CategoryService {
         return categories;
     } catch (error) {
         console.error("Error fetching categories:", error);
+        return [];
     }
   }
-  
 
   async create(createCategoryInput, User): Promise<Category> {
     const cacheKey = "categories:*"; // Match all keys starting with 'categories:'

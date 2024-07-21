@@ -92,8 +92,8 @@ export class CategoryResolver {
   }
 
   @Public()
-  @Query(() => [CategoryDTO], { name: "allCategories" })
-  allCategories() {
+  @Query(() => [CategoryDTO], { name: "mega_menu" })
+  mega_menu() {
     return this.categoryService.getCategories();
   }
 
