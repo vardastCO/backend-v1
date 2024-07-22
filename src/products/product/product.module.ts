@@ -15,6 +15,7 @@ import { SeperateProductCommand } from "./command/seperate-product-csv.command";
 import { XmlProductCommand } from "./command/generate-xml-product.command";
 import { ProductAttribuiteUpdateCommand } from "./product-attribuite-update.command";
 import { BrandCsvUpdateCommand } from "./brand-update-csv.command";
+import { BrandCsvCreateCommand } from "./brand-create-csv.command";
 // import { ProductExportSeller } from "./product-export-controller";
 
 @Module({
@@ -23,6 +24,7 @@ import { BrandCsvUpdateCommand } from "./brand-update-csv.command";
   providers: [ProductResolver, ProductService, 
     ProductCsvSeedCommand, ProductCsvUpdateCommand,
     BrandCsvUpdateCommand,
+    BrandCsvCreateCommand,
     CategoryCsvUpdateFilterCommand,
     SellerPriceUpdateCommand,
     ProductCsvUpdateImageCommand,
