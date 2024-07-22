@@ -134,7 +134,6 @@ export class ProductResolver {
   // @Permission("gql.products.product.show")
   @Query(() => Product, { name: "product" })
   findOne(@Args("id", { type: () => Int }) id: number) {
-    logger.info(`see #product id ${id}`)
     return this.productService.findOne(id);
   }
 

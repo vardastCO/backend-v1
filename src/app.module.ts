@@ -20,8 +20,6 @@ import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 import { KavenegarModule } from "./base/kavenegar/kavenegar.module";
 import { TerminusModule } from '@nestjs/terminus';
 import { OrderModule } from "./order/order.module";
-import logger from "./winston-logger";
-import { WinstonModule } from 'nest-winston';
 // import { RabbitMQModule } from "./rabitmq/rabbitmq.module";
 // import { ElasticsearchModule } from '@nestjs/elasticsearch';
 // import { ElasticsearchServices } from "./elastic/elastic-service";
@@ -33,9 +31,6 @@ import { WinstonModule } from 'nest-winston';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-    }),
-    WinstonModule.forRoot({
-      instance: logger,
     }),
     TerminusModule,
     KavenegarModule,
