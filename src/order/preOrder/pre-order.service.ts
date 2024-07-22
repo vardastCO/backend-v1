@@ -431,6 +431,9 @@ export class PreOrderService {
                 where: { categoryId: category.id },
                 take: maxNumber,
                 relations: ['lines'],
+                order: {
+                  id:'DESC'
+                }
             }),
             File.findOneBy({ id: fileId })
         ]);
