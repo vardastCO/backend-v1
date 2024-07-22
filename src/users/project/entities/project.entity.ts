@@ -50,6 +50,10 @@ export class Project extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true,default:'0'})
+  failedOrdersCount?: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true,default:'0'})
   totalOrdersCount?: string;
 
   @Field({ nullable: true })
