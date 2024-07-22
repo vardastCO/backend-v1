@@ -3,6 +3,7 @@ import { File } from "src/base/storage/file/entities/file.entity";
 import { Category } from "src/base/taxonomy/category/entities/category.entity";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { Product } from "src/products/product/entities/product.entity";
+import { Address } from "src/users/address/entities/address.entity";
 import {
   BaseEntity,
   Column,
@@ -69,10 +70,6 @@ export class Brand extends BaseEntity {
   views?: number;
 
 
-  @Field(() => Int, { nullable: true })
-  @Column( {nullable: true })
-  cityId?: number;
-
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   slug?: string;
@@ -111,6 +108,10 @@ export class Brand extends BaseEntity {
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
   @JoinColumn()
   bannerDesktop: Promise<File>;
+
+  @Field(() => [Address])
+  @OneToMany(() => Address, address => null, { nullable: true })
+  addresses: Address[];
 
   @Field(() => File, { nullable: true })
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
