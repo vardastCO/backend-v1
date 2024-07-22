@@ -1,17 +1,16 @@
 import { ConfigService } from "@nestjs/config";
 import * as Fs from "fs";
+import * as Mime from "mime-types";
 import { Client } from "minio";
 import { Command, CommandRunner } from "nest-commander";
 import { CsvParser } from "nest-csv-parser";
 import { InjectMinio } from "nestjs-minio";
-import { EntityManager } from 'typeorm';
-import { Brand } from "../brand/entities/brand.entity";
 import { Directory } from "src/base/storage/directory/entities/directory.entity";
 import { File } from "src/base/storage/file/entities/file.entity";
-import * as Mime from "mime-types";
 import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
-import { Image } from "../images/entities/image.entity";
+import { EntityManager } from 'typeorm';
+import { Brand } from "../brand/entities/brand.entity";
 @Command({
   name: "brand:update",
   description: "update brand from given csv file base on official format.",
@@ -96,6 +95,8 @@ export class BrandCsvUpdateCommand extends CommandRunner {
         description
       } = csvProduct;
 
+      console.log("sku : ", sku);
+
       try {
         if (!brandId) {
           throw "not found brand id "
@@ -124,24 +125,26 @@ export class BrandCsvUpdateCommand extends CommandRunner {
           console.log('err in address',error)
         }
        
-
+        console.log("files length : ", this.files.length)
         for (const filename of this.files) {
           try {
             const parts = filename.split('-');
             if (parts.length >= 2) {
               const fileSku = parts[0];
-              
-              const extension = parts[1].split('.').pop().toLowerCase();
-
-              const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+              console.log('fileSku',fileSku,sku)
               if (`${fileSku}` == `${sku}`) {
                 console.log('fileSku',fileSku)
                 const sortOrder = 1;
-                await this.addImage(imageDirectory, filename, find_brand, sortOrder);
+                const fileRecord = await this.addImage(imageDirectory, filename, find_brand, sortOrder);
+            
+                find_brand.logoFile = Promise.resolve(fileRecord)
+                await find_brand.save();
+
                 await this.delay(100);
               }
               // await this.delay(100);
             }
+            console.log('no part lengh 2 ')
           } catch (error) {
             console.log('Warning:', error);
           }
@@ -181,11 +184,6 @@ export class BrandCsvUpdateCommand extends CommandRunner {
     fileRecord.directory = Promise.resolve(this.directory);
     await fileRecord.save();
 
-    brand.logoFile = Promise.resolve(fileRecord)
-    await brand.save();
-
-
-
 
     await this.minioClient.putObject(
       this.bucketName,
@@ -196,7 +194,11 @@ export class BrandCsvUpdateCommand extends CommandRunner {
         "File-Uuid": fileRecord.uuid,
         "File-Id": fileRecord.id,
       },
-    );
+
+      );
+    
+      return fileRecord
+    
     } catch (error) {
       console.log('err in add images',error)
     }
