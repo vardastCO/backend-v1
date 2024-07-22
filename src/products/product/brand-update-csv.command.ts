@@ -105,16 +105,20 @@ export class BrandCsvUpdateCommand extends CommandRunner {
         }
         find_brand.bio = description
         await find_brand.save()
-        
-        const new_address = new Address()
-        new_address.address = address
-        new_address.cityId = 1303
-        new_address.countryId = 244
-        new_address.relatedType = AddressRelatedTypes.BRAND
-        new_address.provinceId = 12
-        new_address.relatedId = find_brand.id
-        new_address.title = 'آدرس'
-        await new_address.save()
+        try {
+          const new_address = new Address()
+          new_address.address = address
+          new_address.cityId = 1303
+          new_address.countryId = 244
+          new_address.relatedType = AddressRelatedTypes.BRAND
+          new_address.provinceId = 12
+          new_address.relatedId = find_brand.id
+          new_address.title = 'برند آدرس'
+          await new_address.save()
+        } catch (error) {
+          console.log('err in address',error)
+        }
+       
 
         for (const filename of this.files) {
           try {
@@ -150,7 +154,8 @@ export class BrandCsvUpdateCommand extends CommandRunner {
     brand: Brand,
     sort: number,
   ) {
-    const filepath = `${imageDirectory}/${filename}`;
+    try {
+      const filepath = `${imageDirectory}/${filename}`;
     const file = {
       buffer: Fs.readFileSync(filepath),
       mimetype: Mime.lookup(filepath),
@@ -187,6 +192,10 @@ export class BrandCsvUpdateCommand extends CommandRunner {
         "File-Id": fileRecord.id,
       },
     );
+    } catch (error) {
+      console.log('err in add images',error)
+    }
+    
   }
 }
 
