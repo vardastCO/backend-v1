@@ -98,6 +98,7 @@ export class BrandCsvCreateCommand extends CommandRunner {
         const find_brand = new Brand()
         find_brand.name = name
         find_brand.bio = description
+        find_brand.sum = 1
         find_brand.name_fa = name
         console.log('find brand bio ' , find_brand.bio)
         await find_brand.save()
