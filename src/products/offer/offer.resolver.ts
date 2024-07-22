@@ -1,6 +1,7 @@
 import { ValidationPipe } from "@nestjs/common";
 import {
   Args,
+  Context,
   Int,
   Mutation,
   Parent,
@@ -46,8 +47,15 @@ export class OfferResolver {
       new ValidationPipe({ transform: true }),
     )
     indexOfferInput?: IndexOfferInput,
+    @Context() context?: { req: Request }
   ) {
-    return this.offerService.paginate(user, indexOfferInput);
+    const request = context?.req;
+    const referer = request.headers['origin'] ?? null;
+    let admin = false 
+    if (referer == 'https://admin.vardast.ir' || referer == 'https://admin.vardast.com') {
+      admin = true
+    }
+    return this.offerService.paginate(user, indexOfferInput,admin);
   }
 
   @Permission("gql.products.offer.show.mine")

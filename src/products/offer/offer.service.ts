@@ -96,6 +96,7 @@ export class OfferService {
   async paginate(
     user: User,
     indexOfferInput?: IndexOfferInput,
+    admin?:boolean
   ): Promise<PaginationOfferResponse> {
     indexOfferInput.boot();
     const hasMasterPermission = await this.authorizationService
@@ -106,7 +107,7 @@ export class OfferService {
       indexOfferInput || {};
     let { sellerId } = indexOfferInput || {};
 
-    if (!hasMasterPermission && !sellerId) {
+    if (!hasMasterPermission && !sellerId && !admin) {
       sellerId = (await this.userService.getSellerRecordOf(user))?.id;
     }
 
