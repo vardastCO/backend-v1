@@ -36,7 +36,6 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import { IndexOffersPrice } from "./dto/index-price-offers.input";
 import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { PriceTypesEnum } from "../price/enums/price-types.enum";
-import logger from "src/winston-logger";
 
 @Resolver(() => Product)
 export class ProductResolver {
