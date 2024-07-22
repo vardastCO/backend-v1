@@ -11,6 +11,7 @@ import { File } from "src/base/storage/file/entities/file.entity";
 import * as Mime from "mime-types";
 import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
+import { Image } from "../images/entities/image.entity";
 @Command({
   name: "brand:update",
   description: "update brand from given csv file base on official format.",
@@ -114,7 +115,7 @@ export class BrandCsvUpdateCommand extends CommandRunner {
         new_address.relatedId = find_brand.id
         new_address.title = 'آدرس'
         await new_address.save()
-        
+
         for (const filename of this.files) {
           try {
             const parts = filename.split('-');
@@ -159,7 +160,7 @@ export class BrandCsvUpdateCommand extends CommandRunner {
     const randomizedFilename = File.generateNewFileName(file);
 
     const fileRecord: File = File.create<File>({
-      modelType: Image.name,
+      modelType: 'Brand',
       name: `${this.directory.path}/${randomizedFilename}`,
       originalName: filename,
       size: file.size,
