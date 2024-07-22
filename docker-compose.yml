@@ -60,6 +60,7 @@ services:
       - "3081:3081"
     volumes:
       - .:/app
+      - ./logs:/usr/src/app/logs #
     networks:
       - myNet
     # deploy:

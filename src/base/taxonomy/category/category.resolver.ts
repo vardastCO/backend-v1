@@ -27,6 +27,7 @@ import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
 import { CategoryDTO } from "./dto/category-dto";
+import logger from "src/winston-logger";
 
 @Resolver(() => Category)
 export class CategoryResolver {
@@ -94,6 +95,7 @@ export class CategoryResolver {
   @Public()
   @Query(() => [CategoryDTO], { name: "mega_menu" })
   mega_menu() {
+    logger.info(`see #mega_menu`)
     return this.categoryService.getCategories();
   }
 

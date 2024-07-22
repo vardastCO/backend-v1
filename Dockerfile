@@ -21,6 +21,8 @@ RUN pnpm install
 # Copy the rest of the application files
 COPY --chown=node:node . .
 
+RUN mkdir -p /usr/src/app/logs && chown -R node:node /usr/src/app/logs
+
 RUN cp .env.example .env
 
 RUN pnpm build

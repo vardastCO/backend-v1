@@ -2,6 +2,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import * as compression from 'compression';
+import logger from "./winston-logger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -23,6 +24,7 @@ async function bootstrap() {
   app.use(
     compression()
   );
+  logger.info(`HI VARDAST`)
   await app.listen(3081);
 }
 bootstrap();
