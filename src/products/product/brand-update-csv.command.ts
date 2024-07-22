@@ -97,13 +97,18 @@ export class BrandCsvUpdateCommand extends CommandRunner {
       } = csvProduct;
 
       try {
+        if (!brandId) {
+          throw "not found brand id "
+        }
         const find_brand: Brand = await Brand.findOneBy({
           id:brandId,
         });
         if (!find_brand) {
           throw "not found brand";
         }
+        console.log('find brand' , brandId)
         find_brand.bio = description
+        console.log('find brand bio ' , find_brand.bio)
         await find_brand.save()
         try {
           const new_address = new Address()
