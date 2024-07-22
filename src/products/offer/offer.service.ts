@@ -14,7 +14,6 @@ import { UserService } from "src/users/user/user.service";
 import { DataSource, EntityManager, In } from "typeorm";
 import { File } from "../../base/storage/file/entities/file.entity";
 import { AuthorizationService } from "../../users/authorization/authorization.service";
-import { LastPrice } from "../price/entities/last-price.entity";
 import { Price } from "../price/entities/price.entity";
 import { Product } from "../product/entities/product.entity";
 import { PaginationSellerResponse } from "../seller/dto/pagination-seller.response";
@@ -110,10 +109,17 @@ export class OfferService {
     if (!hasMasterPermission && !sellerId) {
       sellerId = (await this.userService.getSellerRecordOf(user))?.id;
     }
+
+
+    const whereCondition = { productId, isPublic, isAvailable, status };
+    if (sellerId) {
+      whereCondition["sellerId"] = sellerId;
+    }
+
     const [data, total] = await Offer.findAndCount({
       skip,
       take,
-      where: { sellerId, productId, isPublic, isAvailable, status },
+      where: whereCondition,
       order: { id: "DESC" },
     });
 
