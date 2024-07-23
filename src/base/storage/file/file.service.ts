@@ -148,9 +148,8 @@ export class FileService {
           (await this.i18n.translate("exceptions.NOT_FOUND")),
         );
       }
-      banner.id = id;
       await banner.remove();
-      return banner;
+      return;
     } catch (error) {
       console.log("Failed to remove banner. Error: ", error);
     }
