@@ -101,15 +101,7 @@ export class ProductResolver {
     )
     indexProductInput?: IndexProductInput,
     @CurrentUser() user?: User,  
-    // @Context() context?: { req: Request }
   ) {
-
-    // const request = context?.req;
-    // const referer = request.headers['origin'] ?? null;
-    // let client = false 
-    // if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
-    //   client = true
-    // }
     const result = await this.productService.paginate(indexProductInput,user);
 
     return result;

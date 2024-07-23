@@ -25,6 +25,7 @@ import { SellerService } from "./seller.service";
 import { Brand } from "../brand/entities/brand.entity";
 import { IndexSellerBrandInput } from "./dto/index-seller-brand.input";
 import { PaginationBrandResponse } from "../brand/dto/pagination-brand.response";
+import { ReferersEnum } from "src/referers.enum";
 
 @Resolver(() => Seller)
 export class SellerResolver {
@@ -75,11 +76,9 @@ export class SellerResolver {
   ) {
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
-    let client = false 
-    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
-      client = true
-    }
-    return this.sellerService.paginate(user, indexSellerInput,client);
+    const client = [ReferersEnum.CLIENT_VARDAST_IR, ReferersEnum.VARDAST_COM].includes(referer);
+    
+    return this.sellerService.paginate(user, indexSellerInput, client);
   }
 
   @Public()
