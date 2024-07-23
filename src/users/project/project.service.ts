@@ -34,7 +34,8 @@ export class ProjectService {
     try {
       const project: Project = Project.create<Project>(createProjectInput);
       project.uuid = await this.generateNumericUuid()
-      project.type = isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
+      project.type = createProjectInput.type || (isRealUserType ? TypeProject.REAL : TypeProject.LEGAL);
+
       await project.save();
       let user_id = userId
       const userProject = new UserProject()
