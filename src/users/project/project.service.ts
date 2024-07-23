@@ -307,6 +307,7 @@ export class ProjectService {
           id :user.id
         },
       }
+      console.log('inside',isRealUserType);
       whereConditions['type'] = isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
     } else {
       if (createTime) {
