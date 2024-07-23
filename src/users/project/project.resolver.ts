@@ -20,6 +20,7 @@ import { IndexProjectInput } from "./dto/index-project.input";
 import { PaginationProjectResponse } from "./dto/pagination-project.response";
 import { ValidationPipe } from "@nestjs/common";
 import { IsRealUserType } from "../auth/decorators/current-type.decorator";
+import { ReferersEnum } from "src/referers.enum";
 @Resolver(() => Project)
 export class ProjectResolver {
   constructor(private readonly projectService: ProjectService) {}
@@ -29,8 +30,12 @@ export class ProjectResolver {
   createProject(
     @Args("createProjectInput") createProjectInput: CreateProjectInput,
     @CurrentUser() user: User,
+    @IsRealUserType() isRealUserType?: boolean,
   ) {
-    return this.projectService.create(createProjectInput,user.id);
+    if (!isRealUserType) {
+      isRealUserType = false
+    }
+    return this.projectService.create(createProjectInput,user.id,isRealUserType);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
@@ -128,10 +133,8 @@ export class ProjectResolver {
   {
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
-    let client = false 
-    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
-      client = true
-    }
+    const client = [ReferersEnum.CLIENT_VARDAST_IR, ReferersEnum.VARDAST_COM].includes(referer);
+    
     return this.projectService.paginate(indexProjectInput,client,user,isRealUserType)
   }
 

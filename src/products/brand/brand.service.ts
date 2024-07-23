@@ -107,6 +107,9 @@ export class BrandService {
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
       admin = true;
     }
+    if (!admin && indexBrandInput.page > 10) {
+      throw new Error("Non-admin users cannot access beyond page 10.");
+    }
     const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
