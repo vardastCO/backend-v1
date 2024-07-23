@@ -198,6 +198,9 @@ export class ProductService {
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
       admin = true;
     }
+    if (!admin && indexProductInput.page > 10) {
+      throw new Error("Non-admin users cannot access beyond page 10.");
+    }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
     const cachedData = await this.cacheManager.get<String>(cacheKey);
     let isAlicePrice = false;
@@ -242,7 +245,7 @@ export class ProductService {
       const allCategoryIds = await this.getAllCategoryIds(categoryIds);
       whereConditions.categoryId = In(allCategoryIds);
     }
-
+    
     if (sellerId) {
       whereConditions.offers = {
         sellerId: sellerId,
