@@ -12,7 +12,7 @@ import { AuthorizationService } from "src/users/authorization/authorization.serv
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { User } from "src/users/user/entities/user.entity";
-import { EntityManager, IsNull, Like, MoreThanOrEqual, Not } from "typeorm";
+import { EntityManager, IsNull, Like, Not } from "typeorm";
 import * as zlib from "zlib";
 import { Product } from "../product/entities/product.entity";
 import { CreateBrandInput } from "./dto/create-brand.input";
@@ -270,8 +270,9 @@ export class BrandService {
         throw new NotFoundException();
       }
       const brand = brandsql[0];
+      console.log('bbb',brand)
       try {
-        const [bannerDesktop,bannerMobile, priceList, catalog,logo, bannerFile] =
+        const [bannerDesktop,bannerMobile, priceList, catalog,logo, bannerFile, addresses] =
           await Promise.all([
             this.fetchFile(brand.bannerDesktopId),
             this.fetchFile(brand.bannerMobileId),
@@ -279,15 +280,17 @@ export class BrandService {
             this.fetchFile(brand.catalogId),
             this.fetchFile(brand.logoFileId),
             this.fetchFile(brand.bannerFileId),
-            this.incrementBrandViews(brand)
-   
+            this.incrementBrandViews(brand),
+            this.getAddressesOf(brand)
           ]);
+        
         brand.bannerDesktop = bannerDesktop;
         brand.bannerMobile = bannerMobile;
         brand.priceList = priceList;
         brand.catalog = catalog;
         brand.logoFile = logo;
         brand.bannerFile = bannerFile;
+        brand.addresses = addresses;
 
         const compressedData = zlib.gzipSync(JSON.stringify(brand));
         await this.cacheManager.set(
