@@ -113,6 +113,10 @@ export class Brand extends BaseEntity {
   @OneToMany(() => Address, address => null, { nullable: true })
   addresses: Address[];
 
+
+  @Column()
+  cityId: number;
+  
   @Field(() => File, { nullable: true })
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
   @JoinColumn()
