@@ -175,6 +175,8 @@ export class FileResolver {
   async createBanner(
     @Args("createBannerInput") createBannerInput: CreateBannerInput
   ) {
+    const cacheKey = `get_banners`;
+    await this.cacheManager.del(cacheKey);
     return this.fileService.createBanner(createBannerInput);
   }
 
