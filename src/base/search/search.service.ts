@@ -12,7 +12,7 @@ import { Seller } from "src/products/seller/entities/seller.entity";
 import { SellerType } from "src/products/seller/enums/seller-type.enum";
 import { Project } from "src/users/project/entities/project.entity";
 import { User } from "src/users/user/entities/user.entity";
-import { Like, SelectQueryBuilder } from "typeorm";
+import { Like, SelectQueryBuilder, IsNull } from "typeorm";
 import { Category } from "../taxonomy/category/entities/category.entity";
 import { suggestvalue } from "./constants/suggestConstants";
 import { FilterableAttributeInput } from "./dto/filterable-attribute.input";
@@ -145,6 +145,7 @@ export class SearchService {
         : sellerQuery.limit(suggestvalue).getMany(),
       brandQuery.limit(suggestvalue).getMany(),
     ]);
+
 
     return { products, categories, seller, brand };
   }
@@ -280,19 +281,24 @@ export class SearchService {
     take?: number,
     skip?: number,
   ): SelectQueryBuilder<Product> {
-    return Product.createQueryBuilder()
+    const products = Product.createQueryBuilder()
       .where(
-        `to_tsvector('english', COALESCE(name, '')) @@ websearch_to_tsquery(:query) AND 'deletedAt' IS NULL`,
+        `to_tsvector('english', COALESCE(name, '')) @@ websearch_to_tsquery(:query)`,
         {
           query,
         },
-      )
+    )
+      .andWhere({
+        deletedAt : IsNull()
+      })
       .orderBy(
         `ts_rank_cd(to_tsvector('english', COALESCE(name, '')), websearch_to_tsquery(:query))`,
         "DESC",
       )
       .skip(skip)
       .take(take);
+  
+    return products;
   }
 
   private getCategoriesSearchQuery(
