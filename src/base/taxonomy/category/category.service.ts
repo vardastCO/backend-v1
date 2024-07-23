@@ -100,17 +100,17 @@ export class CategoryService {
     const cachedCategories = await this.cacheManager.get<CategoryDTO[]>(cacheKey);
 
     if (cachedCategories && Array.isArray(cachedCategories)) {
-        return cachedCategories;
+        // return cachedCategories;
     }
 
     try {
         const query = `
             SELECT 
-                a.id AS level1_id, a.title AS level1_title,
-                b.id AS level2_id, b.title AS level2_title,
-                c.id AS level3_id, c.title AS level3_title,
-                d.id AS level4_id, d.title AS level4_title,
-                e.id AS level5_id, e.title AS level5_title
+                a.id AS level1_id, a.title AS level1_title, a.sort AS level1_sort,
+                b.id AS level2_id, b.title AS level2_title, b.sort AS level2_sort,
+                c.id AS level3_id, c.title AS level3_title, c.sort AS level3_sort,
+                d.id AS level4_id, d.title AS level4_title, d.sort AS level4_sort,
+                e.id AS level5_id, e.title AS level5_title, e.sort AS level5_sort
             FROM 
                 base_taxonomy_categories a
             LEFT JOIN 
@@ -123,6 +123,8 @@ export class CategoryService {
                 base_taxonomy_categories e ON d.id = e."parentCategoryId"
             WHERE 
                 a."parentCategoryId" IS NULL
+            ORDER BY 
+                a.sort ASC, b.sort ASC, c.sort ASC, d.sort ASC, e.sort ASC
         `;
 
         const result = await this.entityManager.query(query);
@@ -181,7 +183,7 @@ export class CategoryService {
                         relations: ['imageCategory']
                     });
 
-                  if (category) {
+                    if (category) {
                         const imageCategories = await category.imageCategory || [];
                         if (imageCategories.length > 0) {
                             const fileId = imageCategories[0]?.fileId;
@@ -213,6 +215,7 @@ export class CategoryService {
         return [];
     }
   }
+
 
   async create(createCategoryInput, User): Promise<Category> {
     const cacheKey = "categories:*"; // Match all keys starting with 'categories:'

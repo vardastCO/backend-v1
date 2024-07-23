@@ -472,7 +472,7 @@ export class PreOrderService {
   
     const whereConditions: any = {};
     whereConditions['deleted_at'] = IsNull();
-  
+    whereConditions['status'] = Not(PreOrderStatus.PENDING_INFO);
     if (client) {
       const userProjects = await UserProject.find({
         where: {
