@@ -29,8 +29,12 @@ export class ProjectResolver {
   createProject(
     @Args("createProjectInput") createProjectInput: CreateProjectInput,
     @CurrentUser() user: User,
+    @IsRealUserType() isRealUserType?: boolean,
   ) {
-    return this.projectService.create(createProjectInput,user.id);
+    if (!isRealUserType) {
+      isRealUserType = false
+    }
+    return this.projectService.create(createProjectInput,user.id,isRealUserType);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)

@@ -30,10 +30,11 @@ export class ProjectService {
     const max = Math.pow(10, length) - 1;
   return Math.floor(Math.random() * (max - min + 1) + min).toString();
   }
-  async create(createProjectInput: CreateProjectInput,userId:number): Promise<Project> {
+  async create(createProjectInput: CreateProjectInput,userId:number,isRealUserType:boolean): Promise<Project> {
     try {
       const project: Project = Project.create<Project>(createProjectInput);
       project.uuid = await this.generateNumericUuid()
+      project.type = isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
       await project.save();
       let user_id = userId
       const userProject = new UserProject()
