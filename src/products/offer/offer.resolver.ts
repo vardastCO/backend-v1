@@ -24,6 +24,7 @@ import { User } from "src/users/user/entities/user.entity";
 import { IndexTakeBrandToSeller } from "./dto/index-brand-seller.input";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import { PaginationSellerResponse } from "../seller/dto/pagination-seller.response";
+import { ReferersEnum } from "src/referers.enum";
 @Resolver(() => Offer)
 export class OfferResolver {
   constructor(private readonly offerService: OfferService) {}
@@ -51,10 +52,8 @@ export class OfferResolver {
   ) {
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
-    let admin = false 
-    if (referer == 'https://admin.vardast.ir' || referer == 'https://admin.vardast.com') {
-      admin = true
-    }
+    const admin = [ReferersEnum.ADMIN_COM, ReferersEnum.ADMIN_IR].includes(referer);
+  
     return this.offerService.paginate(user, indexOfferInput,admin);
   }
 

@@ -15,6 +15,7 @@ import { ThreeStateSupervisionStatuses } from '../enums/three-state-supervision-
 import { UpdateOrderOfferInput } from './dto/update-order-offer.input';
 import { PaginationOrderOfferResponse } from './dto/pagination-order-offer.responde';
 import { IndexPreOrderOfferInput } from './dto/index-preOrder-offer.input';
+import { ReferersEnum } from 'src/referers.enum';
 
 
 @Resolver(() => Boolean)
@@ -30,14 +31,9 @@ export class OrderOfferResolver {
   ) {
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
-    let admin = false 
-    if (referer == 'https://admin.vardast.ir' || referer == 'https://admin.vardast.com') {
-      admin = true
-    }
-    let client = false 
-    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
-      client = true
-    }
+    const admin = [ReferersEnum.ADMIN_COM, ReferersEnum.ADMIN_IR].includes(referer);
+    const client = [ReferersEnum.VARDAST_COM, ReferersEnum.CLIENT_VARDAST_IR].includes(referer);
+
     return this.orderOfferService.createOffer(createOrderOfferInput,user,admin,client);
   }
   @Permission("gql.users.address.store")

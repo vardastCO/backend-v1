@@ -14,6 +14,7 @@ import { IsRealUserType } from "src/users/auth/decorators/current-type.decorator
 import { PaymentResponse } from "./dto/payment.responde";
 import { IndexPublicOrderInput } from "./dto/index-public-order.input";
 import { PublicPreOrderDTO } from "./dto/publicPreOrderDTO";
+import { ReferersEnum } from "src/referers.enum";
 
 
 @Resolver(() => Boolean)
@@ -91,14 +92,9 @@ export class PreOrderResolver {
   ) {
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
-    let client = false 
-    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
-      client = true
-    }
-    let seller = false 
-    if (referer == 'https://seller.vardast.ir' || referer == 'https://seller.vardast.com') {
-      seller = true
-    }
+    const client = [ReferersEnum.CLIENT_VARDAST_IR, ReferersEnum.VARDAST_COM].includes(referer);
+    const seller = [ReferersEnum.SELLER_COM, ReferersEnum.SELLER_IR].includes(referer);
+    
     return this.preOrderService.paginate(currentUser, indexPreOrderInput,client,seller,isRealUserType);
   }
   @Public()
