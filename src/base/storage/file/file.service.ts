@@ -152,7 +152,7 @@ export class FileService {
       await banner.remove();
       result.id = id;
       return result;
-      return ;
+
     } catch (error) {
       console.log("Failed to remove banner. Error: ", error);
     }
