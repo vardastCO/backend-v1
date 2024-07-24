@@ -178,29 +178,36 @@ export class OrderOfferService {
       }
     
   }
+  convertPersianToEnglish(str) {
+    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+    const englishDigits = '0123456789';
+    return str.replace(/[۰-۹]/g, (char) => englishDigits[persianDigits.indexOf(char)]);
+  }
   async calculatePriceOfferLine(lineId: number, fi_price: string,with_tax:boolean) {
-    if (fi_price == '0') {
+    
+    fi_price = this.convertPersianToEnglish(fi_price);
+
+    if (fi_price === '0') {
       return {
         "fi_price": '0',
         "tax_price": '0',
         "total_price": '0'
       };
     }
+  
     const line = await Line.findOneBy({ id: lineId });
     if (line) {
       const fiPrice = parseFloat(fi_price);
-
       const qty = parseInt(line.qty, 10);
-
+  
       const taxPrice = Math.round(fiPrice * qty * 0.1);
-
       const totalPriceWithTax = Math.round(fiPrice * qty * 1.1);
-      const totalPrice = Math.round(fiPrice * qty );
-    
+      const totalPrice = Math.round(fiPrice * qty);
+  
       return {
         "fi_price": fi_price,
         "tax_price": with_tax ? taxPrice.toString() : "0",
-        "total_price": with_tax ?  totalPriceWithTax.toString() :  totalPrice
+        "total_price": with_tax ? totalPriceWithTax.toString() : totalPrice.toString()
       };
     }
   }
