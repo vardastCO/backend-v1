@@ -271,7 +271,7 @@ export class ProductService {
       }
     }
     if (sortField == SortFieldProduct.PRICE) {
-      console.log('true or false',process.env.FAKE_LIVE_PRICE,process.env.FAKE_LIVE_PRICE == 'true',(15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE == 'true' ? 1000 : 1)))
+  
       whereConditions.prices = {
         createdAt: MoreThan(new Date(Date.now() - (15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE == 'true' ? 1000 : 1))))
       };
