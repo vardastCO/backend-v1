@@ -32,9 +32,6 @@ export class ProjectResolver {
     @CurrentUser() user: User,
     @IsRealUserType() isRealUserType?: boolean,
   ) {
-    if (!isRealUserType) {
-      isRealUserType = false
-    }
     return this.projectService.create(createProjectInput,user.id,isRealUserType);
   }
   @Permission("gql.users.address.store")
