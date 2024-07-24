@@ -428,7 +428,7 @@ export class PreOrderService {
         const [orders, image] = await Promise.all([
             PreOrder.find({
                 select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
-                where: { categoryId: category.id },
+                where: { categoryId: category.id,status:Not(PreOrderStatus.PENDING_INFO) },
                 take: maxNumber,
                 relations: ['lines'],
                 order: {
