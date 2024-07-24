@@ -193,7 +193,7 @@ export class ProductService {
   ): Promise<PaginationProductResponse> {
     indexProductInput.boot();
     const { sortField, sortDirection } = indexProductInput;
-
+    
     let admin = false;
     if (await this.authorizationService.setUser(user).hasRole("admin")) {
       admin = true;
@@ -271,9 +271,8 @@ export class ProductService {
       }
     }
     if (sortField == SortFieldProduct.PRICE) {
-      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000 );
       whereConditions.prices = {
-        createdAt: MoreThan(fifteenMinutesAgo),
+        createdAt: MoreThan(new Date(Date.now() - (15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE ? 1000 : 1))))
       };
     }
     let order: any;
