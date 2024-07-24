@@ -42,6 +42,7 @@ export class UpdateBannerInput {
 
     @Field(() => Int, {
         description: "First Address with sort 0 is considered primary.",
+        nullable:true
       })
       @IsOptional()
       @IsInt()

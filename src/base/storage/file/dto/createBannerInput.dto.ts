@@ -42,6 +42,7 @@ export class CreateBannerInput {
 
   @Field(() => Int, {
     description: "First Banner with sort 0 is considered primary.",
+    nullable:true
   })
   @IsOptional()
   @IsInt()
