@@ -273,7 +273,6 @@ export class BrandService {
         throw new NotFoundException();
       }
       const brand = brandsql[0];
-      console.log('bbb',brand)
       try {
         const [bannerDesktop,bannerMobile, priceList, catalog,logo, bannerFile, addresses] =
           await Promise.all([
