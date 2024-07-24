@@ -445,6 +445,7 @@ export class PreOrderService {
                     uuid: order.uuid,
                     request_date: order.request_date,
                     destination: 'تهران',
+                    payment_method : 'نقدی',
                     need_date: order.need_date,
                     bid_start: order.bid_start,
                     bid_end: order.bid_end,

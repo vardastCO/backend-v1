@@ -18,6 +18,9 @@ export class PreOrderDTO {
   @Field(() => Date,{nullable: true})
   need_date?: Date;
 
+  @Field({nullable: true})
+  payment_method?: string;
+
   @Field(() => Date,{nullable: true})
   bid_start?: Date;
 
