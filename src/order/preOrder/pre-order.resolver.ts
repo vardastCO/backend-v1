@@ -74,11 +74,9 @@ export class PreOrderResolver {
   ) {
     const request = context?.req;
     const referer = request.headers['origin'] ?? null;
-    let client = false 
-    if (referer == 'https://client.vardast.ir' || referer == 'https://vardast.com') {
-      client = true
-    }
-    return this.preOrderService.findPreOrderById(id,user,client);
+    const client = [ReferersEnum.CLIENT_VARDAST_IR, ReferersEnum.VARDAST_COM].includes(referer);
+    
+    return this.preOrderService.findPreOrderById(id, user, client);
   }
 
   @Permission("gql.users.address.store")
