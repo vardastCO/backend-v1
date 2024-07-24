@@ -69,4 +69,10 @@ export class Banner extends BaseEntity {
   })
   status: ThreeBannerStatuses;
 
+  @Field(() => Int, {
+    description: "First Banner with sort 0 is considered primary.",
+  })
+  @Column("smallint", { default: 0 })
+  sort?: number;
+
 }

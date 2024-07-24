@@ -1,5 +1,6 @@
-import { Field, InputType } from "@nestjs/graphql";
+import { Field, InputType, Int } from "@nestjs/graphql";
 import {
+    IsInt,
     IsNotEmpty,
     IsOptional,
     IsString
@@ -13,10 +14,10 @@ export class CreateBannerInput {
   @IsString()
   small_uuid: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
     
   @Field()
   @IsNotEmpty()
@@ -38,4 +39,11 @@ export class CreateBannerInput {
   @IsOptional()
   @IsString()
   link_url?: string;
+
+  @Field(() => Int, {
+    description: "First Banner with sort 0 is considered primary.",
+  })
+  @IsOptional()
+  @IsInt()
+  sort?: number;
 }

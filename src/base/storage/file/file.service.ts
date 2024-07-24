@@ -85,7 +85,8 @@ export class FileService {
         medium_uuid,
         xlarge_uuid,
         link_url,
-        name
+        name,
+        sort
       } = createBannerInput;
 
       const [small, medium, large, xlarge] = await Promise.all([
@@ -123,7 +124,8 @@ export class FileService {
         mediumId :  medium.id,
         largeId :  large.id,
         xlargeId: xlarge.id,
-        name : name
+        name: name,
+        sort : sort ?? 0
       }
 
 
@@ -167,7 +169,7 @@ export class FileService {
         throw new BadRequestException(await this.i18n.translate("exceptions.NOT_FOUND"));
       }
   
-      const { small_uuid, large_uuid, medium_uuid, xlarge_uuid, link_url,name } = updateBannerInput;
+      const { small_uuid, large_uuid, medium_uuid, xlarge_uuid, link_url,name,sort } = updateBannerInput;
   
       const files = await File.find({
         where: { uuid: In([small_uuid, medium_uuid, large_uuid, xlarge_uuid]) }
@@ -187,13 +189,9 @@ export class FileService {
       if (xlarge_uuid && fileMap.has(xlarge_uuid)) {
         banner.xlargeId = fileMap.get(xlarge_uuid)?.id;
       }
-      if (link_url) {
-        banner.url = link_url;
-      }
-
-      if (name) {
-        banner.name = name;
-      }
+      banner.url = link_url ?? banner.url;
+      banner.name = name ?? banner.name;
+      banner.sort = sort ?? banner.sort;
   
       await banner.save();
   

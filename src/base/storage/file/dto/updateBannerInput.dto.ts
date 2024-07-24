@@ -39,4 +39,11 @@ export class UpdateBannerInput {
     @IsOptional()
     @IsString()
     link_url?: string;
+
+    @Field(() => Int, {
+        description: "First Address with sort 0 is considered primary.",
+      })
+      @IsOptional()
+      @IsInt()
+    sort?: number;
 }
