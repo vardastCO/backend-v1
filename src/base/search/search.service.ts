@@ -134,47 +134,34 @@ export class SearchService {
   async suggest(suggestInput: SuggestInput): Promise<SuggestResponse> {
     let { query, cityId, SKU } = suggestInput;
     query = query.replace(/ي/g, "ی").replace(/ك/g, "ک");
-  
-
-    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query);
-  
-
     const productsQuery = this.getProductsSearchQuery(query);
     const categoriesQuery = this.getCategoriesSearchQuery(query);
     const sellerQuery = this.getSellerSearchQuery(query, cityId);
     const brandQuery = this.getBrandQuery(query);
-  
-
-    const productsPromise = SKU
-      ? productsQuery
-          .andWhere("sku IN (:...skus)", { skus: [`%${SKU}%`] })
-          .limit(suggestvalue)
-          .getMany()
-      : productsQuery.limit(suggestvalue).getMany();
-  
-    const categoriesPromise = categoriesQuery.limit(suggestvalue).getMany();
-  
-    const sellerPromise = cityId
-      ? sellerQuery
-          .andWhere("addresses.cityId = :cityId", { cityId })
-          .limit(suggestvalue)
-          .getMany()
-      : sellerQuery.limit(suggestvalue).getMany();
-  
-    const brandPromise = brandQuery.limit(suggestvalue).getMany();
-  
-
-    const [products, categories, seller, brand] = await Promise.all([
-      updateSearchEntityPromise, 
-      productsPromise,
-      categoriesPromise,
-      sellerPromise,
-      brandPromise,
+    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query);
+    // Parallelize queries using Promise.all
+    const [products, categories, seller, brand,updateSearchEntityPromise] = await Promise.all([
+      // SKU filtering using IN clause for better performance
+      SKU
+        ? productsQuery
+            .andWhere("sku IN (:...skus)", { skus: [`%${SKU}%`] })
+            .limit(suggestvalue)
+            .getMany()
+        : productsQuery.limit(suggestvalue).getMany(),
+      categoriesQuery.limit(suggestvalue).getMany(),
+      // Add a where clause to filter by cityId
+      cityId
+        ? sellerQuery
+            .andWhere("addresses.cityId = :cityId", { cityId })
+            .limit(suggestvalue)
+            .getMany()
+        : sellerQuery.limit(suggestvalue).getMany(),
+      brandQuery.limit(suggestvalue).getMany(),
     ]);
-  
+
+
     return { products, categories, seller, brand };
   }
-  
 
   async suggestv2(suggestInput: SuggestInput): Promise<SuggestResponseV2> {
     const { query, cityId, SKU } = suggestInput;
