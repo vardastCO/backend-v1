@@ -12,7 +12,7 @@ import { Seller } from "src/products/seller/entities/seller.entity";
 import { SellerType } from "src/products/seller/enums/seller-type.enum";
 import { Project } from "src/users/project/entities/project.entity";
 import { User } from "src/users/user/entities/user.entity";
-import { Like, SelectQueryBuilder, IsNull } from "typeorm";
+import { Like, SelectQueryBuilder, IsNull, EntityManager } from "typeorm";
 import { Category } from "../taxonomy/category/entities/category.entity";
 import { suggestvalue } from "./constants/suggestConstants";
 import { FilterableAttributeInput } from "./dto/filterable-attribute.input";
@@ -25,11 +25,13 @@ import { SuggestInput } from "./dto/suggest.input";
 import { SuggestResponse } from "./dto/suggest.response";
 import { SuggestResponseV2 } from "./dto/suggest.response-v2";
 import { TotalInfoResponse } from "./dto/totalInfo.output";
-import { SearchQuery } from "./entities/search.entity";
+
 
 @Injectable()
 export class SearchService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,
+  private readonly entityManager: EntityManager,
+  ) { }
   async filters(
     filterInput: FilterableAttributesInput,
   ): Promise<FilterableAttributesResponse> {
@@ -120,16 +122,13 @@ export class SearchService {
   }
 
   async  findOrCreateSearchEntity(query: string) {
-
-    let searchEntity = await SearchQuery.findOne({ where: { query } });
-
-    if (searchEntity) {
-      searchEntity.views += 1;
-    } else {
-      searchEntity = SearchQuery.create({ query, views: 1 });
-    }
-
-    await SearchQuery.save(searchEntity);
+    await this.entityManager.query(
+        `INSERT INTO search_query (query, views)
+         VALUES ($1, $2)
+         ON CONFLICT (query)
+         DO UPDATE SET views = search_query.views + 1`,
+        [query, 1]
+    );
   }
   async suggest(suggestInput: SuggestInput): Promise<SuggestResponse> {
     let { query, cityId, SKU } = suggestInput;
