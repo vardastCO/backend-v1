@@ -134,14 +134,14 @@ export class SearchService {
   async suggest(suggestInput: SuggestInput): Promise<SuggestResponse> {
     let { query, cityId, SKU } = suggestInput;
     query = query.replace(/ي/g, "ی").replace(/ك/g, "ک");
+  
     const productsQuery = this.getProductsSearchQuery(query);
     const categoriesQuery = this.getCategoriesSearchQuery(query);
     const sellerQuery = this.getSellerSearchQuery(query, cityId);
     const brandQuery = this.getBrandQuery(query);
-    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query);
-    // Parallelize queries using Promise.all
-    const [products, categories, seller, brand,updateSearchEntityPromise] = await Promise.all([
-      // SKU filtering using IN clause for better performance
+    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query); // Create promise
+
+    const [products, categories, seller, brand] = await Promise.all([
       SKU
         ? productsQuery
             .andWhere("sku IN (:...skus)", { skus: [`%${SKU}%`] })
@@ -149,7 +149,6 @@ export class SearchService {
             .getMany()
         : productsQuery.limit(suggestvalue).getMany(),
       categoriesQuery.limit(suggestvalue).getMany(),
-      // Add a where clause to filter by cityId
       cityId
         ? sellerQuery
             .andWhere("addresses.cityId = :cityId", { cityId })
@@ -157,11 +156,12 @@ export class SearchService {
             .getMany()
         : sellerQuery.limit(suggestvalue).getMany(),
       brandQuery.limit(suggestvalue).getMany(),
+      updateSearchEntityPromise
     ]);
-
-
+  
     return { products, categories, seller, brand };
   }
+  
 
   async suggestv2(suggestInput: SuggestInput): Promise<SuggestResponseV2> {
     const { query, cityId, SKU } = suggestInput;
