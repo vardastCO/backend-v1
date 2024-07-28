@@ -128,19 +128,19 @@ export class BrandService {
 
     switch (indexBrandInput.sortType) {
       case SortBrandEnum.NEWEST:
-        order['createdAt'] = "DESC";
+        order['sum'] = "DESC";
         break;
       case SortBrandEnum.RATING:
-        order['rating'] = "DESC";
+        order['sum'] = "DESC";
         break;
       case SortBrandEnum.VIEW:
-          order['views'] = "DESC";
+          order['sum'] = "DESC";
         break;
       case SortBrandEnum.SUM:
           order['sum'] = "DESC";
         break;
       default:
-        order['rating'] = "DESC";
+        order['sum'] = "DESC";
         break;
     }
 
@@ -464,7 +464,7 @@ export class BrandService {
       console.log('err in findTopMostParent',error)
     }
  
-}
+  }
   async getContactInfosOf(brand: Brand): Promise<ContactInfo[]> {
     const cacheKey = `contactInfos:${brand.id}:brand`;
     const cachedData = await this.cacheManager.get(cacheKey);
