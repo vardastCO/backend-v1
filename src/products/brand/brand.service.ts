@@ -187,7 +187,9 @@ export class BrandService {
       skip,
       take,
       where: whereConditions,
-      order: order
+      order: {
+        sum:"DESC"
+      }
     });
     try {
       const jsonString = JSON.stringify(data)
