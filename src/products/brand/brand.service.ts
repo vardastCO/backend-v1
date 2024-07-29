@@ -128,22 +128,21 @@ export class BrandService {
 
     switch (indexBrandInput.sortType) {
       case SortBrandEnum.NEWEST:
-        order['sum'] = "DESC";
+        order['createdAt'] = "DESC";
         break;
       case SortBrandEnum.RATING:
-        order['sum'] = "DESC";
+        order['rating'] = "DESC";
         break;
       case SortBrandEnum.VIEW:
-          order['sum'] = "DESC";
+          order['views'] = "DESC";
         break;
       case SortBrandEnum.SUM:
           order['sum'] = "DESC";
         break;
       default:
-        order['sum'] = "DESC";
+        order['rating'] = "DESC";
         break;
     }
-
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
@@ -187,9 +186,7 @@ export class BrandService {
       skip,
       take,
       where: whereConditions,
-      order: {
-        sum:"DESC"
-      }
+      order: order
     });
     try {
       const jsonString = JSON.stringify(data)
