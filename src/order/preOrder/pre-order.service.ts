@@ -378,7 +378,7 @@ export class PreOrderService {
         addOffersToMap(adminOffers);
       }
     
-      order.offers = Array.from(uniqueOffers.values());
+      order.offers = Array.from(uniqueOffers.values()).sort((a, b) => b.id - a.id);
       return order
     } catch (error) {
  
