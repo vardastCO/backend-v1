@@ -27,7 +27,7 @@ import {
 import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
-import { Blacklist } from "./entities/blacklist";
+import { Blacklist } from "./entities/blacklist.entity";
 
 @Injectable()
 export class RegistrationService {
