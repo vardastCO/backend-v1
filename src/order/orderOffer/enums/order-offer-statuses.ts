@@ -1,6 +1,7 @@
 import { registerEnumType } from "@nestjs/graphql";
 //
 export enum OrderOfferStatuses {
+  PENDING_INFO = "PENDING_INFO",
   PENDING_PRICE = "PENDING_PRICE",
   INVOICE = "INVOICE",
   PAYMENT_SUBMITED = "PAYMENT_SUBMITED",

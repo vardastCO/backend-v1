@@ -107,14 +107,15 @@ export class OrderOfferService {
     }
   async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User,admin:boolean,client:boolean): Promise<OfferOrder> {
 
-      try {
+    try {
+        //TODO MAX ORDER NOT HAVE DATA
         let order = await OfferOrder.findOne({
           where: {
             userId: user.id,
             preOrder :  {
               id : createOrderOfferInput.preOrderId
             },
-            status: OrderOfferStatuses.PENDING_PRICE
+            status: OrderOfferStatuses.PENDING_INFO
           },
           relations: ['offerLine'],
           order: {

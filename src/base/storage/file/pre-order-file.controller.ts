@@ -30,7 +30,7 @@ export class PreOrderFileController {
     }
     
     try {
-
+     // TODO PENDIN_INFO
       const offer = await OfferOrder.findOne({
         where: {
           uuid,
