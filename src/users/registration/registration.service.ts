@@ -27,6 +27,7 @@ import {
 import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { Blacklist } from "./entities/blacklist";
 
 @Injectable()
 export class RegistrationService {
@@ -39,6 +40,12 @@ export class RegistrationService {
     await validateCellphoneInput.validateAndFormatCellphone();
     validateCellphoneInput.validationType =
       validateCellphoneInput.validationType ?? ValidationTypes.SIGNUP;
+    
+    const blacklist = await this.loadBlacklistIntoCacheIfNotExists();
+    if (blacklist.has(validateCellphoneInput.cellphone)) {
+      throw new Error('Cellphone number is blacklisted');
+    }
+    
   
     const now = new Date();
     now.setSeconds(now.getSeconds() - OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS);
@@ -90,7 +97,18 @@ export class RegistrationService {
         : `رمز یکبار مصرف قبلا به شماره ${lastUnexpiredOtp.receiver} پیامک شده است.`,
     };
   }
+  async  loadBlacklistIntoCacheIfNotExists(): Promise<Set<string>> {
+    const blacklistKey = 'blacklist:all';
+    let blacklist = await this.cacheManager.get<string[]>(blacklistKey);
   
+    if (!blacklist) {
+      const blacklistEntries = await Blacklist.find();
+      blacklist = blacklistEntries.map(entry => entry.cellphone);
+      await this.cacheManager.set(blacklistKey, blacklist, CacheTTL.TWO_WEEK);
+    }
+  
+    return new Set(blacklist);
+  }
 
   async validateOtp(
     validateOtpInput: ValidateOtpInput,
