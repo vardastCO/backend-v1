@@ -15,7 +15,7 @@ import { OneTimePasswordTypes } from "../enums/one-time-password-types.enum";
 @ObjectType()
 @Entity("user_one_time_passwords")
 export class OneTimePassword extends BaseEntity {
-  public static SMS_OTP_EXPIRES_IN_SECONDS = 90;
+  public static SMS_OTP_EXPIRES_IN_SECONDS = 120;
   public static SIGNUP_DEADLINE_AFTER_VALIDATION_SECONDS = 1_200; // 20 min
 
   @Field(() => Int)

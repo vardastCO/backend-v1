@@ -40,30 +40,6 @@ export class RegistrationService {
     validateCellphoneInput.validationType =
       validateCellphoneInput.validationType ?? ValidationTypes.SIGNUP;
   
-    // Uncomment and implement this section to check if user exists
-    // const userExists = await User.createQueryBuilder()
-    //   .where({ cellphone: validateCellphoneInput.cellphone })
-    //   .getExists();
-  
-    // if (
-    //   validateCellphoneInput.validationType == ValidationTypes.SIGNUP &&
-    //   userExists
-    // ) {
-    //   return {
-    //     nextState: AuthStates.LOGIN,
-    //     message: "لطفا وارد حساب کاربری خود شوید.",
-    //   };
-    // } else if (
-    //   validateCellphoneInput.validationType == ValidationTypes.PASSWORD_RESET &&
-    //   !userExists
-    // ) {
-    //   return {
-    //     nextState: AuthStates.VALIDATE_CELLPHONE,
-    //     message: "کاربری با این مشخصات یافت نشد.",
-    //   };
-    // }
-  
-    // Check if any valid OTP exists
     const now = new Date();
     now.setSeconds(now.getSeconds() - OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS);
   
