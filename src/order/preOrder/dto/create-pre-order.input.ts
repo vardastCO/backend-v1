@@ -1,7 +1,9 @@
 import { Field, InputType, Int} from "@nestjs/graphql";
 import { PaymentMethodEnum } from "../enum/sort-types.enum";
-import { IsNotEmpty, IsEnum, IsOptional,Length } from "class-validator";
+import { IsNotEmpty, IsEnum, IsOptional,Length, IsString, MaxLength, IsInt } from "class-validator";
 import { TypeOrder } from "../enum/type-order.enum";
+import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
+import { ExpireTypes } from "../enum/expire-types.enum";
 
 @InputType()
 export class CreatePreOrderInput {
@@ -46,4 +48,40 @@ export class CreatePreOrderInput {
   @IsOptional()
   @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
   cellphone?: string;
+
+  @Field(() => PreOrderStatus, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsEnum(PreOrderStatus)
+  status?: PreOrderStatus;
+  
+
+  @Field(() => String,{nullable:true}) 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  expert_name?: string;
+
+  @Field(() => String,{nullable:true}) 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  applicant_name?: string;
+
+
+  @Field(() => ExpireTypes, {
+    defaultValue: ExpireTypes.ONE_DAY,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  @IsEnum(ExpireTypes)
+  expire_date?: ExpireTypes = ExpireTypes.ONE_DAY;
+
+  @Field(() => Int, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  categoryId?: number;
 }
