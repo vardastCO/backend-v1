@@ -24,6 +24,7 @@ import { IndexPreOrderInput } from "../preOrder/dto/index-preOrder.input";
 import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
+import { SellerRepresentative } from "src/products/seller/entities/seller-representative.entity";
 
 @Injectable()
 export class OrderOfferService {
@@ -108,36 +109,46 @@ export class OrderOfferService {
   async createOffer(createOrderOfferInput:CreateOrderOfferInput,user:User,admin:boolean,client:boolean): Promise<OfferOrder> {
 
     try {
-        //TODO MAX ORDER NOT HAVE DATA
-        let order = await OfferOrder.findOne({
+        const maxPendingInfoOrders = 5;
+
+        const orders = await OfferOrder.find({
           where: {
             userId: user.id,
-            preOrder :  {
-              id : createOrderOfferInput.preOrderId
+            preOrder: {
+              id: createOrderOfferInput.preOrderId
             },
             status: OrderOfferStatuses.PENDING_INFO
           },
           relations: ['offerLine'],
           order: {
             id: 'DESC'
-          }
-        })
-        if (order) {
-          return order
+          },
+          take: maxPendingInfoOrders + 1
+        });
+      
+        if (orders.length > maxPendingInfoOrders) {
+          return orders[0];
+        }  
+        const new_offer: OfferOrder = OfferOrder.create<OfferOrder>(createOrderOfferInput);
+      
+        new_offer.userId = user.id
+        new_offer.type = admin ? TypeOrderOffer.VARDAST : client ? TypeOrderOffer.CLIENT : new_offer.type;
+        new_offer.uuid = await this.generateNumericUuid();
+        new_offer.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
+        new_offer.request_name = user.fullName ?? 'کاربر وردست';
+      
+        const userAuth = await this.authorizationService.setUser(user);
+
+        if (userAuth.hasRole("seller")) {
+          new_offer.sellerId = (await SellerRepresentative.findOneBy({ userId: user.id })).sellerId;
         }
-        const newOrder: OfferOrder = OfferOrder.create<OfferOrder>(createOrderOfferInput);
-        newOrder.userId = user.id
-        if (admin) {
-          newOrder.type = TypeOrderOffer.VARDAST
+        
+        if (!admin && !userAuth.hasRole("admin") ) {
+          new_offer.status = OrderOfferStatuses.PENDING_PRICE;
         }
-        if (client) {
-          newOrder.type = TypeOrderOffer.CLIENT
-        }
-        newOrder.uuid = await this.generateNumericUuid();
-        newOrder.created_at = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-        newOrder.request_name = user.fullName ??  'کاربر وردست';
-        await newOrder.save();
-        const preOrder = await newOrder.preOrder;
+        
+        await new_offer.save();
+        const preOrder = await new_offer.preOrder;
         if (preOrder) {
   
           preOrder.offersNum += 1;
@@ -145,11 +156,8 @@ export class OrderOfferService {
           await preOrder.save();
         }
 
-   
-  
-
         const  offer =  await OfferOrder.findOne({
-          where: { id: newOrder.id },
+          where: { id: new_offer.id },
           relations: ['offerLine'],
           order: {
             id: 'DESC'
@@ -165,7 +173,7 @@ export class OrderOfferService {
           newOfferLine.total_price = '0'
           newOfferLine.fi_price = '0'
           newOfferLine.tax_price = '0'
-          newOfferLine.offerOrderId = newOrder.id
+          newOfferLine.offerOrderId = new_offer.id
           newOfferLine.lineId = line.id
         
           await newOfferLine.save();
