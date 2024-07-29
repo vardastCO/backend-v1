@@ -365,7 +365,9 @@ export class OrderOfferService {
         where: { id },
         relations: ['offerLine'],
         order: {
-          id: 'DESC'
+          offerLine: {
+            id : "DESC"
+          } 
         }
       });
       return orderOffer
