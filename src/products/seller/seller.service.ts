@@ -161,10 +161,7 @@ export class SellerService {
     indexSellerInput.boot();
     const { take, skip, isPublic, status, createdById, name,hasLogoFile } =
       indexSellerInput || {};
-    let admin = false
-    if (await this.authorizationService.setUser(user).hasRole("admin")) {
-      admin = true
-    }
+    const admin = await this.authorizationService.setUser(user).hasRole("admin");
     if (!admin && indexSellerInput.page > 10) {
       indexSellerInput.page = 10
     }

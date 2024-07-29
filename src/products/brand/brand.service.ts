@@ -103,10 +103,7 @@ export class BrandService {
       hasCatalogeFile,
       hasPriceList,
     } = indexBrandInput || {};
-    let admin = false;
-    if (await this.authorizationService.setUser(user).hasRole("admin")) {
-      admin = true;
-    }
+    const admin = await this.authorizationService.setUser(user).hasRole("admin");
     if (!admin && indexBrandInput.page > 10) {
       indexBrandInput.page = 10
     }

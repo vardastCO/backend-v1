@@ -194,10 +194,7 @@ export class ProductService {
     indexProductInput.boot();
     const { sortField, sortDirection } = indexProductInput;
     
-    let admin = false;
-    if (await this.authorizationService.setUser(user).hasRole("admin")) {
-      admin = true;
-    }
+    const admin = await this.authorizationService.setUser(user).hasRole("admin");
     if (!admin && indexProductInput.page > 10) {
       indexProductInput.page = 10;
     }
