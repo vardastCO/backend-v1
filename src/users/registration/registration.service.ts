@@ -35,18 +35,16 @@ export class RegistrationService {
     validateCellphoneInput: ValidateCellphoneInput,
     ipAddress: string,
   ): Promise<ValidateCellphoneResponse> {
-
+  
     await validateCellphoneInput.validateAndFormatCellphone();
     validateCellphoneInput.validationType =
       validateCellphoneInput.validationType ?? ValidationTypes.SIGNUP;
-
-    // check to see if user exists:
+  
+    // Uncomment and implement this section to check if user exists
     // const userExists = await User.createQueryBuilder()
     //   .where({ cellphone: validateCellphoneInput.cellphone })
     //   .getExists();
-    
-    // console.log('biiiiiiiiiiiiiiii')
-
+  
     // if (
     //   validateCellphoneInput.validationType == ValidationTypes.SIGNUP &&
     //   userExists
@@ -64,62 +62,59 @@ export class RegistrationService {
     //     message: "کاربری با این مشخصات یافت نشد.",
     //   };
     // }
-
-    // check to see if any valid otp exists
+  
+    // Check if any valid OTP exists
     const now = new Date();
-    now.setSeconds(
-      now.getSeconds() - OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS,
-    );
-    // let lastUnexpiredOtp = await OneTimePassword.createQueryBuilder()
-    //   .where({
-    //     requesterIp: ipAddress,
-    //     type: validationTypeToOtpTypeMap[validateCellphoneInput.validationType],
-    //     receiver: validateCellphoneInput.cellphone,
-    //     validatedAt: IsNull(),
-    //     state: OneTimePasswordStates.INIT,
-    //     createdAt: MoreThanOrEqual(now),
-    //   })
-    //   .orderBy({ '"createdAt"': "DESC" })
-    //   .getOne();
-    
-    //   console.log('ggggiiiiiiiiiiiiiiii')
-
-    let isNewTokenSend: boolean;
-    // if ((isNewTokenSend = !lastUnexpiredOtp)) {
-      let lastUnexpiredOtp = OneTimePassword.create({
+    now.setSeconds(now.getSeconds() - OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS);
+  
+    let lastUnexpiredOtp = await OneTimePassword.createQueryBuilder()
+      .where({
+        requesterIp: ipAddress,
+        type: validationTypeToOtpTypeMap[validateCellphoneInput.validationType],
+        receiver: validateCellphoneInput.cellphone,
+        validatedAt: IsNull(),
+        state: OneTimePasswordStates.INIT,
+        createdAt: MoreThanOrEqual(now),
+      })
+      .orderBy({ '"createdAt"': "DESC" })
+      .getOne();
+  
+    let isNewTokenSend: boolean = !lastUnexpiredOtp;
+  
+    if (isNewTokenSend) {
+      lastUnexpiredOtp = OneTimePassword.create({
         requesterIp: ipAddress,
         type: validationTypeToOtpTypeMap[validateCellphoneInput.validationType],
         receiver: validateCellphoneInput.cellphone,
       }).generateNewToken();
-
-    //   console.log('=============================')
+  
       // const key = `kavenegar:${validateCellphoneInput.cellphone}:${lastUnexpiredOtp.token}`;
       // await this.cacheManager.set(key, 'OTP', CacheTTL.TEN_SECONDS);
-      // console.log('kavenegar',validateCellphoneInput.cellphone,lastUnexpiredOtp.token)
+      
       await this.kavenegarService.lookup(
         validateCellphoneInput.cellphone,
         "verify",
         lastUnexpiredOtp.token,
       );
-
+  
       await (await lastUnexpiredOtp.hashTheToken()).save();
-    // }
-
+    }
+  
     const secondsPastFromOtpGeneration = Math.round(
       (new Date().getTime() - lastUnexpiredOtp.createdAt.getTime()) / 1000,
     );
-
+  
     return {
       validationKey: lastUnexpiredOtp.id,
       remainingSeconds:
-        OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS -
-        secondsPastFromOtpGeneration,
+        OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS - secondsPastFromOtpGeneration,
       nextState: AuthStates.VALIDATE_OTP,
       message: isNewTokenSend
         ? `رمز یکبار مصرف به شماره ${lastUnexpiredOtp.receiver} پیامک شد.`
         : `رمز یکبار مصرف قبلا به شماره ${lastUnexpiredOtp.receiver} پیامک شده است.`,
     };
   }
+  
 
   async validateOtp(
     validateOtpInput: ValidateOtpInput,
@@ -151,7 +146,7 @@ export class RegistrationService {
       };
     }
 
-    console.log('validate otp;')
+    console.log('validate otp;',lastUnexpiredOtp.receiver,validateOtpInput.token)
 
     if (!(await lastUnexpiredOtp.doesTokenMatches(validateOtpInput.token))) {
       console.log('wrong password')
@@ -162,7 +157,6 @@ export class RegistrationService {
     lastUnexpiredOtp.state = OneTimePasswordStates.VALIDATED;
     await lastUnexpiredOtp.save();
 
-    // Check to see if any users exists, if so fail with error
     const anyUsersExists = await User.createQueryBuilder()
       .where({ cellphone: lastUnexpiredOtp.receiver })
       .getExists();
