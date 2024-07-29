@@ -166,7 +166,7 @@ export class SellerService {
       admin = true
     }
     if (!admin && indexSellerInput.page > 10) {
-      throw new Error("Non-admin users cannot access beyond page 10.");
+      indexSellerInput.page = 10
     }
     const cacheKey = `sellers_${JSON.stringify(indexSellerInput)}`;
     const cachedData = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);

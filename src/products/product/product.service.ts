@@ -199,7 +199,7 @@ export class ProductService {
       admin = true;
     }
     if (!admin && indexProductInput.page > 10) {
-      throw new Error("Non-admin users cannot access beyond page 10.");
+      indexProductInput.page = 10;
     }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
     const cachedData = await this.cacheManager.get<String>(cacheKey);
