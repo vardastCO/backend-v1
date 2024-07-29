@@ -4,12 +4,14 @@ import axios from 'axios';
 import { Response } from "express";
 import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 import { OfferOrder } from "src/order/orderOffer/entities/order-offer.entity";
+import { OrderOfferStatuses } from "src/order/orderOffer/enums/order-offer-statuses";
 import { TypeOrder } from "src/order/preOrder/enum/type-order.enum";
 import { Address } from "src/users/address/entities/address.entity";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import { Legal } from "src/users/legal/entities/legal.entity";
 import { UserProject } from "src/users/project/entities/user-project.entity";
 import { UserTypeProject } from "src/users/project/enums/type-user-project.enum";
+import { Not } from "typeorm";
 @Controller("pre/order/file")
 export class PreOrderFileController {
   @Public()
@@ -31,7 +33,8 @@ export class PreOrderFileController {
 
       const offer = await OfferOrder.findOne({
         where: {
-          uuid ,
+          uuid,
+          status : Not(OrderOfferStatuses.PENDING_PRICE)
         },
         relations: ["preOrder.user","preOrder.address","offerLine","preOrder.project"],
       })
