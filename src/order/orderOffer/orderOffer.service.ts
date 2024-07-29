@@ -111,7 +111,7 @@ export class OrderOfferService {
     try {
         const maxPendingInfoOrders = 5;
 
-        const orders = await OfferOrder.find({
+        const find_offer = await OfferOrder.find({
           where: {
             userId: user.id,
             preOrder: {
@@ -125,9 +125,9 @@ export class OrderOfferService {
           },
           take: maxPendingInfoOrders + 1
         });
-      
-        if (orders.length > maxPendingInfoOrders) {
-          return orders[0];
+        console.log('orders length',find_offer.length)
+        if (find_offer.length > maxPendingInfoOrders) {
+          return find_offer[0];
         }  
         const new_offer: OfferOrder = OfferOrder.create<OfferOrder>(createOrderOfferInput);
       
