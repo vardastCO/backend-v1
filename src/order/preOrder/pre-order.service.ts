@@ -291,7 +291,7 @@ export class PreOrderService {
      
       const offersPromises = Promise.all([
           OfferOrder.find({ 
-            where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT },
+            where: { preOrderId: order.id, type: TypeOrderOffer.CLIENT,status : Not(OrderOfferStatuses.PENDING_INFO) },
             relations: ["offerLine"],
             order: {
               offerLine: {
@@ -303,7 +303,7 @@ export class PreOrderService {
             }
           }),
           OfferOrder.find({ 
-            where: { preOrderId: order.id, type: TypeOrderOffer.SELLER },
+            where: { preOrderId: order.id, type: TypeOrderOffer.SELLER,status : Not(OrderOfferStatuses.PENDING_INFO) },
             relations: ["offerLine"],
             order: {
               offerLine: {
@@ -316,7 +316,7 @@ export class PreOrderService {
             }
           }),
           OfferOrder.find({ 
-            where: { preOrderId: order.id, type: TypeOrderOffer.VARDAST },
+            where: { preOrderId: order.id, type: TypeOrderOffer.VARDAST , status : Not(OrderOfferStatuses.PENDING_INFO) },
             relations: ["offerLine"],
             order: {
               offerLine: {
@@ -340,7 +340,7 @@ export class PreOrderService {
             }
           }),
           OfferOrder.find({ 
-            where: { preOrderId: order.id,type:TypeOrderOffer.CLIENT, total: Not('0') },
+            where: { preOrderId: order.id,type:TypeOrderOffer.CLIENT, total: Not('0') ,status : Not(OrderOfferStatuses.PENDING_INFO) },
             relations: ["offerLine"],
             order: {
               offerLine: {
