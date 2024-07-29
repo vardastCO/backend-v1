@@ -94,7 +94,7 @@ export class OrderOfferService {
         offer.request_name = findTempSeller.name
       }
     
-     
+      offer.status = OrderOfferStatuses.PENDING_PRICE
       offer.type = TypeOrderOffer.SELLER
     
       await offer.save()

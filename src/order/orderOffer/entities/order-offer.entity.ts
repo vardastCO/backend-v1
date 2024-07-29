@@ -94,7 +94,7 @@ export class OfferOrder extends BaseEntity {
   @Index()
   @Column("enum", {
     enum: OrderOfferStatuses,
-    default: OrderOfferStatuses.PENDING_PRICE,
+    default: OrderOfferStatuses.PENDING_INFO,
   })
   status: OrderOfferStatuses;
 
