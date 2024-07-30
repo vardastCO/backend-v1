@@ -49,10 +49,10 @@ export class UpdatePreOrderInput extends CreatePreOrderInput {
   // @IsEnum(ExpireTypes)
   // expire_date?: ExpireTypes = ExpireTypes.ONE_DAY;
 
-  // @Field(() => Int, {
-  //   nullable: true,
-  // })
-  // @IsOptional()
-  // @IsInt()
-  // categoryId?: number;
+  @Field(() => Int, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  addressId?: number;
 }

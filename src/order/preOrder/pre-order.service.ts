@@ -31,6 +31,7 @@ import { CompressionService } from "src/compression.service";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { File } from "src/base/storage/file/entities/file.entity";
 import { ProjectAddress } from "src/users/project/entities/addressProject.entity";
+import { Console } from "console";
 
 @Injectable()
 export class PreOrderService {
@@ -221,12 +222,11 @@ export class PreOrderService {
       preOrder.expert_name = updatePreOrderInput.expert_name
 
     }
-
     if (updatePreOrderInput.addressId) {
-      const address = await ProjectAddress.findOneBy({
-        id : updatePreOrderInput.addressId
-      })
-      preOrder.addressId = (await Promise.resolve(address)).id
+      preOrder.address = Promise.resolve(ProjectAddress.findOneBy({
+        id: updatePreOrderInput.addressId
+      }));
+      (await preOrder.address).save()
 
     }
   
