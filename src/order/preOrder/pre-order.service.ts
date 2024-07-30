@@ -222,13 +222,13 @@ export class PreOrderService {
       preOrder.expert_name = updatePreOrderInput.expert_name
 
     }
-    if (updatePreOrderInput.addressId) {
-      preOrder.address = Promise.resolve(ProjectAddress.findOneBy({
-        id: updatePreOrderInput.addressId
-      }));
-      (await preOrder.address).save()
+    // if (updatePreOrderInput.addressId) {
+    //   preOrder.address = Promise.resolve(ProjectAddress.findOneBy({
+    //     id: updatePreOrderInput.addressId
+    //   }));
+    //   (await preOrder.address).save()
 
-    }
+    // }
   
     let preOrderAddress = await preOrder.address;
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
@@ -247,8 +247,9 @@ export class PreOrderService {
     }
   
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
-
+    // preOrder.addressId = updatePreOrderInput.addressId  ?? preOrder.addressId
     await preOrder.save()
+    // console.log('all',preOrder,preOrder.addressId)
   
     return preOrder;
   }

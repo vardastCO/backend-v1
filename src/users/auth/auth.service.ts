@@ -417,6 +417,9 @@ export class AuthService {
     const legalData = await Legal.findOneBy({
       id: member.relatedId
     });
+    if (legalData) {
+      legalData.position = member.position
+    }
     user.legal = legalData ?? null; 
     user.sessions = Promise.resolve([]);
     user.country = null;

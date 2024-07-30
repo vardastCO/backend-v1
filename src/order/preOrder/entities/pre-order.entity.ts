@@ -53,7 +53,7 @@ export class PreOrder extends BaseEntity {
   projectId: number;
 
   @Field(() => ProjectAddress, { nullable: true })
-  @ManyToOne(() => ProjectAddress, { nullable: true })
+  @ManyToOne(() => ProjectAddress, {eager: true, nullable: true })
   address: Promise<ProjectAddress>;
 
   @Column({ nullable: true })
