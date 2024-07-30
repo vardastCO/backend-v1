@@ -78,6 +78,7 @@ export class PreOrderService {
 
         if (order) {
             updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
+            order.project  = Promise.resolve(project)  
             await order.save();
             return order;
         }
@@ -98,7 +99,7 @@ export class PreOrderService {
         order.userId = userId;
 
         updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
-
+        order.project  = Promise.resolve(project)  
         await order.save();
         return order;
     } catch (error) {
@@ -246,7 +247,7 @@ export class PreOrderService {
         id : preOrder.projectId
       })
       const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
-  
+      preOrder.project = Promise.resolve(project)
       preOrder.type = findType 
     }
     
