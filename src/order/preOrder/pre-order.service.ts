@@ -207,6 +207,10 @@ export class PreOrderService {
     if (updatePreOrderInput.categoryId) {
       preOrder.categoryId = updatePreOrderInput.categoryId
     }
+
+    if (updatePreOrderInput.addressId) {
+      preOrder.addressId = updatePreOrderInput.addressId
+    }
  
     if (updatePreOrderInput.applicant_name) {
      
@@ -222,13 +226,6 @@ export class PreOrderService {
       preOrder.expert_name = updatePreOrderInput.expert_name
 
     }
-    // if (updatePreOrderInput.addressId) {
-    //   preOrder.address = Promise.resolve(ProjectAddress.findOneBy({
-    //     id: updatePreOrderInput.addressId
-    //   }));
-    //   (await preOrder.address).save()
-
-    // }
   
     let preOrderAddress = await preOrder.address;
     let isHaveAddress = (preOrderAddress?.address?.length > 0) ?? false;
@@ -247,10 +244,15 @@ export class PreOrderService {
     }
   
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
-    // preOrder.addressId = updatePreOrderInput.addressId  ?? preOrder.addressId
+    // preOrder.address = Promise.resolve(ProjectAddress.findOneBy({
+    //   id: updatePreOrderInput.addressId
+    // })) ?? null;
     await preOrder.save()
-    // console.log('all',preOrder,preOrder.addressId)
-  
+
+    // preOrder.address = Promise.resolve(ProjectAddress.findOneBy({
+    //       id: updatePreOrderInput.addressId
+    // })) ?? null;
+
     return preOrder;
   }
   

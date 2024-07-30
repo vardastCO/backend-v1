@@ -12,8 +12,11 @@ export class CreatePreOrderInput {
   @IsOptional()
   projectId?: number;
 
-  @Field({ nullable: true })
+  @Field(() => Int, {
+    nullable: true,
+  })
   @IsOptional()
+  @IsInt()
   addressId?: number;
 
   @Field(() => PaymentMethodEnum, {
@@ -39,7 +42,7 @@ export class CreatePreOrderInput {
   @Field({ nullable: true })
   @IsOptional()
   bid_start?: Date;
-  
+
   @Field(() => TypeOrder, {
     defaultValue: TypeOrder.REAL,
     nullable: true,
