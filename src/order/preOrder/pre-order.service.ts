@@ -318,7 +318,7 @@ export class PreOrderService {
   
     try {
       let order = await PreOrder.findOne({
-        where: { id: id,lines:{deleted_at : IsNull()} },
+        where: { id: id },
         relations: ["files", "lines"],
         order: {
           lines: {
@@ -420,6 +420,11 @@ export class PreOrderService {
       }
     
       order.offers = Array.from(uniqueOffers.values()).sort((a, b) => b.id - a.id);
+   
+      const edit_lines = await order.lines
+      edit_lines.filter(line => line.deleted_at === null)
+        .sort((a, b) => a.type.localeCompare(b.type)); 
+      order.lines = Promise.resolve(edit_lines)
       return order
     } catch (error) {
  
