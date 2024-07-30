@@ -30,6 +30,7 @@ import { DecompressionService } from "src/decompression.service";
 import { CompressionService } from "src/compression.service";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { File } from "src/base/storage/file/entities/file.entity";
+import { ProjectAddress } from "src/users/project/entities/addressProject.entity";
 
 @Injectable()
 export class PreOrderService {
@@ -48,11 +49,10 @@ export class PreOrderService {
   async createPreOrder(createPreOrderInput: CreatePreOrderInput, user: User): Promise<PreOrder> {
     try {
         const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
-        const project = await Project.findOneBy({ id: createPreOrderInput.projectId });
-
-        if (!project) {
-            throw new Error('Project not found');
-        }
+        const [project, projectAddress] = await Promise.all([
+          Project.findOneBy({ id: createPreOrderInput.projectId }),
+          ProjectAddress.findOneBy({ id: createPreOrderInput.addressId }),
+        ]);
 
         let order = await PreOrder.findOneBy({
             userId: user.id,
@@ -78,7 +78,8 @@ export class PreOrderService {
 
         if (order) {
             updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
-            order.project  = Promise.resolve(project)  
+            order.project = Promise.resolve(project)  
+            order.address = Promise.resolve(projectAddress)
             await order.save();
             return order;
         }
@@ -87,7 +88,8 @@ export class PreOrderService {
         order.uuid = await this.generateNumericUuid();
         order.request_date = currentDateTime;
         order.expire_time = currentDateTime;
-
+ 
+      
         let userId = user.id;
         if (createPreOrderInput.cellphone) {
             const userByCellphone = await User.findOneBy({ cellphone: createPreOrderInput.cellphone });
@@ -99,14 +101,15 @@ export class PreOrderService {
         order.userId = userId;
 
         updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
-        order.project  = Promise.resolve(project)  
+        order.project = Promise.resolve(project)  
+        order.address = Promise.resolve(projectAddress)
         await order.save();
         return order;
     } catch (error) {
         console.error('createPreOrder error:', error);
         throw error;
     }
-}
+  }
 
   async pickUpPreOrder(preOrderId : number,user:User): Promise<PreOrder> {
     
@@ -243,14 +246,17 @@ export class PreOrderService {
   
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
     if (preOrder.projectId) {
-      const project = await Project.findOneBy({
-        id : preOrder.projectId
-      })
-      const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
-      preOrder.project = Promise.resolve(project)
-      preOrder.type = findType 
+      const [project, projectAddress] = await Promise.all([
+        Project.findOneBy({ id: preOrder.projectId }),
+        ProjectAddress.findOneBy({ id: updatePreOrderInput.addressId }),
+      ]);
+      
+      const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL;
+      preOrder.project = Promise.resolve(project);
+      preOrder.type = findType;
+      preOrder.address = Promise.resolve(projectAddress); 
     }
-    
+
 
     await preOrder.save()
   
