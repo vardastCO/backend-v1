@@ -45,56 +45,69 @@ export class PreOrderService {
       const max = Math.pow(10, length) - 1;
     return Math.floor(Math.random() * (max - min + 1) + min).toString();
   }
-  async createPreOrder(createPreOrderInput : CreatePreOrderInput,user:User): Promise<PreOrder> {
-
-      try {
-        let order = await PreOrder.findOneBy({
-          userId : user.id,
-          status : PreOrderStatus.PENDING_INFO
+  async createPreOrder(createPreOrderInput: CreatePreOrderInput, user: User): Promise<PreOrder> {
+    try {
+        const order = await PreOrder.findOneBy({
+            userId: user.id,
+            status: PreOrderStatus.PENDING_INFO
         });
+
         if (order) {
-          return order
+            return order;
         }
+
         const newOrder: PreOrder = PreOrder.create<PreOrder>(createPreOrderInput);
-        newOrder.uuid = await this.generateNumericUuid()
-        // newOrder.need_date = createPreOrderInput.need_date ?? new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-        newOrder.request_date = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-        newOrder.expire_time = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" })
-        let user_id = user.id
+        newOrder.uuid = await this.generateNumericUuid();
+        const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
+        newOrder.request_date = currentDateTime;
+        newOrder.expire_time = currentDateTime;
+
+        let userId = user.id;
         if (createPreOrderInput.cellphone) {
-          const findUserId = (await await User.findOneBy({ cellphone: createPreOrderInput.cellphone })).id
-          if (!findUserId) {
-            throw 'error not found user'
-          }
-          user_id = findUserId
+            const userByCellphone = await User.findOneBy({ cellphone: createPreOrderInput.cellphone });
+            if (!userByCellphone) {
+                throw new Error('User not found');
+            }
+            userId = userByCellphone.id;
         }
-        newOrder.userId = user_id
- 
-        const project = await Project.findOneBy({
-          id : createPreOrderInput.projectId
-        })
-        const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL
-        newOrder.type = findType
+        newOrder.userId = userId;
+
+        Object.assign(newOrder, {
+            applicant_name: createPreOrderInput.applicant_name,
+            addressId: createPreOrderInput.addressId,
+            categoryId: createPreOrderInput.categoryId,
+            expert_name: createPreOrderInput.expert_name,
+            descriptions: createPreOrderInput.descriptions,
+            bid_start: createPreOrderInput.bid_start,
+            bid_end: createPreOrderInput.bid_end,
+            projectId: createPreOrderInput.projectId,
+            payment_methods : createPreOrderInput.payment_methods
+        });
+
+        const project = await Project.findOneBy({ id: createPreOrderInput.projectId });
+        newOrder.type = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL;
 
         await newOrder.save();
-  
-        return newOrder
-      } catch (error) {
 
-        console.log('create_pre_order err',error)
-        
-      }
-    
-  }
+        return newOrder;
+    } catch (error) {
+
+        console.error('createPreOrder error:', error);
+        throw error;
+    }
+}
+
   async pickUpPreOrder(preOrderId : number,user:User): Promise<PreOrder> {
     
     try {
-      let order = await PreOrder.findOneBy({
+      const order = await PreOrder.findOneBy({
         id : preOrderId,
       });
       if (order) {
-        order.pickUpUserId =  user.id
-        await order.save();
+        const new_offer = new OfferOrder()
+        new_offer.preOrderId = order.id
+        new_offer.userId = user.id
+        await new_offer.save();
 
         return order
       }
@@ -116,7 +129,9 @@ export class PreOrderService {
     try {
       const whereConditions = {}
       whereConditions['deleted_at'] = IsNull()
-      whereConditions['pickUpUserId'] = user.id;
+      whereConditions['offers'] = [
+        { userId: user.id }
+      ];
       const [data, total] = await PreOrder.findAndCount({
         skip,
         take,
@@ -131,7 +146,7 @@ export class PreOrderService {
 
     } catch (error) {
 
-      console.log('create_pre_order err',error)
+      console.log('myPreOrder err',error)
       
     }
   
