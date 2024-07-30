@@ -308,21 +308,24 @@ export class SearchService {
     return products;
   }
 
-  private getCategoriesSearchQuery(
+  async  getCategoriesSearchQuery(
     query: string,
     take?: number,
-    skip?: number,
-  ): SelectQueryBuilder<Category> {
-    const fieldsString = `COALESCE(product.title, '') || ' '`;
+    skip?: number
+  ): Promise<SelectQueryBuilder<Category>> {
+    // const fieldsString = `COALESCE(title, '') || ' '`;
+    const product = await Product.findOne({
+      where: {
+        name: Like(`%${query}%`)
+      }
+    });
+  
+    if (!product) {
+      return 
+    }
+  
     return Category.createQueryBuilder('category')
-      .innerJoin('category.products', 'product')
-      .where(`to_tsvector(${fieldsString}) @@ websearch_to_tsquery(:query)`, {
-        query,
-      })
-      .orderBy(
-        `ts_rank_cd(to_tsvector(${fieldsString}), websearch_to_tsquery(:query))`,
-        "DESC",
-      )
+      .where('category.id = :productId', { productId: product.id })
       .skip(skip)
       .take(take);
   }
