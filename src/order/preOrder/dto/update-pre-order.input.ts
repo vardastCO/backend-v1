@@ -18,15 +18,15 @@ export class UpdatePreOrderInput extends CreatePreOrderInput {
   // @IsEnum(PreOrderStatus)
   // status?: PreOrderStatus;
   
-  // @Field({ nullable: true })
-  // need_date: Date;
+  @Field({ nullable: true })
+  need_date: Date;
 
   
-  // @Field({ nullable: true })
-  // bid_start: Date;
+  @Field({ nullable: true })
+  bid_start: Date;
 
-  // @Field({ nullable: true })
-  // bid_end: Date;
+  @Field({ nullable: true })
+  bid_end: Date;
 
   // @Field(() => String,{nullable:true}) 
   // @IsOptional()

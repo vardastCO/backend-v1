@@ -80,10 +80,13 @@ export class PreOrderService {
         };
 
         if (order) {
-            updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
-            order.project = Promise.resolve(project)  
-            order.address = Promise.resolve(projectAddress)
-          
+          updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
+            if (createPreOrderInput.projectId) {
+              order.project = Promise.resolve(project)  
+            }
+            if (createPreOrderInput.projectId) {
+              order.address = Promise.resolve(projectAddress)
+            }
             console.log('create order',order )
             await order.save();
             return order;
