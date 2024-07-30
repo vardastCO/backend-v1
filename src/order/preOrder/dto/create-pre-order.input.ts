@@ -8,11 +8,13 @@ import { ExpireTypes } from "../enum/expire-types.enum";
 @InputType()
 export class CreatePreOrderInput {
 
-  @Field(() => Int,{ nullable: true })
-  projectId: number; 
+  @Field({ nullable: true })
+  @IsOptional()
+  projectId?: number;
 
-  @Field(() => Int,{ nullable: true })
-  addressId: number; 
+  @Field({ nullable: true })
+  @IsOptional()
+  addressId?: number;
 
   @Field(() => PaymentMethodEnum, {
     defaultValue: PaymentMethodEnum.CASH,
@@ -27,13 +29,13 @@ export class CreatePreOrderInput {
   descriptions: string;
 
   @Field({ nullable: true })
-  need_date: Date;
+  @IsOptional()
+  need_date?: Date;
 
   @Field({ nullable: true })
-  bid_start: Date;
+  @IsOptional()
+  bid_end?: Date;
 
-  @Field({ nullable: true })
-  bid_end: Date;
 
   @Field(() => TypeOrder, {
     defaultValue: TypeOrder.REAL,
