@@ -148,12 +148,7 @@ export class SearchService {
             .getMany()
         : productsQuery.limit(suggestvalue).getMany(),
       categoriesQuery.limit(suggestvalue).getMany(),
-      cityId
-        ? sellerQuery
-            .andWhere("addresses.cityId = :cityId", { cityId })
-            .limit(suggestvalue)
-            .getMany()
-        : sellerQuery.limit(suggestvalue).getMany(),
+      [],
       brandQuery.limit(suggestvalue).getMany(),
       updateSearchEntityPromise
     ]);
@@ -318,8 +313,9 @@ export class SearchService {
     take?: number,
     skip?: number,
   ): SelectQueryBuilder<Category> {
-    const fieldsString = `COALESCE(title, '') || ' '`;
-    return Category.createQueryBuilder()
+    const fieldsString = `COALESCE(product.title, '') || ' '`;
+    return Category.createQueryBuilder('category')
+      .innerJoin('category.products', 'product')
       .where(`to_tsvector(${fieldsString}) @@ websearch_to_tsquery(:query)`, {
         query,
       })
