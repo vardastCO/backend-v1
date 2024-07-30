@@ -48,11 +48,14 @@ export class PreOrderService {
   }
   async createPreOrder(createPreOrderInput: CreatePreOrderInput, user: User): Promise<PreOrder> {
     try {
+      console.log('inpuut',createPreOrderInput.projectId )
         const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
         const [project, projectAddress] = await Promise.all([
           Project.findOneBy({ id: createPreOrderInput.projectId }),
           ProjectAddress.findOneBy({ id: createPreOrderInput.addressId }),
         ]);
+      
+        console.log('jjj',project,createPreOrderInput.projectId )
 
         let order = await PreOrder.findOneBy({
             userId: user.id,
@@ -80,6 +83,8 @@ export class PreOrderService {
             updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
             order.project = Promise.resolve(project)  
             order.address = Promise.resolve(projectAddress)
+          
+            console.log('create order',order )
             await order.save();
             return order;
         }
@@ -247,7 +252,7 @@ export class PreOrderService {
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
     if (preOrder.projectId) {
       const [project, projectAddress] = await Promise.all([
-        Project.findOneBy({ id: preOrder.projectId }),
+        Project.findOneBy({ id: updatePreOrderInput.projectId }),
         ProjectAddress.findOneBy({ id: updatePreOrderInput.addressId }),
       ]);
       
@@ -255,8 +260,9 @@ export class PreOrderService {
       preOrder.project = Promise.resolve(project);
       preOrder.type = findType;
       preOrder.address = Promise.resolve(projectAddress); 
+      console.log('hhh',project,preOrder.project)
     }
-
+    console.log('update',preOrder,preOrder.project)
 
     await preOrder.save()
   
