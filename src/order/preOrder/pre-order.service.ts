@@ -47,20 +47,45 @@ export class PreOrderService {
   }
   async createPreOrder(createPreOrderInput: CreatePreOrderInput, user: User): Promise<PreOrder> {
     try {
-        const order = await PreOrder.findOneBy({
+        const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
+        const project = await Project.findOneBy({ id: createPreOrderInput.projectId });
+
+        if (!project) {
+            throw new Error('Project not found');
+        }
+
+        let order = await PreOrder.findOneBy({
             userId: user.id,
             status: PreOrderStatus.PENDING_INFO
         });
 
+        const updateOrderDetails = (order: PreOrder, input: CreatePreOrderInput, projectType: TypeProject, currentDateTime: string) => {
+            Object.assign(order, {
+                applicant_name: input.applicant_name,
+                addressId: input.addressId,
+                categoryId: input.categoryId,
+                expert_name: input.expert_name,
+                descriptions: input.descriptions,
+                bid_start: input.bid_start,
+                bid_end: input.bid_end,
+                projectId: input.projectId,
+                payment_methods: input.payment_methods,
+                type: projectType === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL,
+                request_date: currentDateTime,
+                expire_time: currentDateTime,
+            });
+        };
+
         if (order) {
+            updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
+            await order.save();
             return order;
         }
 
-        const newOrder: PreOrder = PreOrder.create<PreOrder>(createPreOrderInput);
-        newOrder.uuid = await this.generateNumericUuid();
-        const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
-        newOrder.request_date = currentDateTime;
-        newOrder.expire_time = currentDateTime;
+        order = PreOrder.create<PreOrder>(createPreOrderInput);
+        order.uuid = await this.generateNumericUuid();
+        order.request_date = currentDateTime;
+        order.expire_time = currentDateTime;
 
         let userId = user.id;
         if (createPreOrderInput.cellphone) {
@@ -70,28 +95,13 @@ export class PreOrderService {
             }
             userId = userByCellphone.id;
         }
-        newOrder.userId = userId;
+        order.userId = userId;
 
-        Object.assign(newOrder, {
-            applicant_name: createPreOrderInput.applicant_name,
-            addressId: createPreOrderInput.addressId,
-            categoryId: createPreOrderInput.categoryId,
-            expert_name: createPreOrderInput.expert_name,
-            descriptions: createPreOrderInput.descriptions,
-            bid_start: createPreOrderInput.bid_start,
-            bid_end: createPreOrderInput.bid_end,
-            projectId: createPreOrderInput.projectId,
-            payment_methods : createPreOrderInput.payment_methods
-        });
+        updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
 
-        const project = await Project.findOneBy({ id: createPreOrderInput.projectId });
-        newOrder.type = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL;
-
-        await newOrder.save();
-
-        return newOrder;
+        await order.save();
+        return order;
     } catch (error) {
-
         console.error('createPreOrder error:', error);
         throw error;
     }

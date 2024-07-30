@@ -137,9 +137,9 @@ export class SearchService {
     const productsQuery = this.getProductsSearchQuery(query);
     // const sellerQuery = this.getSellerSearchQuery(query, cityId);
     const brandQuery = this.getBrandQuery(query);
-    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query); // Create promise
+    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query); 
   
-    const categoriesQuery = await this.getCategoriesSearchQuery(query); // Await here
+    const categoriesQuery = await this.getCategoriesSearchQuery(query); 
   
     const [products, categories, seller, brand] = await Promise.all([
       SKU
@@ -148,7 +148,7 @@ export class SearchService {
             .limit(suggestvalue)
             .getMany()
         : productsQuery.limit(suggestvalue).getMany(),
-      categoriesQuery ? categoriesQuery.limit(suggestvalue).getMany() : [], // Handle null case
+      categoriesQuery ? categoriesQuery.limit(suggestvalue).getMany() : [], 
       [],
       brandQuery.limit(suggestvalue).getMany(),
       updateSearchEntityPromise
@@ -320,6 +320,8 @@ export class SearchService {
         name: Like(`%${query}%`)
       }
     });
+
+    console.log('product',product)
   
     if (!product) {
       return null; // Handle the case when no product is found
