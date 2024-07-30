@@ -320,15 +320,13 @@ export class SearchService {
         name: Like(`%${query}%`)
       }
     });
-
-    console.log('product',product)
   
     if (!product) {
-      return null; // Handle the case when no product is found
+      return null; 
     }
   
     return Category.createQueryBuilder('category')
-      .where('category.id = :productId', { productId: product.id })
+      .where('category.id = :productId', { productId: product.categoryId })
       .skip(skip)
       .take(take);
   }
