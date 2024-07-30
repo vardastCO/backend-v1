@@ -48,8 +48,6 @@ export class PreOrderService {
   }
   async createPreOrder(createPreOrderInput: CreatePreOrderInput, user: User): Promise<PreOrder> {
     try {
-        console.log('==========================')
-
         const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
         const [project, projectAddress] = await Promise.all([
           Project.findOneBy({ id: createPreOrderInput.projectId }),
