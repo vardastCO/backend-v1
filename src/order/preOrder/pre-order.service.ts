@@ -48,19 +48,14 @@ export class PreOrderService {
   }
   async createPreOrder(createPreOrderInput: CreatePreOrderInput, user: User): Promise<PreOrder> {
     try {
-      console.log('inpuut',createPreOrderInput )
+        console.log('==========================')
+
         const currentDateTime = new Date().toLocaleString("en-US", { timeZone: "Asia/Tehran" });
         const [project, projectAddress] = await Promise.all([
           Project.findOneBy({ id: createPreOrderInput.projectId }),
           ProjectAddress.findOneBy({ id: createPreOrderInput.addressId }),
         ]);
-      
-        console.log('jjj',project,createPreOrderInput.projectId )
 
-        let order = await PreOrder.findOneBy({
-            userId: user.id,
-            status: PreOrderStatus.PENDING_INFO
-        });
 
         const updateOrderDetails = (order: PreOrder, input: CreatePreOrderInput, projectType: TypeProject, currentDateTime: string) => {
             Object.assign(order, {
@@ -79,20 +74,9 @@ export class PreOrderService {
             });
         };
 
-        if (order) {
-          updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
-            if (createPreOrderInput.projectId) {
-              order.project = Promise.resolve(project)  
-            }
-            if (createPreOrderInput.projectId) {
-              order.address = Promise.resolve(projectAddress)
-            }
-            console.log('create order',order )
-            await order.save();
-            return order;
-        }
+      
 
-        order = PreOrder.create<PreOrder>(createPreOrderInput);
+        const order = PreOrder.create<PreOrder>(createPreOrderInput);
         order.uuid = await this.generateNumericUuid();
         order.request_date = currentDateTime;
         order.expire_time = currentDateTime;
@@ -253,26 +237,13 @@ export class PreOrderService {
     }
   
     preOrder.status = updateCurrentStatusByCommingProps[updatePreOrderInput.status ?? preOrder.status]
-    if (preOrder.projectId) {
-      const [project, projectAddress] = await Promise.all([
-        Project.findOneBy({ id: updatePreOrderInput.projectId }),
-        ProjectAddress.findOneBy({ id: updatePreOrderInput.addressId }),
-      ]);
-      
-      const findType = project.type === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL;
-      preOrder.project = Promise.resolve(project);
-      preOrder.type = findType;
-      preOrder.address = Promise.resolve(projectAddress); 
-      console.log('hhh',project,preOrder.project)
-    }
-    console.log('update',preOrder,preOrder.project)
 
     await preOrder.save()
   
     return preOrder;
   }
   
-  async removePreOrder( id: number,user:User): Promise<Boolean> {
+  async removePreOrder( id: number,user:User): Promise<boolean> {
     
     try {
      
@@ -421,10 +392,12 @@ export class PreOrderService {
     
       order.offers = Array.from(uniqueOffers.values()).sort((a, b) => b.id - a.id);
    
-      // const edit_lines = await order.lines
-      // edit_lines.filter(line => line.deleted_at === null)
-      //   .sort((a, b) => a.type.localeCompare(b.type)); 
-      // order.lines = Promise.resolve(edit_lines)
+      const lines = await order.lines;
+
+      const filteredAndSortedLines = lines
+        .filter(line => line.deleted_at === null);
+
+      order.lines = Promise.resolve(filteredAndSortedLines);
       return order
     } catch (error) {
  
