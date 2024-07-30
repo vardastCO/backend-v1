@@ -38,10 +38,10 @@ export class ProjectResolver {
   @Mutation(() => Project)
   assignAddressProject(
     @Args("createAddressProjectInput") createAddressProjectInput: CreateAddressProjectInput,
-    @Args("projectId") projectId: number,
     @CurrentUser() user: User,
   ) {
-    return this.projectService.assignAddressProject(createAddressProjectInput,projectId,user);
+    return this.projectService.assignAddressProject
+      (createAddressProjectInput, createAddressProjectInput.projectId, user);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)

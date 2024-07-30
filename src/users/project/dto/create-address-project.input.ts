@@ -41,6 +41,11 @@ export class CreateAddressProjectInput {
   @Field()
   @IsNotEmpty()
   @IsInt()
+  projectId: number;
+
+  @Field()
+  @IsNotEmpty()
+  @IsInt()
   provinceId: number;
 
   @Field({ nullable: true })
