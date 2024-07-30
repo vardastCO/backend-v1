@@ -3,7 +3,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource } from "typeorm";
+import { DataSource, IsNull } from "typeorm";
 import { User } from 'src/users/user/entities/user.entity';
 import { LineDTO } from './dto/lineDTO';
 import { Line } from './entities/order-line.entity';
@@ -49,11 +49,14 @@ export class PreOrderLineService {
      }
      async orderlines(indexLineInput: IndexLineInput) {
       indexLineInput?.boot();
-      const { take, skip } = indexLineInput || {};
-      const [data, total] = await Line.findAndCount({
+       const { take, skip } = indexLineInput || {};
+       const whereConditions = {}
+       whereConditions['deleted_at'] = IsNull()
+       const [data, total] = await Line.findAndCount({
         skip,
         take,
         relations: ['preOrder'],
+        where : whereConditions,
         order: {
           id: 'DESC'
         },
@@ -108,7 +111,7 @@ export class PreOrderLineService {
     }
    
    }
-    async removeline(id: number,user:User): Promise<Boolean> {
+    async removeline(id: number,user:User): Promise<boolean> {
        
       try {
         const line = await Line.findOneBy({
@@ -116,7 +119,8 @@ export class PreOrderLineService {
         })
         
         if (line) {
-          await line.remove()
+          line.deleted_at = new Date().toLocaleString()
+          await line.save()
         }
        
        return true

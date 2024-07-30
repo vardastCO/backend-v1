@@ -318,7 +318,7 @@ export class PreOrderService {
   
     try {
       let order = await PreOrder.findOne({
-        where: { id: id, },
+        where: { id: id,lines:{deleted_at : IsNull()} },
         relations: ["files", "lines"],
         order: {
           lines: {
