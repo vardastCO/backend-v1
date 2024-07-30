@@ -135,11 +135,12 @@ export class SearchService {
     query = query.replace(/ي/g, "ی").replace(/ك/g, "ک");
   
     const productsQuery = this.getProductsSearchQuery(query);
-    const categoriesQuery = this.getCategoriesSearchQuery(query);
-    const sellerQuery = this.getSellerSearchQuery(query, cityId);
+    // const sellerQuery = this.getSellerSearchQuery(query, cityId);
     const brandQuery = this.getBrandQuery(query);
     const updateSearchEntityPromise = this.findOrCreateSearchEntity(query); // Create promise
-
+  
+    const categoriesQuery = await this.getCategoriesSearchQuery(query); // Await here
+  
     const [products, categories, seller, brand] = await Promise.all([
       SKU
         ? productsQuery
@@ -147,7 +148,7 @@ export class SearchService {
             .limit(suggestvalue)
             .getMany()
         : productsQuery.limit(suggestvalue).getMany(),
-      categoriesQuery.limit(suggestvalue).getMany(),
+      categoriesQuery ? categoriesQuery.limit(suggestvalue).getMany() : [], // Handle null case
       [],
       brandQuery.limit(suggestvalue).getMany(),
       updateSearchEntityPromise
@@ -155,6 +156,7 @@ export class SearchService {
   
     return { products, categories, seller, brand };
   }
+  
   
 
   async suggestv2(suggestInput: SuggestInput): Promise<SuggestResponseV2> {
@@ -308,12 +310,11 @@ export class SearchService {
     return products;
   }
 
-  async  getCategoriesSearchQuery(
+  async getCategoriesSearchQuery(
     query: string,
     take?: number,
     skip?: number
-  ): Promise<SelectQueryBuilder<Category>> {
-    // const fieldsString = `COALESCE(title, '') || ' '`;
+  ): Promise<SelectQueryBuilder<Category> | null> {
     const product = await Product.findOne({
       where: {
         name: Like(`%${query}%`)
@@ -321,7 +322,7 @@ export class SearchService {
     });
   
     if (!product) {
-      return 
+      return null; // Handle the case when no product is found
     }
   
     return Category.createQueryBuilder('category')
@@ -329,6 +330,7 @@ export class SearchService {
       .skip(skip)
       .take(take);
   }
+  
   private getSellerSearchQuery(
     query: string,
     take?: number,
