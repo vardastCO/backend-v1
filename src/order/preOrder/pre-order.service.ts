@@ -214,9 +214,21 @@ export class PreOrderService {
       preOrder.applicant_name = updatePreOrderInput.applicant_name
 
     }
+    if (updatePreOrderInput.descriptions) {
+     
+      preOrder.descriptions = updatePreOrderInput.descriptions
+    }
 
     if (updatePreOrderInput.expert_name) {
       preOrder.expert_name = updatePreOrderInput.expert_name
+
+    }
+
+    if (updatePreOrderInput.addressId) {
+      const address = await ProjectAddress.findOneBy({
+        id : updatePreOrderInput.addressId
+      })
+      preOrder.addressId = (await Promise.resolve(address)).id
 
     }
   
