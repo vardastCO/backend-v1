@@ -12,7 +12,7 @@ import { AuthorizationService } from "src/users/authorization/authorization.serv
 import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { User } from "src/users/user/entities/user.entity";
-import { EntityManager, IsNull, Like, Not } from "typeorm";
+import { EntityManager, In, IsNull, Like, Not } from "typeorm";
 import * as zlib from "zlib";
 import { Product } from "../product/entities/product.entity";
 import { CreateBrandInput } from "./dto/create-brand.input";
@@ -99,6 +99,7 @@ export class BrandService {
       categoryId,
       rating,
       cityId,
+      categoryIds,
       hasBannerFile,
       hasCatalogeFile,
       hasPriceList,
@@ -144,9 +145,15 @@ export class BrandService {
       whereConditions[`name`] = Like(`%${name}%`);
     }
 
-    if (categoryId) {
-      whereConditions[`categoryId`] = await this.findTopMostParent(categoryId);
+    // if (categoryId) {
+    //   whereConditions['categoryId'] = await this.findTopMostParent(categoryId);
+    // }
+    whereConditions[`id`] = Not(12269);
+    if (categoryIds && categoryIds.length > 0) {
+      const ids = await this.findBrandCategories(categoryIds)
+      whereConditions.id = In(ids);
     }
+
 
     if (cityId) {
       whereConditions[`cityId`] = cityId;
@@ -178,7 +185,7 @@ export class BrandService {
         ? Not(IsNull())
         : IsNull();
     }
-    whereConditions[`id`] = Not(12269);
+   
     const [data, total] = await Brand.findAndCount({
       skip,
       take,
@@ -422,6 +429,28 @@ export class BrandService {
 
   async getProductsOf(brand: Brand): Promise<Product[]> {
     return await brand.products;
+  }
+
+  async findBrandCategories(categoryIds: number[]): Promise<number[]> {
+    try {
+      const cacheKey = `find:brand:${JSON.stringify(categoryIds)}:categories`;
+      const cachedData = await this.cacheManager.get<number[]>(cacheKey);
+  
+      if (cachedData) {
+        return cachedData ;
+      }
+      
+      const result = await this.entityManager.query(
+        'SELECT "brandId" FROM category_brands WHERE "categoryId" = ANY($1::int[])',
+        [categoryIds]
+      );
+      const brandIds = result.map(row => row.brandId); 
+      await this.cacheManager.set(cacheKey, brandIds, CacheTTL.TWO_WEEK);
+      return result;
+    } catch (error) {
+      console.log('err in findBrandCategories',error)
+    }
+ 
   }
   async findTopMostParent(categoryId: number): Promise<number> {
     try {

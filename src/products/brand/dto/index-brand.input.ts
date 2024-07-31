@@ -45,6 +45,11 @@ export class IndexBrandInput extends IndexInput {
   @IsInt()
   categoryId?: number;
 
+  @Field(() => [Int], { nullable: true })
+  @IsOptional()
+  @IsInt({ each: true })
+  categoryIds?: number[];
+
   @Field(() => Int, {
     nullable: true,
   })
