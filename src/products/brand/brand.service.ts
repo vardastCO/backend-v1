@@ -150,7 +150,7 @@ export class BrandService {
     // }
     whereConditions[`id`] = Not(12269);
     if (categoryIds && categoryIds.length > 0) {
-      const ids = await this.findBrandCategories(categoryIds)
+      const ids = await this.findBrandCategories(await this.findDeepestChild(categoryIds))
       whereConditions.id = In(ids);
     }
 
@@ -433,6 +433,7 @@ export class BrandService {
 
   async findBrandCategories(categoryIds: number[]): Promise<number[]> {
     try {
+     
       const cacheKey = `find:brand:${JSON.stringify(categoryIds)}:categories`;
       const cachedData = await this.cacheManager.get<number[]>(cacheKey);
   
@@ -444,14 +445,78 @@ export class BrandService {
         'SELECT "brandId" FROM category_brands WHERE "categoryId" = ANY($1::int[])',
         [categoryIds]
       );
+
       const brandIds = result.map(row => row.brandId); 
+
       await this.cacheManager.set(cacheKey, brandIds, CacheTTL.TWO_WEEK);
-      return result;
+      return brandIds;
     } catch (error) {
       console.log('err in findBrandCategories',error)
     }
  
   }
+  async findDeepestChild(categoryIds: number[]): Promise<number[]> {
+    try {
+
+      const cacheKey = `findDeepestChild:brand:${categoryIds.join(',')}:categories`;
+      const cachedData = await this.cacheManager.get<number[]>(cacheKey);
+  
+      if (cachedData) {
+
+        return cachedData;
+      }
+  
+      const deepestChildren: Set<number> = new Set();
+      const visitedCategories: Set<number> = new Set();
+      let currentLevelCategories: number[] = [...categoryIds];
+  
+  
+      while (currentLevelCategories.length > 0) {
+        const nextLevelCategories: number[] = [];
+  
+        const results = await this.entityManager.query(
+          'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE "parentCategoryId" = ANY($1::int[])',
+          [currentLevelCategories]
+        );
+  
+        if (results.length === 0) {
+   
+          currentLevelCategories.forEach(id => deepestChildren.add(id));
+          break;
+        }
+  
+
+        results.forEach(category => {
+          nextLevelCategories.push(category.id);
+          visitedCategories.add(category.id);
+        });
+  
+
+        currentLevelCategories = nextLevelCategories;
+      }
+  
+      const allParentCategories = await this.entityManager.query(
+        'SELECT DISTINCT "parentCategoryId" FROM base_taxonomy_categories WHERE "parentCategoryId" = ANY($1::int[])',
+        [Array.from(deepestChildren)]
+      );
+  
+      const parentCategoryIds = new Set(allParentCategories.map(category => category.parentCategoryId));
+  
+      const filteredDeepestChildren = Array.from(deepestChildren).filter(id => !parentCategoryIds.has(id));
+  
+     await this.cacheManager.set(cacheKey, filteredDeepestChildren, CacheTTL.TWO_WEEK);
+
+      return filteredDeepestChildren;
+    } catch (error) {
+      console.log('Error in findDeepestChild:', error);
+      return [];
+    }
+  }
+  
+  
+  
+  
+
   async findTopMostParent(categoryId: number): Promise<number> {
     try {
       const cacheKey = `findTopMostParent:${categoryId}:categories`;
