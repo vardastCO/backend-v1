@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { CreateCityInput } from "./dto/create-city.input";
 import { IndexCityInput } from "./dto/index-city.input";
 import { UpdateCityInput } from "./dto/update-city.input";
@@ -57,11 +57,11 @@ export class CityService {
     indexCityInput?: IndexCityInput,
   ): Promise<PaginationCityResponse> {
     indexCityInput.boot();
-    const { take, skip, provinceId, parentCityId } = indexCityInput || {};
+    const { take, skip, provinceId, parentCityId,name } = indexCityInput || {};
     const [data, total] = await City.findAndCount({
       take,
       skip,
-      where: { provinceId, parentCityId },
+      where: { provinceId, parentCityId , name : Like(`%${name}%`)},
       order: { sort: "ASC", id: "DESC" },
     });
 
