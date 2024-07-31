@@ -144,7 +144,9 @@ export class BrandService {
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
-
+    if (categoryId) {
+      categoryIds.push(categoryId);
+    }
     // if (categoryId) {
     //   whereConditions['categoryId'] = await this.findTopMostParent(categoryId);
     // }
