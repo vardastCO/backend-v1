@@ -59,16 +59,24 @@ export class CityService {
     indexCityInput.boot();
     const { take, skip, provinceId, parentCityId, name } = indexCityInput || {};
     const cacheKey = `city_paginations_${JSON.stringify(indexCityInput)}`;
-    console.log('take',take,skip)
     const cachedCities = await this.cacheManager.get<string>(cacheKey);
     if (cachedCities) {
       return this.decompressionService.decompressData(cachedCities);
     }
-    console.log('take',take,skip)
+    const whereConditions = {}
+    if (name) {
+      whereConditions['name'] =  Like(`%${name}%`)
+    }
+    if (provinceId) {
+      whereConditions['provinceId'] = provinceId
+    }
+    if (parentCityId) {
+      whereConditions['parentCityId'] = parentCityId
+    }
     const [data, total] = await City.findAndCount({
       take,
       skip,
-      where: { provinceId, parentCityId , name : Like(`%${name}%`)},
+      where: whereConditions,
       order: { sort: "ASC", id: "DESC" },
     });
 
