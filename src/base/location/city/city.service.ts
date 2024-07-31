@@ -57,7 +57,14 @@ export class CityService {
     indexCityInput?: IndexCityInput,
   ): Promise<PaginationCityResponse> {
     indexCityInput.boot();
-    const { take, skip, provinceId, parentCityId,name } = indexCityInput || {};
+    const { take, skip, provinceId, parentCityId, name } = indexCityInput || {};
+    const cacheKey = `city_paginations_${JSON.stringify(indexCityInput)}`;
+    console.log('take',take,skip)
+    const cachedCities = await this.cacheManager.get<string>(cacheKey);
+    if (cachedCities) {
+      return this.decompressionService.decompressData(cachedCities);
+    }
+    console.log('take',take,skip)
     const [data, total] = await City.findAndCount({
       take,
       skip,
@@ -65,7 +72,11 @@ export class CityService {
       order: { sort: "ASC", id: "DESC" },
     });
 
-    return PaginationCityResponse.make(indexCityInput, total, data);
+    const result = PaginationCityResponse.make(indexCityInput, total, data);
+    
+    await this.cacheManager.set(cacheKey, this.compressionService.compressData(result), CacheTTL.TWO_WEEK);
+    
+    return result
   }
 
   async findOne(id: number, slug?: string): Promise<City> {
