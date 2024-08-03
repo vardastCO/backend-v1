@@ -616,7 +616,7 @@ export class CategoryService {
 
         const decompressedData = this.decompressionService.decompressData(cachedData);
         console.log('cachedData in  getChildrenOf',decompressedData)
-        // return decompressedData;
+        return decompressedData;
       }
       const result = await  this.findAll({
         parentCategoryId: category.id,
