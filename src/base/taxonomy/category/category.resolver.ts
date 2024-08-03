@@ -137,9 +137,8 @@ export class CategoryResolver {
 
   @ResolveField(type => [Category])
   children(@Parent() category: Category): Promise<Category[]> {
-    return this.categoryService.findAll({
-      parentCategoryId: category.id,
-    });
+    return this.categoryService.getChildrenOf(category);
+
   }
 
   @ResolveField(returns => Int)

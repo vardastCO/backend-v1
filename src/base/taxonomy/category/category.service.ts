@@ -266,11 +266,11 @@ export class CategoryService {
     const cacheKey = `categories_${JSON.stringify(indexCategoryInput)}`;
     const cachedCategories = await this.cacheManager.get<Category[]>(cacheKey);
     if (cachedCategories && Array.isArray(cachedCategories)) {
-      // cachedCategories.forEach(category => {
-      //   category.createdAt = new Date(category.createdAt);
-      //   category.updatedAt = new Date(category.updatedAt);
-      // })
-      // return cachedCategories;
+      cachedCategories.forEach(category => {
+        category.createdAt = new Date(category.createdAt);
+        category.updatedAt = new Date(category.updatedAt);
+      })
+      return cachedCategories;
     }
 
     const { take, skip, vocabularyId, isActive, onlyRoots, brandId, sellerId } =
@@ -586,6 +586,12 @@ export class CategoryService {
 
   async getParentCategoryOf(category: Category): Promise<Category> {
     return await category.parentCategory;
+  }
+
+  async getChildrenOf(category: Category): Promise<Category[]> {
+    return this.findAll({
+      parentCategoryId: category.id,
+    });
   }
 
   async getParentsChainOf(category: Category): Promise<Category[]> {
