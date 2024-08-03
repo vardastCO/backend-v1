@@ -211,7 +211,7 @@ export class ProductService {
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
-      return parsedData;
+      // return parsedData;
     }
   
     const {
