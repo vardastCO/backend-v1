@@ -621,18 +621,19 @@ export class CategoryService {
       const result = await  this.findAll({
         parentCategoryId: category.id,
       });
-      // const compressedData = this.compressionService.compressData(result);
-      // await this.cacheManager.set(
-      //   cacheKey,
-      //   compressedData,
-      //   CacheTTL.TWO_WEEK,
-      // );
+
       const jsonString = JSON.stringify(result)
       .replace(/__imageCategory__/g, "imageCategory")
       .replace(/__file__/g, "file")
       .replace(/__parentCategory__/g, "parentCategory");
-    // Parse the modified JSON back to objects
-    const modifiedDataWithOutText = JSON.parse(jsonString);
+
+      const modifiedDataWithOutText = JSON.parse(jsonString);
+      const compressedData = this.compressionService.compressData(modifiedDataWithOutText);
+      await this.cacheManager.set(
+        cacheKey,
+        compressedData,
+        CacheTTL.TWO_WEEK,
+      );
       console.log('no cachedData in  result',result,modifiedDataWithOutText)
       return result
 
