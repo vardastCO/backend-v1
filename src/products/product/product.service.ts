@@ -33,6 +33,8 @@ import { ProductEntity } from "./entities/product-service.entity";
 import { Product } from "./entities/product.entity";
 import { ProductSortablesEnum } from "./enums/product-sortables.enum";
 import { SortFieldProduct } from "./enums/sort-filed-product.enum";
+import { CompressionService } from "src/compression.service";
+import { DecompressionService } from "src/decompression.service";
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -44,6 +46,8 @@ export class ProductService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly entityManager: EntityManager,
     private authorizationService: AuthorizationService,
+    private readonly compressionService: CompressionService,
+    private readonly decompressionService: DecompressionService,
   ) {
     // this.productClient = ClientProxyFactory.create({
     //   transport: Transport.RMQ,
@@ -179,27 +183,25 @@ export class ProductService {
   
     const result = Array.from(allCategoryIds);
   
-    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); 
+    await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
     
     return result;
   }
   
   
-  
   async paginate(
     indexProductInput?: IndexProductInput,
-    user?: User,
-    // client ?: boolean
+    user?: User
   ): Promise<PaginationProductResponse> {
     indexProductInput.boot();
     const { sortField, sortDirection } = indexProductInput;
-    
+  
     const admin = await this.authorizationService.setUser(user).hasRole("admin");
     if (!admin && indexProductInput.page > 10) {
       indexProductInput.page = 10;
     }
     const cacheKey = `products_${JSON.stringify(indexProductInput)}`;
-    const cachedData = await this.cacheManager.get<String>(cacheKey);
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
     let isAlicePrice = false;
     if (sortField === SortFieldProduct.PRICE) {
       isAlicePrice = true;
@@ -209,10 +211,9 @@ export class ProductService {
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
       const parsedData = JSON.parse(decompressedData);
-      // parsedData.prices = [];
-      return parsedData;
+      // return parsedData;
     }
-
+  
     const {
       take,
       skip,
@@ -228,16 +229,17 @@ export class ProductService {
       techNum,
       attributes,
     } = indexProductInput || {};
-    const whereConditions: any = filterObject({
+  
+    const whereConditions: any = {
       sku,
       brandId,
       uomId,
       techNum,
       isActive,
       createdById,
-    });
-    whereConditions.deletedAt = IsNull();
-
+      deletedAt: IsNull(),
+    };
+  
     if (categoryIds && categoryIds.length > 0) {
       const allCategoryIds = await this.getAllCategoryIds(categoryIds);
       whereConditions.categoryId = In(allCategoryIds);
@@ -248,45 +250,52 @@ export class ProductService {
         sellerId: sellerId,
       };
     }
-
+  
     if (!hasPrice) {
       whereConditions.rating = 1;
     }
-
+  
+    const whereArray: any[] = [];
+  
     if (query) {
-      whereConditions[`name`] = Like(`%${query}%`);
+      whereArray.push(
+        { ...whereConditions, name: Like(`%${query}%`) },
+        { ...whereConditions, description: Like(`%${query}%`) },
+      );
+    } else {
+      whereArray.push(whereConditions);
     }
-
-    if (attributes !== undefined && attributes.length > 0) {
+  
+    if (attributes && attributes.length > 0) {
       for (const attribute of attributes) {
         attribute.value = JSON.stringify(attribute.value);
-
         whereConditions.attributeValues = {
           attributeId: attribute.id,
           value: attribute.value,
         };
       }
     }
-    if (sortField == SortFieldProduct.PRICE) {
   
+    if (sortField === SortFieldProduct.PRICE) {
       whereConditions.prices = {
-        createdAt: MoreThan(new Date(Date.now() - (15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE == 'true' ? 1000 : 1))))
+        createdAt: MoreThan(new Date(Date.now() - 15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE === 'true' ? 1000 : 1))),
       };
     }
+  
     let order: any;
     if (indexProductInput.orderBy === ProductSortablesEnum.MOST_AFFORDABLE) {
-      order = { prices: { amount : "ASC" } };
+      order = { prices: { amount: "ASC" } };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_EXPENSIVE) {
-      order = { prices: { id: 'ASC',amount: "DESC" } };
+      order = { prices: { id: 'ASC', amount: "DESC" } };
     } else {
-      order = { rating: "DESC" }; 
+      order = { rating: "DESC" };
     }
   
     const [totalCount, products] = await Promise.all([
-      Product.count({ where: whereConditions }),
+      Product.count({ where: whereArray }),
       Product.find({
-        where: whereConditions,
-        relations:['prices'],
+        where: whereArray,
+        relations: ['prices'],
         order,
         skip,
         take,
@@ -296,46 +305,41 @@ export class ProductService {
     const productIds = products.map(product => product.id);
     const categoryResultId = products.map(product => product.categoryId);
     const uomResultIds = products.map(product => product.uomId);
-
-    const [uoms,categories,images] = await Promise.all([
+  
+    const [uoms, categories, images] = await Promise.all([
       this.getUoms(uomResultIds),
       this.getCategories(categoryResultId),
       this.getImages(productIds),
-      // this.getPrices(productIds),
     ]);
-
-    const response : any[] = products.map(product => {
-      return {
-        ...product,
-        uom: uoms.find(u => u.id === product.uomId),
-        category: categories.find(cat => cat.id === product.categoryId),
-        images: [images.find(img => img.productId === product.id)] ?? [],
-        // highestPrice: prices.find(p => p.productId === product.id) ,
-        // lowestPrice: prices.find(p => p.productId === product.id),
-      };
-    });
-
+  
+    const response: any[] = products.map(product => ({
+      ...product,
+      uom: uoms.find(u => u.id === product.uomId),
+      category: categories.find(cat => cat.id === product.categoryId),
+      images: images.filter(img => img.productId === product.id),
+    }));
+  
     const jsonString = JSON.stringify(response)
       .replace(/__file__/g, "file")
       .replace(/__images__/g, "images");
-
+  
     const modifiedDataWithOutText = JSON.parse(jsonString);
-
+  
     const result = PaginationProductResponse.make(
       indexProductInput,
       totalCount,
-      modifiedDataWithOutText,
+      modifiedDataWithOutText
     );
-
+  
     if (!admin) {
       const compressedData = zlib.gzipSync(JSON.stringify(result));
       await this.cacheManager.set(
         cacheKey,
         compressedData,
-        isAlicePrice ? CacheTTL.FIFTEEN_MINUTES : CacheTTL.THREE_HOURS,
+        isAlicePrice ? CacheTTL.FIFTEEN_MINUTES : CacheTTL.THREE_HOURS
       );
     }
-
+  
     return result;
   }
   async getUoms(uomResultIds: number[]) {
@@ -402,7 +406,7 @@ export class ProductService {
       return JSON.parse(cachedData);
     }
     const result = await await Price.find({
-      select:['amount','createdAt','isPublic','type','productId','sellerId'],
+      select: ['amount', 'createdAt', 'isPublic', 'type', 'productId', 'sellerId'],
       where: { productId: In(productIds), deletedAt: IsNull() },
       order: { createdAt: "DESC" },
     });
@@ -460,7 +464,7 @@ export class ProductService {
         [product.id]
       );
     } catch (error) {
-      console.log('err in incrementProductViews',error)
+      console.log('err in incrementProductViews', error)
     }
   }
   async findOne(id: number, slug?: string): Promise<Product> {
@@ -474,7 +478,7 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    const [images,price,data] = await Promise.all([
+    const [images, price, data] = await Promise.all([
       // this.findBrand(product.brandId),
       // this.findCategory(product.categoryId),
       // this.findUom(product.uomId),
@@ -487,7 +491,7 @@ export class ProductService {
     // product.category = category;
     // product.uom = uom;
     product.images = JSON.parse(JSON.stringify(images)
-    .replace(/__file__/g, "file")
+      .replace(/__file__/g, "file")
       .replace(/__images__/g, "images"));
     product.highestPrice = price
     product.lowestPrice = price
@@ -543,7 +547,7 @@ export class ProductService {
         /__file__/g,
         "file",
       );
-      const res: Image[] = JSON.parse(modifiedDataWithOutText) 
+      const res: Image[] = JSON.parse(modifiedDataWithOutText)
       return res
     }
 
@@ -639,28 +643,28 @@ export class ProductService {
         }
         return parsedData;
       }
-        const IDS = productId;
-        const result = await Price.findOne({
-          where: { productId: IDS, deletedAt: IsNull() },
-          relations: ["seller"],
-          order: {
-            createdAt: "DESC"
-          },
-        });
+      const IDS = productId;
+      const result = await Price.findOne({
+        where: { productId: IDS, deletedAt: IsNull() },
+        relations: ["seller"],
+        order: {
+          createdAt: "DESC"
+        },
+      });
   
-        if (result) {
-          const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
+      if (result) {
+        const jsonString = JSON.stringify(result).replace(/__seller__/g, 'seller')
           .replace(/__logoFile__/g, 'logoFile');
-          const modifiedDataWithOutText = JSON.parse(jsonString);
-          const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
-          await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
-        }
-      
-        return result || null
-        
-      } catch (e) {
-        console.log('eeeeeeeeeeee',e)
+        const modifiedDataWithOutText = JSON.parse(jsonString);
+        const compressedData = zlib.gzipSync(JSON.stringify(modifiedDataWithOutText));
+        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
       }
+      
+      return result || null
+        
+    } catch (e) {
+      console.log('eeeeeeeeeeee', e)
+    }
       
   }
   async getOffersPrice(
@@ -753,11 +757,51 @@ export class ProductService {
   }
 
   async getCategoryOf(product: Product): Promise<Category> {
-    return await product.category;
+    try {
+      const cacheKey = `category:${product.categoryId}`;
+      
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
+    
+      if (cachedData) {
+  
+        const decompressedData = this.decompressionService.decompressData(cachedData);
+        return decompressedData;
+      }
+      const compressedData = this.compressionService.compressData(await product.category)
+      await this.cacheManager.set(
+        cacheKey,
+        compressedData,
+        CacheTTL.TWO_WEEK,
+      );
+      return await product.category;
+    } catch (error) {
+      console.log('err in  getCategoryOf',error)
+    }
+
   }
 
   async getUomOf(product: Product): Promise<Uom> {
-    return await product.uom;
+    try {
+      const cacheKey = `uom:${product.uomId}`;
+      
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
+    
+      if (cachedData) {
+  
+        const decompressedData = this.decompressionService.decompressData(cachedData);
+        return decompressedData;
+      }
+      const compressedData = this.compressionService.compressData(await product.uom)
+      await this.cacheManager.set(
+        cacheKey,
+        compressedData,
+        CacheTTL.TWO_WEEK,
+      );
+      return await product.uom;
+    } catch (error) {
+      console.log('err in  getUomOf',error)
+    }
+  
   }
 
   async getPricesOf(product: Product): Promise<Price[]> {
@@ -895,7 +939,7 @@ export class ProductService {
         return result || null
         
       } catch (e) {
-        console.log('err in price api',e)
+        console.log('err in getHighestPriceOf',e)
       }
       
   }
@@ -932,7 +976,7 @@ export class ProductService {
       return result || null
       
     } catch (e) {
-      console.log('eeeeeeeeeeee',e)
+      console.log('err in getLowestPriceOf',e)
     }
     
   }

@@ -16,13 +16,16 @@ import { XmlProductCommand } from "./command/generate-xml-product.command";
 import { ProductAttribuiteUpdateCommand } from "./product-attribuite-update.command";
 import { BrandCsvUpdateCommand } from "./brand-update-csv.command";
 import { BrandCsvCreateCommand } from "./brand-create-csv.command";
-// import { ProductExportSeller } from "./product-export-controller";
+import { DecompressionService } from "src/decompression.service";
+import { CompressionService } from "src/compression.service";
 
 @Module({
   imports: [CsvModule],
-  // controllers: [ProductExportSeller],
-  providers: [ProductResolver, ProductService, 
-    ProductCsvSeedCommand, ProductCsvUpdateCommand,
+  providers: [
+    ProductResolver,
+    ProductService, 
+    ProductCsvSeedCommand,
+    ProductCsvUpdateCommand,
     BrandCsvUpdateCommand,
     BrandCsvCreateCommand,
     CategoryCsvUpdateFilterCommand,
@@ -34,7 +37,9 @@ import { BrandCsvCreateCommand } from "./brand-create-csv.command";
     XmlProductCommand,
     ProductAttribuiteUpdateCommand,
     AttProductValueCommand,
-    SeperateProductCommand
+    SeperateProductCommand,
+    CompressionService,
+    DecompressionService
   ],
 })
 export class ProductModule {}

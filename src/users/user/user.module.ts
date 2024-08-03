@@ -17,8 +17,13 @@ import { CompressionService } from "src/compression.service";
     FileModule,
     KavenegarModule,
   ],
-  providers: [UserResolver, UserService, DevUserSeeder,CompressionService,
-    DecompressionService,],
+  providers: [
+    UserResolver,
+    UserService,
+    DevUserSeeder,
+    CompressionService,
+    DecompressionService
+  ],
   exports: [UserService],
 })
 export class UserModule {}

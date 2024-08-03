@@ -446,7 +446,7 @@ export class CategoryService {
   }
 
   async findOne(id: number, slug?: string): Promise<Category> {
-    const cacheKey = `category:${id}:${slug || ""}`;
+    const cacheKey = `category:${id}`;
   
 
     const [cachedCategory, categoryFromDB] = await Promise.all([
