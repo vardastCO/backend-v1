@@ -592,7 +592,6 @@ export class CategoryService {
     
       if (cachedData) {
         const decompressedData = this.decompressionService.decompressData(cachedData);
-        console.log('cachedData in  getParentCategoryOf',decompressedData)
         return decompressedData;
       }
       const compressedData = this.compressionService.compressData(await category.parentCategory)
@@ -603,7 +602,6 @@ export class CategoryService {
       );
       return await category.parentCategory;
     } catch (error) {
-      console.log('err in  getParentCategoryOf',error)
     }
 
   }
@@ -629,7 +627,13 @@ export class CategoryService {
       //   compressedData,
       //   CacheTTL.TWO_WEEK,
       // );
-      console.log('no cachedData in  result',result)
+      const jsonString = JSON.stringify(result)
+      .replace(/__imageCategory__/g, "imageCategory")
+      .replace(/__file__/g, "file")
+      .replace(/__parentCategory__/g, "parentCategory");
+    // Parse the modified JSON back to objects
+    const modifiedDataWithOutText = JSON.parse(jsonString);
+      console.log('no cachedData in  result',result,modifiedDataWithOutText)
       return result
 
     } catch (error) {
