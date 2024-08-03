@@ -100,7 +100,7 @@ export class CategoryService {
     const cachedCategories = await this.cacheManager.get<CategoryDTO[]>(cacheKey);
 
     if (cachedCategories && Array.isArray(cachedCategories)) {
-        // return cachedCategories;
+        return cachedCategories;
     }
 
     try {
