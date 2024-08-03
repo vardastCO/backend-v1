@@ -585,7 +585,27 @@ export class CategoryService {
   }
 
   async getParentCategoryOf(category: Category): Promise<Category> {
-    return await category.parentCategory;
+    try {
+      const cacheKey = `category:${category.parentCategoryId}`;
+      
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
+    
+      if (cachedData) {
+  
+        const decompressedData = this.decompressionService.decompressData(cachedData);
+        return decompressedData;
+      }
+      const compressedData = this.compressionService.compressData(await category.parentCategory)
+      await this.cacheManager.set(
+        cacheKey,
+        compressedData,
+        CacheTTL.TWO_WEEK,
+      );
+      return await category.parentCategory;
+    } catch (error) {
+      console.log('err in  getParentCategoryOf',error)
+    }
+   
   }
 
   async getParentsChainOf(category: Category): Promise<Category[]> {
