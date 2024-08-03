@@ -67,6 +67,7 @@ export class PreOrderLineService {
         const project = await preOrder.project;
         return {
           id: line.id,
+          pre_order_id: preOrder.id,
           pre_order_uuid: preOrder.uuid,
           project_name: project.name,
           expert_name: preOrder.expert_name,
