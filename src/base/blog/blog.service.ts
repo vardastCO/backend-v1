@@ -73,7 +73,7 @@ export class BlogService {
       );
       let posts 
       if (cachedData) {
-        console.log('no cache')
+        console.log('with cache')
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
         const parsedData: PaginationBlogResponse = JSON.parse(decompressedData);
         return parsedData;
