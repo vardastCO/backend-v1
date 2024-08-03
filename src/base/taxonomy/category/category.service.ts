@@ -610,7 +610,7 @@ export class CategoryService {
 
   async getChildrenOf(category: Category): Promise<Category[]> {
     try {
-      const cacheKey = `category:${category.parentCategoryId}`;
+      const cacheKey = `getChildrenOf:${category.parentCategoryId}`;
       
       const cachedData = await this.cacheManager.get<string>(cacheKey);
     
@@ -630,7 +630,7 @@ export class CategoryService {
         CacheTTL.TWO_WEEK,
       );
       return result
-      
+
     } catch (error) {
       console.log('err in  getChildrenOf',error)
     }
