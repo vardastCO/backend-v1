@@ -615,7 +615,6 @@ export class CategoryService {
       if (cachedData) {
 
         const decompressedData = this.decompressionService.decompressData(cachedData);
-        console.log('cachedData in  getChildrenOf',decompressedData)
         return decompressedData;
       }
       const result = await  this.findAll({
@@ -634,7 +633,6 @@ export class CategoryService {
         compressedData,
         CacheTTL.TWO_WEEK,
       );
-      console.log('no cachedData in  result',result,modifiedDataWithOutText)
       return result
 
     } catch (error) {
