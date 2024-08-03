@@ -591,8 +591,8 @@ export class CategoryService {
       const cachedData = await this.cacheManager.get<string>(cacheKey);
     
       if (cachedData) {
-        console.log('cachedData in  getParentCategoryOf')
         const decompressedData = this.decompressionService.decompressData(cachedData);
+        console.log('cachedData in  getParentCategoryOf',decompressedData)
         return decompressedData;
       }
       const compressedData = this.compressionService.compressData(await category.parentCategory)
@@ -615,19 +615,22 @@ export class CategoryService {
       const cachedData = await this.cacheManager.get<string>(cacheKey);
     
       if (cachedData) {
-        console.log('cachedData in  getChildrenOf')
+
         const decompressedData = this.decompressionService.decompressData(cachedData);
+        console.log('cachedData in  getChildrenOf',decompressedData)
         return decompressedData;
       }
-      const compressedData = this.compressionService.compressData(await category.parentCategory)
+      const result = await  this.findAll({
+        parentCategoryId: category.id,
+      });
+      const compressedData = this.compressionService.compressData(result);
       await this.cacheManager.set(
         cacheKey,
         compressedData,
         CacheTTL.TWO_WEEK,
       );
-      return this.findAll({
-        parentCategoryId: category.id,
-      });
+      return result
+      
     } catch (error) {
       console.log('err in  getChildrenOf',error)
     }
