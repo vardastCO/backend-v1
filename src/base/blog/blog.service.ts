@@ -62,15 +62,18 @@ export class BlogService {
     indexBlogInput?: IndexBlogInput,
   ): Promise<PaginationBlogResponse> {
     try {
+      console.log(indexBlogInput.categoryId)
       if (indexBlogInput.categoryId) {
         indexBlogInput.categoryId = await this.findTopMostParent(indexBlogInput.categoryId)
       }
+      console.log(indexBlogInput.categoryId)
       const cacheKey = `blogs_${JSON.stringify(indexBlogInput)}`;
       const cachedData = await this.cacheManager.get<string>(
         cacheKey,
       );
       let posts 
       if (cachedData) {
+        console.log('no cache')
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
         const parsedData: PaginationBlogResponse = JSON.parse(decompressedData);
         return parsedData;
@@ -140,7 +143,7 @@ export class BlogService {
         posts.length,
         paginatedBlogs,
       );
-      
+      console.log('no cache')
       const compressedData = zlib.gzipSync(JSON.stringify(result));
 
       await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
