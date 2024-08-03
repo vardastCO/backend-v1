@@ -610,16 +610,16 @@ export class CategoryService {
 
   async getChildrenOf(category: Category): Promise<Category[]> {
     try {
-      // const cacheKey = `getChildrenOf:${category.parentCategoryId}`;
+      const cacheKey = `getChildrenOf:${category.parentCategoryId}`;
       
-      // const cachedData = await this.cacheManager.get<string>(cacheKey);
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
     
-      // if (cachedData) {
+      if (cachedData) {
 
-      //   const decompressedData = this.decompressionService.decompressData(cachedData);
-      //   console.log('cachedData in  getChildrenOf',decompressedData)
-      //   return decompressedData;
-      // }
+        const decompressedData = this.decompressionService.decompressData(cachedData);
+        console.log('cachedData in  getChildrenOf',decompressedData)
+        // return decompressedData;
+      }
       const result = await  this.findAll({
         parentCategoryId: category.id,
       });
@@ -629,6 +629,7 @@ export class CategoryService {
       //   compressedData,
       //   CacheTTL.TWO_WEEK,
       // );
+      console.log('no cachedData in  result',result)
       return result
 
     } catch (error) {
