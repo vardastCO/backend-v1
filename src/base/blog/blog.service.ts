@@ -8,19 +8,63 @@ import { IndexBlogInput } from "./dto/IndexBlogInput";
 import { PaginationBlogResponse } from "./dto/PaginationBlogResponse";
 import { Blog } from "./entities/blog.entity";
 import * as zlib from 'zlib';
+import { EntityManager } from "typeorm";
 @Injectable()
 export class BlogService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly entityManager: EntityManager,
+  ) { }
   // constructor(
   //   // @InjectRepository(Blog)
   //   // private readonly blogRepository: Repository<Blog>,
   // ) {}
   // Implement your CRUD operations for blogs here
-
+  async findTopMostParent(categoryId: number): Promise<number> {
+    try {
+      const cacheKey = `findTopMostParent:${categoryId}:categories`;
+      const cachedData = await this.cacheManager.get<number>(cacheKey);
+  
+      if (cachedData) {
+        return cachedData ;
+      }
+      let currentCategoryId = categoryId;
+      let parentCategoryId = null;
+      let loopCounter = 0;
+    
+      while (currentCategoryId !== null && loopCounter < 4) {
+          const result = await this.entityManager.query(
+              'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
+              [currentCategoryId]
+          );
+          if (result.length === 0) {
+              break;
+          }
+    
+          const category = result[0];
+          parentCategoryId = category.parentCategoryId;
+          
+          if (parentCategoryId === null) {
+              return category.id;
+          }
+    
+        currentCategoryId = parentCategoryId;
+        loopCounter++;
+      }
+      await this.cacheManager.set(cacheKey,currentCategoryId,CacheTTL.TWO_WEEK)
+      return currentCategoryId;
+    } catch (error) {
+      console.log('err in findTopMostParent',error)
+    }
+ 
+  }
   async getAllBlogs(
     indexBlogInput?: IndexBlogInput,
   ): Promise<PaginationBlogResponse> {
     try {
+      if (indexBlogInput.categoryId) {
+        indexBlogInput.categoryId = await this.findTopMostParent(indexBlogInput.categoryId)
+      }
       const cacheKey = `blogs_${JSON.stringify(indexBlogInput)}`;
       const cachedData = await this.cacheManager.get<string>(
         cacheKey,
