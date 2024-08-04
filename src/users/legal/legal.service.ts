@@ -131,7 +131,9 @@ export class LegalService {
     if (!legal) {
       throw new NotFoundException('Legal entity not found');
     }
-    await Legal.remove(legal);
+    
+    await Member.delete({ relatedId: legal.id });
+    await legal.remove();
     return true;
   }
 
