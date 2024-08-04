@@ -1,43 +1,35 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { Address } from "src/users/address/entities/address.entity";
+import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
+import { Member } from "src/users/member/entities/members.entity";
+import { User } from "src/users/user/entities/user.entity";
 import {
-  AfterInsert,
-  AfterLoad,
-  AfterUpdate,
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
-  Index,
-  Generated,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  Unique,
+  PrimaryGeneratedColumn
 } from "typeorm";
-import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity";
-import { Address } from "src/users/address/entities/address.entity";
-import { Member } from "src/users/member/entities/members.entity";
-import { User } from "src/users/user/entities/user.entity";
 
 
 @ObjectType()
 @Entity("legals")
 export class Legal extends BaseEntity {
+  public static SHABA_COUNTRY_CODE = 'IR';
+  
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field({ nullable: true })
-  @Column({ nullable:true,unique:true})
-  name_company?: string;
+  @Field()
+  @Column({ unique:true })
+  name_company: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable:true,unique: true })
-  national_id?: string;
+  @Field()
+  @Column({ unique: true })
+  national_id: string;
 
   @Field({ nullable: true })
   @Column({  default: '0', nullable: true  })
@@ -63,7 +55,14 @@ export class Legal extends BaseEntity {
   @Column({ nullable: true  })
   position?: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true  })
+  accountNumber?: string;
   
+  @Field({ nullable: true })
+  @Column({ nullable: true  })
+  shabaNumber?: string;
+
   @Field(() => [ContactInfo])
   @OneToMany(() => ContactInfo, contactInfo => null, { nullable: true })
   contacts: ContactInfo[];

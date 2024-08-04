@@ -1,9 +1,10 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { I18n, I18nService } from "nestjs-i18n";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from "src/users/user/entities/user.entity";
-import { Member } from "./entities/members.entity";
 import { CreateMemberInput } from "./dto/create-member.input";
+import { UpdateMemberInput } from "./dto/update-member.input";
+import { Member } from "./entities/members.entity";
 
 
 @Injectable()
@@ -31,10 +32,11 @@ export class MemberService {
         );
       }
       const member: Member = new Member();
-      member.userId = await findUser.id
-      member.position = createMemberInput.position
+      member.userId = await findUser.id;
+      member.type = createMemberInput.typeMember;
+      member.position = createMemberInput.position;
       // member.adminId = user.id
-      member.relatedId = createMemberInput.relatedId
+      member.relatedId = createMemberInput.relatedId;
       await member.save()
       return true
     } else {
@@ -88,23 +90,25 @@ export class MemberService {
 
   
 
-  // async update(
-  //   id: number,
-  //   updateSellerRepresentativeInput: UpdateSellerRepresentativeInput,
-  //   user: User,
-  // ): Promise<Member> {
-  //   const sellerRepresentative: Member =
-  //     await Member.preload({
-  //       id,
-  //       ...updateSellerRepresentativeInput,
-  //     });
-  //   if (!sellerRepresentative) {
-  //     throw new NotFoundException();
-  //   }
+  async update(
+    id: number,
+    updateMemberInput: UpdateMemberInput,
+    user: User,
+  ): Promise<Member> {
+    const member: Member =
+      await Member.preload({
+        id,
+        ...updateMemberInput,
+      });
+    
+    if (!updateMemberInput) {
+      throw new NotFoundException();
+    }
 
-  //   await sellerRepresentative.save();
-  //   return sellerRepresentative;
-  // }
+    await member.save();
+    return member;
+  }
+
 
   async remove(id: number): Promise<boolean> {
     try {

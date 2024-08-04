@@ -7,8 +7,8 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
   Unique,
+  UpdateDateColumn,
 } from "typeorm";
 import {
   IsEnum,
@@ -39,7 +39,7 @@ export class Member extends BaseEntity {
   @Field(() => TypeMember)
   @Column("enum", {
     enum: TypeMember,
-    default: TypeMember.LEGAL,
+    default: TypeMember.LEGAL
   })
   type: TypeMember;
 

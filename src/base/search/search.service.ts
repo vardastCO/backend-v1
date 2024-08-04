@@ -12,7 +12,7 @@ import { Seller } from "src/products/seller/entities/seller.entity";
 import { SellerType } from "src/products/seller/enums/seller-type.enum";
 import { Project } from "src/users/project/entities/project.entity";
 import { User } from "src/users/user/entities/user.entity";
-import { Like, SelectQueryBuilder, IsNull, EntityManager } from "typeorm";
+import { EntityManager, IsNull, Like, SelectQueryBuilder } from "typeorm";
 import { Category } from "../taxonomy/category/entities/category.entity";
 import { suggestvalue } from "./constants/suggestConstants";
 import { FilterableAttributeInput } from "./dto/filterable-attribute.input";
@@ -32,6 +32,29 @@ export class SearchService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,
   private readonly entityManager: EntityManager,
   ) { }
+
+    convertToEnglishNumbersAndReplace(text) {
+    // Replace Arabic numbers with English numbers
+    const arabicToEnglishNumbers = {
+        '٠': '0',
+        '١': '1',
+        '٢': '2',
+        '٣': '3',
+        '٤': '4',
+        '٥': '5',
+        '٦': '6',
+        '٧': '7',
+        '٨': '8',
+        '٩': '9'
+    };
+
+    text = text.replace(/[٠-٩]/g, (char) => arabicToEnglishNumbers[char]);
+
+    // Replace specific Arabic characters with Persian equivalents
+    text = text.replace(/ي/g, "ی").replace(/ك/g, "ک");
+
+    return text;
+}
   async filters(
     filterInput: FilterableAttributesInput,
   ): Promise<FilterableAttributesResponse> {
@@ -132,7 +155,9 @@ export class SearchService {
   }
   async suggest(suggestInput: SuggestInput): Promise<SuggestResponse> {
     let { query, cityId, SKU } = suggestInput;
+    query = this.convertToEnglishNumbersAndReplace(query)
     query = query.replace(/ي/g, "ی").replace(/ك/g, "ک");
+
   
     const productsQuery = this.getProductsSearchQuery(query);
     // const sellerQuery = this.getSellerSearchQuery(query, cityId);

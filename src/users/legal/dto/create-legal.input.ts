@@ -4,7 +4,8 @@ import {
   Length,
   IsString,
   MaxLength,
-  IsOptional
+  IsOptional,
+  MinLength
 } from "class-validator";
 
 
@@ -23,6 +24,15 @@ export class CreateLegalInput {
   @MaxLength(255)
   @Length(11, 11, { message: " شناسه ملی یازده رقمی باید باشد" })
   national_id: string;
+
+  @Field({ nullable: true })
+  @Length(11, 18, { message: " شماره حساب باید بین یزده تا هجده رقم باشد" })
+  accountNumber?: string;
+  
+  @Field({ nullable: true })
+  @MaxLength(26) 
+  @IsString()
+  shabaNumber?: string;
 
 
   @Field({nullable:true})

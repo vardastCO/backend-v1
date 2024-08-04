@@ -1,8 +1,10 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { hash } from "argon2";
+import { I18n, I18nService } from "nestjs-i18n";
 import { KavenegarService } from "src/base/kavenegar/kavenegar.service";
 import { Country } from "src/base/location/country/entities/country.entity";
-import { IsNull, MoreThanOrEqual } from "typeorm";
+import { IsNull, Like, MoreThanOrEqual } from "typeorm";
 import { Role } from "../authorization/role/entities/role.entity";
 import { User } from "../user/entities/user.entity";
 import { UserLanguagesEnum } from "../user/enums/user-languages.enum";
@@ -13,25 +15,34 @@ import { ValidateCellphoneInput } from "./dto/validate-cellphone.input";
 import { ValidateCellphoneResponse } from "./dto/validate-cellphone.response";
 import { ValidateOtpInput } from "./dto/validate-otp.input";
 import { ValidateOtpResponse } from "./dto/validate-otp.response";
-import { LoginResponse } from "../auth/dto/login.response";
 import { OneTimePassword } from "./entities/one-time-password.entity";
 import { AuthStates } from "./enums/auth-states.enum";
+
 import { OneTimePasswordStates } from "./enums/one-time-password-states.enum";
 import { OneTimePasswordTypes } from "./enums/one-time-password-types.enum";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import {
   ValidationTypes,
   validationTypeToFinalStateResponseMap,
   validationTypeToOtpTypeMap,
 } from "./enums/validation-types.enum";
+
 import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { CreateBlackListInput } from "./dto/create-blackList.input";
+import { IndexBlackListInput } from "./dto/index-balckList.input";
+import { PaginationBlackListResponse } from "./dto/pagination-blackList.responde";
+import { UpdateBlackListInput } from "./dto/update-blackList.input";
 import { Blacklist } from "./entities/blacklist.entity";
 
 @Injectable()
 export class RegistrationService {
-  constructor(private readonly kavenegarService: KavenegarService, @Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(
+    private readonly kavenegarService: KavenegarService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @I18n() protected readonly i18n: I18nService
+  ) { }
+  
   async validateCellphone(
     validateCellphoneInput: ValidateCellphoneInput,
     ipAddress: string,
@@ -43,7 +54,9 @@ export class RegistrationService {
     
     const blacklist = await this.loadBlacklistIntoCacheIfNotExists();
     if (blacklist.has(validateCellphoneInput.cellphone)) {
-      throw new Error('Cellphone number is blacklisted');
+      throw new BadRequestException(
+        await this.i18n.translate("exceptions.BLACK_LIST_CELL_PHONE_LOGIN"),
+      );
     }
     
   
@@ -97,6 +110,7 @@ export class RegistrationService {
         : `رمز یکبار مصرف قبلا به شماره ${lastUnexpiredOtp.receiver} پیامک شده است.`,
     };
   }
+
   async  loadBlacklistIntoCacheIfNotExists(): Promise<Set<string>> {
     const blacklistKey = 'blacklist:all';
     let blacklist = await this.cacheManager.get<string[]>(blacklistKey);
@@ -250,5 +264,100 @@ export class RegistrationService {
         "حساب کاربری شما با موفقیت ایجاد شد و پس از تایید کارشناسان وردست فعال می‌شود." +
         "فعال سازی حساب کاربریتان از طریق پیام کوتاه به شما اطلاع رسانی خواهد شد.",
     };
+  }
+
+  async createBlackList(createBlackListInput: CreateBlackListInput): Promise<Blacklist>{
+    const { cellphone, reason } = createBlackListInput;
+    const blackExists: Blacklist = await Blacklist.findOneBy({
+      cellphone
+    })
+    if (blackExists) {
+      throw new BadRequestException(
+        await this.i18n.translate("exceptions.BLACK_LIST_CELL_PHONE"),
+      );
+    }
+
+    const black: Blacklist = await Blacklist.create<Blacklist>(createBlackListInput);
+    await black.save();
+    return black;
+  }
+
+  async updateBlackList(id: number, updateBlackList: UpdateBlackListInput): Promise<Blacklist>{
+    console.log(updateBlackList);
+    // const { cellphone, reason } = updateBlackList;
+
+    // const [black, blackCellphoneExists] = await Promise.all([
+    //   Blacklist.findOneBy({ id }),
+    //   Blacklist.findOneBy({cellphone})
+    // ])
+
+    // if (!black) {
+    //   throw new NotFoundException("Not Found.");
+    // }
+
+    // if (blackCellphoneExists) {
+    //   throw new BadRequestException(
+    //     await this.i18n.translate("exceptions.BLACK_LIST_CELL_PHONE")
+    //   );
+    // }
+
+    const updatedBlack: Blacklist = await Blacklist.preload({
+      id,
+      ...updateBlackList,
+    });
+
+    // console.log(updatedBlack);
+    // if (!updatedBlack) {
+    //   throw new NotFoundException("Not Found.");
+    // }
+
+    await updatedBlack.save();
+
+    return updatedBlack ; 
+  }
+
+  async findOneBlack(id: number): Promise<Blacklist> {
+    const black: Blacklist = await Blacklist.findOneBy({ id });
+
+    if (!black) {
+      throw new NotFoundException('Not Found');
+    }
+
+    return black;
+  }
+
+  async removeBlack(id: number): Promise<boolean>{
+    const black: Blacklist = await Blacklist.findOneBy({ id });
+    if (!black) {
+      throw new NotFoundException('Not Found');
+    }
+    await Blacklist.remove(black);
+    return true
+  }
+
+  async blackListPaginate(
+    indexBlackListInput?: IndexBlackListInput,
+  ): Promise<PaginationBlackListResponse> {
+    indexBlackListInput.boot();
+    const { take, skip, cellphone, reason } =
+      indexBlackListInput || {};
+
+    const whereConditions = {}
+    if (cellphone) {
+      whereConditions['cellphone'] =  Like(`%${cellphone}%`)
+    }
+
+    if (reason) {
+      whereConditions['reason'] =  Like(`%${reason}%`)
+    }
+
+    const [data, total] = await Blacklist.findAndCount({
+      take,
+      skip,
+      where: whereConditions
+    });
+
+    const result = PaginationBlackListResponse.make(indexBlackListInput, total, data);
+    return result;
   }
 }

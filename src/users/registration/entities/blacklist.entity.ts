@@ -1,5 +1,4 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index, BaseEntity } from 'typeorm';
-
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 
 @ObjectType()
@@ -11,14 +10,13 @@ export class Blacklist  extends BaseEntity  {
   id: number;
 
   @Field()
-  @Column({unique:true, })
+  @Column({unique:true })
   @Index()
   cellphone: string;
 
   @Field({nullable: true})
   @Column({ type: 'text', nullable: true })
   reason?: string;
-
 
   @Field()
   @CreateDateColumn()

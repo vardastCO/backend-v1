@@ -4,11 +4,11 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
-  IsOptional,
   IsPositive,
   IsString,
-  MaxLength,
+  MaxLength
 } from "class-validator";
+import { TypeMember } from "../enums/type-member.enum";
 
 @InputType()
 export class CreateMemberInput {
@@ -30,7 +30,10 @@ export class CreateMemberInput {
   @MaxLength(255)
   position: string;
 
-
+  @Field(() => TypeMember, {defaultValue: TypeMember.LEGAL})
+  @IsNotEmpty()
+  @IsEnum(TypeMember)
+  typeMember: TypeMember;
 
   @Field({ defaultValue: true })
   @IsNotEmpty()
