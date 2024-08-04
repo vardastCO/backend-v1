@@ -592,7 +592,7 @@ export class CategoryService {
     
       if (cachedData) {
         const decompressedData = this.decompressionService.decompressData(cachedData);
-        // return decompressedData;
+        return decompressedData;
       }
       const compressedData = this.compressionService.compressData(await category.parentCategory)
       await this.cacheManager.set(
@@ -615,7 +615,7 @@ export class CategoryService {
       if (cachedData) {
 
         const decompressedData = this.decompressionService.decompressData(cachedData);
-        return decompressedData;
+        // return decompressedData;
       }
       const result = await  this.findAll({
         parentCategoryId: category.id,
