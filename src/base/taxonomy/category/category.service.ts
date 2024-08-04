@@ -608,31 +608,40 @@ export class CategoryService {
 
   async getChildrenOf(category: Category): Promise<Category[]> {
     try {
-      const cacheKey = `getChildrenOf:${category.parentCategoryId}`;
+      if (category.parentCategoryId) {
+        const cacheKey = `getChildrenOf:${category.parentCategoryId}`;
       
-      const cachedData = await this.cacheManager.get<string>(cacheKey);
-    
-      if (cachedData) {
-
-        const decompressedData = this.decompressionService.decompressData(cachedData);
-        // return decompressedData;
+        const cachedData = await this.cacheManager.get<string>(cacheKey);
+      
+        if (cachedData) {
+  
+          const decompressedData = this.decompressionService.decompressData(cachedData);
+          return decompressedData;
+        }
+        const result = await  this.findAll({
+          parentCategoryId: category.id,
+        });
+  
+        const jsonString = JSON.stringify(result)
+        .replace(/__imageCategory__/g, "imageCategory")
+        .replace(/__file__/g, "file")
+        .replace(/__parentCategory__/g, "parentCategory");
+  
+        const modifiedDataWithOutText = JSON.parse(jsonString);
+        const compressedData = this.compressionService.compressData(modifiedDataWithOutText);
+        await this.cacheManager.set(
+          cacheKey,
+          compressedData,
+          CacheTTL.TWO_WEEK,
+        );
+        return result
+  
       }
+      
       const result = await  this.findAll({
         parentCategoryId: category.id,
       });
 
-      const jsonString = JSON.stringify(result)
-      .replace(/__imageCategory__/g, "imageCategory")
-      .replace(/__file__/g, "file")
-      .replace(/__parentCategory__/g, "parentCategory");
-
-      const modifiedDataWithOutText = JSON.parse(jsonString);
-      const compressedData = this.compressionService.compressData(modifiedDataWithOutText);
-      await this.cacheManager.set(
-        cacheKey,
-        compressedData,
-        CacheTTL.TWO_WEEK,
-      );
       return result
 
     } catch (error) {
