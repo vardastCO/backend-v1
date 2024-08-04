@@ -1,14 +1,17 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { I18n, I18nService } from "nestjs-i18n";
 import { CreateContactInput } from "./dto/create-contact.input";
 import { IndexContactInput } from "./dto/IndexContactInput";
 import { PaginationContactUsResponse } from "./dto/PaginationContactUsResponse";
+import { UpdateContactUsInput } from "./dto/update-member.input";
 import { ContactUs } from "./entities/Contact.entity";
 
 @Injectable()
 export class ContactUsService {
 
     constructor(
-      ) {}
+        @I18n() protected readonly i18n: I18nService
+    ) {}
     
     // CRUD
     async createContactUs(createContactInput: CreateContactInput): Promise<ContactUs> {
@@ -32,7 +35,6 @@ export class ContactUsService {
     }
 
     async findOneContactUs(id: number): Promise<ContactUs> {
-
         const faq: ContactUs = await ContactUs.findOneBy({ id: id })
         if (!faq) {
             throw new NotFoundException();
@@ -42,7 +44,6 @@ export class ContactUsService {
     }
 
     async getAllContactUs( indexContactInput?: IndexContactInput): Promise<PaginationContactUsResponse> {
-
         try{
             indexContactInput.boot()
             const [result, total] = await ContactUs.findAndCount({
@@ -60,6 +61,26 @@ export class ContactUsService {
         }
        
 
+    }
+
+    async updateContactUs(id: number, updateContactUs: UpdateContactUsInput): Promise<ContactUs>{
+        const cotactUs = await ContactUs.preload({id, ...updateContactUs});
+        if (!cotactUs) {
+            throw new NotFoundException("Contact Us Not Found.");
+        }
+
+        await cotactUs.save();
+        return cotactUs;
+    }
+
+    async removeContactUs(id: number): Promise<Boolean>{
+        const contactUs: ContactUs = await ContactUs.findOneBy({ id });
+        if (!contactUs) {
+            throw new NotFoundException('Contact Us Not Found.');
+        }
+
+        await contactUs.remove();
+        return true;
     }
 }
 
