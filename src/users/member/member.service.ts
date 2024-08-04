@@ -101,7 +101,7 @@ export class MemberService {
         ...updateMemberInput,
       });
     
-    if (!updateMemberInput) {
+    if (!member) {
       throw new NotFoundException();
     }
 
