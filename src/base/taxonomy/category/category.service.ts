@@ -608,8 +608,8 @@ export class CategoryService {
 
   async getChildrenOf(category: Category): Promise<Category[]> {
     try {
-      if (category.parentCategoryId) {
-        const cacheKey = `getChildrenOf:${category.parentCategoryId}`;
+      if (category.id) {
+        const cacheKey = `category:${category.id}:children`;
       
         const cachedData = await this.cacheManager.get<string>(cacheKey);
       
