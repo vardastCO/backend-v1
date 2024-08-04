@@ -25,28 +25,46 @@ export class LegalService {
 
 
   
-  async checkLegalExists(national_id, name_company) {
-    const [legalByNationalId, legalByCompanyName] = await Promise.all([
-      Legal.findOneBy({
-        national_id: national_id,
-      }),
-      Legal.findOne({
-        where : {name_company: name_company}
-      })
-    ]);
+  async checkLegalExists(national_id: any, name_company: any, currentLegalId=null) : Promise<Boolean> {
+    // const whereNationalId: any = { national_id } 
+    const whereCondition : any = [];
 
-    if (legalByCompanyName) {
-      throw new BadRequestException(
-        await this.i18n.translate("exceptions.FOUND_LEGAL_BY_COMPANY_NAME"),
-      );
+    if (name_company) {
+      whereCondition.push({ name_company: name_company });
     }
 
+    if (national_id) {
+      whereCondition.push({ national_id: national_id });
+    }
+
+
+    // Fetch records concurrently
+    const legals = (await Legal.find({
+      where: whereCondition
+    })).filter(legal => legal.id != currentLegalId);
+
+    
+    const legalByNationalId = legals.some(legal => legal.national_id == national_id);
     if (legalByNationalId) {
       throw new BadRequestException(
-        await this.i18n.translate("exceptions.FOUND_LEGAL_BY_NATIONAL_ID"),
+          await this.i18n.translate("exceptions.FOUND_LEGAL_BY_NATIONAL_ID"),
       );
     }
+
+    const legalByNameCompany = legals.some(legal => legal.name_company == name_company);
+    if (legalByNameCompany) {
+      throw new BadRequestException(
+          await this.i18n.translate("exceptions.FOUND_LEGAL_BY_COMPANY_NAME"),
+      );
+    }
+    
+  if (legals.length > 0) {
+    return true
   }
+    return false;
+}
+
+
 
   async create(createLegalInput: CreateLegalInput, userId: number): Promise<Legal> {
     createLegalInput.name_company = createLegalInput.name_company?.replace(/ي/g, "ی").replace(/ك/g, "ک")?.trim();
@@ -103,13 +121,19 @@ export class LegalService {
   }
 
   async update(id: number, updateLegalInput: UpdateLegalInput, userId: number): Promise<Legal> {
-    updateLegalInput.name_company = updateLegalInput.name_company?.replace(/ي/g, "ی").replace(/ك/g, "ک")?.trim();
+    if (updateLegalInput.name_company) {
+      updateLegalInput.name_company = updateLegalInput?.name_company?.replace(/ي/g, "ی").replace(/ك/g, "ک")?.trim();
+    }
+
     const legal = await Legal.findOneBy({ id });
     if (!legal) {
       throw new NotFoundException('Legal entity not found');
     }
-    await this.checkLegalExists(updateLegalInput.national_id, updateLegalInput.name_company);
+   
+    await this.checkLegalExists(updateLegalInput.national_id, updateLegalInput.name_company, legal.id);
     
+
+
     Object.assign(legal, updateLegalInput);
     let user_id = userId
     if (updateLegalInput.cellphone) {
