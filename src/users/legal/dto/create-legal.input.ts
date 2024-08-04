@@ -26,12 +26,14 @@ export class CreateLegalInput {
   national_id: string;
 
   @Field({ nullable: true })
+  @IsOptional()
   @Length(11, 18, { message: " شماره حساب باید بین یزده تا هجده رقم باشد" })
   accountNumber?: string;
   
   @Field({ nullable: true })
   @MaxLength(26) 
   @IsString()
+  @IsOptional()
   shabaNumber?: string;
 
 
