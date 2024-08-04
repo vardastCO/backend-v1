@@ -309,7 +309,7 @@ export class ProductService {
     const [uoms, categories, images] = await Promise.all([
       this.getUoms(uomResultIds),
       this.getCategories(categoryResultId),
-      this.getImages(productIds),
+      this.getImages(productIds,admin),
     ]);
   
     const response: any[] = products.map(product => ({
@@ -380,11 +380,11 @@ export class ProductService {
     return result;
   }
 
-  async getImages(productIds: number[]) {
+  async getImages(productIds: number[],cache:boolean) {
     const sortedCategoryResultId = productIds.sort((a, b) => b - a);
     const cacheKey = `images-${sortedCategoryResultId.join("-")}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
+    if (cachedData && cache) {
       return JSON.parse(cachedData);
     }
     const result = await Image.find({ where: { productId: In(productIds) } });
@@ -454,7 +454,7 @@ export class ProductService {
 
       return result;
     } catch (e) {
-      console.log("fffffff", e);
+      console.log("err in paginateV2", e);
     }
   }
   private async incrementProductViews(product: Product) {
@@ -467,7 +467,7 @@ export class ProductService {
       console.log('err in incrementProductViews', error)
     }
   }
-  async findOne(id: number, slug?: string): Promise<Product> {
+  async findOne(id: number, no_cache:boolean): Promise<Product> {
     const product = await Product.findOne({
       where: {
         id: id,
@@ -478,18 +478,18 @@ export class ProductService {
       throw new NotFoundException();
     }
 
-    const [images, price, data] = await Promise.all([
-      // this.findBrand(product.brandId),
-      // this.findCategory(product.categoryId),
-      // this.findUom(product.uomId),
-      this.getImages([product.id]),
-      this.findPrice(product.id),
+    const [brand,category,uom,images, price, data] = await Promise.all([
+      this.findBrand(product.brandId,no_cache),
+      this.findCategory(product.categoryId,no_cache),
+      this.findUom(product.uomId,no_cache),
+      this.getImages([product.id],no_cache),
+      this.findPrice(product.id,no_cache),
       this.incrementProductViews(product),
      
     ]);
-    // product.brand = brand;
-    // product.category = category;
-    // product.uom = uom;
+    product.brand = brand;
+    product.category = category;
+    product.uom = uom;
     product.images = JSON.parse(JSON.stringify(images)
       .replace(/__file__/g, "file")
       .replace(/__images__/g, "images"));
@@ -567,15 +567,17 @@ export class ProductService {
     return JSON.parse(modifiedDataWithOutText);
   }
 
-  async findBrand(brandId: number) {
+  async findBrand(brandId: number , cache:boolean) {
     const cacheKey = `product_brand_find_${brandId}`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
+    if (cachedData && cache) {
+      console.log('with cache brand')
       return JSON.parse(cachedData);
     }
 
     const result = await Brand.findOne({
+      select:['id','name','slug'],
       where: { id: brandId },
     });
 
@@ -584,15 +586,16 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
-
+    console.log('no cache brand')
     return result;
   }
 
-  async findCategory(categoryId: number) {
+  async findCategory(categoryId: number,cache) {
     const cacheKey = `product_category_find_${categoryId}`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
+    if (cachedData && cache) {
+      console.log('with cache category')
       return JSON.parse(cachedData);
     }
 
@@ -605,15 +608,16 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
-
+    console.log('no cache category')
     return result;
   }
 
-  async findUom(uomId: number) {
+  async findUom(uomId: number,cache) {
     const cacheKey = `product_uom_find_${uomId}`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
-    if (cachedData) {
+    if (cachedData && cache) {
+      console.log('with cache uom')
       return JSON.parse(cachedData);
     }
 
@@ -626,16 +630,16 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
-
+    console.log('no cache uom')
     return result;
   }
-  async findPrice(productId: number) {
+  async findPrice(productId: number,cache:boolean) {
     try {
       const cacheKey = `product_${productId}_lowestPrice`;
   
       // // Try to get the result from cache
       const cachedResult = await this.cacheManager.get<string>(cacheKey);
-      if (cachedResult) {
+      if (cachedResult && cache) {
         const decompressedData = zlib.gunzipSync(Buffer.from(cachedResult, 'base64')).toString('utf-8');
         const parsedData: Price = JSON.parse(decompressedData);
         if (parsedData) {
@@ -819,7 +823,43 @@ export class ProductService {
   }
 
   async getAttributeValuesOf(product: Product): Promise<AttributeValue[]> {
-    return await product.attributeValues;
+      try {
+
+        const cacheKey = `attributes:${product.id}`;
+
+        const cachedData = await this.cacheManager.get<string>(cacheKey);
+      
+        if (cachedData) {
+
+          const decompressedData: AttributeValue[] =
+            this.decompressionService.decompressData(cachedData);
+          return decompressedData; 
+        }
+        
+
+        const attributeValues = await product.attributeValues;
+
+        
+        const jsonString = JSON.stringify(attributeValues)
+        .replace(/__attribute__/g, "attribute");
+  
+        const modifiedDataWithOutText = JSON.parse(jsonString);
+        const compressedData = this.compressionService.compressData(modifiedDataWithOutText);
+
+        await this.cacheManager.set(
+          cacheKey,
+          compressedData,
+          CacheTTL.TWO_WEEK, 
+        );
+
+        return attributeValues;
+      } catch (error) {
+        console.log('err in getAttributeValuesOf', error);
+        throw error; 
+      }
+    
+    
+
   }
 
   async getCreatedByOf(product: Product): Promise<User> {

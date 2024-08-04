@@ -36,6 +36,7 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import { IndexOffersPrice } from "./dto/index-price-offers.input";
 import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { PriceTypesEnum } from "../price/enums/price-types.enum";
+import { ReferersEnum } from "src/referers.enum";
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -124,8 +125,16 @@ export class ProductResolver {
   @Public()
   // @Permission("gql.products.product.show")
   @Query(() => Product, { name: "product" })
-  findOne(@Args("id", { type: () => Int }) id: number) {
-    return this.productService.findOne(id);
+  findOne(
+  @Args("id", { type: () => Int },) id: number,
+  @CurrentUser() user: User,
+  @Context() context?: { req: Request }
+) {
+    const request = context?.req;
+    const referer = request.headers['origin'] ?? null;
+    const admin =  [ReferersEnum.ADMIN_IR, ReferersEnum.ADMIN_COM].includes(referer);
+  
+    return this.productService.findOne(id,!admin);
   }
 
   @Public()
