@@ -572,7 +572,7 @@ export class ProductService {
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData && cache) {
-      console.log('with cache brand')
+   
       return JSON.parse(cachedData);
     }
 
@@ -586,7 +586,7 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
-    console.log('no cache brand')
+
     return result;
   }
 
@@ -595,7 +595,7 @@ export class ProductService {
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData && cache) {
-      console.log('with cache category')
+
       return JSON.parse(cachedData);
     }
 
@@ -608,7 +608,7 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
-    console.log('no cache category')
+
     return result;
   }
 
@@ -617,7 +617,7 @@ export class ProductService {
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData && cache) {
-      console.log('with cache uom')
+  
       return JSON.parse(cachedData);
     }
 
@@ -630,7 +630,7 @@ export class ProductService {
       JSON.stringify(result),
       CacheTTL.ONE_WEEK,
     );
-    console.log('no cache uom')
+
     return result;
   }
   async findPrice(productId: number,cache:boolean) {
@@ -667,7 +667,7 @@ export class ProductService {
       return result || null
         
     } catch (e) {
-      console.log('eeeeeeeeeeee', e)
+      console.log('err in findPrice', e)
     }
       
   }
