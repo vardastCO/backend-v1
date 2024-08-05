@@ -7,9 +7,10 @@
   "NOT_FOUND": "یافت نشد",
   "FOUND_LEGAL_BY_NATIONAL_ID": "شرکتی با این شناسه ملی قبلا ثبت شده است",
   "FOUND_LEGAL_BY_COMPANY_NAME": "شرکتی با این نام قبلا ثبت شده است",
+  "OWNER_ALREADY_HAS_LEGAL": "با این شماره مدیرعامل شرکت دیگری ثبت شده است",
   "FOUND_MEMBER_IN_LEGAL": "این عضو قبلا در این شرکت ثبت شده است",
   "ACCOUNT_NUMBER": "شماره حساب باید یازده رقمی باشد",
   "SHABA_NUMBER": "شماره شبا باید شامل بیست و چهار رقم (بدون احتساب IR) باشد",
   "BLACK_LIST_CELL_PHONE": "این شماره تلفن هم اکنون در لیست سیاه وجود دارد.",
-  "BLACK_LIST_CELL_PHONE_LOGIN": "شما در لیست سیاه قرار گرفته اید."  
+  "BLACK_LIST_CELL_PHONE_LOGIN": "شما در لیست سیاه قرار گرفته اید."
 }

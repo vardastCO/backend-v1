@@ -103,6 +103,13 @@ export class LegalService {
           (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
         );
       }
+      
+      let legalByOwnerId = await Legal.findOneBy({ ownerId: findUserId });
+      if (legalByOwnerId) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.OWNER_ALREADY_HAS_LEGAL")),
+        );
+      }
       id = findUserId
     }
 
@@ -123,6 +130,7 @@ export class LegalService {
 
   }
 
+
   async update(id: number, updateLegalInput: UpdateLegalInput, user: User): Promise<Legal> {
     if (updateLegalInput.name_company) {
       updateLegalInput.name_company = updateLegalInput?.name_company?.replace(/ي/g, "ی").replace(/ك/g, "ک")?.trim();
@@ -133,6 +141,7 @@ export class LegalService {
       throw new NotFoundException('Legal entity not found');
     }
    
+
     await this.checkLegalExists(updateLegalInput.national_id, updateLegalInput.name_company, legal.id);
     
     const isAdmin = await this.authorizationService.setUser(user).hasRole("admin");
@@ -147,15 +156,22 @@ export class LegalService {
     let user_id = user.id;
     
     if (updateLegalInput.cellphone && isAdmin) {
-      let findUser = (await await User.findOneBy({ cellphone: updateLegalInput.cellphone })).id
+      let findUser = (await await User.findOneBy({ cellphone: updateLegalInput.cellphone })).id;
       if (!findUser) {
         throw new BadRequestException(
           (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
         );
       }
       user_id = findUser
+      let legalByOwnerId = await Legal.findOneBy({ ownerId: user_id });
+      if (legalByOwnerId) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.OWNER_ALREADY_HAS_LEGAL")),
+        );
+      }
     }
     legal.createdById = user_id
+
 
     const hasOwner = await legal.owner;
     const hasFinantial = legal.shabaNumber && legal.accountNumber;
@@ -163,7 +179,7 @@ export class LegalService {
     const hasContacts = legal.contacts && (await legal.contacts).length > 0 ;
     const hasMembers = legal.members && (await legal.members).length > 0;
 
-    
+
     const updateCurrentStatesByCommingProps = {
       [LegalStateEnum.PENDING_OWNER]: hasOwner ? LegalStateEnum.PENDING_FINANTIAL : LegalStateEnum.PENDING_OWNER,
       [LegalStateEnum.PENDING_FINANTIAL]: hasFinantial ? LegalStateEnum.PENDING_ADDRESS : LegalStateEnum.PENDING_FINANTIAL,
@@ -178,6 +194,7 @@ export class LegalService {
     await legal.save();
     return legal;
   }
+
 
   async remove(id: number, userId: number): Promise<boolean> {
     const legal = await Legal.findOneBy({ id });

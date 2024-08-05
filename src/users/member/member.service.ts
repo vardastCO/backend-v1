@@ -21,16 +21,21 @@ export class MemberService {
     const findUser = await User.findOneBy({
       cellphone:createMemberInput.cellphone
     })
+    
+    
     if (findUser) {
       delete createMemberInput.cellphone
       const hasMember = await Member.findOneBy({
-        relatedId:createMemberInput.relatedId
+        relatedId: createMemberInput.relatedId,
+        userId: findUser.id
       })
+
       if (hasMember) {
         throw new BadRequestException(
           await this.i18n.translate("exceptions.FOUND_MEMBER_IN_LEGAL"),
         );
       }
+
       const member: Member = new Member();
       member.userId = await findUser.id;
       member.type = createMemberInput.typeMember;
