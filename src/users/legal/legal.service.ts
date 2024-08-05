@@ -172,9 +172,9 @@ export class LegalService {
       [LegalStateEnum.PENDING_MEMBER]: hasMembers ? LegalStateEnum.FULL : LegalStateEnum.PENDING_MEMBER,
       [LegalStateEnum.FULL]:LegalStateEnum.FULL,
     }
-     console.log('legal.state',legal.state)
+     
      legal.state = updateCurrentStatesByCommingProps[legal.state]
-console.log('updateCurrentStatesByCommingProps[legal.state]',updateCurrentStatesByCommingProps[legal.state])
+
     await legal.save();
     return legal;
   }
