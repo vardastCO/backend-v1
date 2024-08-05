@@ -27,7 +27,7 @@ export class LegalResolver {
     @Args("createLegalInput") createLegalInput: CreateLegalInput,
     @CurrentUser() user: User,
   ) {
-    return this.legalService.create(createLegalInput, user.id);
+    return this.legalService.create(createLegalInput, user);
   }
 
   @Permission("gql.users.address.store")
@@ -37,7 +37,7 @@ export class LegalResolver {
     @Args("updateLegalInput") updateLegalInput: UpdateLegalInput,
     @CurrentUser() user: User,
   ) {
-    return this.legalService.update(id, updateLegalInput, user.id);
+    return this.legalService.update(id, updateLegalInput, user);
   }
 
   @Permission("gql.users.address.store")

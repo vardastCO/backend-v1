@@ -12,6 +12,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn
 } from "typeorm";
+import { LegalStateEnum } from "../enum/legalState.enum";
+import { LegalStatusEnum } from "../enum/legalStatus.enum";
 
 
 @ObjectType()
@@ -50,6 +52,23 @@ export class Legal extends BaseEntity {
   owner: Promise<User>;
   @Column({ nullable: true })
   ownerId: number;
+
+
+  @Field(() => LegalStateEnum)
+  @Column("enum", {
+    enum: LegalStateEnum,
+    default: LegalStateEnum.PENDING_OWNER
+  })
+  state: LegalStateEnum;
+
+
+  @Field(() => LegalStatusEnum)
+  @Column("enum", {
+    enum: LegalStatusEnum,
+    default: LegalStatusEnum.IN_ACTIVE
+  })
+  status: LegalStatusEnum;
+
 
   @Field({ nullable: true })
   @Column({ nullable: true  })

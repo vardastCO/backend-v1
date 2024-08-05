@@ -1,12 +1,13 @@
-import { Field, Float, InputType, Int } from "@nestjs/graphql";
+import { Field, InputType } from "@nestjs/graphql";
 import {
+  IsEnum,
   IsNotEmpty,
-  Length,
-  IsString,
-  MaxLength,
   IsOptional,
-  MinLength
+  IsString,
+  Length,
+  MaxLength
 } from "class-validator";
+import { LegalStatusEnum } from "../enum/legalStatus.enum";
 
 
 @InputType()
@@ -18,12 +19,21 @@ export class CreateLegalInput {
   @MaxLength(255)
   name_company: string;
 
+  @Field(() => LegalStatusEnum, {
+    defaultValue: LegalStatusEnum.IN_ACTIVE,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  @IsEnum(LegalStatusEnum)
+  status?: LegalStatusEnum = LegalStatusEnum.IN_ACTIVE;
+
   @Field()
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
   @Length(11, 11, { message: " شناسه ملی یازده رقمی باید باشد" })
   national_id: string;
+
 
   @Field({ nullable: true })
   @IsOptional()
@@ -36,10 +46,15 @@ export class CreateLegalInput {
   @IsOptional()
   shabaNumber?: string;
 
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  wallet?: string;
 
   @Field({nullable:true})
   @IsOptional()
   @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
   cellphone?: string;
 
+  
 }

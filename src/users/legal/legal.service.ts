@@ -5,6 +5,7 @@ import { I18n, I18nService } from "nestjs-i18n";
 import { Like } from 'typeorm';
 import { Address } from "../address/entities/address.entity";
 import { AddressRelatedTypes } from "../address/enums/address-related-types.enum";
+import { AuthorizationService } from "../authorization/authorization.service";
 import { ContactInfo } from "../contact-info/entities/contact-info.entity";
 import { ContactInfoRelatedTypes } from "../contact-info/enums/contact-info-related-types.enum";
 import { Member } from "../member/entities/members.entity";
@@ -15,12 +16,14 @@ import { IndexLegalInput } from "./dto/index-legal.input";
 import { PaginationLegalResponse } from "./dto/pagination-legal.response";
 import { UpdateLegalInput } from "./dto/update-legal.input";
 import { Legal } from "./entities/legal.entity";
+import { LegalStateEnum } from "./enum/legalState.enum";
 
 @Injectable()
 export class LegalService {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @I18n() protected readonly i18n: I18nService,
+    private authorizationService: AuthorizationService
   ) {}
 
 
@@ -66,7 +69,7 @@ export class LegalService {
 
 
 
-  async create(createLegalInput: CreateLegalInput, userId: number): Promise<Legal> {
+  async create(createLegalInput: CreateLegalInput, user: User): Promise<Legal> {
     createLegalInput.name_company = createLegalInput.name_company?.replace(/ي/g, "ی").replace(/ك/g, "ک")?.trim();
     
     await this.checkLegalExists(createLegalInput.national_id, createLegalInput.name_company);
@@ -92,8 +95,8 @@ export class LegalService {
         createLegalInput.shabaNumber = validShabaNumber;
     }
     
-    let id = userId
-    if (createLegalInput.cellphone) {
+    let id = user.id
+    if (createLegalInput.cellphone && (await this.authorizationService.setUser(user).hasRole("admin"))) {
       let findUserId = (await await User.findOneBy({ cellphone: createLegalInput.cellphone })).id
       if (!findUserId) {
         throw new BadRequestException(
@@ -106,12 +109,12 @@ export class LegalService {
     
     const legal: Legal = Legal.create<Legal>(createLegalInput);
     legal.ownerId = id
-    legal.createdById = userId
+    legal.createdById = user.id
     await legal.save();
 
     const member = new Member();
     member.relatedId = legal.id
-    member.userId = userId
+    member.userId = user.id
     // member.adminId = userId
     member.position = 'مدیرعامل'
     await member.save();
@@ -120,7 +123,7 @@ export class LegalService {
 
   }
 
-  async update(id: number, updateLegalInput: UpdateLegalInput, userId: number): Promise<Legal> {
+  async update(id: number, updateLegalInput: UpdateLegalInput, user: User): Promise<Legal> {
     if (updateLegalInput.name_company) {
       updateLegalInput.name_company = updateLegalInput?.name_company?.replace(/ي/g, "ی").replace(/ك/g, "ک")?.trim();
     }
@@ -132,11 +135,18 @@ export class LegalService {
    
     await this.checkLegalExists(updateLegalInput.national_id, updateLegalInput.name_company, legal.id);
     
+    const isAdmin = await this.authorizationService.setUser(user).hasRole("admin");
 
+    if (!isAdmin) {
+      updateLegalInput.cellphone ? delete updateLegalInput.cellphone : null;
+      updateLegalInput.status ? delete updateLegalInput.status : null;
+      updateLegalInput.wallet ? delete updateLegalInput.wallet : null;
+    }
 
     Object.assign(legal, updateLegalInput);
-    let user_id = userId
-    if (updateLegalInput.cellphone) {
+    let user_id = user.id;
+    
+    if (updateLegalInput.cellphone && isAdmin) {
       let findUser = (await await User.findOneBy({ cellphone: updateLegalInput.cellphone })).id
       if (!findUser) {
         throw new BadRequestException(
@@ -146,6 +156,25 @@ export class LegalService {
       user_id = findUser
     }
     legal.createdById = user_id
+
+    const hasOwner = await legal.owner;
+    const hasFinantial = legal.shabaNumber && legal.accountNumber;
+    const hasAddresses = legal.addresses && (await legal.addresses).length > 0;
+    const hasContacts = legal.contacts && (await legal.contacts).length > 0 ;
+    const hasMembers = legal.members && (await legal.members).length > 0;
+
+    
+    const updateCurrentStatesByCommingProps = {
+      [LegalStateEnum.PENDING_OWNER]: hasOwner ? LegalStateEnum.PENDING_FINANTIAL : LegalStateEnum.PENDING_OWNER,
+      [LegalStateEnum.PENDING_FINANTIAL]: hasFinantial ? LegalStateEnum.PENDING_ADDRESS : LegalStateEnum.PENDING_FINANTIAL,
+      [LegalStateEnum.PENDING_ADDRESS]: hasAddresses ? LegalStateEnum.PENDING_CONTACT : LegalStateEnum.PENDING_ADDRESS,
+      [LegalStateEnum.PENDING_CONTACT]: hasContacts ? LegalStateEnum.PENDING_MEMBER : LegalStateEnum.PENDING_CONTACT,
+      [LegalStateEnum.PENDING_MEMBER]: hasMembers ? LegalStateEnum.FULL : LegalStateEnum.PENDING_MEMBER,
+      [LegalStateEnum.FULL]:LegalStateEnum.FULL,
+    }
+     console.log('legal.state',legal.state)
+     legal.state = updateCurrentStatesByCommingProps[legal.state]
+console.log('updateCurrentStatesByCommingProps[legal.state]',updateCurrentStatesByCommingProps[legal.state])
     await legal.save();
     return legal;
   }
@@ -163,20 +192,31 @@ export class LegalService {
 
   async findAll(indexLegalInput: IndexLegalInput): Promise<PaginationLegalResponse> {
     indexLegalInput.boot()
-    const { take, skip,nameOrUuid } =
+    const { take, skip,nameOrUuid, national_id, ownerName } =
       indexLegalInput || {};
     const whereConditions: any = {};
   
     if (nameOrUuid) {
       whereConditions['name_company'] =  Like(`%${nameOrUuid}%`)
-
     }
+
+    if (national_id) {
+      whereConditions['national_id'] =  Like(`%${national_id}%`)
+    }
+
+    if (ownerName) {
+      whereConditions['owner'] = [
+          { firstName: Like(`%${ownerName}%`) },
+          { lastName: Like(`%${ownerName}%`) }
+      ]
+    }
+
     const [data, total] = await Legal.findAndCount({
-        where:whereConditions,
-        take,
-        skip,
-        order: {
-          id:'DESC'
+      where: whereConditions,
+      take,
+      skip,
+      order: {
+        id:'DESC'
         }
       });
   
