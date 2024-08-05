@@ -33,11 +33,10 @@ export class LegalResolver {
   @Permission("gql.users.address.store")
   @Mutation(() => Legal)
   updateLegal(
-    @Args("id") id: number,
     @Args("updateLegalInput") updateLegalInput: UpdateLegalInput,
     @CurrentUser() user: User,
   ) {
-    return this.legalService.update(id, updateLegalInput, user);
+    return this.legalService.update(updateLegalInput.id, updateLegalInput, user);
   }
 
   @Permission("gql.users.address.store")

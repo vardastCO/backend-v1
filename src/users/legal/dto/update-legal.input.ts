@@ -1,7 +1,9 @@
-import { Field, InputType, PartialType } from "@nestjs/graphql";
+import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
 import {
   IsEnum,
+  IsInt, IsNotEmpty,
   IsOptional,
+  IsPositive,
   IsString,
   Length
 } from "class-validator";
@@ -11,6 +13,13 @@ import { CreateLegalInput } from "./create-legal.input";
 
 @InputType()
 export class UpdateLegalInput extends PartialType(CreateLegalInput) {
+
+  @Field(() => Int)
+  @IsNotEmpty()
+  @IsInt()
+  @IsPositive()
+  id: number;
+
   @Field({ nullable: true })
   name_company?: string;
 
