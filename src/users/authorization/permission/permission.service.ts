@@ -33,14 +33,17 @@ export class PermissionService {
     indexPermissionInput.boot();
     const { take, skip, subject, action, displayName } =
       indexPermissionInput || {};
-    const [data, total] = await Permission.findAndCount({
-      skip,
-      take,
-      where: { subject, action, displayName },
-      order: { id: "ASC" },
-    });
+      const [data, total] = await Permission.findAndCount({
+        where: { subject, action, displayName },
+        order: { id: "ASC" },
+      });
 
-    return PaginationPermissionResponse.make(indexPermissionInput, total, data);
+    const uniqueClaims = Array.from(new Map(data.map(item => [item.claim, item])).values());
+    
+    const paginatedData = uniqueClaims.slice(skip, skip + take);
+    
+    
+    return PaginationPermissionResponse.make(indexPermissionInput, total, paginatedData);
   }
 
   async allClaim(

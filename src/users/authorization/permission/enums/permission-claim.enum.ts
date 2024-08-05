@@ -7,8 +7,6 @@ export enum PermissionClaimEnum {
   CATEGORY = "CATEGORY",
   BRAND = "BRAND",
   USER = "USER",
-  ATTRIBUITE = "ATTRIBUTE",
-  UOM = "UOM",
   PROJECT = "PROJECT",
   ORDER = "ORDER",
 
