@@ -86,6 +86,10 @@ export class ContactInfo extends BaseEntity {
   adminId: number;
 
   @Field({ nullable: true })
+  @Column({ nullable: true })
+  combinedNumber?: string;
+
+  @Field({ nullable: true })
   @Column("text", { nullable: true })
   rejectionReason: string;
 
