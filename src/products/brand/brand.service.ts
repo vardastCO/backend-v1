@@ -144,15 +144,16 @@ export class BrandService {
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
+    const category_Ids = categoryIds || [];
     if (categoryId) {
-      categoryIds.push(categoryId);
+      category_Ids.push(categoryId);
     }
     // if (categoryId) {
     //   whereConditions['categoryId'] = await this.findTopMostParent(categoryId);
     // }
     whereConditions[`id`] = Not(12269);
-    if (categoryIds && categoryIds.length > 0) {
-      const ids = await this.findBrandCategories(await this.findDeepestChild(categoryIds))
+    if (category_Ids && category_Ids.length > 0) {
+      const ids = await this.findBrandCategories(await this.findDeepestChild(category_Ids))
       whereConditions.id = In(ids);
     }
 
