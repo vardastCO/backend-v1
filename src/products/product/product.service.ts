@@ -7,9 +7,11 @@ import { Category } from "src/base/taxonomy/category/entities/category.entity";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
 import { filterObject } from "src/base/utilities/helpers";
+import { CompressionService } from "src/compression.service";
+import { DecompressionService } from "src/decompression.service";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from "src/users/user/entities/user.entity";
-import { Brackets, EntityManager, In, IsNull, Like, MoreThan, Not } from "typeorm";
+import { Brackets, EntityManager, In, IsNull, Like, MoreThan } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 import * as zlib from "zlib";
 import { AttributeValue } from "../attribute-value/entities/attribute-value.entity";
@@ -17,7 +19,6 @@ import { Brand } from "../brand/entities/brand.entity";
 import { Image } from "../images/entities/image.entity";
 import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { Offer } from "../offer/entities/offer.entity";
-import { LastPrice } from "../price/entities/last-price.entity";
 import { Price } from "../price/entities/price.entity";
 import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
 import { Uom } from "../uom/entities/uom.entity";
@@ -33,8 +34,6 @@ import { ProductEntity } from "./entities/product-service.entity";
 import { Product } from "./entities/product.entity";
 import { ProductSortablesEnum } from "./enums/product-sortables.enum";
 import { SortFieldProduct } from "./enums/sort-filed-product.enum";
-import { CompressionService } from "src/compression.service";
-import { DecompressionService } from "src/decompression.service";
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -110,7 +109,7 @@ export class ProductService {
       createdById,
       query,
     } = indexProductInput || {};
-
+  
     const queryBuilder = Product.createQueryBuilder()
       .skip(skip)
       .take(16)
@@ -304,12 +303,16 @@ export class ProductService {
   
     const productIds = products.map(product => product.id);
     const categoryResultId = products.map(product => product.categoryId);
+    const brandResultId = products.map(product => product.brandId);
+ 
+
     const uomResultIds = products.map(product => product.uomId);
   
-    const [uoms, categories, images] = await Promise.all([
+    const [uoms, categories, images, brands] = await Promise.all([
       this.getUoms(uomResultIds),
       this.getCategories(categoryResultId),
-      this.getImages(productIds,admin),
+      this.getImages(productIds, admin),
+      this.findBrand(brandResultId, !admin)
     ]);
   
     const response: any[] = products.map(product => ({
@@ -317,6 +320,7 @@ export class ProductService {
       uom: uoms.find(u => u.id === product.uomId),
       category: categories.find(cat => cat.id === product.categoryId),
       images: images.filter(img => img.productId === product.id),
+      brand: brands.find(brand => brand.id === product.brandId)
     }));
   
     const jsonString = JSON.stringify(response)
@@ -479,7 +483,7 @@ export class ProductService {
     }
 
     const [brand,category,uom,images, price, data] = await Promise.all([
-      this.findBrand(product.brandId,no_cache),
+      this.findBrand([product.brandId],no_cache),
       this.findCategory(product.categoryId,no_cache),
       this.findUom(product.uomId,no_cache),
       this.getImages([product.id],no_cache),
@@ -487,7 +491,7 @@ export class ProductService {
       this.incrementProductViews(product),
      
     ]);
-    product.brand = brand;
+    product.brand = brand[0];
     product.category = category;
     product.uom = uom;
     product.images = JSON.parse(JSON.stringify(images)
@@ -567,8 +571,8 @@ export class ProductService {
     return JSON.parse(modifiedDataWithOutText);
   }
 
-  async findBrand(brandId: number , cache:boolean) {
-    const cacheKey = `product_brand_find_${brandId}`;
+  async findBrand(brandIds: number[] , cache:boolean) {
+    const cacheKey = `product_brand_find_${JSON.stringify(brandIds)}`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData && cache) {
@@ -576,10 +580,12 @@ export class ProductService {
       return JSON.parse(cachedData);
     }
 
-    const result = await Brand.findOne({
-      select:['id','name','slug'],
-      where: { id: brandId },
-    });
+    const result = await this.entityManager.query(
+      `SELECT id, name, slug FROM product_brands WHERE id = ANY($1)`,
+      [brandIds]
+    );
+
+
 
     await this.cacheManager.set(
       cacheKey,
