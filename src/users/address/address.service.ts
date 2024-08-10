@@ -12,6 +12,7 @@ import { Address } from "./entities/address.entity";
 export class AddressService {
   async create(createAddressInput: CreateAddressInput): Promise<Address> {
     const address: Address = Address.create<Address>(createAddressInput);
+    address.countryId = 244
     await address.save();
     return address;
   }

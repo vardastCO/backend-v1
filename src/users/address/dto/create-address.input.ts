@@ -32,11 +32,10 @@ export class CreateAddressInput {
   @MaxLength(255)
   title: string;
 
-  @Field(() => Int)
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @IsInt()
-  @IsPositive()
-  countryId: number;
+  countryId?: number;
 
   @Field(() => Int)
   @IsNotEmpty()
