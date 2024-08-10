@@ -1,6 +1,6 @@
 import { registerEnumType } from "@nestjs/graphql";
 
-export enum ReferersEnum {
+export enum ReferrersEnum {
     CLIENT_VARDAST_IR = 'https://client.vardast.ir',
     VARDAST_COM = 'https://vardast.com',
     SELLER_IR = 'https://seller.vardast.ir',
@@ -9,4 +9,4 @@ export enum ReferersEnum {
     ADMIN_COM = 'https://admin.vardast.com'
 }
 
-registerEnumType(ReferersEnum, { name: "ReferersEnum" });
+registerEnumType(ReferrersEnum, { name: "ReferrersEnum" });

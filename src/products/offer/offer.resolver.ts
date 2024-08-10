@@ -9,22 +9,22 @@ import {
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
+import { ReferrersEnum } from "src/referrers.enum";
+import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
+import { Public } from "src/users/auth/decorators/public.decorator";
 import { Permission } from "src/users/authorization/permission.decorator";
+import { User } from "src/users/user/entities/user.entity";
 import { Price } from "../price/entities/price.entity";
 import { Product } from "../product/entities/product.entity";
+import { PaginationSellerResponse } from "../seller/dto/pagination-seller.response";
 import { Seller } from "../seller/entities/seller.entity";
 import { CreateOfferInput } from "./dto/create-offer.input";
+import { IndexTakeBrandToSeller } from "./dto/index-brand-seller.input";
 import { IndexOfferInput } from "./dto/index-offer.input";
 import { PaginationOfferResponse } from "./dto/pagination-offer.response";
 import { UpdateOfferInput } from "./dto/update-offer.input";
 import { Offer } from "./entities/offer.entity";
 import { OfferService } from "./offer.service";
-import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
-import { User } from "src/users/user/entities/user.entity";
-import { IndexTakeBrandToSeller } from "./dto/index-brand-seller.input";
-import { Public } from "src/users/auth/decorators/public.decorator";
-import { PaginationSellerResponse } from "../seller/dto/pagination-seller.response";
-import { ReferersEnum } from "src/referers.enum";
 @Resolver(() => Offer)
 export class OfferResolver {
   constructor(private readonly offerService: OfferService) {}
@@ -48,13 +48,15 @@ export class OfferResolver {
       new ValidationPipe({ transform: true }),
     )
     indexOfferInput?: IndexOfferInput,
-    @Context() context?: { req: Request }
+    @Context() context?: { req: Request },
   ) {
     const request = context?.req;
-    const referer = request.headers['origin'] ?? null;
-    const admin = [ReferersEnum.ADMIN_COM, ReferersEnum.ADMIN_IR].includes(referer);
-  
-    return this.offerService.paginate(user, indexOfferInput,admin);
+    const referer = request.headers["origin"] ?? null;
+    const admin = [ReferrersEnum.ADMIN_COM, ReferrersEnum.ADMIN_IR].includes(
+      referer,
+    );
+
+    return this.offerService.paginate(user, indexOfferInput, admin);
   }
 
   @Permission("gql.products.offer.show.mine")
@@ -94,11 +96,13 @@ export class OfferResolver {
 
   @Permission("gql.products.offer.destroy")
   @Mutation(() => Boolean)
-  removeOffer(@Args("productId", { type: () => Int,nullable: true  }) id: number,
-    @Args("offerId", { type: () => Int, nullable: true }) offerId: number | null,
-    @CurrentUser() user: User) {
-    
-    return this.offerService.remove(id,user,offerId);
+  removeOffer(
+    @Args("productId", { type: () => Int, nullable: true }) id: number,
+    @Args("offerId", { type: () => Int, nullable: true })
+    offerId: number | null,
+    @CurrentUser() user: User,
+  ) {
+    return this.offerService.remove(id, user, offerId);
   }
 
   @ResolveField(() => Product)

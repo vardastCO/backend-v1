@@ -10,23 +10,22 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { LegalStateEnum } from "../enum/legalState.enum";
 import { LegalStatusEnum } from "../enum/legalStatus.enum";
 
-
 @ObjectType()
 @Entity("legals")
 export class Legal extends BaseEntity {
-  public static SHABA_COUNTRY_CODE = 'IR';
-  
+  public static SHABA_COUNTRY_CODE = "IR";
+
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
 
   @Field()
-  @Column({ unique:true })
+  @Column({ unique: true })
   name_company: string;
 
   @Field()
@@ -34,11 +33,11 @@ export class Legal extends BaseEntity {
   national_id: string;
 
   @Field({ nullable: true })
-  @Column({  default: '0', nullable: true  })
+  @Column({ default: "0", nullable: true })
   wallet?: string;
 
   @Field(() => Date, { nullable: true })
-  @CreateDateColumn({ type: 'timestamp', nullable: true })
+  @CreateDateColumn({ type: "timestamp", nullable: true })
   create_at?: Date;
 
   @Field(() => User, { nullable: true })
@@ -53,33 +52,30 @@ export class Legal extends BaseEntity {
   @Column({ nullable: true })
   ownerId: number;
 
-
   @Field(() => LegalStateEnum)
   @Column("enum", {
     enum: LegalStateEnum,
-    default: LegalStateEnum.PENDING_OWNER
+    default: LegalStateEnum.PENDING_OWNER,
   })
   state: LegalStateEnum;
-
 
   @Field(() => LegalStatusEnum)
   @Column("enum", {
     enum: LegalStatusEnum,
-    default: LegalStatusEnum.IN_ACTIVE
+    default: LegalStatusEnum.DEACTIVE,
   })
   status: LegalStatusEnum;
 
-
   @Field({ nullable: true })
-  @Column({ nullable: true  })
+  @Column({ nullable: true })
   position?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true  })
+  @Column({ nullable: true })
   accountNumber?: string;
-  
+
   @Field({ nullable: true })
-  @Column({ nullable: true  })
+  @Column({ nullable: true })
   shabaNumber?: string;
 
   @Field(() => [ContactInfo])
@@ -92,6 +88,5 @@ export class Legal extends BaseEntity {
 
   @Field(() => [Member])
   @OneToMany(() => Member, member => null, { nullable: true })
-  members:Member[];
-  
+  members: Member[];
 }

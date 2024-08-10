@@ -1,27 +1,39 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { Inject, NotFoundException, UseInterceptors, ValidationPipe } from "@nestjs/common";
+import {
+  Inject,
+  NotFoundException,
+  UseInterceptors,
+  ValidationPipe,
+} from "@nestjs/common";
 import {
   Args,
+  Context,
   Int,
   Mutation,
   Parent,
-  Context,
   Query,
   ResolveField,
   Resolver,
 } from "@nestjs/graphql";
 import { Cache } from "cache-manager";
 import { Category } from "src/base/taxonomy/category/entities/category.entity";
+import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
+import { ReferrersEnum } from "src/referrers.enum";
 import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
 import { Public } from "src/users/auth/decorators/public.decorator";
 import { Permission } from "src/users/authorization/permission.decorator";
 import { User } from "src/users/user/entities/user.entity";
 import { AttributeValue } from "../attribute-value/entities/attribute-value.entity";
 import { Brand } from "../brand/entities/brand.entity";
+import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
 import { Offer } from "../offer/entities/offer.entity";
 import { Price } from "../price/entities/price.entity";
+import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
+import { Seller } from "../seller/entities/seller.entity";
 import { Uom } from "../uom/entities/uom.entity";
+import { CreateProductSellerInput } from "./dto/create-product-seller.input";
 import { CreateProductInput } from "./dto/create-product.input";
+import { IndexOffersPrice } from "./dto/index-price-offers.input";
 import { IndexProductInputV2 } from "./dto/index-product-v2.input";
 import { IndexProductInput } from "./dto/index-product.input";
 import { PaginationProductV2Response } from "./dto/pagination-product-v2.response";
@@ -29,14 +41,6 @@ import { PaginationProductResponse } from "./dto/pagination-product.response";
 import { UpdateProductInput } from "./dto/update-product.input";
 import { Product } from "./entities/product.entity";
 import { ProductService } from "./product.service";
-import { CreateProductSellerInput } from "./dto/create-product-seller.input";
-import { SellerRepresentative } from "../seller/entities/seller-representative.entity";
-import { Seller } from "../seller/entities/seller.entity";
-import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-state-supervision-statuses.enum";
-import { IndexOffersPrice } from "./dto/index-price-offers.input";
-import { PaginationOfferResponse } from "../offer/dto/pagination-offer.response";
-import { PriceTypesEnum } from "../price/enums/price-types.enum";
-import { ReferersEnum } from "src/referers.enum";
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -57,38 +61,39 @@ export class ProductResolver {
   @Public()
   @Mutation(() => Product)
   async createProductFromSeller(
-    @Args("createProductSellerInput") createProductSellerInput: CreateProductSellerInput,
+    @Args("createProductSellerInput")
+    createProductSellerInput: CreateProductSellerInput,
     @CurrentUser() user: User,
   ) {
     try {
-    const product = this.productService.createFromSeller(createProductSellerInput, user);
+      const product = this.productService.createFromSeller(
+        createProductSellerInput,
+        user,
+      );
 
-    const offer: Offer = Offer.create<Offer>();
+      const offer: Offer = Offer.create<Offer>();
 
+      offer.productId = (await product).id;
 
-    offer.productId = (await product).id
+      const sellerRepresentative = await SellerRepresentative.findOneBy({
+        userId: user.id,
+      });
+      if (!sellerRepresentative) {
+        throw new NotFoundException();
+      }
+      const seller = Seller.findOneBy({ id: sellerRepresentative.sellerId });
 
-    const sellerRepresentative = await SellerRepresentative.findOneBy({userId : user.id });
-    if (!sellerRepresentative) {
-      throw new NotFoundException();
-    }
-    const seller = Seller.findOneBy({ id: sellerRepresentative.sellerId });
-    
-    offer.sellerId = (await seller).id
-    offer.status = ThreeStateSupervisionStatuses.PENDING
-    offer.isAvailable = false
-    offer.isPublic = false
+      offer.sellerId = (await seller).id;
+      offer.status = ThreeStateSupervisionStatuses.PENDING;
+      offer.isAvailable = false;
+      offer.isPublic = false;
 
-    offer.save()
+      offer.save();
 
-    return product
-
+      return product;
     } catch (e) {
-      console.log(e)
-      
+      console.log(e);
     }
-    
-    
   }
 
   @Public()
@@ -101,9 +106,9 @@ export class ProductResolver {
       new ValidationPipe({ transform: true }),
     )
     indexProductInput?: IndexProductInput,
-    @CurrentUser() user?: User,  
+    @CurrentUser() user?: User,
   ) {
-    const result = await this.productService.paginate(indexProductInput,user);
+    const result = await this.productService.paginate(indexProductInput, user);
 
     return result;
   }
@@ -126,15 +131,17 @@ export class ProductResolver {
   // @Permission("gql.products.product.show")
   @Query(() => Product, { name: "product" })
   findOne(
-  @Args("id", { type: () => Int },) id: number,
-  @CurrentUser() user: User,
-  @Context() context?: { req: Request }
-) {
+    @Args("id", { type: () => Int }) id: number,
+    @CurrentUser() user: User,
+    @Context() context?: { req: Request },
+  ) {
     const request = context?.req;
-    const referer = request.headers['origin'] ?? null;
-    const admin =  [ReferersEnum.ADMIN_IR, ReferersEnum.ADMIN_COM].includes(referer);
-  
-    return this.productService.findOne(id,!admin);
+    const referer = request.headers["origin"] ?? null;
+    const admin = [ReferrersEnum.ADMIN_IR, ReferrersEnum.ADMIN_COM].includes(
+      referer,
+    );
+
+    return this.productService.findOne(id, !admin);
   }
 
   @Public()
@@ -184,7 +191,7 @@ export class ProductResolver {
       new ValidationPipe({ transform: true }),
     )
     indexOffersPrice?: IndexOffersPrice,
- ) {
+  ) {
     return this.productService.getOffersPrice(indexOffersPrice);
   }
 
@@ -248,29 +255,26 @@ export class ProductResolver {
     return this.productService.getPublicOffersOf(product);
   }
 
-  
-
   @ResolveField(() => Price)
   lowestPrice(@Parent() product: Product) {
     return this.productService.getLowestPriceOf(product);
   }
 
   @ResolveField(() => Price, { nullable: true })
-  myPrice(@Parent() product: Product,
+  myPrice(
+    @Parent() product: Product,
     @Context() context: any,
-  ): Promise<Price| null> {
-    const user = context?.req?.user?.id
-   
-    return this.productService.getMyPriceOf(product,user);
+  ): Promise<Price | null> {
+    const user = context?.req?.user?.id;
+
+    return this.productService.getMyPriceOf(product, user);
   }
 
   @ResolveField(() => [Product])
   sameCategory(@Parent() product: Product): Promise<Product[]> {
     return this.productService.getSameCategory(product);
-  } 
+  }
 
-
-  
   @ResolveField(() => Price)
   highestPrice(@Parent() product: Product) {
     return this.productService.getHighestPriceOf(product);

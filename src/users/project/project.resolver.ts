@@ -1,26 +1,20 @@
-import {
-  Args,
-  Mutation,
-  Query,
-  Resolver,
-  Context
-} from "@nestjs/graphql";
+import { ValidationPipe } from "@nestjs/common";
+import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { ReferrersEnum } from "src/referrers.enum";
+import { IsRealUserType } from "../auth/decorators/current-type.decorator";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { Permission } from "../authorization/permission.decorator";
 import { User } from "../user/entities/user.entity";
 import { CreateAddressProjectInput } from "./dto/create-address-project.input";
 import { CreateProjectInput } from "./dto/create-project.input";
 import { CreateUserProjectInput } from "./dto/create-user-project.input";
-import { UpdateProjectAddressInput } from "./dto/update-address-input";
-import { UpdateProjectInput } from "./dto/update-project-input";
-import { Project } from "./entities/project.entity";
-import { ProjectService } from "./project.service";
-import { UpdateProjectUserInput } from "./dto/update-user-input";
 import { IndexProjectInput } from "./dto/index-project.input";
 import { PaginationProjectResponse } from "./dto/pagination-project.response";
-import { ValidationPipe } from "@nestjs/common";
-import { IsRealUserType } from "../auth/decorators/current-type.decorator";
-import { ReferersEnum } from "src/referers.enum";
+import { UpdateProjectAddressInput } from "./dto/update-address-input";
+import { UpdateProjectInput } from "./dto/update-project-input";
+import { UpdateProjectUserInput } from "./dto/update-user-input";
+import { Project } from "./entities/project.entity";
+import { ProjectService } from "./project.service";
 @Resolver(() => Project)
 export class ProjectResolver {
   constructor(private readonly projectService: ProjectService) {}
@@ -32,24 +26,33 @@ export class ProjectResolver {
     @CurrentUser() user: User,
     @IsRealUserType() isRealUserType?: boolean,
   ) {
-    return this.projectService.create(createProjectInput,user.id,isRealUserType);
+    return this.projectService.create(
+      createProjectInput,
+      user.id,
+      isRealUserType,
+    );
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   assignAddressProject(
-    @Args("createAddressProjectInput") createAddressProjectInput: CreateAddressProjectInput,
+    @Args("createAddressProjectInput")
+    createAddressProjectInput: CreateAddressProjectInput,
     @CurrentUser() user: User,
   ) {
-    return this.projectService.assignAddressProject
-      (createAddressProjectInput, createAddressProjectInput.projectId, user);
+    return this.projectService.assignAddressProject(
+      createAddressProjectInput,
+      createAddressProjectInput.projectId,
+      user,
+    );
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   assignUserProject(
-    @Args("createUserProjectInput") createUserProjectInput: CreateUserProjectInput,
+    @Args("createUserProjectInput")
+    createUserProjectInput: CreateUserProjectInput,
     @CurrentUser() user: User,
   ) {
-    return this.projectService.assignUserProject(createUserProjectInput,user);
+    return this.projectService.assignUserProject(createUserProjectInput, user);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
@@ -57,7 +60,7 @@ export class ProjectResolver {
     @Args("projectId") projectId: number,
     @Args("userId") userId: number,
   ) {
-    return this.projectService.removeUserProject(projectId,userId);
+    return this.projectService.removeUserProject(projectId, userId);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
@@ -65,7 +68,7 @@ export class ProjectResolver {
     @Args("projectId") projectId: number,
     @Args("addressId") addressId: number,
   ) {
-    return this.projectService.removeAddressProject(projectId,addressId);
+    return this.projectService.removeAddressProject(projectId, addressId);
   }
   // @Permission("gql.users.address.store")
   // @Mutation(() => Project)
@@ -90,9 +93,7 @@ export class ProjectResolver {
   // }
   @Permission("gql.users.address.store")
   @Query(() => Project, { name: "findOneProject" })
-  findOneProject(
-    @Args("id") id: number,
-  ) {
+  findOneProject(@Args("id") id: number) {
     return this.projectService.findOneProject(id);
   }
   @Permission("gql.users.address.store")
@@ -101,17 +102,18 @@ export class ProjectResolver {
     @IsRealUserType() isRealUserType: boolean,
     @CurrentUser() user: User,
   ) {
-  
-    return this.projectService.myProjects(user.id,isRealUserType);
+    return this.projectService.myProjects(user.id, isRealUserType);
   }
 
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   updateProject(
-    @Args("updateProjectInput") updateProjectInput: UpdateProjectInput
+    @Args("updateProjectInput") updateProjectInput: UpdateProjectInput,
   ) {
-    return this.projectService.update(updateProjectInput.id,
-      updateProjectInput)
+    return this.projectService.update(
+      updateProjectInput.id,
+      updateProjectInput,
+    );
   }
 
   @Permission("gql.users.address.store")
@@ -126,31 +128,36 @@ export class ProjectResolver {
     @Context() context?: { req: Request },
     @CurrentUser() user?: User,
     @IsRealUserType() isRealUserType?: boolean,
-  )
-  {
+  ) {
     const request = context?.req;
-    const referer = request.headers['origin'] ?? null;
-    const client = [ReferersEnum.CLIENT_VARDAST_IR, ReferersEnum.VARDAST_COM].includes(referer);
-    
-    return this.projectService.paginate(indexProjectInput,client,user,isRealUserType)
+    const referer = request.headers["origin"] ?? null;
+    const client = [
+      ReferrersEnum.CLIENT_VARDAST_IR,
+      ReferrersEnum.VARDAST_COM,
+    ].includes(referer);
+
+    return this.projectService.paginate(
+      indexProjectInput,
+      client,
+      user,
+      isRealUserType,
+    );
   }
 
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   updateProjectAddress(
-    @Args("updateProjectAddressInput") updateProjectAddressInput: UpdateProjectAddressInput
+    @Args("updateProjectAddressInput")
+    updateProjectAddressInput: UpdateProjectAddressInput,
   ) {
-    return this.projectService.updateAddress(
-      updateProjectAddressInput
-    )
+    return this.projectService.updateAddress(updateProjectAddressInput);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
   updateProjectUser(
-    @Args("updateProjectUserInput") updateProjectUserInput: UpdateProjectUserInput
+    @Args("updateProjectUserInput")
+    updateProjectUserInput: UpdateProjectUserInput,
   ) {
-    return this.projectService.updateUser(
-      updateProjectUserInput
-    )
+    return this.projectService.updateUser(updateProjectUserInput);
   }
 }
