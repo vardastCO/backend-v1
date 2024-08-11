@@ -17,7 +17,8 @@ import { Project } from "./entities/project.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
 import { UserTypeProject } from "./enums/type-user-project.enum";
-import { TypeProject } from "./enums/type-project.enum";
+import { Legal } from "../legal/entities/legal.entity";
+// import { TypeProject } from "./enums/type-project.enum";
 @Injectable()
 export class ProjectService {
   constructor(
@@ -34,23 +35,23 @@ export class ProjectService {
     try {
       const project: Project = Project.create<Project>(createProjectInput);
       project.uuid = await this.generateNumericUuid()
-      project.type = createProjectInput.type || (isRealUserType ? TypeProject.REAL : TypeProject.LEGAL);
+      project.legalId = createProjectInput.legalId
 
       await project.save();
-      let user_id = userId
+ 
       const userProject = new UserProject()
-      if (createProjectInput.cellphone) {
-        let findUserId = (await await User.findOneBy({ cellphone: createProjectInput.cellphone })).id
-        if (!findUserId) {
-          throw new BadRequestException(
-            (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
-          );
-        }
-        user_id = findUserId
+      
+      const findOwnerId = (await await Legal.findOneBy({ id: createProjectInput.legalId })).ownerId
+      if (!findOwnerId) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+        );
       }
-      userProject.userId = user_id
+
+      userProject.userId = findOwnerId
       userProject.projectId = await project.id
       userProject.type = UserTypeProject.MANAGER
+
       await userProject.save();
       return project;
 
@@ -91,7 +92,7 @@ export class ProjectService {
       const assign: UserProject = UserProject.create<UserProject>(createUserProjectInput);
       assign.userId = await findUser.id
       assign.name = ''
-    
+      assign.type = createUserProjectInput.type ?? UserTypeProject.EMPLOYER
       await assign.save()
     } else {
       throw new BadRequestException(
@@ -258,7 +259,7 @@ export class ProjectService {
       id: userProject.id,
       ...updateProjectUserInput
     });
-
+    res.type = updateProjectUserInput.type ?? UserTypeProject.EMPLOYER
     await res.save();
     
     
@@ -282,7 +283,7 @@ export class ProjectService {
     });
     const ids = all.map(item => item.id);
     return await Project.find({
-      where: { id: In(ids), type:isRealUserType ? TypeProject.REAL : TypeProject.LEGAL },
+      where: { id: In(ids) },
       relations: ['user', 'address'],
       order: {
         id: 'DESC'
@@ -308,7 +309,7 @@ export class ProjectService {
           id :user.id
         },
       }
-      whereConditions['type'] = isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
+      // whereConditions['type'] = isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
     } else {
       if (createTime) {
         whereConditions['createTime'] = MoreThan(createTime); 

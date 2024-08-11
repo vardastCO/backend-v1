@@ -71,20 +71,23 @@ export class CreateAddressInput {
   @IsNumber()
   longitude?: number;
 
-  @Field(() => Int, {
-    description: "First Address with sort 0 is considered primary.",
-  })
-  @IsOptional()
-  @IsInt()
-  sort?: number;
-
   @Field()
   @IsNotEmpty()
   @IsBoolean()
   isPublic: boolean;
 
-  @Field(() => ThreeStateSupervisionStatuses)
-  @IsNotEmpty()
-  @IsEnum(ThreeStateSupervisionStatuses)
-  status: ThreeStateSupervisionStatuses;
+  @Field(() => Int, {
+    description: "First Address with sort 0 is considered primary.",
+    defaultValue: 0, 
+  })
+  @IsOptional()  
+  @IsInt()  
+  sort?: number = 0;  
+
+  @Field(() => ThreeStateSupervisionStatuses, {
+    defaultValue: ThreeStateSupervisionStatuses.CONFIRMED,  
+  })
+  @IsOptional() 
+  @IsEnum(ThreeStateSupervisionStatuses)  
+  status: ThreeStateSupervisionStatuses = ThreeStateSupervisionStatuses.CONFIRMED;
 }

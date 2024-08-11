@@ -14,6 +14,7 @@ import {
 } from "typeorm";
 import { LegalStateEnum } from "../enum/legalState.enum";
 import { LegalStatusEnum } from "../enum/legalStatus.enum";
+import { Project } from "src/users/project/entities/project.entity";
 
 @ObjectType()
 @Entity("legals")
@@ -89,4 +90,8 @@ export class Legal extends BaseEntity {
   @Field(() => [Member])
   @OneToMany(() => Member, member => null, { nullable: true })
   members: Member[];
+
+  @Field(() => [Project])
+  @OneToMany(() => Project, project => project.legal, { nullable: true })
+  projects: Project[];
 }

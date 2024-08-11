@@ -10,6 +10,7 @@ import {
   IsString,
   MaxLength,
 } from "class-validator";
+import { UserTypeProject } from "../enums/type-user-project.enum";
 
 
 @InputType()
@@ -27,10 +28,19 @@ export class CreateUserProjectInput {
   @MaxLength(255)
   name?: string;
 
+  @Field({nullable:true})
+  @IsOptional()
+  @IsInt()
+  memberId?: number;
 
   @Field()
   @IsNotEmpty()
   @IsInt()
   projectId: number;
+
+  @Field(() => UserTypeProject)
+  @IsNotEmpty()
+  @IsEnum(UserTypeProject)
+  type: UserTypeProject;
 
 }

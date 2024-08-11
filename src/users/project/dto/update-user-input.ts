@@ -1,11 +1,13 @@
 import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
 import {
+    IsEnum,
     IsInt,
     IsNotEmpty,
     IsOptional,
     IsString
 } from "class-validator";
 import { CreateUserProjectInput } from "./create-user-project.input";
+import { UserTypeProject } from "../enums/type-user-project.enum";
 
 
 
@@ -25,6 +27,11 @@ export class UpdateProjectUserInput extends PartialType(CreateUserProjectInput) 
     @IsNotEmpty()
     @IsString()
     cellphone: string;
+
+    @Field(() => UserTypeProject)
+    @IsNotEmpty()
+    @IsEnum(UserTypeProject)
+    type: UserTypeProject;
 }
 
 

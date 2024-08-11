@@ -16,26 +16,26 @@ export class IndexAddressInput extends IndexInput {
   @IsEnum(AddressRelatedTypes)
   relatedType: AddressRelatedTypes;
 
-  @Field(() => Int)
-  @IsNotEmpty()
-  @IsInt()
-  @IsPositive()
-  relatedId: number;
+  // @Field(() => Int)
+  // @IsNotEmpty()
+  // @IsInt()
+  // @IsPositive()
+  // relatedId: number;
 
-  @Field(() => Int)
-  @IsNotEmpty()
-  @IsInt()
-  @IsPositive()
-  provinceId: number;
+  // @Field(() => Int)
+  // @IsNotEmpty()
+  // @IsInt()
+  // @IsPositive()
+  // provinceId: number;
 
-  @Field(() => Int)
-  @IsNotEmpty()
-  @IsInt()
-  @IsPositive()
-  cityId: number;
+  // @Field(() => Int)
+  // @IsNotEmpty()
+  // @IsInt()
+  // @IsPositive()
+  // cityId: number;
 
-  @Field()
-  @IsNotEmpty()
-  @IsBoolean()
-  isPublic: boolean;
+  // @Field()
+  // @IsNotEmpty()
+  // @IsBoolean()
+  // isPublic: boolean;
 }

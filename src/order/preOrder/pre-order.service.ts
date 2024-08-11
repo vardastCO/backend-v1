@@ -56,7 +56,7 @@ export class PreOrderService {
         ]);
 
 
-        const updateOrderDetails = (order: PreOrder, input: CreatePreOrderInput, projectType: TypeProject, currentDateTime: string) => {
+        const updateOrderDetails = (order: PreOrder, input: CreatePreOrderInput, currentDateTime: string) => {
             Object.assign(order, {
                 applicant_name: input.applicant_name,
                 addressId: input.addressId,
@@ -67,7 +67,7 @@ export class PreOrderService {
                 bid_end: input.bid_end,
                 projectId: input.projectId,
                 payment_methods: input.payment_methods,
-                type: projectType === TypeProject.REAL ? TypeOrder.REAL : TypeOrder.LEGAL,
+                type: input.projectId ? TypeOrder.LEGAL : TypeOrder.REAL,
                 request_date: currentDateTime,
                 expire_time: currentDateTime,
             });
@@ -91,7 +91,7 @@ export class PreOrderService {
         }
         order.userId = userId;
 
-        updateOrderDetails(order, createPreOrderInput, project.type, currentDateTime);
+        updateOrderDetails(order, createPreOrderInput, currentDateTime);
         order.project = Promise.resolve(project)  
         order.address = Promise.resolve(projectAddress)
         await order.save();
@@ -509,9 +509,6 @@ export class PreOrderService {
     if (client) {
       const userProjects = await UserProject.find({
         where: {
-          project :  {
-            type : isRealUserType ? TypeProject.REAL : TypeProject.LEGAL
-          },
           userId: user.id
         }
       });

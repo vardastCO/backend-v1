@@ -28,11 +28,12 @@ export class AddressResolver {
   @Mutation(() => Address)
   createAddress(
     @Args("createAddressInput") createAddressInput: CreateAddressInput,
+    @CurrentUser() user: User,
   ) {
-    return this.addressService.create(createAddressInput);
+    return this.addressService.create(createAddressInput,user);
   }
 
-  // @Permission("users.address.city.index")
+  @Permission("gql.users.address.store")
   @Query(() => PaginationAddressResponse, { name: "addresses" })
   findAll(
     @Args(
@@ -41,8 +42,9 @@ export class AddressResolver {
       new ValidationPipe({ transform: true }),
     )
     indexAddressInput?: IndexAddressInput,
+    @CurrentUser() user?: User,
   ) {
-    return this.addressService.paginate(indexAddressInput);
+    return this.addressService.paginate(indexAddressInput,user);
   }
 
   @Permission("gql.users.address.show")

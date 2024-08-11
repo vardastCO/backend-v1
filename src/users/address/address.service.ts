@@ -7,12 +7,16 @@ import { IndexAddressInput } from "./dto/index-address.input";
 import { PaginationAddressResponse } from "./dto/pagination-address.response";
 import { UpdateAddressInput } from "./dto/update-address.input";
 import { Address } from "./entities/address.entity";
+import { AddressRelatedTypes } from "./enums/address-related-types.enum";
 
 @Injectable()
 export class AddressService {
-  async create(createAddressInput: CreateAddressInput): Promise<Address> {
+  async create(createAddressInput: CreateAddressInput,user:User): Promise<Address> {
     const address: Address = Address.create<Address>(createAddressInput);
     address.countryId = 244
+    if (createAddressInput.relatedType = AddressRelatedTypes.USER) {
+      address.relatedId = user.id
+    }
     await address.save();
     return address;
   }
@@ -30,13 +34,22 @@ export class AddressService {
 
   async paginate(
     indexAddressInput?: IndexAddressInput,
+    user?:User
   ): Promise<PaginationAddressResponse> {
     indexAddressInput.boot();
-    const { take, skip } = indexAddressInput || {};
+    const { take, skip, relatedType } = indexAddressInput || {};
+  
+    const whereCondition: any = {};
+  
+    if (relatedType === AddressRelatedTypes.USER) {
+      whereCondition.relatedId = user.id;
+      whereCondition.relatedType = AddressRelatedTypes.USER;
+    } 
+
     const [data, total] = await Address.findAndCount({
       skip,
       take,
-      where: {},
+      where: whereCondition,
       order: { id: "DESC" },
     });
 

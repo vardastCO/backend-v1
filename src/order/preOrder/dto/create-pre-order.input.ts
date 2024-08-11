@@ -10,6 +10,7 @@ export class CreatePreOrderInput {
 
   @Field({ nullable: true })
   @IsOptional()
+  @IsInt()
   projectId?: number;
 
   @Field(() => Int, {

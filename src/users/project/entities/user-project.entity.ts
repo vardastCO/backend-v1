@@ -42,5 +42,9 @@ export class UserProject extends BaseEntity {
   })
   type: UserTypeProject;
 
+  @Field({ nullable: true })
+  @Column({  default: '0', nullable: true  })
+  wallet?: string;
+
 
 }

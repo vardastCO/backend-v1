@@ -24,6 +24,7 @@ import { ProjectHasAddress } from "./projectHasAddress.entity";
 import { TypeProject } from "../enums/type-project.enum";
 import { ThreeStateSupervisionStatuses } from "src/order/enums/three-state-supervision-statuses.enum";
 import { MultiStatuses } from "../enums/multi-statuses.enum";
+import { Legal } from "src/users/legal/entities/legal.entity";
 
 @ObjectType()
 @Entity("projects")
@@ -60,12 +61,16 @@ export class Project extends BaseEntity {
   @Column({ nullable: true })
   description?: string;
 
-  @Field(() => TypeProject)
-  @Column("enum", {
-    enum: TypeProject,
-    default: TypeProject.REAL,
-  })
-  type: TypeProject;
+  // @Field(() => TypeProject)
+  // @Column("enum", {
+  //   enum: TypeProject,
+  //   default: TypeProject.LEGAL,
+  // })
+  // type: TypeProject;
+
+  @Field({ nullable: true })
+  @Column({  default: '0', nullable: true  })
+  wallet?: string;
 
   @Field(() => Date, { nullable: true })
   @CreateDateColumn({ type: 'timestamp', nullable: true })
@@ -79,6 +84,13 @@ export class Project extends BaseEntity {
   @Field(() => [UserProject], { nullable: "items" })
   @OneToMany(() => UserProject, userProject => userProject.project)
   user: Promise<UserProject[]>;
+
+  @Field(() => Legal, { nullable: true })
+  @ManyToOne(() => Legal, legal => legal.projects, { nullable: true })
+  legal?: Legal;
+
+  @Column({ nullable: true })
+  legalId?: number;
 
   
   @Field(() => MultiStatuses)
