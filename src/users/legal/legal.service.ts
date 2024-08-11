@@ -256,6 +256,9 @@ export class LegalService {
         relatedType: AddressRelatedTypes.LEGAL,
         relatedId: id,
       },
+      order: {
+        sort: 'ASC'
+      }
     });
 
     const membersPromise = Member.find({
