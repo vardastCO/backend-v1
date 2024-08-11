@@ -12,11 +12,13 @@ import { AddressRelatedTypes } from "./enums/address-related-types.enum";
 @Injectable()
 export class AddressService {
   async create(createAddressInput: CreateAddressInput,user:User): Promise<Address> {
-    const address: Address = Address.create<Address>(createAddressInput);
-    address.countryId = 244
-    if (createAddressInput.relatedType = AddressRelatedTypes.USER) {
-      address.relatedId = user.id
-    }
+    const address: Address = Address.create<Address>({
+      ...createAddressInput,
+      //  todo
+      countryId: 244,
+      relatedId:createAddressInput.relatedType === AddressRelatedTypes.USER ? user.id : createAddressInput.relatedId  
+    });
+
     await address.save();
     return address;
   }
