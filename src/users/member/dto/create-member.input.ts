@@ -9,6 +9,7 @@ import {
   MaxLength
 } from "class-validator";
 import { TypeMember } from "../enums/type-member.enum";
+import { MemberRoles } from "../enums/member.enum";
 
 @InputType()
 export class CreateMemberInput {
@@ -34,6 +35,11 @@ export class CreateMemberInput {
   @IsNotEmpty()
   @IsEnum(TypeMember)
   typeMember: TypeMember;
+
+  @Field(() => MemberRoles, {defaultValue: MemberRoles.ADMIN})
+  @IsNotEmpty()
+  @IsEnum(MemberRoles)
+  role: MemberRoles;
 
   @Field({ defaultValue: true })
   @IsNotEmpty()

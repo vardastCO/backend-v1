@@ -5,6 +5,7 @@ import { User } from "src/users/user/entities/user.entity";
 import { CreateMemberInput } from "./dto/create-member.input";
 import { UpdateMemberInput } from "./dto/update-member.input";
 import { Member } from "./entities/members.entity";
+import { MemberRoles } from "./enums/member.enum";
 
 
 @Injectable()
@@ -40,6 +41,7 @@ export class MemberService {
       member.userId = await findUser.id;
       member.type = createMemberInput.typeMember;
       member.position = createMemberInput.position;
+      member.role = createMemberInput.role ?? MemberRoles.ADMIN
       // member.adminId = user.id
       member.relatedId = createMemberInput.relatedId;
       await member.save()
