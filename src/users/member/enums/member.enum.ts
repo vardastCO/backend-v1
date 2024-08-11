@@ -1,8 +1,8 @@
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum MemberRoles {
-  ADMIN = "admin",
-  ZERO_LEVEL = "zero_level"
+  ADMIN = "0",
+  ZERO_LEVEL = "1"
 }
 registerEnumType(MemberRoles, {
   name: "MemberRoles",
