@@ -6,6 +6,8 @@ import { CreateMemberInput } from "./dto/create-member.input";
 import { UpdateMemberInput } from "./dto/update-member.input";
 import { Member } from "./entities/members.entity";
 import { MemberRoles } from "./enums/member.enum";
+import { PaginationMemberResponse } from "./dto/pagination-member.response";
+import { IndexMemberInput } from "./dto/index-member.input";
 
 
 @Injectable()
@@ -65,25 +67,32 @@ export class MemberService {
   //   });
   // }
 
-  // async paginate(
-  //   user: User,
-  //   indexSellerRepresentativeInput?: IndexSellerRepresentativeInput,
-  // ): Promise<PaginationSellerRepresentativeResponse> {
-  //   indexSellerRepresentativeInput.boot();
-  //   const { take, skip } = indexSellerRepresentativeInput || {};
+  async paginate(
+    user: User,
+    indexMemberInput?: IndexMemberInput,
+  ): Promise<PaginationMemberResponse> {
+    indexMemberInput.boot();
+    const { take, skip ,type,relatedId } = indexMemberInput || {};
+    const whereCondition: any = {};
+  
+  
+    if (type && relatedId) {
+      whereCondition.relatedId = relatedId;
+      whereCondition.type = type;
+    } 
+    const [data, total] = await Member.findAndCount({
+      skip,
+      take,
+      where:whereCondition,
+      order: { id: "DESC" },
+    });
 
-  //   const [data, total] = await Member.findAndCount({
-  //     skip,
-  //     take,
-  //     order: { id: "DESC" },
-  //   });
-
-  //   return PaginationSellerRepresentativeResponse.make(
-  //     indexSellerRepresentativeInput,
-  //     total,
-  //     data,
-  //   );
-  // }
+    return PaginationMemberResponse.make(
+      indexMemberInput,
+      total,
+      data,
+    );
+  }
 
   async findOne(id: number): Promise<Member> {
     const member = await Member.findOneBy({ id });

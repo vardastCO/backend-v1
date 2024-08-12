@@ -14,6 +14,9 @@ import { CreateMemberInput } from "./dto/create-member.input";
 import { UpdateMemberInput } from "./dto/update-member.input";
 import { Member } from "./entities/members.entity";
 import { MemberService } from "./member.service";
+import { ValidationPipe } from "@nestjs/common";
+import { PaginationMemberResponse } from "./dto/pagination-member.response";
+import { IndexMemberInput } from "./dto/index-member.input";
 
 @Resolver(() => Member)
 export class MemberResolver {
@@ -36,25 +39,24 @@ export class MemberResolver {
   }
 
   
-  // @Public()
-  // @Permission("gql.products.seller_representative.index")
-  // @Query(() => PaginationSellerRepresentativeResponse, {
-  //   name: "sellerRepresentatives",
-  // })
-  // findAll(
-  //   @CurrentUser() user: User,
-  //   @Args(
-  //     "indexSellerRepresentativeInput",
-  //     { nullable: true },
-  //     new ValidationPipe({ transform: true }),
-  //   )
-  //   indexSellerRepresentativeInput?: IndexSellerRepresentativeInput,
-  // ) {
-  //   return this.memberService.paginate(
-  //     user,
-  //     indexSellerRepresentativeInput,
-  //   );
-  // }
+  @Permission("gql.products.seller_representative.index")
+  @Query(() => PaginationMemberResponse, {
+    name: "members",
+  })
+  findAll(
+    @CurrentUser() user: User,
+    @Args(
+      "indexMemberInput",
+      { nullable: true },
+      new ValidationPipe({ transform: true }),
+    )
+    indexMemberInput?: IndexMemberInput,
+  ) {
+    return this.memberService.paginate(
+      user,
+      indexMemberInput,
+    );
+  }
 
   @Permission("gql.products.seller_representative.show")
   @Query(() => Member, { name: "findOneMember" })
