@@ -152,24 +152,29 @@ export class LegalService {
       updateLegalInput.wallet ? delete updateLegalInput.wallet : null;
     }
 
-    Object.assign(legal, updateLegalInput);
     let user_id = user.id;
     
     if (updateLegalInput.cellphone && isAdmin) {
-      let findUser = (await await User.findOneBy({ cellphone: updateLegalInput.cellphone })).id;
-      if (!findUser) {
+      let user_id = (await await User.findOneBy({ cellphone: updateLegalInput.cellphone })).id;
+      if (!user_id) {
         throw new BadRequestException(
           (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
         );
       }
-      user_id = findUser
-      let legalByOwnerId = await Legal.findOneBy({ ownerId: user_id });
-      if (legalByOwnerId) {
+
+      
+      let legalByOwnerId: Legal = await Legal.findOneBy({ ownerId: user_id });
+
+
+      if (legalByOwnerId &&  legal.id !==  legalByOwnerId.id ) {
         throw new BadRequestException(
           (await this.i18n.translate("exceptions.OWNER_ALREADY_HAS_LEGAL")),
         );
       }
     }
+
+    Object.assign(legal, updateLegalInput);
+
     legal.createdById = user_id
 
 
