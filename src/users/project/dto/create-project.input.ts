@@ -10,7 +10,7 @@ import {
   IsString,
   MaxLength,
 } from "class-validator";
-import { TypeProject } from "../enums/type-project.enum";
+import { MultiStatuses } from "../enums/multi-statuses.enum";
 
 
 @InputType()
@@ -22,26 +22,28 @@ export class CreateProjectInput {
   @MaxLength(255)
   name: string;
 
-  // @Field(() => TypeProject, {
-  //   defaultValue: TypeProject.LEGAL,
-  //   nullable: true,
-  // })
-  // @IsNotEmpty()
-  // @IsEnum(TypeProject)
-  // type?: TypeProject = TypeProject.LEGAL;
 
   @Field({ nullable: true })
   @IsOptional()
   description?: string;
+
+
+  @Field(type => MultiStatuses, {
+    defaultValue: MultiStatuses.CONFIRMED,
+  })
+  @IsOptional()
+  status: MultiStatuses;
+
+
+  @Field({ nullable: true })
+  @IsOptional()
+  wallet?: string;
+
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
   legalId?: number;  
 
-  // @Field({ nullable: true })
-  // @IsOptional()
-  // @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
-  // cellphone?: string;
 
 }

@@ -151,7 +151,6 @@ export class SellerCsvUpdateCommand extends CommandRunner {
     const contactInfo = ContactInfo.create({
       relatedType: ContactInfoRelatedTypes.SELLER,
       title: "دفتر",
-      countryId: 244,
       relatedId: id,
       number: number,
       type: ContactInfoTypes.TEL,

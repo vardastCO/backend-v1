@@ -47,7 +47,7 @@ export class OrderOfferService {
       })
       
 
-      let  offer  =  await OfferOrder.findOne({
+      const  offer  =  await OfferOrder.findOne({
         where: { id: addSellerOrderOffer.orderOfferId },
         relations: ['offerLine'],
         order: {
@@ -56,28 +56,28 @@ export class OrderOfferService {
       });
       if (!findTempSeller) {
         
-        let seller: Seller = new Seller()
+        const seller: Seller = new Seller()
         seller.name = `${addSellerOrderOffer.seller_name} | ${addSellerOrderOffer.company_name}`
         seller.sellerType = SellerType.EXTENDED
         seller.createdById = user.id
         await seller.save()
-        let PhoneContact = new ContactInfo()
+        const PhoneContact = new ContactInfo()
         PhoneContact.relatedId = await seller.id
         PhoneContact.relatedType = ContactInfoRelatedTypes.SELLER
         PhoneContact.title = 'تلفن'
         PhoneContact.type = ContactInfoTypes.TEL
-        PhoneContact.countryId = 244
+
         PhoneContact.number = addSellerOrderOffer.phone
         await PhoneContact.save()
-        let CellContact = new ContactInfo()
+        const CellContact = new ContactInfo()
         CellContact.relatedType = ContactInfoRelatedTypes.SELLER
         CellContact.relatedId = await seller.id
         CellContact.title = 'موبایل'
         CellContact.type = ContactInfoTypes.MOBILE
         CellContact.number = addSellerOrderOffer.cellphone
-        CellContact.countryId = 244
+   
         await CellContact.save()
-        let address = new Address()
+        const address = new Address()
         address.relatedType = AddressRelatedTypes.SELLER
         address.countryId = 244
         address.address = addSellerOrderOffer.address

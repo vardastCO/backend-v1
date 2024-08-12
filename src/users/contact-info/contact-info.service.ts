@@ -15,6 +15,7 @@ export class ContactInfoService {
     const contact: ContactInfo = ContactInfo.create<ContactInfo>(
       createContactInfoInput,
     );
+    
     await contact.save();
     return contact;
   }
@@ -86,7 +87,7 @@ export class ContactInfoService {
   }
 
   async getCountryOf(contact: ContactInfo): Promise<Country> {
-    return await contact.country;
+    return ;
   }
 
   async getAdminOf(contact: ContactInfo): Promise<User> {

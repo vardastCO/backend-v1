@@ -19,7 +19,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Project } from "./project.entity";
-import { ProjectAddress } from "./addressProject.entity";
+import { Address } from "src/users/address/entities/address.entity";
 
 
 @ObjectType()
@@ -36,9 +36,9 @@ export class ProjectHasAddress extends BaseEntity {
   @Column()
   projectId: number;
 
-  @Field(() => ProjectAddress)
-  @ManyToOne(() => ProjectAddress)
-  address: Promise<ProjectAddress>;
+  @Field(() => Address)
+  @ManyToOne(() => Address)
+  address: Promise<Address>;
   @Column()
   addressId: number;
   

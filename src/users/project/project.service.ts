@@ -18,12 +18,15 @@ import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
 import { UserTypeProject } from "./enums/type-user-project.enum";
 import { Legal } from "../legal/entities/legal.entity";
+import { AuthorizationService } from "../authorization/authorization.service";
+import { Member } from "../member/entities/members.entity";
 // import { TypeProject } from "./enums/type-project.enum";
 @Injectable()
 export class ProjectService {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @I18n() protected readonly i18n: I18nService,
+    private authorizationService: AuthorizationService,
   ) { }
   
   async generateNumericUuid(length: number = 5): Promise<string> {
@@ -31,17 +34,22 @@ export class ProjectService {
     const max = Math.pow(10, length) - 1;
   return Math.floor(Math.random() * (max - min + 1) + min).toString();
   }
-  async create(createProjectInput: CreateProjectInput,userId:number,isRealUserType:boolean): Promise<Project> {
+  async create(createProjectInput: CreateProjectInput,user:User,isRealUserType:boolean): Promise<Project> {
     try {
       const project: Project = Project.create<Project>(createProjectInput);
       project.uuid = await this.generateNumericUuid()
       project.legalId = createProjectInput.legalId
 
+      if (await this.authorizationService.setUser(user).hasRole("admin")) {
+        project.wallet = createProjectInput.wallet
+        project.status = createProjectInput.status
+      }
+
       await project.save();
  
       const userProject = new UserProject()
       
-      const findOwnerId = (await await Legal.findOneBy({ id: createProjectInput.legalId })).ownerId
+      const findOwnerId = (await (await await Legal.findOneBy({ id: createProjectInput.legalId })).owner).id
       if (!findOwnerId) {
         throw new BadRequestException(
           (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
@@ -53,6 +61,7 @@ export class ProjectService {
       userProject.type = UserTypeProject.MANAGER
 
       await userProject.save();
+      
       return project;
 
     } catch(e) {
@@ -62,68 +71,65 @@ export class ProjectService {
   }
   async assignAddressProject(createAddressProjectInput:CreateAddressProjectInput,projectId:number,user:User): Promise<Project> {
     try {
-      const address: ProjectAddress = ProjectAddress.create<ProjectAddress>(createAddressProjectInput);
-      address.userId = user.id
-      await address.save();
 
       const projectHasAddress = new ProjectHasAddress()
       projectHasAddress.projectId = projectId
-      projectHasAddress.addressId = await address.id
+      projectHasAddress.addressId = await createAddressProjectInput.addressId
       await projectHasAddress.save();
-      await address.save();
       
       return await Project.findOne({
         where: { id: projectId },
-        relations: ['user','address'],
+        relations: ['users','addresses','legal'],
       });
     }catch(e){
-      console.log('create project',e)
+      console.log('assignAddressProject project',e)
     }
    
   }
   async assignUserProject(createUserProjectInput:CreateUserProjectInput,user:User): Promise<Project> {
 
-    let findUser = await User.findOneBy({
-      cellphone:createUserProjectInput.cellphone
-    })
-    if (findUser) {
-      delete createUserProjectInput.cellphone
-
-      const assign: UserProject = UserProject.create<UserProject>(createUserProjectInput);
-      assign.userId = await findUser.id
-      assign.name = ''
-      assign.type = createUserProjectInput.type ?? UserTypeProject.EMPLOYER
-      await assign.save()
-    } else {
+    const member = await (await Member.findOneBy({id:createUserProjectInput.memberId}))
+    if (!member) {
       throw new BadRequestException(
-          (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+        (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
       );
-
     }
+
+    const assign = new UserProject()
+    assign.userId = member.userId
+    assign.projectId = createUserProjectInput.projectId
+    assign.name = (await member.user).fullName
+    assign.type = createUserProjectInput.type ?? UserTypeProject.EMPLOYER
+    await assign.save()
   
     return await Project.findOne({
       where: { id: createUserProjectInput.projectId },
-      relations: ['user','address'],
+      relations: ['users','addresses'],
     });
 
    
   }
   async removeUserProject(projectId:number,userId:number): Promise<Project> {
     try {
-      let userProject=  await UserProject.findOne({
+      const userProject=  await UserProject.findOne({
           where: { userId,projectId },
       });
-     
+      if (!userProject) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+        );
+      }
+  
       if (userProject) {
         await userProject.remove();
       }
 
       return await Project.findOne({
         where: { id: projectId },
-        relations: ['user','address'],
+        relations: ['users','addresses'],
       }); 
     }catch(e){
-      console.log('create project',e)
+      console.log('removeUserProject project',e)
     }
    
   }
@@ -131,18 +137,22 @@ export class ProjectService {
     try {
       const projecAddress =  await ProjectHasAddress.findOne({
           where: { projectId,addressId},
-        });
-  
+      });
+      if (!projecAddress) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
+        );
+      }
       if (projecAddress) {
         await projecAddress.remove();
       }
 
       return await Project.findOne({
         where: { id: projectId },
-        relations: ['user','address'],
+        relations: ['users','addresses'],
       }); 
     }catch(e){
-      console.log('create project',e)
+      console.log('removeAddressProject project',e)
     }
    
   }
@@ -191,10 +201,10 @@ export class ProjectService {
   async findOneProject(
     id?: number,
   ): Promise<Project> {
-   
+    
     return await Project.findOne({
       where: { id: id },
-      relations: ['user','address'],
+      relations: ['users','addresses','legal'],
     });
   }
 
@@ -202,7 +212,11 @@ export class ProjectService {
     id: number,
     updateProjectInput: UpdateProjectInput): Promise<Project> {
   
-
+    if (!this.authorizationService.hasRole('admin')) {
+      delete updateProjectInput.legalId
+      delete updateProjectInput.wallet
+      delete updateProjectInput.status
+    }
     const project: Project = await Project.preload({
       id,
       ...updateProjectInput
@@ -275,7 +289,7 @@ export class ProjectService {
     isRealUserType?: boolean
   ): Promise<Project[]> {
     const all = await Project.find({
-      where: { user: { userId: userId } },
+      where: { users: { userId: userId } },
       relations: ['user', 'address'],
       order: {
         id: 'DESC'

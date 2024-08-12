@@ -28,7 +28,7 @@ export class ProjectResolver {
   ) {
     return this.projectService.create(
       createProjectInput,
-      user.id,
+      user,
       isRealUserType,
     );
   }

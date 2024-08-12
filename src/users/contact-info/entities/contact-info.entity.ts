@@ -39,11 +39,6 @@ export class ContactInfo extends BaseEntity {
   @Column()
   title: string;
 
-  @Field(() => Country)
-  @ManyToOne(() => Country)
-  country: Promise<Country>;
-  @Column()
-  countryId: number;
 
 
   @Field({ nullable: true })

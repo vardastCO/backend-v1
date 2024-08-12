@@ -15,49 +15,16 @@ import {
 @InputType()
 export class CreateAddressProjectInput {
 
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(255)
-  address: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(255)
-  title: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(255)
-  delivery_name: string;
 
   @Field()
   @IsNotEmpty()
   @IsInt()
-  cityId: number;
+  addressId: number;
 
   @Field()
   @IsNotEmpty()
   @IsInt()
   projectId: number;
-
-  @Field()
-  @IsNotEmpty()
-  @IsInt()
-  provinceId: number;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @MaxLength(10)
-  postalCode?: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(255)
-  delivery_contact: string;
 
 
 }

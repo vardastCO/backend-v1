@@ -21,8 +21,6 @@ import {
 
 import { UserProject } from "./user-project.entity";
 import { ProjectHasAddress } from "./projectHasAddress.entity";
-import { TypeProject } from "../enums/type-project.enum";
-import { ThreeStateSupervisionStatuses } from "src/order/enums/three-state-supervision-statuses.enum";
 import { MultiStatuses } from "../enums/multi-statuses.enum";
 import { Legal } from "src/users/legal/entities/legal.entity";
 
@@ -61,12 +59,6 @@ export class Project extends BaseEntity {
   @Column({ nullable: true })
   description?: string;
 
-  // @Field(() => TypeProject)
-  // @Column("enum", {
-  //   enum: TypeProject,
-  //   default: TypeProject.LEGAL,
-  // })
-  // type: TypeProject;
 
   @Field({ nullable: true })
   @Column({  default: '0', nullable: true  })
@@ -79,11 +71,11 @@ export class Project extends BaseEntity {
 
   @Field(() => [ProjectHasAddress], { nullable: "items" })
   @OneToMany(() => ProjectHasAddress, projectHasAddress => projectHasAddress.project)
-  address: Promise<ProjectHasAddress[]>;
+  addresses: Promise<ProjectHasAddress[]>;
 
   @Field(() => [UserProject], { nullable: "items" })
   @OneToMany(() => UserProject, userProject => userProject.project)
-  user: Promise<UserProject[]>;
+  users: Promise<UserProject[]>;
 
   @Field(() => Legal, { nullable: true })
   @ManyToOne(() => Legal, legal => legal.projects, { nullable: true })

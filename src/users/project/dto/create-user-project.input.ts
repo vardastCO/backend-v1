@@ -18,20 +18,8 @@ export class CreateUserProjectInput {
 
   @Field()
   @IsNotEmpty()
-  @IsString()
-  @MaxLength(255)
-  cellphone: string;
-
-  @Field({nullable:true})
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  name?: string;
-
-  @Field({nullable:true})
-  @IsOptional()
   @IsInt()
-  memberId?: number;
+  memberId: number;
 
   @Field()
   @IsNotEmpty()
