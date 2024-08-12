@@ -340,16 +340,16 @@ export class CategoryService {
     indexCategoryInput?: IndexCategoryInput,
   ): Promise<PaginationCategoryResponse> {
     indexCategoryInput.boot();
-    const cacheKey = `categories_find_paginate_${JSON.stringify(indexCategoryInput)}`;
-    const cachedCategories = await this.cacheManager.get<PaginationCategoryResponse>(cacheKey);
-    if (cachedCategories) {
-      // cachedCategories.forEach(category => {
-      //   category.createdAt = new Date(category.createdAt);
-      //   category.updatedAt = new Date(category.updatedAt);
-      // })
-      console.log('cachedCategories',cachedCategories)
-      // return cachedCategories;
-    }
+    // const cacheKey = `categories_find_paginate_${JSON.stringify(indexCategoryInput)}`;
+    // const cachedCategories = await this.cacheManager.get<PaginationCategoryResponse>(cacheKey);
+    // if (cachedCategories) {
+    //   // cachedCategories.forEach(category => {
+    //   //   category.createdAt = new Date(category.createdAt);
+    //   //   category.updatedAt = new Date(category.updatedAt);
+    //   // })
+    //   // console.log('cachedCategories',cachedCategories)
+    //   // return cachedCategories;
+    // }
 
     const { take, skip, vocabularyId, isActive, onlyRoots, brandId, sellerId } =
       indexCategoryInput || {};
@@ -403,7 +403,7 @@ export class CategoryService {
       const modifiedDataWithOutText = JSON.parse(jsonString);
       // await this.cacheManager.set(cacheKey, modifiedDataWithOutText, CacheTTL.ONE_WEEK); // Set TTL as needed
       const [data, total] = await queryBuilder.getManyAndCount();
-      console.log('Categories',PaginationCategoryResponse.make(indexCategoryInput, total, data))
+      // console.log('Categories',PaginationCategoryResponse.make(indexCategoryInput, total, data))
       return PaginationCategoryResponse.make(indexCategoryInput, total, data);
       // return result;
     } catch (error) {
