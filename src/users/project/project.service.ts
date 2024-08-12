@@ -99,6 +99,7 @@ export class ProjectService {
     assign.userId = member.userId
     assign.projectId = createUserProjectInput.projectId
     assign.name = (await member.user).fullName
+    assign.wallet = createUserProjectInput.wallet ?? '0'
     assign.type = createUserProjectInput.type ?? UserTypeProject.EMPLOYER
     await assign.save()
   

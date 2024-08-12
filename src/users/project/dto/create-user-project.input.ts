@@ -31,4 +31,8 @@ export class CreateUserProjectInput {
   @IsEnum(UserTypeProject)
   type?: UserTypeProject;
 
+  @Field({nullable:true})
+  @IsOptional()
+  wallet?: string;
+
 }
