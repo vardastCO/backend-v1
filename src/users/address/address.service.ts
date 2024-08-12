@@ -87,9 +87,11 @@ export class AddressService {
 
   async remove(id: number): Promise<Address> {
     const address: Address = await this.findOne(id);
+    const result = address
     await address.remove();
-    address.id = id;
-    return address;
+    result.id = id;
+    return result;
+  
   }
 
   async getProvinceOf(address: Address): Promise<Province> {
