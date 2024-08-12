@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsPositive,
 } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
@@ -16,11 +17,11 @@ export class IndexAddressInput extends IndexInput {
   @IsEnum(AddressRelatedTypes)
   relatedType: AddressRelatedTypes;
 
-  // @Field(() => Int)
-  // @IsNotEmpty()
-  // @IsInt()
-  // @IsPositive()
-  // relatedId: number;
+  @Field({nullable:true})
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  relatedId?: number;
 
   // @Field(() => Int)
   // @IsNotEmpty()

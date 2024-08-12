@@ -39,14 +39,19 @@ export class AddressService {
     user?:User
   ): Promise<PaginationAddressResponse> {
     indexAddressInput.boot();
-    const { take, skip, relatedType } = indexAddressInput || {};
+    const { take, skip, relatedType ,relatedId } = indexAddressInput || {};
   
     const whereCondition: any = {};
   
     if (relatedType === AddressRelatedTypes.USER) {
       whereCondition.relatedId = user.id;
       whereCondition.relatedType = AddressRelatedTypes.USER;
+    }
+    if (relatedType && relatedId) {
+      whereCondition.relatedId = relatedId;
+      whereCondition.relatedType = relatedType;
     } 
+
 
     const [data, total] = await Address.findAndCount({
       skip,
