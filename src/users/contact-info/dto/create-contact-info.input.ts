@@ -39,7 +39,7 @@ export class CreateContactInfoInput {
   countryId?: number;
 
   @Field({ nullable: true })
-  @MaxLength(255)
+  @IsOptional()
   code?: string;
 
   @Field()
@@ -49,7 +49,7 @@ export class CreateContactInfoInput {
   number: string;
 
   @Field({ nullable: true })
-  @MaxLength(255)
+  @IsOptional()
   ext?: string;
 
   @Field(() => ContactInfoTypes)
