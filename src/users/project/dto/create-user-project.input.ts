@@ -26,9 +26,9 @@ export class CreateUserProjectInput {
   @IsInt()
   projectId: number;
 
-  @Field(() => UserTypeProject)
-  @IsNotEmpty()
+  @Field({nullable:true})
+  @IsOptional()
   @IsEnum(UserTypeProject)
-  type: UserTypeProject;
+  type?: UserTypeProject;
 
 }
