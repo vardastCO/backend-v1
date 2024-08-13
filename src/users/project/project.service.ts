@@ -346,7 +346,7 @@ export class ProjectService {
     const whereConditions: any = {};
 
     if (client) {
-      whereConditions['user'] = {
+      whereConditions['users'] = {
         user :  {
           id :user.id
         },
@@ -363,8 +363,8 @@ export class ProjectService {
       if (status) {
         whereConditions['status'] = status;
       }
+      
       if (nameManager) {
-        
         whereConditions['users'] = {
           user :  {
             firstName : Like(`%${nameManager}%`)

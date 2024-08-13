@@ -19,7 +19,11 @@ export class ContactUsService {
         try{
             
             const { fullname, title, cellphone, text, fileuuid } = createContactInput;
-            const file = await File.findOneBy({ uuid: fileuuid })
+            let file = null
+            if (fileuuid) {
+                file = await File.findOneBy({ uuid: fileuuid })
+            }
+            
             
 
             const contact_us     = new ContactUs()
