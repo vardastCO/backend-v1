@@ -3,6 +3,9 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from "@nes
 import { Cache } from "cache-manager";
 import { I18n, I18nService } from "nestjs-i18n";
 import { In, Like, MoreThan } from 'typeorm';
+import { AuthorizationService } from "../authorization/authorization.service";
+import { Legal } from "../legal/entities/legal.entity";
+import { Member } from "../member/entities/members.entity";
 import { User } from "../user/entities/user.entity";
 import { CreateAddressProjectInput } from "./dto/create-address-project.input";
 import { CreateProjectInput } from "./dto/create-project.input";
@@ -17,9 +20,6 @@ import { Project } from "./entities/project.entity";
 import { ProjectHasAddress } from "./entities/projectHasAddress.entity";
 import { UserProject } from "./entities/user-project.entity";
 import { UserTypeProject } from "./enums/type-user-project.enum";
-import { Legal } from "../legal/entities/legal.entity";
-import { AuthorizationService } from "../authorization/authorization.service";
-import { Member } from "../member/entities/members.entity";
 // import { TypeProject } from "./enums/type-project.enum";
 @Injectable()
 export class ProjectService {
@@ -34,6 +34,7 @@ export class ProjectService {
     const max = Math.pow(10, length) - 1;
   return Math.floor(Math.random() * (max - min + 1) + min).toString();
   }
+
   async create(createProjectInput: CreateProjectInput,user:User,isRealUserType:boolean): Promise<Project> {
     try {
       const project: Project = Project.create<Project>(createProjectInput);
@@ -69,6 +70,7 @@ export class ProjectService {
     }
    
   }
+
   async assignAddressProject(createAddressProjectInput:CreateAddressProjectInput,projectId:number,user:User): Promise<Project> {
     try {
 
@@ -86,6 +88,7 @@ export class ProjectService {
     }
    
   }
+  
   async assignUserProject(createUserProjectInput:CreateUserProjectInput,user:User): Promise<Project> {
 
     const member = await (await Member.findOneBy({id:createUserProjectInput.memberId}))
@@ -110,15 +113,25 @@ export class ProjectService {
 
    
   }
+
   async removeUserProject(projectId:number,userId:number): Promise<Project> {
     try {
-      const userProject=  await UserProject.findOne({
+      const userProject: UserProject=  await UserProject.findOne({
           where: { userId,projectId },
       });
+
+
       if (!userProject) {
         throw new BadRequestException(
           (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
         );
+      }
+
+
+      if (userProject.type == UserTypeProject.MANAGER) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.PROJECT_USER_IS_MANAGER"))
+        )
       }
   
       if (userProject) {
@@ -134,6 +147,7 @@ export class ProjectService {
     }
    
   }
+
   async removeAddressProject(projectId:number,addressId:number): Promise<Project> {
     try {
       const projecAddress =  await ProjectHasAddress.findOne({
@@ -157,6 +171,7 @@ export class ProjectService {
     }
    
   }
+
   // async  updateProjectAdress(params:type) {
   //   const things: Brand = await Brand.preload({
   //     id,
@@ -199,6 +214,7 @@ export class ProjectService {
   //   return PaginationProjectResponse.make(indexProjectInput, total, data);
 
   // }
+  
   async findOneProject(
     id?: number,
   ): Promise<Project> {
@@ -377,8 +393,6 @@ export class ProjectService {
     }catch(e){
       return false
     }
-   
   }
-
 
 }

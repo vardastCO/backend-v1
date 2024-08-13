@@ -12,5 +12,6 @@
   "ACCOUNT_NUMBER": "شماره حساب باید یازده رقمی باشد",
   "SHABA_NUMBER": "شماره شبا باید شامل بیست و چهار رقم (بدون احتساب IR) باشد",
   "BLACK_LIST_CELL_PHONE": "این شماره تلفن هم اکنون در لیست سیاه وجود دارد.",
-  "BLACK_LIST_CELL_PHONE_LOGIN": "شما در لیست سیاه قرار گرفته اید."
+  "BLACK_LIST_CELL_PHONE_LOGIN": "شما در لیست سیاه قرار گرفته اید.",
+  "PROJECT_USER_IS_MANAGER": "امکان حذف مدیر پروژه وجود ندارد"
 }
