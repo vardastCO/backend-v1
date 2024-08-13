@@ -71,6 +71,10 @@ export class ContactUsService {
         if (!cotactUs) {
             throw new NotFoundException("Contact Us Not Found.");
         }
+        if (updateContactUs.fileuuid) {
+            const file = await File.findOneBy({ uuid: updateContactUs.fileuuid })
+            cotactUs.file      = file ? Promise.resolve(file) : null 
+        }
 
         await cotactUs.save();
         return cotactUs;
