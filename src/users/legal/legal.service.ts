@@ -117,17 +117,25 @@ export class LegalService {
     const legal: Legal = Legal.create<Legal>(createLegalInput);
     legal.ownerId = id
     legal.createdById = user.id
-    await legal.save();
+    
 
     const member = new Member();
     member.relatedId = legal.id
     member.userId = user.id
     // member.adminId = userId
     member.position = 'مدیرعامل'
-    await member.save();
-    
-    return legal;
 
+
+    const memberExists = await Member.findOneBy({ userId: id });
+      if (memberExists) {
+        throw new BadRequestException(
+          (await this.i18n.translate("exceptions.MEMBER_ALREADY_EXISTS")),
+        );
+    }
+    
+    await member.save();
+    await legal.save();
+    return legal;
   }
 
 
