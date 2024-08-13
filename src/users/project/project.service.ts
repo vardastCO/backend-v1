@@ -365,7 +365,7 @@ export class ProjectService {
       }
       if (nameManager) {
         
-        whereConditions['user'] = {
+        whereConditions['users'] = {
           user :  {
             firstName : Like(`%${nameManager}%`)
           },
@@ -373,7 +373,7 @@ export class ProjectService {
         }
       }
       if (nameEmployer) {
-        whereConditions['user'] = {
+        whereConditions['users'] = {
           user :  {
             firstName : Like(`%${nameEmployer}%`)
           },
