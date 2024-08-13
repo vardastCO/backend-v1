@@ -5,6 +5,7 @@ import { IndexContactInput } from "./dto/IndexContactInput";
 import { PaginationContactUsResponse } from "./dto/PaginationContactUsResponse";
 import { UpdateContactUsInput } from "./dto/update-member.input";
 import { ContactUs } from "./entities/Contact.entity";
+import { File } from "../storage/file/entities/file.entity";
 
 @Injectable()
 export class ContactUsService {
@@ -17,17 +18,19 @@ export class ContactUsService {
     async createContactUs(createContactInput: CreateContactInput): Promise<ContactUs> {
         try{
             
-            const { fullname, title,cellphone,text,fileId } = createContactInput;
+            const { fullname, title, cellphone, text, fileuuid } = createContactInput;
+            const file = await File.findOneBy({ uuid: fileuuid })
+            
 
-            const things     = new ContactUs()
-            things.fullname  = fullname
-            things.title     = title
-            things.cellphone = cellphone
-            things.text      = text
-            things.fileId    = fileId ?? null
+            const contact_us     = new ContactUs()
+            contact_us.fullname  = fullname
+            contact_us.title     = title
+            contact_us.cellphone = cellphone
+            contact_us.text      = text
+            contact_us.file      = file ? Promise.resolve(file) : null 
     
-            await things.save()
-            return things
+            await contact_us.save()
+            return contact_us
         }catch(e){
          console.log('err in createContactUs ',e)
         }
