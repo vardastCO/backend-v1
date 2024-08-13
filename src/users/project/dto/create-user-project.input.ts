@@ -1,14 +1,9 @@
-import { Field, Float, InputType, Int } from "@nestjs/graphql";
+import { Field, InputType } from "@nestjs/graphql";
 import {
-  IsBoolean,
   IsEnum,
   IsInt,
   IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsPositive,
-  IsString,
-  MaxLength,
+  IsOptional
 } from "class-validator";
 import { UserTypeProject } from "../enums/type-user-project.enum";
 
@@ -34,5 +29,4 @@ export class CreateUserProjectInput {
   @Field({nullable:true})
   @IsOptional()
   wallet?: string;
-
 }

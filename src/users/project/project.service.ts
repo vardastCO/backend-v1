@@ -88,14 +88,27 @@ export class ProjectService {
     }
    
   }
-  
+
   async assignUserProject(createUserProjectInput:CreateUserProjectInput,user:User): Promise<Project> {
 
-    const member = await (await Member.findOneBy({id:createUserProjectInput.memberId}))
+    const member: Member = await (await Member.findOneBy({id:createUserProjectInput.memberId}))
     if (!member) {
       throw new BadRequestException(
         (await this.i18n.translate("exceptions.NOT_FOUND_USER")),
       );
+    }
+
+    const projectUserExists = await UserProject.findOne({
+      where: {
+        userId: member.userId,
+        projectId: createUserProjectInput.projectId
+      }
+    })
+
+    if (projectUserExists) {
+      throw new BadRequestException(
+        (await this.i18n.translate("exceptions.MEMBER_EXISTS_IN_PROJECT"))
+      )
     }
 
     const assign = new UserProject()
@@ -110,8 +123,6 @@ export class ProjectService {
       where: { id: createUserProjectInput.projectId },
       relations: ['users','addresses'],
     });
-
-   
   }
 
   async removeUserProject(projectId:number,userId:number): Promise<Project> {
