@@ -25,6 +25,9 @@ import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { SellerRepresentative } from "src/products/seller/entities/seller-representative.entity";
+import { Country } from "src/base/location/country/entities/country.entity";
+import { City } from "src/base/location/city/entities/city.entity";
+import { Province } from "src/base/location/province/entities/province.entity";
 
 @Injectable()
 export class OrderOfferService {
@@ -79,13 +82,13 @@ export class OrderOfferService {
         await CellContact.save()
         const address = new Address()
         address.relatedType = AddressRelatedTypes.SELLER
-        address.countryId = 244
+        address.countryId = Country.IR
         address.address = addSellerOrderOffer.address
-        address.cityId = 1303
+        address.cityId = City.TEHRAN
         address.relatedId = await seller.id
         address.relatedId = await seller.id
         address.title = 'آدرس'
-        address.provinceId = 12
+        address.provinceId = Province.TEHRAN
         await address.save()
         offer.sellerId = await seller.id
         offer.request_name = seller.name;

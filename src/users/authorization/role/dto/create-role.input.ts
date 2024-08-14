@@ -4,6 +4,7 @@ import { Permission } from "../../permission/entities/permission.entity";
 import {IsUnique} from "../../../../base/utilities/validations/is-unique.validation";
 import {Country} from "../../../../base/location/country/entities/country.entity";
 import {Role} from "../entities/role.entity";
+import { PermissionClaimEnum } from "../../permission/enums/permission-claim.enum";
 
 @InputType()
 export class CreateRoleInput {
@@ -33,4 +34,9 @@ export class CreateRoleInput {
   permissionIds: number[] | null;
 
   permissions: Permission[] | null;
+
+  @Field(() => [Int], { nullable: "items" })
+  @IsNotEmpty()
+  claims: PermissionClaimEnum[] | null;
+
 }

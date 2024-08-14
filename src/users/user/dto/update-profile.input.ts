@@ -19,6 +19,14 @@ export class UpdateProfileInput  {
 
   @Field({ nullable: true })
   @IsOptional()
+  identificationCode: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  birth: Date;
+
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   name_company: string;

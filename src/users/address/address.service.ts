@@ -8,14 +8,14 @@ import { PaginationAddressResponse } from "./dto/pagination-address.response";
 import { UpdateAddressInput } from "./dto/update-address.input";
 import { Address } from "./entities/address.entity";
 import { AddressRelatedTypes } from "./enums/address-related-types.enum";
+import { Country } from "src/base/location/country/entities/country.entity";
 
 @Injectable()
 export class AddressService {
   async create(createAddressInput: CreateAddressInput,user:User): Promise<Address> {
     const address: Address = Address.create<Address>({
       ...createAddressInput,
-      //  todo
-      countryId: 244,
+      countryId: Country.IR,
       relatedId:createAddressInput.relatedType === AddressRelatedTypes.USER ? user.id : createAddressInput.relatedId  
     });
 

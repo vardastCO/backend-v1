@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CreateRoleInput } from "./dto/create-role.input";
 import { IndexRoleInput } from "./dto/index-role.input";
 import { PaginationRoleResponse } from "./dto/pagination-role.response";
 import { UpdateRoleInput } from "./dto/update-role.input";
 import { Role } from "./entities/role.entity";
+import { Permission } from "../permission/entities/permission.entity";
+
 
 @Injectable()
 export class RoleService {
@@ -15,10 +17,17 @@ export class RoleService {
   ) {}
 
   async create(createRoleInput: CreateRoleInput): Promise<Role> {
-    // TODO: fix
-    // if (typeof createRoleInput.permissionIds == 'array') {
-    //   createRoleInput.permissions = createRoleInput.
-    // }
+    if (createRoleInput.claims.length > 0) {
+      const permissions = await Permission.find({
+        select: ['id'],
+        where: {
+          claim: In(createRoleInput.claims)
+        }
+      });
+      
+      createRoleInput.permissionIds = permissions.map(permission => permission.id);
+    }
+    
     return await this.roleRepository.save(createRoleInput);
   }
 

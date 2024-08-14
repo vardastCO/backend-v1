@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UserLanguagesEnum } from "src/users/user/enums/user-languages.enum";
 import { UserStatusesEnum } from "src/users/user/enums/user-statuses.enum";
 import { Role } from "src/users/authorization/role/entities/role.entity";
+import { Country } from "src/base/location/country/entities/country.entity";
 
 @Command({
   name: "seller:update",
@@ -113,15 +114,13 @@ export class SellerCsvUpdateCommand extends CommandRunner {
   }
 
   async createUser(title: string, phone: string): Promise<User> {
-    console.log(phone, title)
-    console.log('=====================')
     const userRole = await Role.findOneBy({ name: "user" });
     const user = User.create({
       firstName: title,
       uuid: uuidv4(),
       cellphone: phone,
       language: UserLanguagesEnum.FARSI,
-      countryId: 244,
+      countryId: Country.IR,
       username: phone,
       timezone: "Asia/Terhan",
       status: UserStatusesEnum.ACTIVE,

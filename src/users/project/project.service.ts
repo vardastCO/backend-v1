@@ -394,6 +394,28 @@ export class ProjectService {
   
   }
 
+  async removeProject(id: number): Promise<boolean> {
+       
+    try {
+      const project = await Project.findOneBy({
+       id
+      })
+      
+      if (project) {
+        project.deleted_at = new Date().toLocaleString()
+        await project.save()
+      }
+     
+     return true
+    
+   } catch (error) {
+
+     console.log('removeProject err',error)
+     return false
+   }
+ 
+ }
+
   async assignUserToProject(projectId: number,userId:number): Promise<boolean> {
     try{
       const userProject = new UserProject()

@@ -91,4 +91,9 @@ export class Project extends BaseEntity {
     default: MultiStatuses.CONFIRMED,
   })
   status: MultiStatuses;
+
+  @Field()
+  @Index()
+  @Column({ nullable: true })
+  deleted_at: string; 
 }

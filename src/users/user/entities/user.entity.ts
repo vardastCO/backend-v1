@@ -57,6 +57,11 @@ export class User extends BaseEntity {
   @Index()
   cellphone: string;
 
+  @Field({ nullable: true })
+  @Index()
+  @Column({ nullable: true })
+  birth?: Date; 
+
   @Field(type => Int, { nullable: true })
   @Column("int8", { nullable: true })
   telegramChatId?: number;

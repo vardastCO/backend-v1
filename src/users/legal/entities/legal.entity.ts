@@ -8,6 +8,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -26,14 +27,17 @@ export class Legal extends BaseEntity {
   id: number;
 
   @Field()
+  @Index()
   @Column({ unique: true })
   name_company: string;
 
   @Field()
+  @Index()
   @Column({ unique: true })
   national_id: string;
 
   @Field({ nullable: true })
+  @Index()
   @Column({ default: "0", nullable: true })
   wallet?: string;
 
@@ -94,4 +98,6 @@ export class Legal extends BaseEntity {
   @Field(() => [Project])
   @OneToMany(() => Project, project => project.legal, { nullable: true })
   projects: Project[];
+
+
 }

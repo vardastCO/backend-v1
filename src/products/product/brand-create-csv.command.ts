@@ -11,6 +11,9 @@ import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
 import { EntityManager } from 'typeorm';
 import { Brand } from "../brand/entities/brand.entity";
+import { Country } from "src/base/location/country/entities/country.entity";
+import { City } from "src/base/location/city/entities/city.entity";
+import { Province } from "src/base/location/province/entities/province.entity";
 @Command({
   name: "brand:create",
   description: "create brand from given csv file base on official format.",
@@ -105,10 +108,10 @@ export class BrandCsvCreateCommand extends CommandRunner {
         try {
           const new_address = new Address()
           new_address.address = address
-          new_address.cityId = 1303
-          new_address.countryId = 244
+          new_address.cityId = City.TEHRAN
+          new_address.countryId = Country.IR
           new_address.relatedType = AddressRelatedTypes.BRAND
-          new_address.provinceId = 12
+          new_address.provinceId = Province.TEHRAN
           new_address.relatedId = find_brand.id
           new_address.title = 'دفتر'
           await new_address.save()

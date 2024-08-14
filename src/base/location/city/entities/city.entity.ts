@@ -17,6 +17,7 @@ import { CityTypesEnum } from "../enums/city-types.enum";
 @Unique(["name", "provinceId"])
 @Unique(["nameEn", "provinceId"])
 export class City extends BaseEntity {
+  public static TEHRAN = 1303;
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;

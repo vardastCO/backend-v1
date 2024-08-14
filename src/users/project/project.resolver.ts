@@ -1,5 +1,5 @@
 import { ValidationPipe } from "@nestjs/common";
-import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, Context, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ReferrersEnum } from "src/referrers.enum";
 import { IsRealUserType } from "../auth/decorators/current-type.decorator";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
@@ -103,6 +103,16 @@ export class ProjectResolver {
     @CurrentUser() user: User,
   ) {
     return this.projectService.myProjects(user.id, isRealUserType);
+  }
+
+  @Permission("gql.users.address.store")
+  @Mutation(() => Boolean)
+  removeProject(
+    @Args('id', { type: () => Int, nullable: true }, new ValidationPipe({ transform: true }))
+    id: number,
+  ) {
+   
+    return this.projectService.removeProject(id);
   }
 
   @Permission("gql.users.address.store")

@@ -14,6 +14,8 @@ import { Province } from "../../province/entities/province.entity";
 @ObjectType()
 @Entity("base_location_countries")
 export class Country extends BaseEntity {
+  public static IR = 244;
+
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
