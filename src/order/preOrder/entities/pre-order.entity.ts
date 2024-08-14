@@ -80,6 +80,16 @@ export class PreOrder extends BaseEntity {
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
+  delivery_fullName: string; 
+
+  @Field({ nullable: true })
+  @Index()
+  @Column({ nullable: true })
+  delivery_contact: string; 
+
+  @Field({ nullable: true })
+  @Index()
+  @Column({ nullable: true })
   expert_name: string; 
 
   @Field({ nullable: true })

@@ -78,6 +78,17 @@ export class CreatePreOrderInput {
   @MaxLength(255)
   applicant_name?: string;
 
+  @Field(() => String,{nullable:true}) 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  delivery_fullName?: string;
+
+  @Field(() => String,{nullable:true}) 
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  delivery_contact?: string;
 
   @Field(() => ExpireTypes, {
     defaultValue: ExpireTypes.ONE_DAY,

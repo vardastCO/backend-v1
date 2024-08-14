@@ -65,6 +65,8 @@ export class PreOrderService {
                 descriptions: input.descriptions,
                 bid_start: input.bid_start,
                 bid_end: input.bid_end,
+                delivery_contact: input.delivery_contact ?? user.cellphone,
+                delivery_fullName:input.delivery_fullName ?? user.firstName,
                 projectId: input.projectId,
                 payment_methods: input.payment_methods,
                 type: input.projectId ? TypeOrder.LEGAL : TypeOrder.REAL,
