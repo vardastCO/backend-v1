@@ -11,7 +11,7 @@ import { CompressionService } from "src/compression.service";
 import { DecompressionService } from "src/decompression.service";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from "src/users/user/entities/user.entity";
-import { Brackets, EntityManager, In, IsNull, Like, MoreThan } from "typeorm";
+import { Brackets, EntityManager, In, IsNull, Like, MoreThan, Not } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 import * as zlib from "zlib";
 import { AttributeValue } from "../attribute-value/entities/attribute-value.entity";
@@ -32,8 +32,11 @@ import { PaginationProductResponse } from "./dto/pagination-product.response";
 import { UpdateProductInput } from "./dto/update-product.input";
 import { ProductEntity } from "./entities/product-service.entity";
 import { Product } from "./entities/product.entity";
+import { ProductImageStatusEnum } from "./enums/product-imageStatus.enum";
+import { ProductPriceStatusEnum } from "./enums/product-priceStatus.enum";
 import { ProductSortablesEnum } from "./enums/product-sortables.enum";
 import { SortFieldProduct } from "./enums/sort-filed-product.enum";
+
 interface MainQueryResult {
   totalCount: number;
   data: any[];
@@ -227,6 +230,7 @@ export class ProductService {
       hasPrice,
       techNum,
       attributes,
+      hasImage
     } = indexProductInput || {};
   
     const whereConditions: any = {
@@ -249,11 +253,50 @@ export class ProductService {
         sellerId: sellerId,
       };
     }
-   //todo
-    if (!hasPrice) {
-      whereConditions.rating = 1;
+    switch (hasImage) {
+      case ProductImageStatusEnum.HAS_IMAGE:
+        whereConditions.images = {
+          id: Not(IsNull())
+        };
+        break;
+      
+      case ProductImageStatusEnum.NO_IMAGE:
+        whereConditions.images = {
+          id: IsNull()
+        };
+        break;
     }
-  
+
+
+    switch (hasPrice) {
+      case ProductPriceStatusEnum.HAS_PRICE:
+        whereConditions.prices = {
+          amount: Not(IsNull())
+        };
+        break;
+      
+      case ProductPriceStatusEnum.NO_PRICE:
+        whereConditions.prices = {
+          id: IsNull()
+        };
+        break;
+
+      case ProductPriceStatusEnum.PRICE_LESS_THAN_4_MONTHS:
+        const fourMonthsAgo = new Date();
+        fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+        whereConditions.prices = {
+          createdAt: MoreThan(fourMonthsAgo)
+        };
+        break;
+
+      case ProductPriceStatusEnum.PRICE_LESS_THAN_6_MONTHS:
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        whereConditions.prices = {
+          createdAt: MoreThan(sixMonthsAgo)
+        };
+        break;
+    }
     const whereArray: any[] = [];
   
     if (query) {
@@ -275,6 +318,7 @@ export class ProductService {
       }
     }
   
+    
     if (sortField === SortFieldProduct.PRICE) {
       whereConditions.prices = {
         createdAt: MoreThan(new Date(Date.now() - 15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE === 'true' ? 1000 : 1))),

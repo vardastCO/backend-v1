@@ -9,12 +9,9 @@ import {
   IsMobilePhone,
   IsNotEmpty,
   IsOptional,
-  IsPositive,
   IsStrongPassword,
-  IsTimeZone,
-  IsUUID,
   MaxLength,
-  ValidateIf,
+  ValidateIf
 } from "class-validator";
 import { Country } from "src/base/location/country/entities/country.entity";
 import { CellphoneUtil } from "src/base/utilities/cellphone.util";
@@ -59,6 +56,11 @@ export class CreateUserInput {
     minSymbols: 0,
   })
   password: string;
+
+  @Field({nullable:true})
+  @IsOptional()
+  @MaxLength(10)
+  nationalCode?: string;
 
   @Field({nullable:true})
   @IsOptional()

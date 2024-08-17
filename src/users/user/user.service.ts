@@ -5,16 +5,16 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { filterObject } from "src/base/utilities/helpers";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Cache } from "cache-manager";
 import { Country } from "src/base/location/country/entities/country.entity";
-import { File } from "src/base/storage/file/entities/file.entity";
 import { FileService } from "src/base/storage/file/file.service";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
+import { CompressionService } from "src/compression.service";
+import { DecompressionService } from "src/decompression.service";
 import { Seller } from "src/products/seller/entities/seller.entity";
 import { SellerRepresentativeRoles } from "src/products/seller/enums/seller-representative-roles.enum";
-import { DataSource, In, Repository } from "typeorm";
+import { DataSource, In, Like, Repository } from "typeorm";
 import { KavenegarService } from "../../base/kavenegar/kavenegar.service";
 import { CountryService } from "../../base/location/country/country.service";
 import { Permission } from "../authorization/permission/entities/permission.entity";
@@ -22,14 +22,10 @@ import { Role } from "../authorization/role/entities/role.entity";
 import { CreateUserInput } from "./dto/create-user.input";
 import { IndexUserInput } from "./dto/index-user.input";
 import { PaginationUserResponse } from "./dto/pagination-user.response";
+import { UpdateProfileInput } from "./dto/update-profile.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UserStatusesEnum } from "./enums/user-statuses.enum";
-import { UpdateProfileInput } from "./dto/update-profile.input";
-import { CompressionService } from "src/compression.service";
-import { DecompressionService } from "src/decompression.service";
-import { Legal } from "../legal/entities/legal.entity";
-import { Member } from "../member/entities/members.entity";
 
 @Injectable()
 export class UserService {
@@ -110,15 +106,39 @@ export class UserService {
     const {
       take,
       skip,
+      status,
+      birth,
+      cellphone,
+      email,
+      nationalCode
     } = indexUserInput || {};
     const whereConditions: any = {}
-    if (indexUserInput.status) {
-      whereConditions['status'] = indexUserInput.status
+
+    if (status) {
+      whereConditions['status'] = status as UserStatusesEnum;
+    }
+
+    if (nationalCode) {
+      whereConditions['nationalCode'] = Like(`%${nationalCode}%`);
+    }
+
+    if (email) {
+      whereConditions['email'] = Like(`%${email}%`);
+    }
+
+    if (cellphone) {
+      whereConditions['cellphone'] = Like(`%${cellphone}%`);
     }
   
+    if (birth) {
+      whereConditions['birth'] = birth;
+    }
+
+
     if (indexUserInput.roleIds && indexUserInput.roleIds.length > 0) {
       whereConditions.roles = { id: In(indexUserInput.roleIds) };
     }
+
   
     const [data, total] = await User.findAndCount({
       skip,

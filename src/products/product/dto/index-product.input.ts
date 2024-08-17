@@ -12,9 +12,11 @@ import {
   ValidateNested,
 } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
+import { SortDirection } from "src/base/utilities/enums/sort-direction.enum";
+import { ProductImageStatusEnum } from "../enums/product-imageStatus.enum";
+import { ProductPriceStatusEnum } from "../enums/product-priceStatus.enum";
 import { ProductSortablesEnum } from "../enums/product-sortables.enum";
 import { SortFieldProduct } from "../enums/sort-filed-product.enum";
-import { SortDirection } from "src/base/utilities/enums/sort-direction.enum";
 
 @InputType()
 export class IndexProductInput extends IndexInput {
@@ -69,11 +71,20 @@ export class IndexProductInput extends IndexInput {
   @IsBoolean()
   isActive?: boolean;
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => ProductPriceStatusEnum, {
+    nullable: true
+  })
   @IsOptional()
-  @IsBoolean()
-  hasPrice?: boolean = true;
+  @IsEnum(ProductPriceStatusEnum)
+  hasPrice?: ProductPriceStatusEnum;
 
+  @Field(() => ProductImageStatusEnum, {
+    nullable: true
+  })
+  @IsOptional()
+  @IsEnum(ProductImageStatusEnum)
+  hasImage?: ProductImageStatusEnum;
+  
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
