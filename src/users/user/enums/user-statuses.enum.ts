@@ -2,7 +2,7 @@ import { registerEnumType } from "@nestjs/graphql";
 
 export enum UserStatusesEnum {
   BANNED = -1,
-  NOT_ACTIVATED = 0,
+  NOT_ACTIVATED = 2,
   ACTIVE = 1,
 }
 

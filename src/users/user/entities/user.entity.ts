@@ -2,6 +2,7 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { File } from "src/base/storage/file/entities/file.entity";
 import { Seller } from "src/products/seller/entities/seller.entity";
 import { Permission } from "src/users/authorization/permission/entities/permission.entity";
+import { Legal } from "src/users/legal/entities/legal.entity";
 import { Session } from "src/users/sessions/entities/session.entity";
 import {
   AfterInsert,
@@ -11,8 +12,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   Generated,
+  Index,
   JoinColumn,
   JoinTable,
   ManyToMany,
@@ -26,7 +27,6 @@ import { Country } from "../../../base/location/country/entities/country.entity"
 import { Role } from "../../authorization/role/entities/role.entity";
 import { UserLanguagesEnum } from "../enums/user-languages.enum";
 import { UserStatusesEnum } from "../enums/user-statuses.enum";
-import { Legal } from "src/users/legal/entities/legal.entity";
 
 @ObjectType()
 @Entity("users")
@@ -111,11 +111,14 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   timezone?: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  nationalCode?: string;
+
   @Field(type => Country)
   @ManyToOne(type => Country)
   country: Country;
 
-  
 
   @Column("int")
   countryId: number;
