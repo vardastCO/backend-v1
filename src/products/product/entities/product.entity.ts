@@ -46,6 +46,10 @@ export class Product extends InfraEntity {
   @Field(() => Int, { nullable: true, defaultValue: 1 })
   @Column({ type: 'int', nullable: true, default: 1 })
   views?: number;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true, default: 0 })
+  offersNum?: number;
   
 
   @Field()
