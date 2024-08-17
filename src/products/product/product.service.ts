@@ -249,7 +249,7 @@ export class ProductService {
         sellerId: sellerId,
       };
     }
-  
+   //todo
     if (!hasPrice) {
       whereConditions.rating = 1;
     }
