@@ -356,10 +356,11 @@ export class ProjectService {
       if (createTime) {
         whereConditions['createTime'] = MoreThan(createTime); 
       }
+
       if (nameOrUuid) {
-        whereConditions['name'] =  Like(`%${nameOrUuid}%`)
-  
+        whereConditions['name'] = Like(`%${nameOrUuid}%`);
       }
+
       if (status) {
         whereConditions['status'] = status;
       }
@@ -367,19 +368,28 @@ export class ProjectService {
       if (nameManager) {
         whereConditions['users'] = {
           user :  {
-            firstName : Like(`%${nameManager}%`)
+            fullName : Like(`%${nameManager}%`)
           },
+
+        }
+        whereConditions['users'] = {
           type : UserTypeProject.MANAGER
         }
       }
+
+
       if (nameEmployer) {
         whereConditions['users'] = {
           user :  {
             firstName : Like(`%${nameEmployer}%`)
-          },
+          }
+        }
+
+        whereConditions['users'] = {
           type : UserTypeProject.EMPLOYER
         }
       }
+
     }
 
    
@@ -387,6 +397,7 @@ export class ProjectService {
       where:whereConditions ,
       take,
       skip,
+      relations : ['users'],
       order: {id: "DESC" },
     });
 

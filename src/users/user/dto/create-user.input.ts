@@ -46,8 +46,8 @@ export class CreateUserInput {
 
   username: string;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @IsStrongPassword({
     minLength: 8,
     minLowercase: 1,
@@ -55,7 +55,7 @@ export class CreateUserInput {
     minNumbers: 1,
     minSymbols: 0,
   })
-  password: string;
+  password?: string;
 
   @Field({nullable:true})
   @IsOptional()

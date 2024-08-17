@@ -59,7 +59,6 @@ export class Project extends BaseEntity {
   @Column({ nullable: true })
   description?: string;
 
-
   @Field({ nullable: true })
   @Column({  default: '0', nullable: true  })
   wallet?: string;
@@ -67,7 +66,6 @@ export class Project extends BaseEntity {
   @Field(() => Date, { nullable: true })
   @CreateDateColumn({ type: 'timestamp', nullable: true })
   createTime?: Date;
-
 
   @Field(() => [ProjectHasAddress], { nullable: "items" })
   @OneToMany(() => ProjectHasAddress, projectHasAddress => projectHasAddress.project)
@@ -84,7 +82,6 @@ export class Project extends BaseEntity {
   @Column({ nullable: true })
   legalId?: number;
 
-  
   @Field(() => MultiStatuses)
   @Column("enum", {
     enum: MultiStatuses,

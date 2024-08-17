@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { hash } from "argon2";
 import { Cache } from "cache-manager";
 import { Country } from "src/base/location/country/entities/country.entity";
 import { FileService } from "src/base/storage/file/file.service";
@@ -168,18 +169,28 @@ export class UserService {
     return user;
   }
 
+  async hashPassword(password: string): Promise<string> {
+    return await hash(password);
+  }
+
   async update(
     id: number,
     updateUserInput: UpdateUserInput,
     currentUser: User,
   ): Promise<User> {
     const user: User = await User.findOneBy({ id });
-
+    
     if (!user) {
       throw new NotFoundException();
     }
 
     const originalUser = { ...user };
+
+    if (updateUserInput.password) {
+      updateUserInput.password = await this.hashPassword(updateUserInput.password);
+    }
+  
+
 
     Object.assign(user, updateUserInput);
 
