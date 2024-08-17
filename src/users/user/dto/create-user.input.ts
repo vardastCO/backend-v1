@@ -138,7 +138,7 @@ export class CreateUserInput {
 
     const country: Country = await dataSource
       .getRepository(Country)
-      .findOneBy({ id: this.countryId });
+      .findOneBy({ id: Country.IR });
 
     const cellphoneUtil = new CellphoneUtil(this.cellphone, country.alphaTwo);
     if (!cellphoneUtil.isValid()) {
