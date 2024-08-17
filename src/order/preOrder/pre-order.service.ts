@@ -524,7 +524,7 @@ export class PreOrderService {
     const category = firstOrder.category;
 
 
-    const orderDTOs: PreOrderDTO[] = orders.map(order => ({
+    const orderDTOs: PreOrderDTO[] = await Promise.all(orders.map(async order => ({
         id: order.id,
         uuid: order.uuid,
         request_date: order.request_date,
@@ -534,15 +534,15 @@ export class PreOrderService {
         bid_start: order.bid_start,
         bid_end: order.bid_end,
         lines: order.lines,
-        lineDetail: order.lines.map(line => line.item_name).join(' - ')
-    }));
+        lineDetail: (await order.lines).map(line => line.item_name).join(' - ')
+    })));
     const publicPreOrderDTO: PublicPreOrderDTO = {
         categoryName: category ? (await category).title : null,
         categoryId: category ? (await category).id : null,
         categoryImage: '',
         orders: orderDTOs,
     };
-    await this.cacheManager.set(cacheKey, publicPreOrderDTO, CacheTTL.SIX_HOURS);
+    await this.cacheManager.set(cacheKey, publicPreOrderDTO, CacheTTL.ONE_HOUR);
 
     return publicPreOrderDTO;
 }
