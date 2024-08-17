@@ -288,7 +288,9 @@ export class ProductService {
       order = { prices: { id: 'ASC', amount: "DESC" } };
     } else if (indexProductInput.orderBy === ProductSortablesEnum.MOST_OFFER) {
       order = { offersNum:'DESC' };
-    } else {
+    } else if (indexProductInput.orderBy === ProductSortablesEnum.NAME) {
+      order = { name:'ASC' };
+    }else {
       order = { rating: "DESC" };
     }
   

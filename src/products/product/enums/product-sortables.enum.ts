@@ -8,6 +8,7 @@ export enum ProductSortablesEnum {
   MOST_EXPENSIVE = "most_expensive",
   MOST_AFFORDABLE = "most_affordable",
   MOST_OFFER = "most_offer",
+  NAME = "name",
 }
 registerEnumType(ProductSortablesEnum, { name: "ProductSortablesEnum" });
 
