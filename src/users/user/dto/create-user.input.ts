@@ -4,6 +4,7 @@ import { Field, InputType, Int } from "@nestjs/graphql";
 import { hash } from "argon2";
 import {
   IsEmail,
+  IsEnum,
   IsInt,
   IsMobilePhone,
   IsNotEmpty,
@@ -36,9 +37,9 @@ export class CreateUserInput {
 
   @Field({ nullable: true })
   @ValidateIf(object => UserConfig.usernameField === "email")
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail(null, { always: true })
-  email: string;
+  email?: string;
 
   @Field({ nullable: true })
   @ValidateIf(object => UserConfig.usernameField === "cellphone")
@@ -59,29 +60,33 @@ export class CreateUserInput {
   })
   password: string;
 
-  @Field()
-  @IsNotEmpty()
-  mustChangePassword: boolean;
-
-  @Field(type => UserLanguagesEnum)
-  @IsNotEmpty()
-  language: UserLanguagesEnum;
-
-  @Field()
-  @IsNotEmpty()
-  @IsTimeZone()
-  timezone: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsInt()
-  @IsPositive()
-  countryId: number;
-
-  @Field({ nullable: true })
+  @Field({nullable:true})
   @IsOptional()
-  @IsUUID("4")
-  avatarUuid?: string;
+  mustChangePassword?: boolean;
+
+  @Field(() => UserLanguagesEnum, {
+    defaultValue: UserLanguagesEnum.FARSI,
+    nullable: true,
+  })
+  @IsNotEmpty()
+  @IsEnum(UserLanguagesEnum)
+  language?: UserLanguagesEnum = UserLanguagesEnum.FARSI;
+
+  // @Field({nullable:true})
+  // @IsOptional()
+  // @IsTimeZone()
+  // timezone: string;
+
+  // @Field({nullable:true})
+  // @IsOptional()
+  // @IsInt()
+  // @IsPositive()
+  // countryId?: number;
+
+  // @Field({ nullable: true })
+  // @IsOptional()
+  // @IsUUID("4")
+  // avatarUuid?: string;
 
   @Field(type => UserStatusesEnum, {
     defaultValue: UserStatusesEnum.ACTIVE,
@@ -89,31 +94,31 @@ export class CreateUserInput {
   @IsOptional()
   status: UserStatusesEnum;
 
-  @Field({ nullable: true })
-  @IsOptional()
-  suspensionReason?: string;
+  // @Field({ nullable: true })
+  // @IsOptional()
+  // suspensionReason?: string;
 
   @Field(type => Int)
   @IsNotEmpty()
   displayRoleId: number;
 
-  @Field({ nullable: true })
-  @IsOptional()
-  customDisplayRole?: string;
+  // @Field({ nullable: true })
+  // @IsOptional()
+  // customDisplayRole?: string;
 
-  @Field({ nullable: true })
-  @IsOptional()
-  adminComments?: string;
+  // @Field({ nullable: true })
+  // @IsOptional()
+  // adminComments?: string;
 
   @Field(() => [Int], { nullable: true })
   @IsOptional()
   @IsInt({ each: true })
   roleIds: number[];
 
-  @Field(() => [Int], { nullable: true })
-  @IsOptional()
-  @IsInt({ each: true })
-  permissionIds: number[];
+  // @Field(() => [Int], { nullable: true })
+  // @IsOptional()
+  // @IsInt({ each: true })
+  // permissionIds: number[];
 
   protected setUsernameProperty(): this {
     this.username = this[UserConfig.usernameField];
@@ -133,7 +138,7 @@ export class CreateUserInput {
 
     const country: Country = await dataSource
       .getRepository(Country)
-      .findOneBy({ id: this.countryId });
+      .findOneBy({ id: Country.IR });
 
     const cellphoneUtil = new CellphoneUtil(this.cellphone, country.alphaTwo);
     if (!cellphoneUtil.isValid()) {

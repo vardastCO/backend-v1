@@ -53,18 +53,18 @@ export class UserService {
       await createUserInput.prepare(this.dataSource),
     );
 
-    if (createUserInput.avatarUuid) {
-      const file = await this.fileService.getNewlyUploadedFileOrFail(
-        "user/user/avatars",
-        createUserInput.avatarUuid,
-        User.name,
-        currentUser.id,
-      );
+    // if (createUserInput.avatarUuid) {
+    //   const file = await this.fileService.getNewlyUploadedFileOrFail(
+    //     "user/user/avatars",
+    //     createUserInput.avatarUuid,
+    //     User.name,
+    //     currentUser.id,
+    //   );
 
-      user.avatarFile = Promise.resolve(file);
+    //   user.avatarFile = Promise.resolve(file);
 
-      delete createUserInput.avatarUuid;
-    }
+    //   delete createUserInput.avatarUuid;
+    // }
 
     if (createUserInput.roleIds) {
       const roles = await Role.findBy({ id: In(createUserInput.roleIds) });
@@ -74,16 +74,16 @@ export class UserService {
       user.roles = Promise.resolve(roles);
     }
 
-    if (createUserInput.permissionIds) {
-      const permissions = await Permission.findBy({
-        id: In(createUserInput.permissionIds),
-      });
-      if (permissions.length != createUserInput.permissionIds.length) {
-        throw new BadRequestException("Some permissions are invalid.");
-      }
-      user.permissions = Promise.resolve(permissions);
-    }
-
+    // if (createUserInput.permissionIds) {
+    //   const permissions = await Permission.findBy({
+    //     id: In(createUserInput.permissionIds),
+    //   });
+    //   if (permissions.length != createUserInput.permissionIds.length) {
+    //     throw new BadRequestException("Some permissions are invalid.");
+    //   }
+    //   user.permissions = Promise.resolve(permissions);
+    // }
+    user.countryId = Country.IR
     await user.save();
     return user;
   }
@@ -163,22 +163,22 @@ export class UserService {
 
     Object.assign(user, updateUserInput);
 
-    const shouldWeChangeAvatar = !!updateUserInput.avatarUuid;
-    const oldAvatar: File = originalUser.avatarFileId
-      ? await originalUser.avatarFile
-      : null;
-    let newAvatar: File;
+    // const shouldWeChangeAvatar = !!updateUserInput.avatarUuid;
+    // const oldAvatar: File = originalUser.avatarFileId
+    //   ? await originalUser.avatarFile
+    //   : null;
+    // let newAvatar: File;
 
-    if (shouldWeChangeAvatar) {
-      newAvatar = await this.fileService.getNewlyUploadedFileOrFail(
-        "user/user/avatars",
-        updateUserInput.avatarUuid,
-        User.name,
-        currentUser.id,
-      );
+    // if (shouldWeChangeAvatar) {
+    //   newAvatar = await this.fileService.getNewlyUploadedFileOrFail(
+    //     "user/user/avatars",
+    //     updateUserInput.avatarUuid,
+    //     User.name,
+    //     currentUser.id,
+    //   );
 
-      user.avatarFile = Promise.resolve(newAvatar);
-    }
+    //   user.avatarFile = Promise.resolve(newAvatar);
+    // }
 
     if (updateUserInput.roleIds) {
       const roles = await Role.findBy({ id: In(updateUserInput.roleIds) });
@@ -188,15 +188,15 @@ export class UserService {
       user.roles = Promise.resolve(roles);
     }
 
-    if (updateUserInput.permissionIds) {
-      const permissions = await Permission.findBy({
-        id: In(updateUserInput.permissionIds),
-      });
-      if (permissions.length != updateUserInput.permissionIds.length) {
-        throw new BadRequestException("Some permissions are invalid.");
-      }
-      user.permissions = Promise.resolve(permissions);
-    }
+    // if (updateUserInput.permissionIds) {
+    //   const permissions = await Permission.findBy({
+    //     id: In(updateUserInput.permissionIds),
+    //   });
+    //   if (permissions.length != updateUserInput.permissionIds.length) {
+    //     throw new BadRequestException("Some permissions are invalid.");
+    //   }
+    //   user.permissions = Promise.resolve(permissions);
+    // }
 
     if (
       updateUserInput.status == UserStatusesEnum.ACTIVE &&
@@ -211,28 +211,29 @@ export class UserService {
 
     this.dataSource.transaction(async () => {
       await user.save({ transaction: false });
-      if (shouldWeChangeAvatar) {
-        await File.update(newAvatar.id, { modelId: user.id });
-        oldAvatar
-          ? await this.fileService.removeFromStorageAndDB(oldAvatar)
-          : null;
-      }
+      // if (shouldWeChangeAvatar) {
+      //   await File.update(newAvatar.id, { modelId: user.id });
+      //   oldAvatar
+      //     ? await this.fileService.removeFromStorageAndDB(oldAvatar)
+      //     : null;
+      // }
     });
 
     if (updateUserInput.roleIds) {
       await this.cacheRolesOf(user);
       await this.cachePermissionsOf(user);
-    } else if (updateUserInput.permissionIds) {
-      await this.cachePermissionsOf(user);
     }
-    if (updateUserInput.name_company && updateUserInput.national_id) {
-      const legal        = new Legal()
-      legal.createdById = user.id
-      legal.ownerId  = user.id
-      legal.name_company = updateUserInput.name_company
-      legal.national_id  = updateUserInput.national_id
-      await legal.save()
-    }
+    //  else if (updateUserInput.permissionIds) {
+    //   await this.cachePermissionsOf(user);
+    // }
+    // if (updateUserInput.name_company && updateUserInput.national_id) {
+    //   const legal        = new Legal()
+    //   legal.createdById = user.id
+    //   legal.ownerId  = user.id
+    //   legal.name_company = updateUserInput.name_company
+    //   legal.national_id  = updateUserInput.national_id
+    //   await legal.save()
+    // }
     return user;
   }
   async updateProfile(
@@ -260,51 +261,51 @@ export class UserService {
       await user.save({ transaction: false });
     });
 
-    if (updateProfileInput.name_company || updateProfileInput.national_id) {
-      try {
-      let legal
-      legal = await Legal.findOne({
-        where: {
-          createdById: user.id
-        },
-        order: {
-          id: "DESC"
-        }
-      });
-      if (!legal) {
-        legal        = new Legal()
-        if (updateProfileInput.name_company) {
-          legal.name_company = updateProfileInput.name_company
-        }
-        if (updateProfileInput.national_id) {
-          legal.national_id = updateProfileInput.national_id
-        }
-        legal.createdById = user.id
-        legal.ownerId = user.id
-        await legal.save()
+    // if (updateProfileInput.name_company || updateProfileInput.national_id) {
+    //   try {
+    //   let legal
+    //   legal = await Legal.findOne({
+    //     where: {
+    //       createdById: user.id
+    //     },
+    //     order: {
+    //       id: "DESC"
+    //     }
+    //   });
+    //   if (!legal) {
+    //     legal        = new Legal()
+    //     if (updateProfileInput.name_company) {
+    //       legal.name_company = updateProfileInput.name_company
+    //     }
+    //     if (updateProfileInput.national_id) {
+    //       legal.national_id = updateProfileInput.national_id
+    //     }
+    //     legal.createdById = user.id
+    //     legal.ownerId = user.id
+    //     await legal.save()
 
-        const member = new Member()
-        // member.adminId = user.id
-        member.userId = user.id
-        member.position = 'مدیرعامل'
-        member.relatedId = legal.id
-        await member.save()
-      } else {
-        if (updateProfileInput.name_company) {
-          legal.name_company = updateProfileInput.name_company
-        }
-        if (updateProfileInput.national_id) {
-          legal.national_id = updateProfileInput.national_id
-        }
-        await legal.save()
-      }
-      user.legal = legal
-      } catch (e) {
-        console.log('err in add legal',e)
-      }
+    //     const member = new Member()
+    //     // member.adminId = user.id
+    //     member.userId = user.id
+    //     member.position = 'مدیرعامل'
+    //     member.relatedId = legal.id
+    //     await member.save()
+    //   } else {
+    //     if (updateProfileInput.name_company) {
+    //       legal.name_company = updateProfileInput.name_company
+    //     }
+    //     if (updateProfileInput.national_id) {
+    //       legal.national_id = updateProfileInput.national_id
+    //     }
+    //     await legal.save()
+    //   }
+    //   user.legal = legal
+    //   } catch (e) {
+    //     console.log('err in add legal',e)
+    //   }
       
      
-    }
+    // }
 
     return user;
   }

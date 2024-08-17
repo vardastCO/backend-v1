@@ -253,7 +253,6 @@ export class ProductService {
         sellerId: sellerId,
       };
     }
-
     switch (hasImage) {
       case ProductImageStatusEnum.HAS_IMAGE:
         whereConditions.images = {
@@ -272,7 +271,7 @@ export class ProductService {
     switch (hasPrice) {
       case ProductPriceStatusEnum.HAS_PRICE:
         whereConditions.prices = {
-          amount : Not(IsNull())
+          amount: Not(IsNull())
         };
         break;
       
