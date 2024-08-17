@@ -124,6 +124,18 @@ export class PreOrderResolver {
   ) {
     return this.preOrderService.publicOrders(indexPublicOrderInput);
   }
+  @Public()
+  @Query(() => [PublicPreOrderDTO], { name: "publicOrders" })
+  findOnepublicOrder(
+    @Args(
+      "id",
+      { type: () => Int, nullable: true },
+      new ValidationPipe({ transform: true }),
+    )
+    id: number,
+  ) {
+    return this.preOrderService.findOnepublicOrder(id);
+  }
   @Permission("gql.users.address.store")
   @Mutation(() => Boolean)
   removePreOrder(

@@ -103,8 +103,13 @@ export class User extends BaseEntity {
   @Column("timestamp", { nullable: true })
   twoFactorEnabledAt?: Date;
 
-  @Field(type => UserLanguagesEnum)
-  @Column()
+
+  @Field(() => UserLanguagesEnum)
+  @Index()
+  @Column("enum", {
+    enum: UserLanguagesEnum,
+    default: UserLanguagesEnum.FARSI,
+  })
   language: UserLanguagesEnum;
 
   @Field({ nullable: true })

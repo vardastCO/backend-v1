@@ -500,6 +500,54 @@ export class PreOrderService {
     await this.cacheManager.set(cacheKey, publicPreOrderDTOs, CacheTTL.SIX_HOURS);
     return publicPreOrderDTOs;
   }
+
+  async findOnepublicOrder(id: number): Promise<PublicPreOrderDTO> {
+    const cacheKey = `publicOrder-${id}`;
+
+    const cachedData = await this.cacheManager.get<PublicPreOrderDTO>(cacheKey);
+    if (cachedData) {
+        return cachedData;
+    }
+
+    const orders = await PreOrder.find({
+        select: ['id', 'uuid', 'request_date', 'need_date', 'bid_start', 'bid_end', 'lines', 'categoryId', 'category'],
+        where: { id: id },
+        relations: ['lines', 'category'],
+        order: { id: 'DESC' }
+    });
+
+    if (orders.length === 0) {
+        throw new Error('Order not found');
+    }
+
+    const firstOrder = orders[0];
+    const category = firstOrder.category;
+
+
+    const orderDTOs: PreOrderDTO[] = orders.map(order => ({
+        id: order.id,
+        uuid: order.uuid,
+        request_date: order.request_date,
+        destination: 'تهران',
+        payment_method: 'نقدی',
+        need_date: order.need_date,
+        bid_start: order.bid_start,
+        bid_end: order.bid_end,
+        lines: order.lines,
+        lineDetail: order.lines.map(line => line.item_name).join(' - ')
+    }));
+    const publicPreOrderDTO: PublicPreOrderDTO = {
+        categoryName: category ? (await category).title : null,
+        categoryId: category ? (await category).id : null,
+        categoryImage: '',
+        orders: orderDTOs,
+    };
+    await this.cacheManager.set(cacheKey, publicPreOrderDTO, CacheTTL.SIX_HOURS);
+
+    return publicPreOrderDTO;
+}
+
+
   
   async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean, seller: boolean, isRealUserType: boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();

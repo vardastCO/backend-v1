@@ -13,6 +13,18 @@ export class IndexUserInput extends IndexInput {
   @IsOptional()
   displayRoleId?: number;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  email?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  cellphone?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  national_code?: string;
+
   @Field(() => [Int], { nullable: true })
   @IsOptional()
   @IsArray()
