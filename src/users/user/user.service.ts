@@ -83,7 +83,7 @@ export class UserService {
     //   }
     //   user.permissions = Promise.resolve(permissions);
     // }
-
+    user.countryId = Country.IR
     await user.save();
     return user;
   }
