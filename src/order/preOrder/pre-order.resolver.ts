@@ -125,7 +125,7 @@ export class PreOrderResolver {
     return this.preOrderService.publicOrders(indexPublicOrderInput);
   }
   @Public()
-  @Query(() => [PublicPreOrderDTO], { name: "publicOrders" })
+  @Query(() => PublicPreOrderDTO, { name: "findOnepublicOrder" })
   findOnepublicOrder(
     @Args(
       "id",
