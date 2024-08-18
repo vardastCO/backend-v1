@@ -119,7 +119,7 @@ export class CreateUserInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  need_date?: Date;
+  birth?: Date;
 
   // @Field(() => [Int], { nullable: true })
   // @IsOptional()
