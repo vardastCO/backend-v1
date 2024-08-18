@@ -64,7 +64,9 @@ export class PreOrderLineService {
         const userProjectIds = userProjects.map(data => data.projectId);
 
   
-        whereConditions['projectId'] = In(userProjectIds);
+        whereConditions['preOrder'] = {
+          projectId : In(userProjectIds)
+        } ;
       }
 
        const [data, total] = await Line.findAndCount({
