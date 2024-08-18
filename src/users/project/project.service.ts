@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { I18n, I18nService } from "nestjs-i18n";
-import { In, Like, MoreThan } from 'typeorm';
+import { EntityManager, In, Like, MoreThan } from 'typeorm';
 import { AuthorizationService } from "../authorization/authorization.service";
 import { Legal } from "../legal/entities/legal.entity";
 import { Member } from "../member/entities/members.entity";
@@ -27,6 +27,7 @@ export class ProjectService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @I18n() protected readonly i18n: I18nService,
     private authorizationService: AuthorizationService,
+    private readonly entityManager: EntityManager
   ) { }
   
   async generateNumericUuid(length: number = 5): Promise<string> {
@@ -365,27 +366,34 @@ export class ProjectService {
         whereConditions['status'] = status;
       }
       
+      let userProjecttIds = [];
       if (nameManager) {
-        whereConditions['users'] = {
-          user :  {
-            fullName : Like(`%${nameManager}%`)
-          },
+         userProjecttIds = (await this.entityManager.query(
+           ` SELECT user_project."id" 
+             FROM users
+             INNER JOIN user_project
+             ON users."id" = user_project."userId"
+             WHERE "firstName" like '%${nameManager}%' OR "lastName" like '%${nameManager}%'`
+        )).map(user => user.id);
 
-        }
         whereConditions['users'] = {
+          id: In(userProjecttIds),
           type : UserTypeProject.MANAGER
         }
       }
 
 
       if (nameEmployer) {
-        whereConditions['users'] = {
-          user :  {
-            firstName : Like(`%${nameEmployer}%`)
-          }
-        }
+         userProjecttIds = (await this.entityManager.query(
+           ` SELECT user_project."id" 
+             FROM users
+             INNER JOIN user_project
+             ON users."id" = user_project."userId"
+             WHERE "firstName" like '%${nameEmployer}%' OR "lastName" like '%${nameEmployer}%'`
+        )).map(user => user.id);
 
         whereConditions['users'] = {
+          id: In(userProjecttIds),
           type : UserTypeProject.EMPLOYER
         }
       }
