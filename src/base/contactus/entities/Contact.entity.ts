@@ -30,9 +30,9 @@ export class ContactUs extends BaseEntity {
     @Index()
     text: string;
 
-    // @Field(type => Int, { nullable: true })
-    // @Column("int", { nullable: true })
-    // fileId?: number;
+    @Field(() => Int,{nullable:true})
+    @Column({nullable:true})
+    userId: number;
 
     @Field(() => File, { nullable: true })
     @OneToOne(() => File, file => null, { eager: true, nullable: true })

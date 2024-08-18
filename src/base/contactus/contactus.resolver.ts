@@ -14,6 +14,8 @@ import { IndexContactInput } from "./dto/IndexContactInput";
 import { PaginationContactUsResponse } from "./dto/PaginationContactUsResponse";
 import { UpdateContactUsInput } from "./dto/update-member.input";
 import { ContactUs } from './entities/Contact.entity';
+import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
+import { User } from "src/users/user/entities/user.entity";
 
 @Resolver(() => ContactUs)
 export class ContactResolver {
@@ -42,8 +44,10 @@ export class ContactResolver {
 
     @Permission("gql.products.seller_representative.update")
     @Mutation(() => ContactUs)
-    createContactUs(@Args("createContactInput") createContactInput: CreateContactInput){
-        return this.contactUsService.createContactUs(createContactInput);
+    createContactUs(@Args("createContactInput") createContactInput: CreateContactInput,
+        @CurrentUser() user: User
+    ) {
+        return this.contactUsService.createContactUs(createContactInput,user);
     }
 
     @Permission("gql.products.seller_representative.update")

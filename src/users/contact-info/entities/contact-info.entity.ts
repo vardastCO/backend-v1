@@ -40,7 +40,6 @@ export class ContactInfo extends BaseEntity {
   title: string;
 
 
-
   @Field({ nullable: true })
   @Column({ nullable: true })
   code?: string;

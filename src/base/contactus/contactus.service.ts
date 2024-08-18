@@ -6,6 +6,7 @@ import { PaginationContactUsResponse } from "./dto/PaginationContactUsResponse";
 import { UpdateContactUsInput } from "./dto/update-member.input";
 import { ContactUs } from "./entities/Contact.entity";
 import { File } from "../storage/file/entities/file.entity";
+import { User } from "src/users/user/entities/user.entity";
 
 @Injectable()
 export class ContactUsService {
@@ -15,9 +16,15 @@ export class ContactUsService {
     ) {}
     
     // CRUD
-    async createContactUs(createContactInput: CreateContactInput): Promise<ContactUs> {
+    async createContactUs(createContactInput: CreateContactInput,user:User): Promise<ContactUs> {
         try{
-            
+            const cotactUs = await ContactUs.findOneBy({
+                userId : user.id
+            });
+            if (!cotactUs) {
+                throw new NotFoundException("user sent contact us before.");
+            }
+
             const { fullname, title, cellphone, text, fileuuid } = createContactInput;
             let file = null
             if (fileuuid) {
@@ -31,7 +38,8 @@ export class ContactUsService {
             contact_us.title     = title
             contact_us.cellphone = cellphone
             contact_us.text      = text
-            contact_us.file      = file ? Promise.resolve(file) : null 
+            contact_us.file = file ? Promise.resolve(file) : null 
+            contact_us.userId = user.id ?? null
     
             await contact_us.save()
             return contact_us

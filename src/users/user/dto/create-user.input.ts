@@ -100,9 +100,9 @@ export class CreateUserInput {
   // @IsOptional()
   // suspensionReason?: string;
 
-  @Field(type => Int)
-  @IsNotEmpty()
-  displayRoleId: number;
+  @Field(type => Int,{nullable:true})
+  @IsOptional()
+  displayRoleId?: number;
 
   // @Field({ nullable: true })
   // @IsOptional()
