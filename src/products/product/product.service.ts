@@ -321,7 +321,7 @@ export class ProductService {
     
     if (sortField === SortFieldProduct.PRICE) {
       whereConditions.prices = {
-        createdAt: MoreThan(new Date(Date.now() - 15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE === 'true' ? 1000 : 1))),
+        createdAt: MoreThan(new Date(Date.now() - 15 * 60 * 1000 * (process.env.FAKE_LIVE_PRICE === 'true' ? 100000 : 1))),
       };
     }
   

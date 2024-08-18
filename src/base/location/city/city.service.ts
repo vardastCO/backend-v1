@@ -61,6 +61,7 @@ export class CityService {
     const cacheKey = `city_paginations_${JSON.stringify(indexCityInput)}`;
     const cachedCities = await this.cacheManager.get<string>(cacheKey);
     if (cachedCities) {
+      console.log('with cache cities')
       return this.decompressionService.decompressData(cachedCities);
     }
     const whereConditions = {}
@@ -79,7 +80,7 @@ export class CityService {
       where: whereConditions,
       order: { sort: "ASC", id: "DESC" },
     });
-
+    console.log('no cache cities')
     const result = PaginationCityResponse.make(indexCityInput, total, data);
     
     await this.cacheManager.set(cacheKey, this.compressionService.compressData(result), CacheTTL.TWO_WEEK);
