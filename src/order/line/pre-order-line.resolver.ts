@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Args, Int, Mutation, Context } from '@nestjs/graphql';
 import { PreOrderLineService } from './pre-order-line.service';
 import { User } from 'src/users/user/entities/user.entity';
 import { CurrentUser } from 'src/users/auth/decorators/current-user.decorator';
@@ -10,6 +10,7 @@ import { UpdateLineInput } from './dto/update-line-order.input';
 import { CreateLineInput } from './dto/create-line-order.input';
 import { IndexLineInput } from './dto/index-line.input';
 import { PaginationLineResponse } from './dto/pagination-lines.responde';
+import { ReferrersEnum } from 'src/referrers.enum';
 
 
 
@@ -45,10 +46,17 @@ export class PreOrderLineResolver {
   Orderlines(
     @Args('indexLineInput', { type: () => IndexLineInput, nullable: true }, new ValidationPipe({ transform: true }))
     indexLineInput: IndexLineInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
+    @Context() context?: { req: Request },
   ) {
-   
-    return this.preOrderLineService.orderlines(indexLineInput);
+    const request = context?.req;
+    const referer = request.headers["origin"] ?? null;
+    const client = [
+      ReferrersEnum.CLIENT_VARDAST_IR,
+      ReferrersEnum.VARDAST_COM,
+    ].includes(referer);
+
+    return this.preOrderLineService.orderlines(indexLineInput,client,user);
   }
 
   @Permission("gql.users.address.store")

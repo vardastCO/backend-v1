@@ -3,7 +3,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { InjectDataSource } from "@nestjs/typeorm";
-import { DataSource, IsNull } from "typeorm";
+import { DataSource, In, IsNull, Not } from "typeorm";
 import { User } from 'src/users/user/entities/user.entity';
 import { LineDTO } from './dto/lineDTO';
 import { Line } from './entities/order-line.entity';
@@ -13,6 +13,7 @@ import { UpdateLineInput } from './dto/update-line-order.input';
 import { CreateLineInput } from './dto/create-line-order.input';
 import { IndexLineInput } from './dto/index-line.input';
 import { PaginationLineResponse } from './dto/pagination-lines.responde';
+import { UserProject } from 'src/users/project/entities/user-project.entity';
 
 
 @Injectable()
@@ -47,11 +48,25 @@ export class PreOrderLineService {
       }
     
      }
-     async orderlines(indexLineInput: IndexLineInput) {
+    async orderlines(indexLineInput: IndexLineInput,client:boolean,user:User) {
       indexLineInput?.boot();
-       const { take, skip } = indexLineInput || {};
-       const whereConditions = {}
-       whereConditions['deleted_at'] = IsNull()
+      const { take, skip } = indexLineInput || {};
+      const whereConditions = {}
+      whereConditions['deleted_at'] = IsNull()
+    
+      if (client) {
+        const userProjects = await UserProject.find({
+          where: {
+            userId: user.id
+          }
+        });
+    
+        const userProjectIds = userProjects.map(data => data.projectId);
+
+  
+        whereConditions['projectId'] = In(userProjectIds);
+      }
+
        const [data, total] = await Line.findAndCount({
         skip,
         take,
