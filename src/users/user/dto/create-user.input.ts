@@ -117,6 +117,10 @@ export class CreateUserInput {
   @IsInt({ each: true })
   roleIds: number[];
 
+  @Field({ nullable: true })
+  @IsOptional()
+  need_date?: Date;
+
   // @Field(() => [Int], { nullable: true })
   // @IsOptional()
   // @IsInt({ each: true })

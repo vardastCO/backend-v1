@@ -551,7 +551,7 @@ export class PreOrderService {
   
   async paginate(user: User, indexPreOrderInput: IndexPreOrderInput, client: boolean, seller: boolean, isRealUserType: boolean): Promise<PaginationPreOrderResponse> {
     indexPreOrderInput?.boot();
-    const { take, skip, projectId, customerName, hasFile, projectName, status } = indexPreOrderInput || {};
+    const { take, skip, projectId, customerName, hasFile, projectName, status ,typeOrder } = indexPreOrderInput || {};
   
     const whereConditions: any = {};
     whereConditions['deleted_at'] = IsNull();
@@ -571,6 +571,9 @@ export class PreOrderService {
     } else {
       if (projectId) {
         whereConditions['projectId'] = projectId;
+      }
+      if (typeOrder) {
+        whereConditions['type'] = typeOrder;
       }
     }
   

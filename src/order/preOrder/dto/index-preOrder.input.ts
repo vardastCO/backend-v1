@@ -1,7 +1,8 @@
 import { Field, InputType } from "@nestjs/graphql";
-import { IsInt, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsInt, IsOptional, IsString } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
 import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
+import { TypeOrder } from "../enum/type-order.enum";
 
 
 
@@ -29,4 +30,11 @@ export class IndexPreOrderInput extends IndexInput {
   @Field(() => PreOrderStatus, { nullable: true })
   @IsOptional()
   status?: PreOrderStatus;
+
+  @Field(() => TypeOrder, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsEnum(TypeOrder)
+  typeOrder?: TypeOrder ;
 }
