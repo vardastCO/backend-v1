@@ -328,6 +328,10 @@ export class OrderOfferService {
       const [data, total] = await OfferOrder.findAndCount({
         skip,
         take,
+        where: {
+          status : OrderOfferStatuses.INVOICE
+
+        },
         order: {
           id: 'DESC'
         },
