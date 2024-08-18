@@ -27,6 +27,7 @@ import { Country } from "../../../base/location/country/entities/country.entity"
 import { Role } from "../../authorization/role/entities/role.entity";
 import { UserLanguagesEnum } from "../enums/user-languages.enum";
 import { UserStatusesEnum } from "../enums/user-statuses.enum";
+import { Address } from "src/users/address/entities/address.entity";
 
 @ObjectType()
 @Entity("users")
@@ -235,6 +236,10 @@ export class User extends BaseEntity {
 
   @Field(() => Seller, { nullable: true })
   seller: Seller;
+
+  @Field(() => [Address])
+  @OneToMany(() => Address, address => null, { nullable: true })
+  addresses: Address[];
 
   @AfterLoad()
   @AfterInsert()

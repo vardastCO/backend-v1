@@ -5,10 +5,10 @@ import { CreateUserInput } from "./create-user.input";
 
 @InputType()
 export class UpdateUserInput extends PartialType(CreateUserInput) {
-  @Field(() => Int)
-  @IsNotEmpty()
+  @Field(() => Int,{nullable:true})
+  @IsOptional()
   @IsInt()
-  id: number;
+  id?: number;
 
   
   // @Field(() => [Int], { nullable: true })

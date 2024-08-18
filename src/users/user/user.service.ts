@@ -27,6 +27,9 @@ import { UpdateProfileInput } from "./dto/update-profile.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UserStatusesEnum } from "./enums/user-statuses.enum";
+import { Address } from "../address/entities/address.entity";
+import { AddressRelatedTypes } from "../address/enums/address-related-types.enum";
+import { AuthorizationService } from "../authorization/authorization.service";
 
 @Injectable()
 export class UserService {
@@ -38,6 +41,7 @@ export class UserService {
     @Inject(DataSource) private readonly dataSource: DataSource,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private kavenegarService: KavenegarService,
+    private authorizationService: AuthorizationService,
     private readonly compressionService: CompressionService,
     private readonly decompressionService: DecompressionService,
   ) {}
@@ -151,6 +155,18 @@ export class UserService {
     return PaginationUserResponse.make(indexUserInput, total, data);
   }
 
+  async getAddressesOf(user: User): Promise<Address[]> {
+
+
+    const addresses = await Address.createQueryBuilder()
+      .limit(15)
+      .where({ relatedType: AddressRelatedTypes.USER, relatedId: user.id })
+      .orderBy({ sort: "ASC" })
+      .getMany();
+
+    return addresses;
+  }
+
   async findOne(id: number, uuid?: string): Promise<User> {
     const user = await User.findOne({
       where: {
@@ -162,6 +178,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException();
     }
+    user.addresses = await this.getAddressesOf(user)
     // const roles = await user.roles;
     // const permissions = roles.flatMap(role => role.permissions); 
     // const uniqueClaims = [...new Set<string>(permissions.map(permission => permission.claim))];
@@ -177,8 +194,14 @@ export class UserService {
     id: number,
     updateUserInput: UpdateUserInput,
     currentUser: User,
+    admin:boolean
   ): Promise<User> {
-    const user: User = await User.findOneBy({ id });
+    const userAuth = await this.authorizationService.setUser(currentUser);
+    let user_id = currentUser.id
+    if (userAuth.hasRole("admin") && id && admin ) {
+      user_id = id
+    }
+    const user: User = await User.findOneBy({ id:user_id });
     
     if (!user) {
       throw new NotFoundException();

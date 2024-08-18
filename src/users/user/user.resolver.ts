@@ -21,6 +21,7 @@ import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UserService } from "./user.service";
 import { UpdateProfileInput } from "./dto/update-profile.input";
+import { ReferrersEnum } from "src/referrers.enum";
 
 @Resolver(() => User)
 export class UserResolver {
@@ -63,11 +64,20 @@ export class UserResolver {
   updateUser(
     @Args("updateUserInput") updateUserInput: UpdateUserInput,
     @CurrentUser() currentUser: User,
-  ) {
+    @Context() context?: { req: Request },
+  )
+  {
+    const request = context?.req;
+    const referer = request.headers["origin"] ?? null;
+    const admin = [
+      ReferrersEnum.ADMIN_COM,
+      ReferrersEnum.ADMIN_IR,
+    ].includes(referer);
     return this.userService.update(
       updateUserInput.id,
       updateUserInput,
       currentUser,
+      admin
     );
   }
   @Permission("gql.base.event_tracker.create")
