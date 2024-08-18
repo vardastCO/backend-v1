@@ -76,7 +76,7 @@ export class OfferOrder extends BaseEntity {
   @Index()
   @Column("enum", {
     enum: ModelOffer,
-    default: ModelOffer.Quotation,
+    default: ModelOffer.QUOTATION,
   })
   model: ModelOffer;
   
