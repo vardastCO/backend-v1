@@ -14,6 +14,7 @@ import { CreateLineInput } from './dto/create-line-order.input';
 import { IndexLineInput } from './dto/index-line.input';
 import { PaginationLineResponse } from './dto/pagination-lines.responde';
 import { UserProject } from 'src/users/project/entities/user-project.entity';
+import { TypeOrder } from '../preOrder/enum/type-order.enum';
 
 
 @Injectable()
@@ -48,7 +49,7 @@ export class PreOrderLineService {
       }
     
      }
-    async orderlines(indexLineInput: IndexLineInput,client:boolean,user:User) {
+    async orderlines(indexLineInput: IndexLineInput,client:boolean,user:User,isRealUserType:boolean) {
       indexLineInput?.boot();
       const { take, skip } = indexLineInput || {};
       const whereConditions = {}
@@ -62,11 +63,19 @@ export class PreOrderLineService {
         });
     
         const userProjectIds = userProjects.map(data => data.projectId);
-
+        if (!isRealUserType) {
+          whereConditions['preOrder'] = {
+            projectId: In(userProjectIds),
+            type : TypeOrder.LEGAL
+          } 
+        } else {
+          whereConditions['preOrder'] = {
+            type : TypeOrder.REAL
+          } 
+        }
+        
   
-        whereConditions['preOrder'] = {
-          projectId : In(userProjectIds)
-        } ;
+;
       }
 
        const [data, total] = await Line.findAndCount({

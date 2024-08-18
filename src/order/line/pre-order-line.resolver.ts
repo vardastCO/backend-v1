@@ -11,6 +11,7 @@ import { CreateLineInput } from './dto/create-line-order.input';
 import { IndexLineInput } from './dto/index-line.input';
 import { PaginationLineResponse } from './dto/pagination-lines.responde';
 import { ReferrersEnum } from 'src/referrers.enum';
+import { IsRealUserType } from 'src/users/auth/decorators/current-type.decorator';
 
 
 
@@ -46,7 +47,8 @@ export class PreOrderLineResolver {
   Orderlines(
     @Args('indexLineInput', { type: () => IndexLineInput, nullable: true }, new ValidationPipe({ transform: true }))
     indexLineInput: IndexLineInput,
-    @CurrentUser() user: User,
+    @IsRealUserType() isRealUserType?: boolean,
+    @CurrentUser() user?: User,
     @Context() context?: { req: Request },
   ) {
     const request = context?.req;
@@ -56,7 +58,7 @@ export class PreOrderLineResolver {
       ReferrersEnum.VARDAST_COM,
     ].includes(referer);
 
-    return this.preOrderLineService.orderlines(indexLineInput,client,user);
+    return this.preOrderLineService.orderlines(indexLineInput,client,user,isRealUserType);
   }
 
   @Permission("gql.users.address.store")
