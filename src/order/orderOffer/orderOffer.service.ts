@@ -128,7 +128,7 @@ export class OrderOfferService {
           },
           take: maxPendingInfoOrders + 1
         });
-        console.log('orders length',find_offer.length)
+
         if (find_offer.length > maxPendingInfoOrders) {
           return find_offer[0];
         }  
