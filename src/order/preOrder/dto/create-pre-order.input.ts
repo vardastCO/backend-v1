@@ -87,7 +87,7 @@ export class CreatePreOrderInput {
   @Field(() => String,{nullable:true}) 
   @IsOptional()
   @IsString()
-  @MaxLength(255)
+  @Length(11, 11, { message: "شماره یازده رقمی باید باشد" })
   delivery_contact?: string;
 
   @Field(() => ExpireTypes, {
