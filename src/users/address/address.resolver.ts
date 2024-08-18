@@ -1,6 +1,7 @@
 import { ValidationPipe } from "@nestjs/common";
 import {
   Args,
+  Context,
   Int,
   Mutation,
   Parent,
@@ -19,6 +20,7 @@ import { IndexAddressInput } from "./dto/index-address.input";
 import { PaginationAddressResponse } from "./dto/pagination-address.response";
 import { UpdateAddressInput } from "./dto/update-address.input";
 import { Address } from "./entities/address.entity";
+import { ReferrersEnum } from "src/referrers.enum";
 
 @Resolver(() => Address)
 export class AddressResolver {
@@ -29,8 +31,17 @@ export class AddressResolver {
   createAddress(
     @Args("createAddressInput") createAddressInput: CreateAddressInput,
     @CurrentUser() user: User,
+    @Context() context?: { req: Request },
+    
   ) {
-    return this.addressService.create(createAddressInput,user);
+
+    const request = context?.req;
+    const referer = request.headers["origin"] ?? null;
+    const admin = [
+      ReferrersEnum.ADMIN_COM,
+      ReferrersEnum.ADMIN_IR,
+    ].includes(referer);
+    return this.addressService.create(createAddressInput,user,admin);
   }
 
   @Permission("gql.users.address.store")

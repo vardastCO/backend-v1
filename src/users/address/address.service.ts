@@ -9,14 +9,23 @@ import { UpdateAddressInput } from "./dto/update-address.input";
 import { Address } from "./entities/address.entity";
 import { AddressRelatedTypes } from "./enums/address-related-types.enum";
 import { Country } from "src/base/location/country/entities/country.entity";
+import { AuthorizationService } from "../authorization/authorization.service";
 
 @Injectable()
 export class AddressService {
-  async create(createAddressInput: CreateAddressInput,user:User): Promise<Address> {
+  constructor(
+    private authorizationService: AuthorizationService,
+  ) {}
+  async create(createAddressInput: CreateAddressInput, user: User,admin:boolean): Promise<Address> {
+    const userAuth = await this.authorizationService.setUser(user);
+    let related_id = user.id
+    if (userAuth.hasRole("admin") && admin && createAddressInput.relatedType === AddressRelatedTypes.USER ) {
+      related_id = createAddressInput.relatedId
+    }
     const address: Address = Address.create<Address>({
       ...createAddressInput,
       countryId: Country.IR,
-      relatedId:createAddressInput.relatedType === AddressRelatedTypes.USER ? user.id : createAddressInput.relatedId  
+      relatedId: related_id
     });
 
     await address.save();
