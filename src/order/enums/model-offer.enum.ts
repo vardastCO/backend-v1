@@ -1,8 +1,9 @@
 import { registerEnumType } from "@nestjs/graphql";
 
 export enum ModelOffer {
-  Quotation = "1",
-  Proposal = "2", 
+  QUOTATION = "1", 
+  PROPOSAL = "2", 
+  
 }
 
 registerEnumType(ModelOffer, {
