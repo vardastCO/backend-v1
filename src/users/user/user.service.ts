@@ -179,7 +179,6 @@ export class UserService {
       throw new NotFoundException();
     }
     user.addresses = await this.getAddressesOf(user)
-    // const roles = await user.roles;
     // const permissions = roles.flatMap(role => role.permissions); 
     // const uniqueClaims = [...new Set<string>(permissions.map(permission => permission.claim))];
     // user.claims = uniqueClaims.length > 0 ? uniqueClaims : [];
@@ -233,13 +232,15 @@ export class UserService {
 
     //   user.avatarFile = Promise.resolve(newAvatar);
     // }
-
     if (updateUserInput.roleIds) {
       const roles = await Role.findBy({ id: In(updateUserInput.roleIds) });
       if (roles.length != updateUserInput.roleIds.length) {
         throw new BadRequestException("Some roles are invalid.");
       }
+      const cacheKey = `roles_user_{id:${JSON.stringify(user.id)}}`;
+      await this.cacheManager.del(cacheKey)
       user.roles = Promise.resolve(roles);
+      await user.save()
     }
 
     // if (updateUserInput.permissionIds) {
