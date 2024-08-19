@@ -15,5 +15,6 @@
   "BLACK_LIST_CELL_PHONE_LOGIN": "شما در لیست سیاه قرار گرفته اید.",
   "PROJECT_USER_IS_MANAGER": "امکان حذف مدیر پروژه وجود ندارد",
   "MEMBER_EXISTS_IN_PROJECT": "این عضو قبلا در این پروژه ثبت شده است",
-  "MEMBER_ALREADY_EXISTS": "این شماره قبلا به عنوان همکار ثبت شده است"
+  "MEMBER_ALREADY_EXISTS": "این شماره قبلا به عنوان همکار ثبت شده است",
+  "ORDER_REPORT_CHARD_INPUT_DATE_IS_NOT_VALID": "بازه انتخابی حداکثر می‌تواند 14 روز باشد"
 }

@@ -26,5 +26,4 @@ export class CreateAddressProjectInput {
   @IsInt()
   projectId: number;
 
-
 }

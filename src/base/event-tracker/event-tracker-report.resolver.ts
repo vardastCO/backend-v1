@@ -1,7 +1,9 @@
-import { Query, Resolver,Args,Int } from "@nestjs/graphql";
+import { Args, Int, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
 import { Permission } from "src/users/authorization/permission.decorator";
 import { User } from "src/users/user/entities/user.entity";
+import { OrderPercentageInput } from "./dto/order-percentage.input";
+import { OrderReportChartResponse } from "./dto/order-percentage.response";
 import { ReportEventsCountChart } from "./dto/report-events-count-chart.response";
 import { ReportTotalEventsCount } from "./dto/report-total-events-count.response";
 import { EventTracker } from "./entities/event-tracker.entity";
@@ -30,4 +32,12 @@ export class EventTrackerReportResolver {
   ) {
     return this.eventTrackerReportService.pastDurationEventsChart(user,sellerId);
   }
+
+
+  @Permission("gql.base.event_tracker.report.events_chart")
+  @Query(() => OrderReportChartResponse)
+  orderPercentage(@Args("orderPercentageInput") orderPercentageInput: OrderPercentageInput) {
+    return this.eventTrackerReportService.orderPecentageChart(orderPercentageInput)
+  }
+
 }
