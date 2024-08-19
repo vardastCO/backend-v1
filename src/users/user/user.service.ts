@@ -198,7 +198,7 @@ export class UserService {
   ): Promise<User> {
     const userAuth = await this.authorizationService.setUser(currentUser);
     let user_id = currentUser.id
-    if (userAuth.hasRole("admin") && id && admin ) {
+    if (userAuth.hasRole("admin") && id ) {
       user_id = id
     }
     const user: User = await User.findOneBy({ id:user_id });
