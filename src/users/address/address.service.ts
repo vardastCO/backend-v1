@@ -1,6 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { I18n, I18nService } from "nestjs-i18n";
 import { City } from "src/base/location/city/entities/city.entity";
+import { Country } from "src/base/location/country/entities/country.entity";
 import { Province } from "src/base/location/province/entities/province.entity";
+import { AuthorizationService } from "../authorization/authorization.service";
 import { User } from "../user/entities/user.entity";
 import { CreateAddressInput } from "./dto/create-address.input";
 import { IndexAddressInput } from "./dto/index-address.input";
@@ -8,13 +11,12 @@ import { PaginationAddressResponse } from "./dto/pagination-address.response";
 import { UpdateAddressInput } from "./dto/update-address.input";
 import { Address } from "./entities/address.entity";
 import { AddressRelatedTypes } from "./enums/address-related-types.enum";
-import { Country } from "src/base/location/country/entities/country.entity";
-import { AuthorizationService } from "../authorization/authorization.service";
 
 @Injectable()
 export class AddressService {
   constructor(
     private authorizationService: AuthorizationService,
+    @I18n() protected readonly i18n: I18nService
   ) {}
   async create(createAddressInput: CreateAddressInput, user: User,admin:boolean): Promise<Address> {
     const userAuth = await this.authorizationService.setUser(user);
@@ -22,6 +24,33 @@ export class AddressService {
     if (userAuth.hasRole("admin") && admin && createAddressInput.relatedType === AddressRelatedTypes.USER ) {
       related_id = createAddressInput.relatedId
     }
+
+    let exception = "";
+    const whereCondition = {}
+    switch (createAddressInput.relatedType) {
+      case AddressRelatedTypes.LEGAL:
+        related_id = createAddressInput.relatedId
+        whereCondition['relatedId'] = related_id;
+        whereCondition['relatedType'] = AddressRelatedTypes.LEGAL;
+        exception = "exceptions.LEGAL_ALREADY_HAS_ADDRESS"
+        break;
+
+      case AddressRelatedTypes.PROJECT:
+        related_id = createAddressInput.relatedId
+        whereCondition['relatedId'] = related_id;
+        whereCondition['relatedType'] = AddressRelatedTypes.PROJECT;
+        exception = "exceptions.PROJECT_ALREADY_HAS_ADDRESS"
+        break;
+    }
+    
+    const existsAddress: Address = await Address.findOne({
+      where: whereCondition
+    })
+
+    if (existsAddress) {
+      throw new BadRequestException((await this.i18n.translate(exception)))
+    } 
+
     const address: Address = Address.create<Address>({
       ...createAddressInput,
       countryId: Country.IR,
