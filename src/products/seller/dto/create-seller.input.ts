@@ -2,6 +2,7 @@ import { Field, InputType } from "@nestjs/graphql";
 import {
   IsBoolean,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -36,7 +37,7 @@ export class CreateSellerInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsString()
+  @IsInt()
   rating ?: number;
 
 
