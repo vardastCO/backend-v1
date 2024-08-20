@@ -178,23 +178,28 @@ export class EventTrackerReportService {
 
   async getOrderReport(startDateTimestamp: string, endDateTimestamp: string): Promise<OrderCountResponse> {
     const query = `
-      SELECT 
-          jyear(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')) || '/' ||
-          jmonth(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')) || '/' ||
-          jday(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')) AS label, 
-          COUNT(*) AS total, 
-          COUNT(CASE WHEN po.status = 'COMPLETED' THEN 1 END) AS completed_count,
-          COUNT(CASE WHEN po.status = 'CLOSED' THEN 1 END) AS closed_count,
-          COUNT(*) - (COUNT(CASE WHEN po.status = 'COMPLETED' THEN 1 END) + COUNT(CASE WHEN po.status = 'CLOSED' THEN 1 END)) AS inProgress_count
-      FROM 
-          pre_order po
-      WHERE 
-          TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM') 
-          BETWEEN $1 AND $2
-      GROUP BY 
-          label
-      ORDER BY 
-          label;
+        SELECT 
+            jyear(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')) || '/' ||
+            jmonth(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')) || '/' ||
+            jday(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')) AS label, 
+            COUNT(*) AS total, 
+            COUNT(CASE WHEN po.status = 'COMPLETED' THEN 1 END) AS completed_count,
+            COUNT(CASE WHEN po.status = 'CLOSED' THEN 1 END) AS closed_count,
+            COUNT(*) - (COUNT(CASE WHEN po.status = 'COMPLETED' THEN 1 END) + COUNT(CASE WHEN po.status = 'CLOSED' THEN 1 END)) AS inProgress_count
+        FROM 
+            pre_order po
+        WHERE 
+            TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM') 
+            BETWEEN $1  AND $2
+        GROUP BY 
+            jyear(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')),
+            jmonth(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')),
+            jday(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM'))
+        ORDER BY 
+            jyear(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')),
+            jmonth(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')),
+            jday(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM'));
+  
     `
     const rows = await this.entityManager.query(
       query,
