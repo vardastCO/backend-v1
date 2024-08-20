@@ -18,6 +18,7 @@ import {
   Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Unique,
 } from "typeorm";
 
 import { ProductTypesEnum } from "../enums/product-types.enum";
@@ -25,6 +26,7 @@ import { ParentProductEntity } from "./parent-product.entity";
 
 @Index("idx_product_name", ["name"])
 @ObjectType()
+@Unique(["name", "deletedAt"])
 @Entity("products")
 export class Product extends InfraEntity {
   @Field(() => Int)
@@ -40,7 +42,7 @@ export class Product extends InfraEntity {
   type: ProductTypesEnum;
 
   @Field()
-  @Column({ unique: true })
+  @Column()
   name: string;
 
   @Field(() => Int, { nullable: true, defaultValue: 1 })
