@@ -27,7 +27,7 @@ export class CreateProductInput {
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
-  @Validate(IsUnique, [Product])
+  // @Validate(IsUnique, [Product])
   name: string;
 
   @Field(() => String, { defaultValue: uuidv4() }) // Set default value using uuidv4()
