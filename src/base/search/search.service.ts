@@ -25,6 +25,7 @@ import { SuggestInput } from "./dto/suggest.input";
 import { SuggestResponse } from "./dto/suggest.response";
 import { SuggestResponseV2 } from "./dto/suggest.response-v2";
 import { TotalInfoResponse } from "./dto/totalInfo.output";
+import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 
 
 @Injectable()
@@ -301,7 +302,7 @@ export class SearchService {
   }
 
   private async getCountOfOrders(): Promise<number> {
-    const countOfOrders = await OfferOrder.count();
+    const countOfOrders = await PreOrder.count();
     return countOfOrders;
   }
 
