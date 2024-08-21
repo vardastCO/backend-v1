@@ -208,30 +208,20 @@ export class UserService {
 
     const originalUser = { ...user };
 
-    if (updateUserInput.password) {
+    if (updateUserInput.password) { 
       updateUserInput.password = await this.hashPassword(updateUserInput.password);
     }
-  
-
-
+   
     Object.assign(user, updateUserInput);
+    if (updateUserInput.displayRoleId) { 
+      // user.displayRoleId = updateUserInput.displayRoleId
+      const dis_role = await Role.findOneBy({ id: updateUserInput.displayRoleId })
+      user.displayRole = Promise.resolve(dis_role)
+      console.log('user.roles',await user.displayRole);
+      await user.save()
+    }
 
-    // const shouldWeChangeAvatar = !!updateUserInput.avatarUuid;
-    // const oldAvatar: File = originalUser.avatarFileId
-    //   ? await originalUser.avatarFile
-    //   : null;
-    // let newAvatar: File;
 
-    // if (shouldWeChangeAvatar) {
-    //   newAvatar = await this.fileService.getNewlyUploadedFileOrFail(
-    //     "user/user/avatars",
-    //     updateUserInput.avatarUuid,
-    //     User.name,
-    //     currentUser.id,
-    //   );
-
-    //   user.avatarFile = Promise.resolve(newAvatar);
-    // }
     if (updateUserInput.roleIds) {
       const roles = await Role.findBy({ id: In(updateUserInput.roleIds) });
       if (roles.length != updateUserInput.roleIds.length) {
@@ -242,16 +232,6 @@ export class UserService {
       user.roles = Promise.resolve(roles);
       await user.save()
     }
-
-    // if (updateUserInput.permissionIds) {
-    //   const permissions = await Permission.findBy({
-    //     id: In(updateUserInput.permissionIds),
-    //   });
-    //   if (permissions.length != updateUserInput.permissionIds.length) {
-    //     throw new BadRequestException("Some permissions are invalid.");
-    //   }
-    //   user.permissions = Promise.resolve(permissions);
-    // }
 
     if (
       updateUserInput.status == UserStatusesEnum.ACTIVE &&
@@ -266,29 +246,13 @@ export class UserService {
 
     this.dataSource.transaction(async () => {
       await user.save({ transaction: false });
-      // if (shouldWeChangeAvatar) {
-      //   await File.update(newAvatar.id, { modelId: user.id });
-      //   oldAvatar
-      //     ? await this.fileService.removeFromStorageAndDB(oldAvatar)
-      //     : null;
-      // }
     });
 
     if (updateUserInput.roleIds) {
       await this.cacheRolesOf(user);
       await this.cachePermissionsOf(user);
     }
-    //  else if (updateUserInput.permissionIds) {
-    //   await this.cachePermissionsOf(user);
-    // }
-    // if (updateUserInput.name_company && updateUserInput.national_id) {
-    //   const legal        = new Legal()
-    //   legal.createdById = user.id
-    //   legal.ownerId  = user.id
-    //   legal.name_company = updateUserInput.name_company
-    //   legal.national_id  = updateUserInput.national_id
-    //   await legal.save()
-    // }
+    console.log('lll',user)
     return user;
   }
   async updateProfile(
