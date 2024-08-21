@@ -15,9 +15,12 @@ import { CompressionService } from "src/compression.service";
 import { DecompressionService } from "src/decompression.service";
 import { Seller } from "src/products/seller/entities/seller.entity";
 import { SellerRepresentativeRoles } from "src/products/seller/enums/seller-representative-roles.enum";
-import { DataSource, In, Like, Repository } from "typeorm";
+import { DataSource, EntityManager, In, Like, Repository } from "typeorm";
 import { KavenegarService } from "../../base/kavenegar/kavenegar.service";
 import { CountryService } from "../../base/location/country/country.service";
+import { Address } from "../address/entities/address.entity";
+import { AddressRelatedTypes } from "../address/enums/address-related-types.enum";
+import { AuthorizationService } from "../authorization/authorization.service";
 import { Permission } from "../authorization/permission/entities/permission.entity";
 import { Role } from "../authorization/role/entities/role.entity";
 import { CreateUserInput } from "./dto/create-user.input";
@@ -27,9 +30,6 @@ import { UpdateProfileInput } from "./dto/update-profile.input";
 import { UpdateUserInput } from "./dto/update-user.input";
 import { User } from "./entities/user.entity";
 import { UserStatusesEnum } from "./enums/user-statuses.enum";
-import { Address } from "../address/entities/address.entity";
-import { AddressRelatedTypes } from "../address/enums/address-related-types.enum";
-import { AuthorizationService } from "../authorization/authorization.service";
 
 @Injectable()
 export class UserService {
@@ -44,7 +44,8 @@ export class UserService {
     private authorizationService: AuthorizationService,
     private readonly compressionService: CompressionService,
     private readonly decompressionService: DecompressionService,
-  ) {}
+    private readonly entityManager: EntityManager
+  ) { }
 
   async create(
     createUserInput: CreateUserInput,
@@ -148,7 +149,7 @@ export class UserService {
     const [data, total] = await User.findAndCount({
       skip,
       take,
-      where:whereConditions,
+      where: whereConditions,
       order: { id: "DESC" },
     });
 
@@ -158,7 +159,7 @@ export class UserService {
   async getAddressesOf(user: User): Promise<Address[]> {
 
 
-    const addresses = await Address.createQueryBuilder()
+  const addresses = await Address.createQueryBuilder()
       .limit(15)
       .where({ relatedType: AddressRelatedTypes.USER, relatedId: user.id })
       .orderBy({ sort: "ASC" })
@@ -193,68 +194,97 @@ export class UserService {
     id: number,
     updateUserInput: UpdateUserInput,
     currentUser: User,
-    admin:boolean
+    admin: boolean
   ): Promise<User> {
-    const userAuth = await this.authorizationService.setUser(currentUser);
-    let user_id = currentUser.id
-    if (userAuth.hasRole("admin") && id ) {
-      user_id = id
-    }
-    const user: User = await User.findOneBy({ id:user_id });
-    
-    if (!user) {
-      throw new NotFoundException();
-    }
+    try {
+      const userAuth = await this.authorizationService.setUser(currentUser);
+      let user_id = currentUser.id
 
-    const originalUser = { ...user };
-
-    if (updateUserInput.password) { 
-      updateUserInput.password = await this.hashPassword(updateUserInput.password);
-    }
-   
-    Object.assign(user, updateUserInput);
-    if (updateUserInput.displayRoleId) { 
-      // user.displayRoleId = updateUserInput.displayRoleId
-      const dis_role = await Role.findOneBy({ id: updateUserInput.displayRoleId })
-      user.displayRole = Promise.resolve(dis_role)
-      console.log('user.roles',await user.displayRole);
-      await user.save()
-    }
-
-
-    if (updateUserInput.roleIds) {
-      const roles = await Role.findBy({ id: In(updateUserInput.roleIds) });
-      if (roles.length != updateUserInput.roleIds.length) {
-        throw new BadRequestException("Some roles are invalid.");
+      if (userAuth.hasRole("admin") && id) {
+        user_id = id
       }
-      const cacheKey = `roles_user_{id:${JSON.stringify(user.id)}}`;
-      await this.cacheManager.del(cacheKey)
-      user.roles = Promise.resolve(roles);
+      const user: User = await User.findOneBy({ id: user_id });
+        
+        
+      if (!user) {
+        throw new NotFoundException();
+      }
+
+        
+      const originalUser = { ...user };
+
+
+      if (updateUserInput.password) {
+        updateUserInput.password = await this.hashPassword(updateUserInput.password);
+      }
+      const displayRoleId = updateUserInput.displayRoleId
+      const role_ids = updateUserInput.roleIds
+      delete updateUserInput.displayRoleId
+      delete updateUserInput.roleIds
+
+      Object.assign(user, updateUserInput);
+
+      if (displayRoleId) {
+        try {
+          await this.entityManager.query(
+            `update users
+             set "displayRoleId" = $1
+             where "id" = $2 
+            `,
+            [displayRoleId, user.id]
+          )
+        } catch (error) {
+          console.log("error :", error);
+        }
+      }
+
+
+
+      if (role_ids) {
+        
+        await this.entityManager.query(`
+            delete from "users_authorization_user_roles"
+            where "userId" = $1
+          `,
+          [user.id]
+        )
+
+        await this.entityManager.query(`
+          INSERT INTO "users_authorization_user_roles" ("userId", "roleId")
+          SELECT $1, UNNEST($2::int[]);
+          `, [user.id, role_ids])
+        
+        const cacheKey = `roles_user_{id:${JSON.stringify(user.id)}}`;
+        await this.cacheManager.del(cacheKey)
+        await user.save()
+      }
+
+      if (
+        updateUserInput.status == UserStatusesEnum.ACTIVE &&
+        originalUser.status == UserStatusesEnum.NOT_ACTIVATED
+      ) {
+        await this.kavenegarService.lookup(
+          user.cellphone,
+          "accountActivated",
+          "کاربر",
+        );
+      }
+
       await user.save()
-    }
 
-    if (
-      updateUserInput.status == UserStatusesEnum.ACTIVE &&
-      originalUser.status == UserStatusesEnum.NOT_ACTIVATED
-    ) {
-      await this.kavenegarService.lookup(
-        user.cellphone,
-        "accountActivated",
-        "کاربر",
-      );
-    }
+      
+      if (updateUserInput.roleIds) {
+        await this.cacheRolesOf(user);
+        await this.cachePermissionsOf(user);
+      }
 
-    this.dataSource.transaction(async () => {
-      await user.save({ transaction: false });
-    });
-
-    if (updateUserInput.roleIds) {
-      await this.cacheRolesOf(user);
-      await this.cachePermissionsOf(user);
+      return user;
+    } catch (error) {
+      console.log(error);
     }
-    console.log('lll',user)
-    return user;
   }
+
+  
   async updateProfile(
     updateProfileInput: UpdateProfileInput,
     currentUser: User,
@@ -266,14 +296,11 @@ export class UserService {
     }
     
     Object.assign(user, updateProfileInput);
-    if (updateProfileInput.firstName && updateProfileInput.lastName) {
-      user.fullName = `${updateProfileInput.firstName} ${updateProfileInput.lastName}`;
-    } else if (updateProfileInput.firstName) {
-      user.fullName = updateProfileInput.firstName;
-    } else if (updateProfileInput.lastName) {
-      user.fullName = updateProfileInput.lastName;
+    const { firstName, lastName } = updateProfileInput;
+    if (firstName || lastName) {
+        user.fullName = [firstName, lastName].filter(Boolean).join(' ');
     } else {
-      user.fullName =  'کاربر وردست'; 
+        user.fullName = 'کاربر وردست';
     }
 
     this.dataSource.transaction(async () => {
