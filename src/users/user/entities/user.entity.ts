@@ -156,10 +156,10 @@ export class User extends BaseEntity {
    * Authorization related
    */
   @Field(() => Role)
-  @ManyToOne(() => Role, { eager : true ,nullable:true })
+  @ManyToOne(() => Role, { eager: true })
   displayRole: Promise<Role>;
-  @Column("int",{ nullable: true })
-  displayRoleId?: number;
+  @Column("int")
+  displayRoleId: number;
 
   // @Field(() => [String], { nullable: "items" }) 
   // @Column("text", { array: true, nullable: true }) 
