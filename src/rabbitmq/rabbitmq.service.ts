@@ -5,7 +5,7 @@ import { connect } from 'amqplib';
 @Injectable()
 export class RabbitMQService {
   private readonly rabbitMQUrl = 'amqp://rabbitmq:5672';
-  private readonly queueName = 'chat_events';
+  private readonly queueName = 'chat';
 
   async checkConnection(): Promise<void> {
     const connection = await connect(this.rabbitMQUrl);

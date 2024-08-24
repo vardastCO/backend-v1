@@ -12,12 +12,12 @@ export class RabbitMQProducerService {
       transport: Transport.RMQ,
       options: {
         urls: ['amqp://localhost:5672'], // RabbitMQ server URL
-        queue: 'your_queue_name',
+        queue: 'vardast',
       },
     });
   }
 
   async sendMessage(message: string): Promise<void> {
-    await this.client.emit('your_event_name', message).toPromise();
+    await this.client.emit('vardast', message).toPromise();
   }
 }
