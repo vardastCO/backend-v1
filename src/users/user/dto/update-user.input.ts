@@ -11,16 +11,14 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {
   id?: number;
 
   
-  // @Field(() => [Int], { nullable: true })
-  // @IsOptional()
-  // @IsInt({ each: true })
-  // roleIds?: number[]; 
+  @Field(() => [Int], { nullable: true })
+  @IsOptional()
+  @IsInt({ each: true })
+  roleIds?: number[]; 
 
-  // @Field({ nullable: true })
-  // @IsOptional()
-  // @IsString()
-  // @MaxLength(255)
-  // name_company?: string;
+  @Field(type => Int,{nullable:true})
+  @IsOptional()
+  displayRoleId?: number;
 
   @Field({ nullable: true })
   @IsOptional()
