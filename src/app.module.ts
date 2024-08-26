@@ -13,12 +13,12 @@ import { i18nConfig } from "./config/i18n.config";
 import { typeOrmAsyncConfig } from "./config/typeorm.config";
 import { ProductsModule } from "./products/products.module";
 import { UsersModule } from "./users/users.module";
-import { ScheduleModule } from '@nestjs/schedule';
+import { ScheduleModule } from "@nestjs/schedule";
 import { CronJobService } from "./cron-job.service";
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from "@nestjs/throttler";
 import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 import { KavenegarModule } from "./base/kavenegar/kavenegar.module";
-import { TerminusModule } from '@nestjs/terminus';
+import { TerminusModule } from "@nestjs/terminus";
 import { OrderModule } from "./order/order.module";
 // import { RabbitMQModule } from "./rabitmq/rabbitmq.module";
 // import { ElasticsearchModule } from '@nestjs/elasticsearch';
@@ -43,31 +43,26 @@ import { OrderModule } from "./order/order.module";
     OrderModule,
     ProductsModule,
     ScheduleModule.forRoot(),
+
     ThrottlerModule.forRoot([
       {
-        name: 'short',
+        name: "short",
         ttl: 1000,
         limit: 5,
       },
       {
-        name: 'medium',
+        name: "medium",
         ttl: 10000,
-        limit: 20
+        limit: 20,
       },
       {
-        name: 'long',
+        name: "long",
         ttl: 60000,
-        limit: 100
-      }
+        limit: 100,
+      },
     ]),
-    // RabbitMQModule,
-    // ElasticsearchModule.register({
-    //   node: 'http://elasticsearch:9200', // Elasticsearch server URL
-    // }),
-
   ],
   controllers: [AppController],
-  // providers: [AppService, ElasticsearchServices],
-  providers: [AppService,CronJobService],
+  providers: [AppService, CronJobService],
 })
-export class AppModule  {}
+export class AppModule {}
