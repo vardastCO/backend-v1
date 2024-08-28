@@ -101,5 +101,10 @@ export class AppController {
       async () => this.http.pingCheck('vardast-version', 'https://dev.vardast.com/app/version'),
     ]);
   }
+
+  @Get('/app')
+  getHello(): string {
+    return this.appService.getHello();
+  }
   
 }
