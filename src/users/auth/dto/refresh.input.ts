@@ -19,5 +19,4 @@ export class RefreshInput {
   @IsNotEmpty()
   @IsEnum(UserType)
   type?: UserType = UserType.REAL;
-
 }

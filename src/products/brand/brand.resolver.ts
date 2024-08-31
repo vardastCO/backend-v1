@@ -61,18 +61,15 @@ export class BrandResolver {
       new ValidationPipe({ transform: true }),
     )
     indexBrandInput?: IndexBrandInput,
-    @CurrentUser() user?: User,  
+    @CurrentUser() user?: User,
   ) {
-    return this.brandService.paginate(indexBrandInput,user);
+    return this.brandService.paginate(indexBrandInput, user);
   }
 
   @Public()
   // @Permission("gql.products.brand.show")
   @Query(() => Brand, { name: "brand" })
-  findOne(
-    @Args("id", { type: () => Int }) id: number,
-  ): Promise<Brand> {
-
+  findOne(@Args("id", { type: () => Int }) id: number): Promise<Brand> {
     return this.brandService.findOne(id);
   }
   @Permission("gql.products.brand.update")
@@ -96,9 +93,11 @@ export class BrandResolver {
 
   @Permission("gql.products.brand.destroy")
   @Mutation(() => Brand)
-  removeBrandFile(@Args("fileId", { type: () => Int }) fileId: number,
-  @Args("id", { type: () => Int }) id: number) {
-    return this.brandService.removeBrandFile(id,fileId);
+  removeBrandFile(
+    @Args("fileId", { type: () => Int }) fileId: number,
+    @Args("id", { type: () => Int }) id: number,
+  ) {
+    return this.brandService.removeBrandFile(id, fileId);
   }
 
   @ResolveField(() => [Product])

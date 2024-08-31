@@ -23,17 +23,14 @@ export class OptionValue extends BaseEntity {
   @ManyToOne(() => Option)
   option: Promise<Option>;
   @Index()
-  @JoinColumn({ name: 'optionId' })
+  @JoinColumn({ name: "optionId" })
   @Column()
   optionId: number;
-  
-    
+
   @Field(() => ValuesService)
   @ManyToOne(() => ValuesService)
   value: Promise<ValuesService>;
   @Index()
   @Column()
   valueId: number;
-    
-
 }

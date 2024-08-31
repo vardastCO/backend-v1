@@ -26,7 +26,7 @@ export class LineDTO {
 
   @Field({ nullable: true })
   item_name: string;
-  
+
   @Field({ nullable: true })
   attribuite: string;
 

@@ -2,11 +2,10 @@
 
 import { Module } from "@nestjs/common";
 
-import {FaqService} from "./faq.service"
-import { FaqResolver } from "./faq.resolver"
+import { FaqService } from "./faq.service";
+import { FaqResolver } from "./faq.resolver";
 
 @Module({
-    providers: [FaqService, FaqResolver]
+  providers: [FaqService, FaqResolver],
 })
-
-export class FaqModule { };
+export class FaqModule {}

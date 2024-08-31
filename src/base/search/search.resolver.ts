@@ -32,14 +32,11 @@ export class SearchResolver {
     return this.searchService.suggest(suggestInput);
   }
 
-
   @Public()
   @Query(() => TotalInfoResponse, { name: "totalInfo" })
-  totalInfo(
-  ) {
+  totalInfo() {
     return this.searchService.totalInfo();
   }
-
 
   @Public()
   @Query(() => SuggestResponseV2, { name: "suggestV2" })
@@ -60,7 +57,9 @@ export class SearchResolver {
   }
 
   @Public()
-  @Query(() => FilterableAttributesResponse, { name: "filterableAdminAttributes" })
+  @Query(() => FilterableAttributesResponse, {
+    name: "filterableAdminAttributes",
+  })
   filterAdmin(
     @Args("filterableAdminAttributes")
     filterableAttributes?: FilterableAttributesInput,

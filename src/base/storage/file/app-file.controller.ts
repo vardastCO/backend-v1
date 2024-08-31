@@ -17,13 +17,13 @@ export class AppFileController {
     const cachedData = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedData) {
-      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader("Content-Type", "text/plain");
       return res.send(cachedData);
     }
 
     const appVersion = process.env.APP_VERSION || "1.0.0";
     await this.cacheManager.set(cacheKey, appVersion, CacheTTL.ONE_DAY);
-    res.setHeader('Content-Type', 'text/plain');
-    return res.send(appVersion); 
+    res.setHeader("Content-Type", "text/plain");
+    return res.send(appVersion);
   }
 }

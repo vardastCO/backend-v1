@@ -97,14 +97,16 @@ export class CategoryService {
   async getCategories(searchTerm = null): Promise<CategoryDTO[]> {
     const cacheKey = `category_mega_menu`;
 
-    const cachedCategories = await this.cacheManager.get<CategoryDTO[]>(cacheKey);
+    const cachedCategories = await this.cacheManager.get<CategoryDTO[]>(
+      cacheKey,
+    );
 
     if (cachedCategories && Array.isArray(cachedCategories)) {
-        return cachedCategories;
+      return cachedCategories;
     }
 
     try {
-        const query = `
+      const query = `
             SELECT 
                 a.id AS level1_id, a.title AS level1_title, a.sort AS level1_sort,
                 b.id AS level2_id, b.title AS level2_title, b.sort AS level2_sort,
@@ -127,95 +129,106 @@ export class CategoryService {
                 a.sort ASC, b.sort ASC, c.sort ASC, d.sort ASC, e.sort ASC
         `;
 
-        const result = await this.entityManager.query(query);
+      const result = await this.entityManager.query(query);
 
-        async function buildHierarchy(rows): Promise<CategoryDTO[]> {
-            const map = {};
-            const roots = [];
-            const levelOneIds = new Set();
+      async function buildHierarchy(rows): Promise<CategoryDTO[]> {
+        const map = {};
+        const roots = [];
+        const levelOneIds = new Set();
 
-            for (const row of rows) {
-                const {
-                    level1_id, level1_title,
-                    level2_id, level2_title,
-                    level3_id, level3_title,
-                    level4_id, level4_title,
-                    level5_id, level5_title
-                } = row;
+        for (const row of rows) {
+          const {
+            level1_id,
+            level1_title,
+            level2_id,
+            level2_title,
+            level3_id,
+            level3_title,
+            level4_id,
+            level4_title,
+            level5_id,
+            level5_title,
+          } = row;
 
-                function addCategory(id, title, parent) {
-                    if (!id) return;
-                    if (!map[id]) {
-                        map[id] = new CategoryDTO();
-                        map[id].id = id;
-                        map[id].title = title;
-                        map[id].children = [];
-                        if (parent) {
-                            parent.children.push(map[id]);
-                        } else {
-                            roots.push(map[id]);
-                        }
-                    }
-                }
-
-                addCategory(level1_id, level1_title, null);
-                addCategory(level2_id, level2_title, map[level1_id]);
-                addCategory(level3_id, level3_title, map[level2_id]);
-                addCategory(level4_id, level4_title, map[level3_id]);
-                addCategory(level5_id, level5_title, map[level4_id]);
-
-                levelOneIds.add(level1_id);
+          function addCategory(id, title, parent) {
+            if (!id) return;
+            if (!map[id]) {
+              map[id] = new CategoryDTO();
+              map[id].id = id;
+              map[id].title = title;
+              map[id].children = [];
+              if (parent) {
+                parent.children.push(map[id]);
+              } else {
+                roots.push(map[id]);
+              }
             }
+          }
 
-            const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
-            const processedCategories = {};
-            const processCategory = async (level1_id) => {
-                if (level1_id in processedCategories) {
-                    return;
-                }
+          addCategory(level1_id, level1_title, null);
+          addCategory(level2_id, level2_title, map[level1_id]);
+          addCategory(level3_id, level3_title, map[level2_id]);
+          addCategory(level4_id, level4_title, map[level3_id]);
+          addCategory(level5_id, level5_title, map[level4_id]);
 
-                processedCategories[level1_id] = true;
-                
-                try {
-                    const category = await Category.findOne({
-                        select: ['id', 'imageCategory'],
-                        where: { id: level1_id },
-                        relations: ['imageCategory']
-                    });
-
-                    if (category) {
-                        const imageCategories = await category.imageCategory || [];
-                        if (imageCategories.length > 0) {
-                            const fileId = imageCategories[0]?.fileId;
-  
-                            if (fileId) {
-                                const image = await File.findOneBy({ id: fileId });
-               
-                                if (image) {
-                                    map[level1_id].image_url = `${baseUrl}${image.name}`;
-                                }
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.error(`Error processing category with ID ${level1_id}:`, error);
-                }
-            };
-            await Promise.all(Array.from(levelOneIds).map(id => processCategory(id)));
-
-            return roots;
+          levelOneIds.add(level1_id);
         }
 
-        const categories = await buildHierarchy(result);
+        const baseUrl =
+          process.env.STORAGE_MINIO_URL ||
+          "https://storage.vardast.ir/vardast/";
+        const processedCategories = {};
+        const processCategory = async level1_id => {
+          if (level1_id in processedCategories) {
+            return;
+          }
 
-        await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK); 
-        return categories;
+          processedCategories[level1_id] = true;
+
+          try {
+            const category = await Category.findOne({
+              select: ["id", "imageCategory"],
+              where: { id: level1_id },
+              relations: ["imageCategory"],
+            });
+
+            if (category) {
+              const imageCategories = (await category.imageCategory) || [];
+              if (imageCategories.length > 0) {
+                const fileId = imageCategories[0]?.fileId;
+
+                if (fileId) {
+                  const image = await File.findOneBy({ id: fileId });
+
+                  if (image) {
+                    map[level1_id].image_url = `${baseUrl}${image.name}`;
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error(
+              `Error processing category with ID ${level1_id}:`,
+              error,
+            );
+          }
+        };
+        await Promise.all(
+          Array.from(levelOneIds).map(id => processCategory(id)),
+        );
+
+        return roots;
+      }
+
+      const categories = await buildHierarchy(result);
+
+      await this.cacheManager.set(cacheKey, categories, CacheTTL.ONE_WEEK);
+      return categories;
     } catch (error) {
-        console.error("Error fetching categories:", error);
-        return [];
+      console.error("Error fetching categories:", error);
+      return [];
     }
   }
-
 
   async create(createCategoryInput, User): Promise<Category> {
     const cacheKey = "categories:*"; // Match all keys starting with 'categories:'
@@ -269,7 +282,7 @@ export class CategoryService {
       cachedCategories.forEach(category => {
         category.createdAt = new Date(category.createdAt);
         category.updatedAt = new Date(category.updatedAt);
-      })
+      });
       return cachedCategories;
     }
 
@@ -448,39 +461,41 @@ export class CategoryService {
 
   async findOne(id: number, slug?: string): Promise<Category> {
     const cacheKey = `category:${id}`;
-  
 
     const [cachedCategory, categoryFromDB] = await Promise.all([
       this.cacheManager.get<string>(cacheKey),
-      this.categoryRepository.findOneBy({ id, slug })
+      this.categoryRepository.findOneBy({ id, slug }),
     ]);
-  
+
     if (cachedCategory) {
       const decompressedData = zlib
         .gunzipSync(Buffer.from(cachedCategory, "base64"))
         .toString("utf-8");
       const parsedData: Category = JSON.parse(decompressedData);
-  
+
       const incrementViewsPromise = this.incrementCategoryViews(parsedData);
       await incrementViewsPromise;
-  
+
       return parsedData;
     }
-  
+
     if (!categoryFromDB) {
       throw new NotFoundException();
     }
-  
+
     const compressedData = zlib.gzipSync(JSON.stringify(categoryFromDB));
-    const cachePromise = this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
-    
+    const cachePromise = this.cacheManager.set(
+      cacheKey,
+      compressedData,
+      CacheTTL.ONE_WEEK,
+    );
+
     const incrementViewsPromise = this.incrementCategoryViews(categoryFromDB);
-    
+
     await Promise.all([cachePromise, incrementViewsPromise]);
-  
+
     return categoryFromDB;
   }
-  
 
   async findOneAttribuite(id: number, slug?: string): Promise<Category> {
     const category = await this.categoryRepository.findOneBy({ id, slug });
@@ -493,10 +508,10 @@ export class CategoryService {
     try {
       await this.entityManager.query(
         `UPDATE base_taxonomy_categories SET views = views + 1 WHERE id = $1`,
-        [brand.id]
+        [brand.id],
       );
     } catch (error) {
-      console.log('err in incrementCategoryViews',error)
+      console.log("err in incrementCategoryViews", error);
     }
   }
   async update(
@@ -578,7 +593,9 @@ export class CategoryService {
     let count = await this.cacheManager.get<number>(cacheKey);
 
     if (count === undefined) {
-      count = await this.categoryRepository.count({ where: indexCategoryInput });
+      count = await this.categoryRepository.count({
+        where: indexCategoryInput,
+      });
       await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK);
     }
 
@@ -588,67 +605,63 @@ export class CategoryService {
   async getParentCategoryOf(category: Category): Promise<Category> {
     try {
       const cacheKey = `category:${category.parentCategoryId}`;
-      
+
       const cachedData = await this.cacheManager.get<string>(cacheKey);
-    
+
       if (cachedData) {
-        const decompressedData = this.decompressionService.decompressData(cachedData);
+        const decompressedData =
+          this.decompressionService.decompressData(cachedData);
         return decompressedData;
       }
-      const compressedData = this.compressionService.compressData(await category.parentCategory)
-      await this.cacheManager.set(
-        cacheKey,
-        compressedData,
-        CacheTTL.TWO_WEEK,
+      const compressedData = this.compressionService.compressData(
+        await category.parentCategory,
       );
+      await this.cacheManager.set(cacheKey, compressedData, CacheTTL.TWO_WEEK);
       return await category.parentCategory;
-    } catch (error) {
-    }
-
+    } catch (error) {}
   }
 
   async getChildrenOf(category: Category): Promise<Category[]> {
     try {
       if (category.id) {
         const cacheKey = `category:${category.id}:children`;
-      
+
         const cachedData = await this.cacheManager.get<string>(cacheKey);
-      
+
         if (cachedData) {
-  
-          const decompressedData = this.decompressionService.decompressData(cachedData);
+          const decompressedData =
+            this.decompressionService.decompressData(cachedData);
           return decompressedData;
         }
-        const result = await  this.findAll({
+        const result = await this.findAll({
           parentCategoryId: category.id,
         });
-  
+
         const jsonString = JSON.stringify(result)
-        .replace(/__imageCategory__/g, "imageCategory")
-        .replace(/__file__/g, "file")
-        .replace(/__parentCategory__/g, "parentCategory");
-  
+          .replace(/__imageCategory__/g, "imageCategory")
+          .replace(/__file__/g, "file")
+          .replace(/__parentCategory__/g, "parentCategory");
+
         const modifiedDataWithOutText = JSON.parse(jsonString);
-        const compressedData = this.compressionService.compressData(modifiedDataWithOutText);
+        const compressedData = this.compressionService.compressData(
+          modifiedDataWithOutText,
+        );
         await this.cacheManager.set(
           cacheKey,
           compressedData,
           CacheTTL.TWO_WEEK,
         );
-        return result
-  
+        return result;
       }
-      
-      const result = await  this.findAll({
+
+      const result = await this.findAll({
         parentCategoryId: category.id,
       });
 
-      return result
-
+      return result;
     } catch (error) {
-      console.log('err in  getChildrenOf',error)
+      console.log("err in  getChildrenOf", error);
     }
-    
   }
 
   async getParentsChainOf(category: Category): Promise<Category[]> {
@@ -667,7 +680,7 @@ export class CategoryService {
           .getMany()
       ).reverse();
 
-      await this.cacheManager.set(cacheKey, parentsChain,CacheTTL.ONE_WEEK); 
+      await this.cacheManager.set(cacheKey, parentsChain, CacheTTL.ONE_WEEK);
     }
 
     return parentsChain;
@@ -687,7 +700,6 @@ export class CategoryService {
     }
 
     return count;
-  
   }
   async createImage(
     createImageCategoryInput: createImageCategoryInput,

@@ -1,10 +1,7 @@
 // src/options/dto/option.dto.ts
 
-import { InputType, Field, Int } from '@nestjs/graphql';
-import {
-  IsInt,
-  IsNotEmpty,
-} from "class-validator";
+import { InputType, Field, Int } from "@nestjs/graphql";
+import { IsInt, IsNotEmpty } from "class-validator";
 
 @InputType()
 export class CreateOptionInput {

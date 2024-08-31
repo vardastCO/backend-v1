@@ -11,14 +11,16 @@ import { CreateEventTrackerInput } from "./base/event-tracker/dto/create-event-t
 import { File } from "./base/storage/file/entities/file.entity";
 import { Client } from "minio";
 import { InjectMinio } from "nestjs-minio";
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 @Injectable()
 export class CronJobService {
   constructor(
     @InjectMinio() protected readonly minioClient: Client,
-    private readonly kavenegarService: KavenegarService, @Inject(CACHE_MANAGER) private cacheManager: Cache) { }
- 
+    private readonly kavenegarService: KavenegarService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
+
   // @Cron(CronExpression.EVERY_5_SECONDS)
   // async logProductViewsToElasticsearch() {
   //   // Fetch product views and log to Elasticsearch
@@ -52,8 +54,7 @@ export class CronJobService {
   //   );
   //   for (const view of views) {
   //     try {
-       
-      
+
   //       const data : CreateEventTrackerInput = JSON.parse(view.value)
   //       const event: EventTracker = EventTracker.create<EventTracker>(data);
   //       await event.save()
@@ -84,7 +85,7 @@ export class CronJobService {
   //       this.cacheManager.del(view.key);
 
   //       console.log('views',view)
-        
+
   //       const valueObject = JSON.parse(view.value);
   //       const sellerId = `02-${valueObject.sellerId}`;
   //       const files = File.findOneBy({ id:valueObject.file  })
@@ -97,9 +98,7 @@ export class CronJobService {
   //       const folderPath = '/usr/src/app';  // Replace with the actual folder path
   //       const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
 
-  
   //       await this.executePnpmCommand(sellerId);
-  
 
   //     } catch (error) {
   //       // Handle error appropriately
@@ -108,74 +107,72 @@ export class CronJobService {
   //   }
   // }
 
-// @Cron(CronExpression.EVERY_5_MINUTES)
-// async logCommand() {
-//   const randomTimeout = Math.floor(Math.random() * (15000 - 5000 + 1) + 5000);
+  // @Cron(CronExpression.EVERY_5_MINUTES)
+  // async logCommand() {
+  //   const randomTimeout = Math.floor(Math.random() * (15000 - 5000 + 1) + 5000);
 
-//   await new Promise(resolve => setTimeout(resolve, randomTimeout));
+  //   await new Promise(resolve => setTimeout(resolve, randomTimeout));
 
-//   const allKeys: string[] = await this.cacheManager.store.keys();
-//   const productKeys: string[] = allKeys.filter(key =>
-//     key.startsWith("pnpm"),
-//   );
+  //   const allKeys: string[] = await this.cacheManager.store.keys();
+  //   const productKeys: string[] = allKeys.filter(key =>
+  //     key.startsWith("pnpm"),
+  //   );
 
-//   const views: any[] = await Promise.all(
-//     productKeys.map(async key => {
-//       const value = await this.cacheManager.get(key);
-//       this.cacheManager.del(key);
-//       return { key, value };
-//     }),
-//   );
+  //   const views: any[] = await Promise.all(
+  //     productKeys.map(async key => {
+  //       const value = await this.cacheManager.get(key);
+  //       this.cacheManager.del(key);
+  //       return { key, value };
+  //     }),
+  //   );
 
-//   await this.processViewsSequentially(views);
-// }
+  //   await this.processViewsSequentially(views);
+  // }
 
-// private async processViewsSequentially(views: any[], index: number = 0) {
-//   // Remove duplicates based on the 'key' property
-//   const uniqueViews = views.filter((view, currentIndex) => {
-//     const firstIndex = views.findIndex((v) => v.key === view.key);
-//     return currentIndex === firstIndex;
-//   });
+  // private async processViewsSequentially(views: any[], index: number = 0) {
+  //   // Remove duplicates based on the 'key' property
+  //   const uniqueViews = views.filter((view, currentIndex) => {
+  //     const firstIndex = views.findIndex((v) => v.key === view.key);
+  //     return currentIndex === firstIndex;
+  //   });
 
-//   if (index < uniqueViews.length) {
-//     const view = uniqueViews[index];
+  //   if (index < uniqueViews.length) {
+  //     const view = uniqueViews[index];
 
-//     try {
-//       await this.processView(view);
-//     } catch (error) {
-//       // Handle error appropriately
-//       console.error("Error logging view to command:", error.message);
-//     }
+  //     try {
+  //       await this.processView(view);
+  //     } catch (error) {
+  //       // Handle error appropriately
+  //       console.error("Error logging view to command:", error.message);
+  //     }
 
-//     // Process the next view recursively
-//     await this.processViewsSequentially(uniqueViews, index + 1);
-//   }
-// }
+  //     // Process the next view recursively
+  //     await this.processViewsSequentially(uniqueViews, index + 1);
+  //   }
+  // }
 
-// private async processView(view: any) {
-//   this.cacheManager.del(view.key);
+  // private async processView(view: any) {
+  //   this.cacheManager.del(view.key);
 
-//   console.log('views', view);
+  //   console.log('views', view);
 
-//   const valueObject = JSON.parse(view.value);
-//   const sellerId = `02-${valueObject.sellerId}`;
-//   const files = File.findOneBy({ id: valueObject.file });
-  
-//   if (!files) {
-//     throw 'not found';
-//   }
+  //   const valueObject = JSON.parse(view.value);
+  //   const sellerId = `02-${valueObject.sellerId}`;
+  //   const files = File.findOneBy({ id: valueObject.file });
 
-//   const name = (await files).name;
-//   const fileStream = await this.minioClient.getObject('vardast', name);
+  //   if (!files) {
+  //     throw 'not found';
+  //   }
 
-//   const folderPath = '/usr/src/app';  // Replace with the actual folder path
-//   const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
+  //   const name = (await files).name;
+  //   const fileStream = await this.minioClient.getObject('vardast', name);
 
-//   await this.executePnpmCommand(sellerId);
-// }
+  //   const folderPath = '/usr/src/app';  // Replace with the actual folder path
+  //   const savedFilePath = await this.saveFileToLocalFolder(fileStream, sellerId, folderPath);
 
+  //   await this.executePnpmCommand(sellerId);
+  // }
 
-  
   // @Cron(CronExpression.EVERY_5_SECONDS)
   // async logBrandViewsToElasticsearch() {
   //   // Fetch product views and log to Elasticsearch
@@ -190,17 +187,16 @@ export class CronJobService {
   //   );
   //   productKeys.map(async (key) => {
   //     try {
-        
+
   //       const [prefix, cellphone, token] = key.split(':');
   //       await this.cacheManager.del(key);
   //       await this.kavenegarService.lookup(cellphone, "verify", token);
-          
+
   //     } catch (e) {
   //       console.log('errr kavenegar', e);
   //     }
   //   })
 
-     
   // }
 
   // private async saveFileToLocalFolder(fileStream, fileName, baseFolderPath2) {
@@ -251,15 +247,14 @@ export class CronJobService {
   //   const command = `pnpm a seller:price "${filePath}"`;
   //   const child = exec(command);
 
-  
   //   child.stdout.on('data', (data) => {
   //     console.log(`pnpm command output: ${data}`);
   //   });
-  
+
   //   child.stderr.on('data', (data) => {
   //     console.error(`pnpm command errors: ${data}`);
   //   });
-  
+
   //   await new Promise((resolve) => {
   //     child.on('exit', resolve);
   //   });

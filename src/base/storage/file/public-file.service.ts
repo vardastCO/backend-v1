@@ -3,7 +3,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  Inject
+  Inject,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Cache } from "cache-manager";
@@ -56,8 +56,8 @@ export class PublicFileService {
       mimeType: file.mimetype,
       disk: "minio",
       bucketName: this.bucketName,
-      orderColumn : createFileDto?.orderColumn ,
-      modelType: createFileDto?.modelType ?? directory.relatedModel
+      orderColumn: createFileDto?.orderColumn,
+      modelType: createFileDto?.modelType ?? directory.relatedModel,
     });
     fileRecord.directory = Promise.resolve(directory);
     fileRecord.createdBy = Promise.resolve(user);
@@ -101,18 +101,17 @@ export class PublicFileService {
   async uploadCatalogue(
     file: Express.Multer.File,
     user: User,
-    brandId: number
+    brandId: number,
   ) {
-
     // console.log("brand id", brandId);
     // check brand exists
-    const brand: Brand = await Brand.findOneBy({id: brandId});
+    const brand: Brand = await Brand.findOneBy({ id: brandId });
     if (!brand) {
       throw new NotFoundException("Brand Not Found");
     }
 
     const directory: Directory = await Directory.findOneBy({
-      path: 'brand/cataloge',
+      path: "brand/cataloge",
     });
 
     // TODO: check for directory upload permission
@@ -129,12 +128,12 @@ export class PublicFileService {
       mimeType: file.mimetype,
       disk: "minio",
       bucketName: this.bucketName,
-      orderColumn : 1 ,
-      modelType: directory.relatedModel
+      orderColumn: 1,
+      modelType: directory.relatedModel,
     });
     fileRecord.directory = Promise.resolve(directory);
     fileRecord.createdBy = Promise.resolve(user);
-   
+
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
       const uploadedFileInfo = await this.minioClient.putObject(
@@ -152,10 +151,9 @@ export class PublicFileService {
     brand.catalog = Promise.resolve(fileRecord);
     // console.log('brand', await brand.catalog)
     try {
-
-         await brand.save();
+      await brand.save();
     } catch (e) {
-      console.log('eee',e)
+      console.log("eee", e);
     }
 
     // TODO: add retention for files
@@ -182,16 +180,15 @@ export class PublicFileService {
     file: Express.Multer.File,
     user: User,
     brandId: number,
-    type:string
+    type: string,
   ) {
-
-    const brand: Brand = await Brand.findOneBy({id: brandId});
+    const brand: Brand = await Brand.findOneBy({ id: brandId });
     if (!brand) {
       throw new NotFoundException("Brand Not Found");
     }
 
     const directory: Directory = await Directory.findOneBy({
-      path: 'brand/banner',
+      path: "brand/banner",
     });
 
     // TODO: check for directory upload permission
@@ -208,12 +205,12 @@ export class PublicFileService {
       mimeType: file.mimetype,
       disk: "minio",
       bucketName: this.bucketName,
-      orderColumn : 1 ,
-      modelType: directory.relatedModel
+      orderColumn: 1,
+      modelType: directory.relatedModel,
     });
     fileRecord.directory = Promise.resolve(directory);
     fileRecord.createdBy = Promise.resolve(user);
-   
+
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
       const uploadedFileInfo = await this.minioClient.putObject(
@@ -227,7 +224,7 @@ export class PublicFileService {
         },
       );
     });
-    if (type == 'desktop') {
+    if (type == "desktop") {
       brand.bannerDesktop = Promise.resolve(fileRecord);
     } else {
       brand.bannerMobile = Promise.resolve(fileRecord);
@@ -235,7 +232,7 @@ export class PublicFileService {
     try {
       await brand.save();
     } catch (e) {
-      console.log('eee',e)
+      console.log("eee", e);
     }
 
     // TODO: add retention for files
@@ -262,16 +259,15 @@ export class PublicFileService {
   async uploadBannerMobile(
     file: Express.Multer.File,
     user: User,
-    brandId: number
+    brandId: number,
   ) {
-
-    const brand: Brand = await Brand.findOneBy({id: brandId});
+    const brand: Brand = await Brand.findOneBy({ id: brandId });
     if (!brand) {
       throw new NotFoundException("Brand Not Found");
     }
 
     const directory: Directory = await Directory.findOneBy({
-      path: 'brand/banner',
+      path: "brand/banner",
     });
 
     if (!directory) {
@@ -287,12 +283,12 @@ export class PublicFileService {
       mimeType: file.mimetype,
       disk: "minio",
       bucketName: this.bucketName,
-      orderColumn : 1 ,
-      modelType: directory.relatedModel
+      orderColumn: 1,
+      modelType: directory.relatedModel,
     });
     fileRecord.directory = Promise.resolve(directory);
     fileRecord.createdBy = Promise.resolve(user);
-   
+
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
       const uploadedFileInfo = await this.minioClient.putObject(
@@ -309,10 +305,9 @@ export class PublicFileService {
 
     brand.bannerMobile = Promise.resolve(fileRecord);
     try {
-
       await brand.save();
     } catch (e) {
-      console.log('err in upload banner',e)
+      console.log("err in upload banner", e);
     }
 
     // TODO: add retention for files
@@ -336,21 +331,20 @@ export class PublicFileService {
     };
   }
 
-    async uploadSellerLogo(
+  async uploadSellerLogo(
     file: Express.Multer.File,
     user: User,
-    sellerId: number
+    sellerId: number,
   ) {
-
     // console.log("seller Id", sellerId);
     // check brand exists
-    const seller: Seller = await Seller.findOneBy({id: sellerId});
+    const seller: Seller = await Seller.findOneBy({ id: sellerId });
     if (!seller) {
       throw new NotFoundException("Seller Not Found");
     }
 
     const directory: Directory = await Directory.findOneBy({
-      path: 'product/seller/logos',
+      path: "product/seller/logos",
     });
 
     // TODO: check for directory upload permission
@@ -367,12 +361,12 @@ export class PublicFileService {
       mimeType: file.mimetype,
       disk: "minio",
       bucketName: this.bucketName,
-      orderColumn : 1 ,
-      modelType: directory.relatedModel
+      orderColumn: 1,
+      modelType: directory.relatedModel,
     });
     fileRecord.directory = Promise.resolve(directory);
     fileRecord.createdBy = Promise.resolve(user);
-   
+
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
       const uploadedFileInfo = await this.minioClient.putObject(
@@ -392,7 +386,7 @@ export class PublicFileService {
     try {
       await seller.save();
     } catch (e) {
-      console.log('eee',e)
+      console.log("eee", e);
     }
 
     // TODO: add retention for files
@@ -410,36 +404,33 @@ export class PublicFileService {
     //   },
     // );
 
-      
     // delete cache
-    const cacheKey = `seller_${JSON.stringify(sellerId)}`
+    const cacheKey = `seller_${JSON.stringify(sellerId)}`;
     const keyExists = await this.cacheManager.get(cacheKey);
     if (keyExists) {
       await this.cacheManager.del(cacheKey);
       console.log("Dellete Cache");
     }
-      
+
     return {
       uuid: fileRecord.uuid,
       expiresAt: oneHourLater,
     };
   }
 
-
   async uploadBrandPriceList(
     file: Express.Multer.File,
     user: User,
-    brandId: number
+    brandId: number,
   ) {
-
     // check brand exists
-    const brand: Brand = await Brand.findOneBy({id: brandId});
+    const brand: Brand = await Brand.findOneBy({ id: brandId });
     if (!brand) {
       throw new NotFoundException("Brand Not Found");
     }
 
     const directory: Directory = await Directory.findOneBy({
-      path: 'brand/priceList',
+      path: "brand/priceList",
     });
 
     // TODO: check for directory upload permission
@@ -456,12 +447,12 @@ export class PublicFileService {
       mimeType: file.mimetype,
       disk: "minio",
       bucketName: this.bucketName,
-      orderColumn : 1 ,
-      modelType: directory.relatedModel
+      orderColumn: 1,
+      modelType: directory.relatedModel,
     });
     fileRecord.directory = Promise.resolve(directory);
     fileRecord.createdBy = Promise.resolve(user);
-   
+
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
       const uploadedFileInfo = await this.minioClient.putObject(
@@ -478,10 +469,9 @@ export class PublicFileService {
 
     brand.priceList = Promise.resolve(fileRecord);
     try {
-
       await brand.save();
     } catch (e) {
-      console.log('eee',e)
+      console.log("eee", e);
     }
 
     // TODO: add retention for files
@@ -505,15 +495,13 @@ export class PublicFileService {
     };
   }
 
-
   async updatePriceList(
     file: Express.Multer.File,
     user: User,
-    sellerId: number
+    sellerId: number,
   ) {
-
     const directory: Directory = await Directory.findOneBy({
-      path: 'price/update',
+      path: "price/update",
     });
 
     // TODO: check for directory upload permission
@@ -530,12 +518,12 @@ export class PublicFileService {
       mimeType: file.mimetype,
       disk: "minio",
       bucketName: this.bucketName,
-      orderColumn : 1 ,
-      modelType: directory.relatedModel
+      orderColumn: 1,
+      modelType: directory.relatedModel,
     });
     fileRecord.directory = Promise.resolve(directory);
     fileRecord.createdBy = Promise.resolve(user);
-   
+
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
       const uploadedFileInfo = await this.minioClient.putObject(
@@ -555,8 +543,12 @@ export class PublicFileService {
     const oneHourLater = new Date();
     oneHourLater.setSeconds(oneHourLater.getSeconds() + fileTTL);
 
-    await this.cacheManager.set(`pnpm a seller:price ${sellerId} ${fileRecord.id}`, JSON.stringify({'sellerId':sellerId,'file':fileRecord.id}), CacheTTL.THREE_MINUTES);
-    
+    await this.cacheManager.set(
+      `pnpm a seller:price ${sellerId} ${fileRecord.id}`,
+      JSON.stringify({ sellerId: sellerId, file: fileRecord.id }),
+      CacheTTL.THREE_MINUTES,
+    );
+
     // await this.minioClient.putObjectRetention(
     //   this.bucketName,
     //   fileRecord.name,
@@ -591,8 +583,8 @@ export class PublicFileService {
 
   async remove(uuid: string, user: User) {
     const file = await this.findOne(uuid, user);
-    const image = await Image.findOneBy({ fileId: file.id })
-    console.log(image)
+    const image = await Image.findOneBy({ fileId: file.id });
+    console.log(image);
     if (image) {
       await Image.delete({ fileId: file.id });
     }
@@ -606,11 +598,14 @@ export class PublicFileService {
   }
   async getFileStream(uuid: string): Promise<any> {
     try {
-      const files = File.findOneBy({ uuid })
+      const files = File.findOneBy({ uuid });
       if (!files) {
-        throw 'not found';
+        throw "not found";
       }
-      const fileStream = this.minioClient.getObject(this.bucketName, (await files).name);
+      const fileStream = this.minioClient.getObject(
+        this.bucketName,
+        (await files).name,
+      );
 
       return await fileStream;
     } catch (error) {
@@ -625,6 +620,6 @@ export class PublicFileService {
   //       directory: { path: 'banner/mobile' }, //it should be dynamic
   //     },
   //   })
-  //   return file 
+  //   return file
   // }
 }

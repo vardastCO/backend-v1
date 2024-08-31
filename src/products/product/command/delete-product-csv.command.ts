@@ -28,30 +28,33 @@ export class DeleteProductCommand extends CommandRunner {
   async run(): Promise<void> {
     const products = await Product.find({
       where: {
-          categoryId : 3876
-      }
+        categoryId: 3876,
+      },
     });
     try {
       for (const product of products) {
         try {
-          const attributeValues = await AttributeValue.findBy({ productId: product.id });
-          await Promise.all(attributeValues.map((attributeValue) => attributeValue.remove()));
-      
+          const attributeValues = await AttributeValue.findBy({
+            productId: product.id,
+          });
+          await Promise.all(
+            attributeValues.map(attributeValue => attributeValue.remove()),
+          );
+
           // Remove Prices for the current product
           const prices = await Price.findBy({ productId: product.id });
-          await Promise.all(prices.map((price) => price.remove()));
-      
+          await Promise.all(prices.map(price => price.remove()));
+
           // Remove Offers for the current product
           const offers = await Offer.findBy({ productId: product.id });
-          await Promise.all(offers.map((offer) => offer.remove()));
+          await Promise.all(offers.map(offer => offer.remove()));
 
           const images = await Image.findBy({ productId: product.id });
-          await Promise.all(images.map((images) => images.remove()));
-          await product.remove()
-      
+          await Promise.all(images.map(images => images.remove()));
+          await product.remove();
+
           // Introduce a delay of 100 milliseconds
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          
+          await new Promise(resolve => setTimeout(resolve, 100));
         } catch (e) {
           console.log("ffffff", e);
         }

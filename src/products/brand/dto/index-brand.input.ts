@@ -1,8 +1,7 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import { IsOptional,IsNotEmpty, IsEnum,IsInt } from "class-validator";
+import { IsOptional, IsNotEmpty, IsEnum, IsInt } from "class-validator";
 import { IndexInput } from "src/base/utilities/dto/index.input";
 import { SortBrandEnum } from "../enum/sort-types.enum";
-
 
 @InputType()
 export class IndexBrandInput extends IndexInput {
@@ -16,20 +15,20 @@ export class IndexBrandInput extends IndexInput {
 
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
-  hasLogoFile?: boolean ;
+  hasLogoFile?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
-  hasBannerFile?: boolean ;
+  hasBannerFile?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
-  hasCatalogeFile?: boolean ;
+  hasCatalogeFile?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
-  hasPriceList?: boolean ;
-  
+  hasPriceList?: boolean;
+
   @Field(() => SortBrandEnum, {
     defaultValue: SortBrandEnum.RATING,
     nullable: true,

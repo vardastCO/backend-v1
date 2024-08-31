@@ -21,7 +21,7 @@ export class SellerFile extends BaseEntity {
 
   @Column()
   sellerId: number;
-  
+
   @Field({ nullable: true })
   @Column({ nullable: true })
   name?: string;
@@ -35,9 +35,9 @@ export class SellerFile extends BaseEntity {
   fileId: number;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: SellerTypeEnum,
-    default: SellerTypeEnum.LOGO 
+    default: SellerTypeEnum.LOGO,
   })
   type: SellerTypeEnum;
 }

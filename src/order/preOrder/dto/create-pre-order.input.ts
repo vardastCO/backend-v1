@@ -1,13 +1,20 @@
-import { Field, InputType, Int} from "@nestjs/graphql";
+import { Field, InputType, Int } from "@nestjs/graphql";
 import { PaymentMethodEnum } from "../enum/sort-types.enum";
-import { IsNotEmpty, IsEnum, IsOptional,Length, IsString, MaxLength, IsInt } from "class-validator";
+import {
+  IsNotEmpty,
+  IsEnum,
+  IsOptional,
+  Length,
+  IsString,
+  MaxLength,
+  IsInt,
+} from "class-validator";
 import { TypeOrder } from "../enum/type-order.enum";
 import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
 import { ExpireTypes } from "../enum/expire-types.enum";
 
 @InputType()
 export class CreatePreOrderInput {
-
   @Field({ nullable: true })
   @IsOptional()
   @IsInt()
@@ -27,7 +34,6 @@ export class CreatePreOrderInput {
   @IsNotEmpty()
   @IsEnum(PaymentMethodEnum)
   payment_methods?: PaymentMethodEnum = PaymentMethodEnum.CASH;
-
 
   @Field({ nullable: true })
   descriptions: string;
@@ -52,7 +58,6 @@ export class CreatePreOrderInput {
   @IsEnum(TypeOrder)
   type?: TypeOrder = TypeOrder.REAL;
 
-
   @Field({ nullable: true })
   @IsOptional()
   @Length(11, 11, { message: "شماره همراه یازده رقمی باید باشد" })
@@ -64,27 +69,26 @@ export class CreatePreOrderInput {
   @IsOptional()
   @IsEnum(PreOrderStatus)
   status?: PreOrderStatus;
-  
 
-  @Field(() => String,{nullable:true}) 
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(255)
   expert_name?: string;
 
-  @Field(() => String,{nullable:true}) 
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(255)
   applicant_name?: string;
 
-  @Field(() => String,{nullable:true}) 
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(255)
   delivery_fullName?: string;
 
-  @Field(() => String,{nullable:true}) 
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   @Length(11, 11, { message: "شماره یازده رقمی باید باشد" })

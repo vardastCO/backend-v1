@@ -11,11 +11,8 @@ import {
   MaxLength,
 } from "class-validator";
 
-
 @InputType()
 export class CreateAddressProjectInput {
-
-
   @Field()
   @IsNotEmpty()
   @IsInt()
@@ -25,5 +22,4 @@ export class CreateAddressProjectInput {
   @IsNotEmpty()
   @IsInt()
   projectId: number;
-
 }

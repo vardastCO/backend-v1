@@ -1,11 +1,6 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import {
-  IsNotEmpty,IsString,IsEnum,IsOptional
-} from "class-validator";
-import {
-  Column,
-  ManyToOne,
-} from "typeorm";
+import { IsNotEmpty, IsString, IsEnum, IsOptional } from "class-validator";
+import { Column, ManyToOne } from "typeorm";
 import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 @InputType()
 export class CreateLineOfferInput {
@@ -16,8 +11,6 @@ export class CreateLineOfferInput {
   @Field(() => Int)
   @IsNotEmpty()
   lineId: number;
-
-
 
   @Field()
   @IsNotEmpty()
@@ -31,14 +24,11 @@ export class CreateLineOfferInput {
   @IsEnum(TypeOrderOffer)
   status: TypeOrderOffer = TypeOrderOffer.CLIENT;
 
-  
   @Field()
   @IsNotEmpty()
   @IsString()
   total_price: string;
 
-
-  
   @Field()
   @IsNotEmpty()
   @IsString()

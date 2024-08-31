@@ -73,33 +73,36 @@ export class RepresentativeService {
     return sellerRepresentative;
   }
 
-  async myProfileSeller(id: number,name:string, searchSellerRepresentativeInput:SearchSellerRepresentativeInput): Promise<Seller> {
-    const sellerRepresentative = await SellerRepresentative.findOneBy({userId : id });
+  async myProfileSeller(
+    id: number,
+    name: string,
+    searchSellerRepresentativeInput: SearchSellerRepresentativeInput,
+  ): Promise<Seller> {
+    const sellerRepresentative = await SellerRepresentative.findOneBy({
+      userId: id,
+    });
     if (!sellerRepresentative) {
       throw new NotFoundException();
     }
     const seller = Seller.findOneBy({ id: sellerRepresentative.sellerId });
 
-    const querybuilder = Offer.createQueryBuilder()
-  
+    const querybuilder = Offer.createQueryBuilder();
+
     const result = await querybuilder
-      .leftJoinAndSelect(`${querybuilder.alias}.product`, 'product')
-      .where(`${querybuilder.alias}.sellerId = :sellerId`, { sellerId: sellerRepresentative.sellerId })
-      .andWhere('LOWER(product.name) LIKE LOWER(:name)', { name: `%${name}%` })
-      .orderBy(`${querybuilder.alias}.createdAt`, 'DESC')
+      .leftJoinAndSelect(`${querybuilder.alias}.product`, "product")
+      .where(`${querybuilder.alias}.sellerId = :sellerId`, {
+        sellerId: sellerRepresentative.sellerId,
+      })
+      .andWhere("LOWER(product.name) LIKE LOWER(:name)", { name: `%${name}%` })
+      .orderBy(`${querybuilder.alias}.createdAt`, "DESC")
       .take(searchSellerRepresentativeInput.perPage)
       .skip(searchSellerRepresentativeInput.skip)
       .getMany();
-    
-    
-  
+
     (await seller).myProduct = Promise.resolve(result);
 
-    return seller
-    
+    return seller;
   }
-
-  
 
   async update(
     id: number,

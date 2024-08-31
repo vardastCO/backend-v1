@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-
 @ObjectType()
 @Entity("search_query")
 export class SearchQuery extends BaseEntity {
@@ -20,11 +19,10 @@ export class SearchQuery extends BaseEntity {
   @Field()
   @Column({ unique: true })
   query: string;
- 
+
   @Field(() => Int, { nullable: true, defaultValue: 1 })
-  @Column({ type: 'int', nullable: true, default: 1 })
+  @Column({ type: "int", nullable: true, default: 1 })
   views?: number;
-  
 
   @Field()
   @CreateDateColumn()
@@ -33,6 +31,4 @@ export class SearchQuery extends BaseEntity {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
-
-  
 }

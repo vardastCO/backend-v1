@@ -8,9 +8,8 @@ import {
   Entity,
   Index,
   ManyToOne,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from "typeorm";
-
 
 @ObjectType()
 @Entity("order_line")
@@ -20,29 +19,27 @@ export class Line extends BaseEntity {
   id: number;
 
   @Field(() => PreOrder)
-  @ManyToOne(() => PreOrder,{ eager: true })
+  @ManyToOne(() => PreOrder, { eager: true })
   preOrder: Promise<PreOrder>;
   @Index()
   @Column()
   preOrderId: number;
-  
+
   @Field()
   @Index()
   @Column()
   userId: number;
-
 
   @Field()
   @Index()
   @Column({ nullable: true })
   item_name: string;
 
-  
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
   attribuite: string;
-  
+
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
@@ -56,15 +53,12 @@ export class Line extends BaseEntity {
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  qty: string; 
-
+  qty: string;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  descriptions: string; 
-
-
+  descriptions: string;
 
   @Field(() => MultiTypeOrder)
   @Index()
@@ -90,5 +84,5 @@ export class Line extends BaseEntity {
   @Field()
   @Index()
   @Column({ nullable: true })
-  deleted_at: string; 
+  deleted_at: string;
 }

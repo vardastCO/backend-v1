@@ -7,9 +7,7 @@ import { UpdateCityInput } from "./dto/update-city.input";
 import { City } from "./entities/city.entity";
 import { PaginationCityResponse } from "./dto/pagination-city.response";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import {
-  Inject,
-} from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { CompressionService } from "src/compression.service";
@@ -33,7 +31,12 @@ export class CityService {
     const { take, skip, provinceId, parentCityId } = indexCityInput || {};
 
     // Generate a unique cache key based on the input parameters
-    const cacheKey = `city_findAll_${JSON.stringify({ take, skip, provinceId, parentCityId })}`;
+    const cacheKey = `city_findAll_${JSON.stringify({
+      take,
+      skip,
+      provinceId,
+      parentCityId,
+    })}`;
 
     const cachedCities = await this.cacheManager.get<string>(cacheKey);
 
@@ -45,10 +48,14 @@ export class CityService {
       take,
       skip,
       where: { provinceId, parentCityId },
-      order: { sort: 'ASC', id: 'DESC' },
+      order: { sort: "ASC", id: "DESC" },
     });
 
-    await this.cacheManager.set(cacheKey,this.compressionService.compressData(cities),CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(cities),
+      CacheTTL.TWO_WEEK,
+    );
 
     return cities;
   }
@@ -61,18 +68,18 @@ export class CityService {
     const cacheKey = `city_paginations_${JSON.stringify(indexCityInput)}`;
     const cachedCities = await this.cacheManager.get<string>(cacheKey);
     if (cachedCities) {
-      console.log('with cache cities')
+      console.log("with cache cities");
       return this.decompressionService.decompressData(cachedCities);
     }
-    const whereConditions = {}
+    const whereConditions = {};
     if (name) {
-      whereConditions['name'] =  Like(`%${name}%`)
+      whereConditions["name"] = Like(`%${name}%`);
     }
     if (provinceId) {
-      whereConditions['provinceId'] = provinceId
+      whereConditions["provinceId"] = provinceId;
     }
     if (parentCityId) {
-      whereConditions['parentCityId'] = parentCityId
+      whereConditions["parentCityId"] = parentCityId;
     }
     const [data, total] = await City.findAndCount({
       take,
@@ -80,12 +87,16 @@ export class CityService {
       where: whereConditions,
       order: { sort: "ASC", id: "DESC" },
     });
-    console.log('no cache cities')
+    console.log("no cache cities");
     const result = PaginationCityResponse.make(indexCityInput, total, data);
-    
-    await this.cacheManager.set(cacheKey, this.compressionService.compressData(result), CacheTTL.TWO_WEEK);
-    
-    return result
+
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(result),
+      CacheTTL.TWO_WEEK,
+    );
+
+    return result;
   }
 
   async findOne(id: number, slug?: string): Promise<City> {
@@ -122,7 +133,6 @@ export class CityService {
     const cachedCount = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedCount !== undefined) {
-
       return this.decompressionService.decompressData(cachedCount);
     }
 
@@ -131,7 +141,11 @@ export class CityService {
       order: { sort: "ASC" },
     });
 
-    await this.cacheManager.set(cacheKey,this.compressionService.compressData(count), CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(count),
+      CacheTTL.TWO_WEEK,
+    );
 
     return count;
   }

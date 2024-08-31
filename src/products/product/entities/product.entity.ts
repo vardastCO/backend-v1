@@ -46,20 +46,19 @@ export class Product extends InfraEntity {
   name: string;
 
   @Field(() => Int, { nullable: true, defaultValue: 1 })
-  @Column({ type: 'int', nullable: true, default: 1 })
+  @Column({ type: "int", nullable: true, default: 1 })
   views?: number;
 
   @Field({ nullable: true })
   @Column({ nullable: true, default: 0 })
   offersNum?: number;
-  
 
   @Field()
   @Column({ unique: true })
   sku: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   techNum: string;
 
   @Field(() => Brand)
@@ -127,7 +126,7 @@ export class Product extends InfraEntity {
 
   @Field()
   @Column({ nullable: true })
-  deletedAt: Date; 
+  deletedAt: Date;
 
   @Field(() => [Price], { nullable: "items" })
   @OneToMany(() => Price, price => price.product)
@@ -168,7 +167,7 @@ export class Product extends InfraEntity {
   @Column({ nullable: true })
   rank?: number = 1;
 
-  @Field(() => Int,{ nullable: true })
+  @Field(() => Int, { nullable: true })
   @Index()
   @Column({ nullable: true })
   parentId: number;

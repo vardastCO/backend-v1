@@ -98,6 +98,4 @@ export class Legal extends BaseEntity {
   @Field(() => [Project])
   @OneToMany(() => Project, project => project.legal, { nullable: true })
   projects: Project[];
-
-
 }

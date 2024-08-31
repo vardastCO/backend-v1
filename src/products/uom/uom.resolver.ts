@@ -29,7 +29,6 @@ export class UomResolver {
     return this.uomService.create(createUomInput);
   }
 
-
   @Public()
   // @Permission("gql.products.uom.index")
   @Query(() => [Uom], { name: "uomsWithoutPagination" })

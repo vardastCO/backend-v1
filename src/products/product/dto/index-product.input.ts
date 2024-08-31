@@ -72,25 +72,24 @@ export class IndexProductInput extends IndexInput {
   isActive?: boolean;
 
   @Field(() => ProductPriceStatusEnum, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsEnum(ProductPriceStatusEnum)
   hasPrice?: ProductPriceStatusEnum;
 
   @Field(() => ProductImageStatusEnum, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsEnum(ProductImageStatusEnum)
   hasImage?: ProductImageStatusEnum;
-  
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
   createdById?: number;
 
-  
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
@@ -107,7 +106,7 @@ export class IndexProductInput extends IndexInput {
   @Field(() => SortDirection, {
     defaultValue: SortDirection.DESC,
     nullable: true,
-    })
+  })
   @IsNotEmpty()
   @IsEnum(SortDirection)
   sortDirection?: SortDirection = SortDirection.DESC;

@@ -8,7 +8,6 @@ import { UpdateRoleInput } from "./dto/update-role.input";
 import { Role } from "./entities/role.entity";
 import { Permission } from "../permission/entities/permission.entity";
 
-
 @Injectable()
 export class RoleService {
   constructor(
@@ -19,15 +18,17 @@ export class RoleService {
   async create(createRoleInput: CreateRoleInput): Promise<Role> {
     if (createRoleInput.claims.length > 0) {
       const permissions = await Permission.find({
-        select: ['id'],
+        select: ["id"],
         where: {
-          claim: In(createRoleInput.claims)
-        }
+          claim: In(createRoleInput.claims),
+        },
       });
-      
-      createRoleInput.permissionIds = permissions.map(permission => permission.id);
+
+      createRoleInput.permissionIds = permissions.map(
+        permission => permission.id,
+      );
     }
-    
+
     return await this.roleRepository.save(createRoleInput);
   }
 

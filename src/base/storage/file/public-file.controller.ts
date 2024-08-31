@@ -10,11 +10,11 @@ import {
   Post,
   Res,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
 } from "@nestjs/common";
 import { Inject } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Response } from 'express';
+import { Response } from "express";
 import { Client } from "minio";
 import { InjectMinio } from "nestjs-minio";
 import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
@@ -23,15 +23,16 @@ import { User } from "src/users/user/entities/user.entity";
 import { CreateFilePublicDto } from "./dto/create-file.public.dto";
 import { UpdateFilePublicDto } from "./dto/update-file.public.dto";
 import { PublicFileService } from "./public-file.service";
-import * as zlib from 'zlib';
+import * as zlib from "zlib";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
 @Controller("base/storage/file")
 export class PublicFileController {
-  constructor(private readonly fileService: PublicFileService,
+  constructor(
+    private readonly fileService: PublicFileService,
     @InjectMinio() protected readonly minioClient: Client,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Post()
   @UseInterceptors(FileInterceptor("file"))
@@ -57,7 +58,7 @@ export class PublicFileController {
   @UseInterceptors(FileInterceptor("file"))
   @Permission("rest.base.storage.file.store")
   uploadCatalogue(
-    @Param('id') brandId: number, 
+    @Param("id") brandId: number,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -76,36 +77,34 @@ export class PublicFileController {
   @UseInterceptors(FileInterceptor("file"))
   @Permission("rest.base.storage.file.store")
   uploadBannerBrand(
-    @Param('id') brandId: number, 
+    @Param("id") brandId: number,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType:
-            /png|gif|jpg|jpeg/,
+          fileType: /png|gif|jpg|jpeg/,
         })
         .addMaxSizeValidator({ maxSize: 50 * 1_000_000 }) // 50MB
         .build({ fileIsRequired: true }),
     )
     file: Express.Multer.File,
-    @Body('type') type: string,
+    @Body("type") type: string,
     @CurrentUser() user: User,
   ) {
     if (!type) {
-      type = 'desktop';
+      type = "desktop";
     }
-    return this.fileService.uploadBanner(file, user, brandId,type);
+    return this.fileService.uploadBanner(file, user, brandId, type);
   }
 
   @Post("/brand/banner/mobile/:id")
   @UseInterceptors(FileInterceptor("file"))
   @Permission("rest.base.storage.file.store")
   uploadBannerBrandMobile(
-    @Param('id') brandId: number, 
+    @Param("id") brandId: number,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType:
-            /png|gif|jpg|jpeg/,
+          fileType: /png|gif|jpg|jpeg/,
         })
         .addMaxSizeValidator({ maxSize: 50 * 1_000_000 }) // 50MB
         .build({ fileIsRequired: true }),
@@ -120,7 +119,7 @@ export class PublicFileController {
   @UseInterceptors(FileInterceptor("file"))
   @Permission("rest.base.storage.file.store")
   uploadBrandPriceList(
-    @Param('id') brandId: number, 
+    @Param("id") brandId: number,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -143,32 +142,28 @@ export class PublicFileController {
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
-          fileType:
-            /csv/,
+          fileType: /csv/,
         })
         .addMaxSizeValidator({ maxSize: 50 * 1_000_000 }) // 50MB
         .build({ fileIsRequired: true }),
     )
     file: Express.Multer.File,
-    @Param('id') sellerId: number, 
+    @Param("id") sellerId: number,
     @CurrentUser() user: User,
   ) {
-  const allKeys: string[] = await this.cacheManager.store.keys();
-  const productKeys: string[] = allKeys.filter(key =>
-    key.startsWith("pnpm"),
-    );
-  if (productKeys.length) {
-    return  {};
-  }
-    return this.fileService.updatePriceList(file, user,sellerId);
+    const allKeys: string[] = await this.cacheManager.store.keys();
+    const productKeys: string[] = allKeys.filter(key => key.startsWith("pnpm"));
+    if (productKeys.length) {
+      return {};
+    }
+    return this.fileService.updatePriceList(file, user, sellerId);
   }
 
-
-  @Post('/seller/logo/:id')
+  @Post("/seller/logo/:id")
   @UseInterceptors(FileInterceptor("file"))
-  @Permission("rest.base.storage.file.store")   
+  @Permission("rest.base.storage.file.store")
   uploadSellerLogo(
-    @Param('id') sellerId: number, 
+    @Param("id") sellerId: number,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -183,8 +178,7 @@ export class PublicFileController {
   ) {
     return this.fileService.uploadSellerLogo(file, user, sellerId);
   }
-  
-    
+
   @Patch(":uuid")
   @Permission("rest.base.storage.file.update")
   update(
@@ -195,27 +189,29 @@ export class PublicFileController {
     return this.fileService.update(uuid, updateFileDto);
   }
 
-  
-  @Get(':uuid')
-  async servePdf(@Param("uuid", new ParseUUIDPipe()) uuid: string, @Res() res: Response): Promise<void> {
+  @Get(":uuid")
+  async servePdf(
+    @Param("uuid", new ParseUUIDPipe()) uuid: string,
+    @Res() res: Response,
+  ): Promise<void> {
     try {
       const fileStream = await this.fileService.getFileStream(uuid);
 
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Transfer-Encoding', 'chunked');
-      res.setHeader('Content-Encoding', 'gzip'); // Set the content encoding to gzip
-  
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Transfer-Encoding", "chunked");
+      res.setHeader("Content-Encoding", "gzip"); // Set the content encoding to gzip
+
       const gzip = zlib.createGzip(); // Create a gzip stream
-  
-      fileStream.on('error', (error) => {
-        console.error('Error streaming file:', error);
-        res.status(500).send('Internal Server Error');
+
+      fileStream.on("error", error => {
+        console.error("Error streaming file:", error);
+        res.status(500).send("Internal Server Error");
       });
-  
+
       fileStream.pipe(gzip).pipe(res);
     } catch (error) {
       // Handle errors, e.g., file not found
-      res.status(404).send('File not found');
+      res.status(404).send("File not found");
     }
   }
 
@@ -231,13 +227,13 @@ export class PublicFileController {
   // @Get()
   // async getBanner() {
   //   const ttlSeconds = 3600;
-  
+
   //   const now = new Date();
   //   now.setSeconds(now.getSeconds() + ttlSeconds);
-  
+
   //   // Call this.fileService.getBanner() and get its result
   //   const bannerData = await this.fileService.getBanner();
-  
+
   //   // Generate presigned URLs for each file in bannerData
   //   const presignedUrls = await Promise.all(
   //     bannerData.map(async (file) => {
@@ -249,7 +245,7 @@ export class PublicFileController {
   //       return { ...file, url: fileUrl };
   //     })
   //   );
-  
+
   //   return {
   //     expiresAt: now,
   //     bannerData: presignedUrls, // Include presigned URLs for each file

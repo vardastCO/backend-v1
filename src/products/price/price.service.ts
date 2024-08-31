@@ -21,10 +21,11 @@ import { DiscountPrice } from "./entities/price-discount.entity";
 
 @Injectable()
 export class PriceService {
-  constructor(
-    @InjectDataSource() private readonly dataSource: DataSource
-  ){}
-  async create(createPriceInput: CreatePriceInput, client: User): Promise<Price> {
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  async create(
+    createPriceInput: CreatePriceInput,
+    client: User,
+  ): Promise<Price> {
     // if (createPriceInput.attributeValueId > 0) {
     //   const attributeIsValid = AttributeValue.createQueryBuilder()
     //     .where({
@@ -38,31 +39,35 @@ export class PriceService {
     //     );
     //   }
     // }
-   
+
     const price: Price = Price.create<Price>(createPriceInput);
     if (!createPriceInput.sellerId) {
-      const sellerRepresentative = await SellerRepresentative.findOneBy({userId : client.id });
+      const sellerRepresentative = await SellerRepresentative.findOneBy({
+        userId: client.id,
+      });
       if (!sellerRepresentative) {
         throw new NotFoundException();
       }
-      price.sellerId = sellerRepresentative.sellerId
-      
+      price.sellerId = sellerRepresentative.sellerId;
     }
     price.createdBy = Promise.resolve(client);
     await price.save();
 
-    if (createPriceInput.valueDiscount && Number(createPriceInput.valueDiscount) > 0) {
-      const discount = DiscountPrice.create()
-      discount.priceId = price.id
-      discount.id = price.id
-      discount.value = createPriceInput.valueDiscount
+    if (
+      createPriceInput.valueDiscount &&
+      Number(createPriceInput.valueDiscount) > 0
+    ) {
+      const discount = DiscountPrice.create();
+      discount.priceId = price.id;
+      discount.id = price.id;
+      discount.value = createPriceInput.valueDiscount;
       discount.type = createPriceInput.typeDiscount;
-     
-      discount.calculated_price =
-         Math.floor((Number(price.amount) * ((100 - Number(createPriceInput.valueDiscount))/100))).toString();
-      await discount.save()
 
-      
+      discount.calculated_price = Math.floor(
+        Number(price.amount) *
+          ((100 - Number(createPriceInput.valueDiscount)) / 100),
+      ).toString();
+      await discount.save();
     }
     return price;
   }
@@ -133,26 +138,29 @@ export class PriceService {
     return await price.createdBy;
   }
 
-
   getDateFromEnum(type: ChartEnum): Date | null {
     const currentDate = new Date();
-    switch(type) {
+    switch (type) {
       case ChartEnum.DAILY:
-        return new Date(currentDate.setDate(currentDate.getDate() - 1))
+        return new Date(currentDate.setDate(currentDate.getDate() - 1));
       case ChartEnum.WEEKLY:
         return new Date(currentDate.setDate(currentDate.getDate() - 7));
       case ChartEnum.MONTHLY:
         return new Date(currentDate.setMonth(currentDate.getMonth() - 1));
       case ChartEnum.YEARLY:
-        return new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDate());
+        return new Date(
+          currentDate.getFullYear() - 1,
+          currentDate.getMonth(),
+          currentDate.getDate(),
+        );
       default:
-        return null; 
+        return null;
     }
   }
 
   async priceChart(chartInput: ChartInput): Promise<ChartOutput> {
     if (chartInput.type == ChartEnum.DAILY) {
-      return { data: [], labels: [] };  
+      return { data: [], labels: [] };
     }
     const { productId, type } = chartInput;
     const toDate = this.getDateFromEnum(type);
@@ -172,19 +180,17 @@ export class PriceService {
       JOIN min_prices ON date_trunc('day', price."createdAt"::date) = min_prices.date AND price.amount = min_prices.min_amount
       WHERE price."productId" = $1 
         AND price."createdAt" BETWEEN $2 and NOW();
-    `
+    `;
 
     const data = await this.dataSource.query(query, [productId, toDate]);
-  
+
     return data.reduce(
-       (carry, current) => {
+      (carry, current) => {
         carry.data.push(current.amount.toString());
         carry.labels.push(new Date(current.date).toISOString());
         return carry;
       },
       { data: [], labels: [] },
     );
-
   }
-
 }

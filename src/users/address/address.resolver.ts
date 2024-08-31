@@ -32,16 +32,13 @@ export class AddressResolver {
     @Args("createAddressInput") createAddressInput: CreateAddressInput,
     @CurrentUser() user: User,
     @Context() context?: { req: Request },
-    
   ) {
-
     const request = context?.req;
     const referer = request.headers["origin"] ?? null;
-    const admin = [
-      ReferrersEnum.ADMIN_COM,
-      ReferrersEnum.ADMIN_IR,
-    ].includes(referer);
-    return this.addressService.create(createAddressInput,user,admin);
+    const admin = [ReferrersEnum.ADMIN_COM, ReferrersEnum.ADMIN_IR].includes(
+      referer,
+    );
+    return this.addressService.create(createAddressInput, user, admin);
   }
 
   @Permission("gql.users.address.store")
@@ -55,7 +52,7 @@ export class AddressResolver {
     indexAddressInput?: IndexAddressInput,
     @CurrentUser() user?: User,
   ) {
-    return this.addressService.paginate(indexAddressInput,user);
+    return this.addressService.paginate(indexAddressInput, user);
   }
 
   @Permission("gql.users.address.show")

@@ -15,7 +15,6 @@ import { OrderOfferStatuses } from "../enums/order-offer-statuses";
 import { OfferLine } from "./offer-line.entity";
 import { ModelOffer } from "src/order/enums/model-offer.enum";
 
-
 @ObjectType()
 @Entity("order_offer")
 export class OfferOrder extends BaseEntity {
@@ -23,19 +22,17 @@ export class OfferOrder extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-
   @Field()
   @Index()
   @Column()
   userId: number;
 
   @Field(() => PreOrder)
-  @ManyToOne(() => PreOrder,{ eager: true })
+  @ManyToOne(() => PreOrder, { eager: true })
   preOrder: Promise<PreOrder>;
   @Index()
   @Column()
   preOrderId: number;
-
 
   @Field({ nullable: true })
   @Index()
@@ -49,19 +46,17 @@ export class OfferOrder extends BaseEntity {
   @Column({ nullable: true })
   sellerId: number;
 
-
   @Field({ nullable: true })
-  @Column({ nullable: true, default: '0' })
+  @Column({ nullable: true, default: "0" })
   total?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true, default: '0' })
+  @Column({ nullable: true, default: "0" })
   total_tax?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true, default: '0' })
+  @Column({ nullable: true, default: "0" })
   total_fi?: string;
-
 
   @Field(() => TypeOrderOffer)
   @Index()
@@ -71,7 +66,6 @@ export class OfferOrder extends BaseEntity {
   })
   type: TypeOrderOffer;
 
-
   @Field(() => ModelOffer)
   @Index()
   @Column("enum", {
@@ -79,17 +73,15 @@ export class OfferOrder extends BaseEntity {
     default: ModelOffer.QUOTATION,
   })
   model: ModelOffer;
-  
-  @Field(() => [OfferLine],{nullable:"items"})
+
+  @Field(() => [OfferLine], { nullable: "items" })
   @OneToMany(() => OfferLine, offerLine => offerLine.offerOrder)
   offerLine: OfferLine[];
 
-
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   uuid?: string;
 
-  
   @Field(() => OrderOfferStatuses)
   @Index()
   @Column("enum", {
@@ -106,5 +98,5 @@ export class OfferOrder extends BaseEntity {
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  deleted_at: string; 
+  deleted_at: string;
 }

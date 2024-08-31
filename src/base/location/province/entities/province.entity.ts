@@ -17,7 +17,7 @@ import { Country } from "../../country/entities/country.entity";
 @Unique(["nameEn", "countryId"])
 export class Province extends BaseEntity {
   public static TEHRAN = 12;
-  
+
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;

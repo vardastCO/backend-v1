@@ -13,9 +13,8 @@ export class ValuesService extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   @Field()
   @Column()
   value: string;
-  
 }

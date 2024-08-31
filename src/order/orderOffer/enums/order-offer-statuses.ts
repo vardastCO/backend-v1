@@ -7,7 +7,7 @@ export enum OrderOfferStatuses {
   PAYMENT_SUBMITED = "PAYMENT_SUBMITED",
   PENDING_PAYMENT = "PENDING_PAYMENT",
   CLOSED = "CLOSED",
- }
+}
 
 registerEnumType(OrderOfferStatuses, {
   name: "OrderOfferStatuses",

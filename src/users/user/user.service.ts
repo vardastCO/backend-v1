@@ -44,8 +44,8 @@ export class UserService {
     private authorizationService: AuthorizationService,
     private readonly compressionService: CompressionService,
     private readonly decompressionService: DecompressionService,
-    private readonly entityManager: EntityManager
-  ) { }
+    private readonly entityManager: EntityManager,
+  ) {}
 
   async create(
     createUserInput: CreateUserInput,
@@ -85,7 +85,7 @@ export class UserService {
     //   }
     //   user.permissions = Promise.resolve(permissions);
     // }
-    user.countryId = Country.IR
+    user.countryId = Country.IR;
     await user.save();
     return user;
   }
@@ -109,43 +109,34 @@ export class UserService {
     indexUserInput?: IndexUserInput,
   ): Promise<PaginationUserResponse> {
     indexUserInput.boot();
-    const {
-      take,
-      skip,
-      status,
-      birth,
-      cellphone,
-      email,
-      nationalCode
-    } = indexUserInput || {};
-    const whereConditions: any = {}
+    const { take, skip, status, birth, cellphone, email, nationalCode } =
+      indexUserInput || {};
+    const whereConditions: any = {};
 
     if (status) {
-      whereConditions['status'] = status as UserStatusesEnum;
+      whereConditions["status"] = status as UserStatusesEnum;
     }
 
     if (nationalCode) {
-      whereConditions['nationalCode'] = Like(`%${nationalCode}%`);
+      whereConditions["nationalCode"] = Like(`%${nationalCode}%`);
     }
 
     if (email) {
-      whereConditions['email'] = Like(`%${email}%`);
+      whereConditions["email"] = Like(`%${email}%`);
     }
 
     if (cellphone) {
-      whereConditions['cellphone'] = Like(`%${cellphone}%`);
-    }
-  
-    if (birth) {
-      whereConditions['birth'] = birth;
+      whereConditions["cellphone"] = Like(`%${cellphone}%`);
     }
 
+    if (birth) {
+      whereConditions["birth"] = birth;
+    }
 
     if (indexUserInput.roleIds && indexUserInput.roleIds.length > 0) {
       whereConditions.roles = { id: In(indexUserInput.roleIds) };
     }
 
-  
     const [data, total] = await User.findAndCount({
       skip,
       take,
@@ -157,9 +148,7 @@ export class UserService {
   }
 
   async getAddressesOf(user: User): Promise<Address[]> {
-
-
-  const addresses = await Address.createQueryBuilder()
+    const addresses = await Address.createQueryBuilder()
       .limit(15)
       .where({ relatedType: AddressRelatedTypes.USER, relatedId: user.id })
       .orderBy({ sort: "ASC" })
@@ -174,13 +163,13 @@ export class UserService {
         id: id,
         uuid: uuid,
       },
-      relations: ['roles.permissions'],
-    })
+      relations: ["roles.permissions"],
+    });
     if (!user) {
       throw new NotFoundException();
     }
-    user.addresses = await this.getAddressesOf(user)
-    // const permissions = roles.flatMap(role => role.permissions); 
+    user.addresses = await this.getAddressesOf(user);
+    // const permissions = roles.flatMap(role => role.permissions);
     // const uniqueClaims = [...new Set<string>(permissions.map(permission => permission.claim))];
     // user.claims = uniqueClaims.length > 0 ? uniqueClaims : [];
     return user;
@@ -194,33 +183,32 @@ export class UserService {
     id: number,
     updateUserInput: UpdateUserInput,
     currentUser: User,
-    admin: boolean
+    admin: boolean,
   ): Promise<User> {
     try {
       const userAuth = await this.authorizationService.setUser(currentUser);
-      let user_id = currentUser.id
+      let user_id = currentUser.id;
 
       if (userAuth.hasRole("admin") && id) {
-        user_id = id
+        user_id = id;
       }
       const user: User = await User.findOneBy({ id: user_id });
-        
-        
+
       if (!user) {
         throw new NotFoundException();
       }
 
-        
       const originalUser = { ...user };
 
-
       if (updateUserInput.password) {
-        updateUserInput.password = await this.hashPassword(updateUserInput.password);
+        updateUserInput.password = await this.hashPassword(
+          updateUserInput.password,
+        );
       }
-      const displayRoleId = updateUserInput.displayRoleId
-      const role_ids = updateUserInput.roleIds
-      delete updateUserInput.displayRoleId
-      delete updateUserInput.roleIds
+      const displayRoleId = updateUserInput.displayRoleId;
+      const role_ids = updateUserInput.roleIds;
+      delete updateUserInput.displayRoleId;
+      delete updateUserInput.roleIds;
 
       Object.assign(user, updateUserInput);
 
@@ -231,32 +219,33 @@ export class UserService {
              set "displayRoleId" = $1
              where "id" = $2 
             `,
-            [displayRoleId, user.id]
-          )
+            [displayRoleId, user.id],
+          );
         } catch (error) {
           console.log("error :", error);
         }
       }
 
-
-
       if (role_ids) {
-        
-        await this.entityManager.query(`
+        await this.entityManager.query(
+          `
             delete from "users_authorization_user_roles"
             where "userId" = $1
           `,
-          [user.id]
-        )
+          [user.id],
+        );
 
-        await this.entityManager.query(`
+        await this.entityManager.query(
+          `
           INSERT INTO "users_authorization_user_roles" ("userId", "roleId")
           SELECT $1, UNNEST($2::int[]);
-          `, [user.id, role_ids])
-        
+          `,
+          [user.id, role_ids],
+        );
+
         const cacheKey = `roles_user_{id:${JSON.stringify(user.id)}}`;
-        await this.cacheManager.del(cacheKey)
-        await user.save()
+        await this.cacheManager.del(cacheKey);
+        await user.save();
       }
 
       if (
@@ -270,9 +259,8 @@ export class UserService {
         );
       }
 
-      await user.save()
+      await user.save();
 
-      
       if (updateUserInput.roleIds) {
         await this.cacheRolesOf(user);
         await this.cachePermissionsOf(user);
@@ -284,23 +272,22 @@ export class UserService {
     }
   }
 
-  
   async updateProfile(
     updateProfileInput: UpdateProfileInput,
     currentUser: User,
   ): Promise<User> {
-    const user: User = await User.findOneBy({ id:currentUser.id });
+    const user: User = await User.findOneBy({ id: currentUser.id });
 
     if (!user) {
       throw new NotFoundException();
     }
-    
+
     Object.assign(user, updateProfileInput);
     const { firstName, lastName } = updateProfileInput;
     if (firstName || lastName) {
-        user.fullName = [firstName, lastName].filter(Boolean).join(' ');
+      user.fullName = [firstName, lastName].filter(Boolean).join(" ");
     } else {
-        user.fullName = 'کاربر وردست';
+      user.fullName = "کاربر وردست";
     }
 
     this.dataSource.transaction(async () => {
@@ -349,8 +336,7 @@ export class UserService {
     //   } catch (e) {
     //     console.log('err in add legal',e)
     //   }
-      
-     
+
     // }
 
     return user;
@@ -372,20 +358,17 @@ export class UserService {
 
   async getCountry(user: User): Promise<Country> {
     const cacheKey = `getCountry`;
-    const cachedData = await this.cacheManager.get<string>(
-      cacheKey,
-    );
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-      return await this.decompressionService.decompressData(cachedData)
+      return await this.decompressionService.decompressData(cachedData);
     }
-    const result = await this.countryService.findOne(user.countryId);;
+    const result = await this.countryService.findOne(user.countryId);
     await this.cacheManager.set(
       cacheKey,
       this.compressionService.compressData(result),
       CacheTTL.ONE_DAY,
     );
     return result;
-
   }
 
   async getRoles(user: User): Promise<Role[]> {
@@ -396,11 +379,12 @@ export class UserService {
       return this.decompressionService.decompressData(cachedRoles);
     }
 
-    const roles = await user.roles; 
-    await this.cacheManager.set(cacheKey,
+    const roles = await user.roles;
+    await this.cacheManager.set(
+      cacheKey,
       this.compressionService.compressData(roles),
-      CacheTTL.ONE_DAY)
-    ; 
+      CacheTTL.ONE_DAY,
+    );
 
     return roles;
   }
@@ -413,23 +397,21 @@ export class UserService {
       return this.decompressionService.decompressData(cachedRoles);
     }
 
-    const result = await user.permissions; 
-    await this.cacheManager.set(cacheKey,
+    const result = await user.permissions;
+    await this.cacheManager.set(
+      cacheKey,
       this.compressionService.compressData(result),
-      CacheTTL.ONE_DAY)
-    ; 
+      CacheTTL.ONE_DAY,
+    );
 
     return result;
   }
 
   async cacheRolesOf(user: User): Promise<string[]> {
     const cacheKey = `roles_user_{id:${JSON.stringify(user.id)}}`;
-    const cachedData = await this.cacheManager.get<string>(
-      cacheKey,
-    );
+    const cachedData = await this.cacheManager.get<string>(cacheKey);
     if (cachedData) {
-
-      return this.decompressionService.decompressData(cachedData)
+      return this.decompressionService.decompressData(cachedData);
     }
     const roleNames = (await user.roles).map(role => role.name);
     await this.cacheManager.set(
@@ -443,26 +425,28 @@ export class UserService {
   async cachePermissionsOf(user: User): Promise<string[]> {
     const cacheKey = `permissions_user_{id:${JSON.stringify(user.id)}}`;
     const cachedData = await this.cacheManager.get<string>(cacheKey);
-  
+
     if (cachedData) {
-  
-      const decompressedData = this.decompressionService.decompressData(cachedData);
-      return decompressedData.filter(permission => permission.endsWith('.index'));
+      const decompressedData =
+        this.decompressionService.decompressData(cachedData);
+      return decompressedData.filter(permission =>
+        permission.endsWith(".index"),
+      );
     }
-  
+
     const userWholePermissions = await user.wholePermissionNames();
-    const limitedPermissions = userWholePermissions.filter(permission => permission.endsWith('.index'));
-  
+    const limitedPermissions = userWholePermissions.filter(permission =>
+      permission.endsWith(".index"),
+    );
+
     await this.cacheManager.set(
       cacheKey,
       this.compressionService.compressData(limitedPermissions),
       CacheTTL.ONE_DAY,
     );
-  
+
     return limitedPermissions;
   }
-  
-  
 
   async getSellerRecordOf(user: User): Promise<Seller> {
     const cacheKey = `seller_${user.id}_${SellerRepresentativeRoles.ADMIN}`;

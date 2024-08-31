@@ -33,7 +33,7 @@ export class CreateContactInfoInput {
   @MaxLength(255)
   title: string;
 
-  @Field({nullable : true})
+  @Field({ nullable: true })
   @IsOptional()
   @IsInt()
   countryId?: number;

@@ -12,7 +12,6 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-
 @ObjectType()
 @Entity("pre_order_file")
 export class PreOrderFile extends BaseEntity {
@@ -21,7 +20,7 @@ export class PreOrderFile extends BaseEntity {
   id: number;
 
   @Field(() => PreOrder)
-  @ManyToOne(() => PreOrder,{ eager: true })
+  @ManyToOne(() => PreOrder, { eager: true })
   preOrder: Promise<PreOrder>;
   @Index()
   @Column()
@@ -38,6 +37,5 @@ export class PreOrderFile extends BaseEntity {
   @Field()
   @Index()
   @Column({ nullable: true })
-  deleted_at: string; 
-
+  deleted_at: string;
 }

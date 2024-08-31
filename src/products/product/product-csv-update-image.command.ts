@@ -10,35 +10,30 @@ import * as Mime from "mime-types";
 import { File } from "src/base/storage/file/entities/file.entity";
 import { Image } from "../images/entities/image.entity";
 
-
 @Command({
   name: "product:image",
   description: "image products from given csv file base on official format.",
 })
 export class ProductCsvUpdateImageCommand extends CommandRunner {
   private headerMap = {
-    "productid": "productid",
-    "sku":'sku'
+    productid: "productid",
+    sku: "sku",
   };
- 
+
   private valueMap = {
     csvAttributes: value => {
       const attributes = value.split(/\n|(\r\n)/) ?? [];
       return attributes
-          .map((attribute) => {
-            attribute = attribute ?? "";
-            const [ productid,sku] = attribute;
-            return {
-              productid,
-              sku
-        
-            };
-          })
-          .filter((a) => a)
-          .reduce((carry, cleanAttribute) => {
-          
-          
-          
+        .map(attribute => {
+          attribute = attribute ?? "";
+          const [productid, sku] = attribute;
+          return {
+            productid,
+            sku,
+          };
+        })
+        .filter(a => a)
+        .reduce((carry, cleanAttribute) => {
           return carry;
         }, {});
     },
@@ -65,7 +60,7 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
     const [csvFile, imageDirectory] = passedParam;
     const stream = Fs.createReadStream(csvFile, "utf8");
     await this.setFiles(imageDirectory);
-   
+
     const csvProducts = await this.csvParser.parse(
       stream,
       CsvProduct,
@@ -84,64 +79,64 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
     try {
       for (const csvProduct of csvProducts.list) {
         try {
-
-        const { productid, sku } = csvProduct;
-        let product: Product = await Product.findOneBy({
-          sku: sku,
-        });
-        if (!product) {
-          throw product;
-        }
- 
-        const productImages = await product.images;
-      
-        // Check if the product already has images
-        // console.log('first ',productImages,productImages.length)
-
-        // Check if the product already has images
-        if (productImages.length != 0) {
-          // console.log('Skipped adding images for', product.name, 'as it already has images.');
-          continue; // Continue to the next product if images exist
-        }
-         
-        console.log('iiiiiiii',sku)
-        let i = 1;
-        for (const filename of this.files) {
-          try {
-            const parts = filename.split('-');
-            if (parts.length >= 2) {
-              const fileSku = parts[0];
-              const sortPart = parts[1].split('.')[0];
-              const extension = parts[1].split('.').pop().toLowerCase();
-
-              const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-              if (`${fileSku}` == `${sku}`) {
-                console.log('fileSku',fileSku)
-                const sortOrder = parseInt(sortPart, 10) || i++;
-                await this.addImage(imageDirectory, filename, product, sortOrder);
-                await this.delay(100);
-              }
-              // await this.delay(100);
-            }
-          } catch (error) {
-            console.log('Warning:', error);
+          const { productid, sku } = csvProduct;
+          let product: Product = await Product.findOneBy({
+            sku: sku,
+          });
+          if (!product) {
+            throw product;
           }
-        }
-          
+
+          const productImages = await product.images;
+
+          // Check if the product already has images
+          // console.log('first ',productImages,productImages.length)
+
+          // Check if the product already has images
+          if (productImages.length != 0) {
+            // console.log('Skipped adding images for', product.name, 'as it already has images.');
+            continue; // Continue to the next product if images exist
+          }
+
+          console.log("iiiiiiii", sku);
+          let i = 1;
+          for (const filename of this.files) {
+            try {
+              const parts = filename.split("-");
+              if (parts.length >= 2) {
+                const fileSku = parts[0];
+                const sortPart = parts[1].split(".")[0];
+                const extension = parts[1].split(".").pop().toLowerCase();
+
+                const validExtensions = ["jpg", "jpeg", "png", "webp"];
+                if (`${fileSku}` == `${sku}`) {
+                  console.log("fileSku", fileSku);
+                  const sortOrder = parseInt(sortPart, 10) || i++;
+                  await this.addImage(
+                    imageDirectory,
+                    filename,
+                    product,
+                    sortOrder,
+                  );
+                  await this.delay(100);
+                }
+                // await this.delay(100);
+              }
+            } catch (error) {
+              console.log("Warning:", error);
+            }
+          }
         } catch (e) {
-          console.log('eerr',e)
+          console.log("eerr", e);
         }
-        
-  
+
         // console.log('Saved', product.name);
       }
     } catch (e) {
-      console.log('rrrrrr', e);
+      console.log("rrrrrr", e);
     }
-  
+
     console.log("Finished.");
-  
-  
   }
 
   async addImage(
@@ -189,10 +184,9 @@ export class ProductCsvUpdateImageCommand extends CommandRunner {
       },
     );
   }
-
 }
 class CsvProduct {
   name: string;
   category: string;
-  brand : string;
+  brand: string;
 }

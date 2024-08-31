@@ -10,9 +10,7 @@ import { UpdateVocabularyInput } from "./dto/update-vocabulary.input";
 import { Vocabulary } from "./entities/vocabulary.entity";
 import { Cache } from "cache-manager";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import {
-  Inject,
-} from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 @Injectable()
 export class VocabularyService {
   constructor(
@@ -53,14 +51,12 @@ export class VocabularyService {
       order: { sort: "ASC" },
     });
 
-
     return PaginationVocabularyResponse.make(indexVocabularyInput, total, data);
   }
 
   async findOne(id: number, slug?: string, user?: User): Promise<Vocabulary> {
-
     const vocabulary = await this.vocabularyRepository.findOneBy({ id, slug });
-  
+
     if (!vocabulary) {
       throw new NotFoundException();
     }

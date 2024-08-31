@@ -5,5 +5,4 @@ export enum ProductImageStatusEnum {
   HAS_IMAGE = 1,
 }
 
-
 registerEnumType(ProductImageStatusEnum, { name: "ProductImageStatusEnum" });

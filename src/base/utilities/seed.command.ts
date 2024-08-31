@@ -59,7 +59,7 @@ export class SeedCommand extends CommandRunner {
       // RoleSeeder,
       // PermissionSeeder,
       // DevUserSeeder,
-      
+
       // DirectorySeed,
       CategorySeeder,
       // AddressSeeder,

@@ -33,7 +33,6 @@ export class PreOrder extends BaseEntity {
   @ManyToOne(() => Project, { eager: true, nullable: true })
   project: Promise<Project>;
 
-  
   @Field(() => TypeOrder)
   @Column("enum", {
     enum: TypeOrder,
@@ -53,7 +52,7 @@ export class PreOrder extends BaseEntity {
   projectId: number;
 
   @Field(() => ProjectAddress, { nullable: true })
-  @ManyToOne(() => ProjectAddress, {eager: true, nullable: true })
+  @ManyToOne(() => ProjectAddress, { eager: true, nullable: true })
   address: Promise<ProjectAddress>;
 
   @Column({ nullable: true })
@@ -71,51 +70,50 @@ export class PreOrder extends BaseEntity {
   @Column({ nullable: true })
   pickUpUserId: number;
 
+  @Field({ nullable: true })
+  @Index()
+  @Column({ nullable: true })
+  request_date: string;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  request_date: string; 
+  delivery_fullName: string;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  delivery_fullName: string; 
+  delivery_contact: string;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  delivery_contact: string; 
+  expert_name: string;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  expert_name: string; 
+  applicant_name: string;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  applicant_name: string; 
+  need_date: Date;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  need_date: Date; 
+  bid_end: Date;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  bid_end: Date; 
+  bid_start: Date;
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  bid_start: Date; 
-
-  @Field({ nullable: true })
-  @Index()
-  @Column({ nullable: true })
-  expire_time: string; 
+  expire_time: string;
 
   @Field({ nullable: true })
   @Index()
@@ -144,20 +142,19 @@ export class PreOrder extends BaseEntity {
   descriptions: string;
 
   @Field(() => [Line], { nullable: "items" })
-  @OneToMany(() => Line, line => line.preOrder) 
+  @OneToMany(() => Line, line => line.preOrder)
   lines: Promise<Line[]>;
 
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   lineDetail?: string;
 
   @Field(() => [PreOrderFile], { nullable: "items" })
-  @OneToMany(() => PreOrderFile, file => file.preOrder) 
+  @OneToMany(() => PreOrderFile, file => file.preOrder)
   files: Promise<PreOrderFile[]>;
 
   @Field(() => Boolean, { defaultValue: false })
   hasFile: Boolean = false;
-
 
   @Field(() => PreOrderStatus)
   @Index()
@@ -175,21 +172,19 @@ export class PreOrder extends BaseEntity {
   })
   last_offer_status: OrderOfferStatuses;
 
-
   @Field({ nullable: true })
   @Column({ nullable: true, default: 0 })
   offersNum?: number;
 
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   uuid?: string;
 
-
-  @Field(() => [OfferOrder], { nullable: true }) 
+  @Field(() => [OfferOrder], { nullable: true })
   offers?: OfferOrder[];
 
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  deleted_at: string; 
+  deleted_at: string;
 }

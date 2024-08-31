@@ -18,5 +18,4 @@ export class createImageCategoryInput {
   @IsOptional()
   @IsUUID("4")
   fileUuid: string;
-
 }

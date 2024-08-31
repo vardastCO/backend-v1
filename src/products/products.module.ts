@@ -6,8 +6,8 @@ import { ImagesModule } from "./images/images.module";
 import { PriceModule } from "./price/price.module";
 import { ProductModule } from "./product/product.module";
 import { UomModule } from "./uom/uom.module";
-import { SellerModule } from './seller/seller.module';
-import { OfferModule } from './offer/offer.module';
+import { SellerModule } from "./seller/seller.module";
+import { OfferModule } from "./offer/offer.module";
 import { OptionsModule } from "./options/options.module";
 
 @Module({
@@ -21,7 +21,7 @@ import { OptionsModule } from "./options/options.module";
     ImagesModule,
     SellerModule,
     OfferModule,
-    OptionsModule
+    OptionsModule,
   ],
 })
 export class ProductsModule {}

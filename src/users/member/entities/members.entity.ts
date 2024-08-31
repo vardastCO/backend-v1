@@ -10,10 +10,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from "typeorm";
-import {
-  IsEnum,
-  IsNotEmpty,
-} from "class-validator";
+import { IsEnum, IsNotEmpty } from "class-validator";
 import { MemberRoles } from "../enums/member.enum";
 import { TypeMember } from "../enums/type-member.enum";
 
@@ -39,7 +36,7 @@ export class Member extends BaseEntity {
   @Field(() => TypeMember)
   @Column("enum", {
     enum: TypeMember,
-    default: TypeMember.LEGAL
+    default: TypeMember.LEGAL,
   })
   type: TypeMember;
 
@@ -60,7 +57,7 @@ export class Member extends BaseEntity {
   isActive: boolean;
 
   @Field({ nullable: true })
-  @Column({ nullable: true  })
+  @Column({ nullable: true })
   position?: string;
 
   @Field()

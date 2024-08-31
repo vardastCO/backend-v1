@@ -66,19 +66,17 @@ export class UserResolver {
     @Args("updateUserInput") updateUserInput: UpdateUserInput,
     @CurrentUser() currentUser: User,
     @Context() context?: { req: Request },
-  )
-  {
+  ) {
     const request = context?.req;
     const referer = request.headers["origin"] ?? null;
-    const admin = [
-      ReferrersEnum.ADMIN_COM,
-      ReferrersEnum.ADMIN_IR,
-    ].includes(referer);
+    const admin = [ReferrersEnum.ADMIN_COM, ReferrersEnum.ADMIN_IR].includes(
+      referer,
+    );
     return this.userService.update(
       updateUserInput.id,
       updateUserInput,
       currentUser,
-      admin
+      admin,
     );
   }
   @Permission("gql.base.event_tracker.create")
@@ -87,10 +85,7 @@ export class UserResolver {
     @Args("updateProfileInput") updateProfileInput: UpdateProfileInput,
     @CurrentUser() currentUser: User,
   ) {
-    return this.userService.updateProfile(
-      updateProfileInput,
-      currentUser,
-    );
+    return this.userService.updateProfile(updateProfileInput, currentUser);
   }
 
   @Permission("gql.users.user.destroy")

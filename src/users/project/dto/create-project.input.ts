@@ -12,21 +12,17 @@ import {
 } from "class-validator";
 import { MultiStatuses } from "../enums/multi-statuses.enum";
 
-
 @InputType()
 export class CreateProjectInput {
-
   @Field()
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
   name: string;
 
-
   @Field({ nullable: true })
   @IsOptional()
   description?: string;
-
 
   @Field(type => MultiStatuses, {
     defaultValue: MultiStatuses.CONFIRMED,
@@ -34,16 +30,12 @@ export class CreateProjectInput {
   @IsOptional()
   status: MultiStatuses;
 
-
   @Field({ nullable: true })
   @IsOptional()
   wallet?: string;
 
-
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
-  legalId?: number;  
-
-
+  legalId?: number;
 }

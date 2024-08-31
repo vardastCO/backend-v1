@@ -1,7 +1,5 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import {
-  IsNotEmpty,IsString,IsEnum,IsOptional
-} from "class-validator";
+import { IsNotEmpty, IsString, IsEnum, IsOptional } from "class-validator";
 import { OrderOfferStatuses } from "../enums/order-offer-statuses";
 @InputType()
 export class UpdateOrderOfferInput {
@@ -16,5 +14,4 @@ export class UpdateOrderOfferInput {
   @IsNotEmpty()
   @IsEnum(OrderOfferStatuses)
   status?: OrderOfferStatuses = OrderOfferStatuses.PENDING_INFO;
-  
 }

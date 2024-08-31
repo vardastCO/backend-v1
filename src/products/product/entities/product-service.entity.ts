@@ -14,11 +14,10 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import { AttributeValuesProductService } from "src/products/attribute-value/entities/attribute-value-service.entity";
 
 @ObjectType()
-
 @Entity("products_detail")
 export class ProductEntity extends BaseEntity {
   @Field(() => Int)
-  @PrimaryColumn({ type: 'int' })
+  @PrimaryColumn({ type: "int" })
   id: number;
 
   @Field()
@@ -47,9 +46,11 @@ export class ProductEntity extends BaseEntity {
   })
   status: ThreeStateSupervisionStatuses;
 
-
   @Field(() => [AttributeValuesProductService], { nullable: "items" })
-  @OneToMany(() => AttributeValuesProductService, attributeValue => attributeValue.product)
+  @OneToMany(
+    () => AttributeValuesProductService,
+    attributeValue => attributeValue.product,
+  )
   attributeValues: Promise<AttributeValuesProductService[]>;
 
   // @Field(() => [Price], { nullable: "items" })

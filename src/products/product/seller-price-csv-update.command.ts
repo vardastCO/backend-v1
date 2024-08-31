@@ -50,7 +50,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
     sku: "sku",
     price: "price",
     discount: "discount",
-    offprice : "offprice"
+    offprice: "offprice",
   };
 
   private valueMap = {
@@ -60,7 +60,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
         .map(attribute => {
           attribute = attribute ?? "";
           // const [ name, category,brand,sku,filter,uom] = attribute;
-          const [name, sku, price,discount,offprice] = attribute;
+          const [name, sku, price, discount, offprice] = attribute;
           return {
             name,
             sku,
@@ -109,7 +109,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
 
     for (const csvProduct of csvProducts.list) {
       try {
-        const { name, sku, price,discount,offprice } = csvProduct;
+        const { name, sku, price, discount, offprice } = csvProduct;
         let product = Product.findOneBy({ name });
         if (!product) {
           product = Product.findOneBy({ sku });
@@ -121,7 +121,6 @@ export class SellerPriceUpdateCommand extends CommandRunner {
         for (let i = 0; i < sellerIds.length; i++) {
           const sellerInfo = sellerIds[i];
 
-
           for (let j = 0; j < sellerInfo.sellerId.length; j++) {
             const singleSellerId = sellerInfo.sellerId[j];
 
@@ -132,7 +131,7 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                   productId: (await product).id,
                 },
               });
-            
+
               if (!existingOffer) {
                 const offer = Offer.create();
                 offer.productId = (await product).id;
@@ -140,16 +139,14 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                 offer.status = ThreeStateSupervisionStatuses.CONFIRMED;
                 offer.isPublic = true;
                 offer.isAvailable = true;
-            
+
                 await offer.save();
               }
-            
             } catch (e) {
               console.log("Error processing product:", e);
             }
 
             try {
-              
               if (price) {
                 const priceModel = Price.create();
                 priceModel.sellerId = singleSellerId; // Set a single seller ID
@@ -157,27 +154,24 @@ export class SellerPriceUpdateCommand extends CommandRunner {
                 priceModel.isPublic = true;
                 priceModel.createdById = 1;
                 priceModel.amount = sellerInfo.isCurrencyTrue
-                  ?  parseInt(price) / 10
-                  :  parseInt(price);
+                  ? parseInt(price) / 10
+                  : parseInt(price);
                 priceModel.type = PriceTypesEnum.CONSUMER;
                 await priceModel.save();
                 const priceModelId = await priceModel.id;
                 if (discount && offprice && priceModel) {
+                  console.log("await discount", discount);
 
-                  console.log('await discount',discount)
-
-                  const discounts = DiscountPrice.create()
-                  discounts.priceId = priceModelId
-                  discounts.id = priceModelId
-                  discounts.value = (Number(discount)*100).toString()
+                  const discounts = DiscountPrice.create();
+                  discounts.priceId = priceModelId;
+                  discounts.id = priceModelId;
+                  discounts.value = (Number(discount) * 100).toString();
                   discounts.type = DiscountTypesEnum.PERCENT;
-                 
+
                   discounts.calculated_price = offprice.toString();
-                  await discounts.save()
+                  await discounts.save();
                 }
               }
-              
-          
             } catch (e) {
               console.log("Error processing product:", e);
             }

@@ -18,7 +18,7 @@ export class KavenegarService {
   constructor(
     configService: ConfigService,
     private readonly httpService: HttpService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.apiKey = configService.get("SMS_KAVENEGAR_API_KEY");
     this.smsServiceEnabled = configService.get("SMS_ENABLED") == "true";
@@ -73,9 +73,8 @@ export class KavenegarService {
         }),
       );
     } catch (e) {
-      console.log('look up kavenegar ',e )
-    } 
-    
+      console.log("look up kavenegar ", e);
+    }
   }
 
   async request(
@@ -98,7 +97,7 @@ export class KavenegarService {
         })
         .pipe(
           catchError((error: AxiosError) => {
-          //  console.log(url, body, error);
+            //  console.log(url, body, error);
             throw "An error happened while calling sms provider api!";
           }),
         ),

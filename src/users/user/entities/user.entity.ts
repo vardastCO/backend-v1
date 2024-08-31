@@ -61,7 +61,7 @@ export class User extends BaseEntity {
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
-  birth?: Date; 
+  birth?: Date;
 
   @Field(type => Int, { nullable: true })
   @Column("int8", { nullable: true })
@@ -104,7 +104,6 @@ export class User extends BaseEntity {
   @Column("timestamp", { nullable: true })
   twoFactorEnabledAt?: Date;
 
-
   @Field(() => UserLanguagesEnum)
   @Index()
   @Column("enum", {
@@ -125,7 +124,6 @@ export class User extends BaseEntity {
   @ManyToOne(type => Country)
   country: Country;
 
-
   @Column("int")
   countryId: number;
 
@@ -139,7 +137,7 @@ export class User extends BaseEntity {
   legal: Legal;
 
   @Field({ nullable: true })
-  @Column({  default: '0', nullable: true  })
+  @Column({ default: "0", nullable: true })
   wallet?: string;
 
   @Field(type => UserStatusesEnum, {
@@ -161,8 +159,8 @@ export class User extends BaseEntity {
   @Column("int")
   displayRoleId: number;
 
-  // @Field(() => [String], { nullable: "items" }) 
-  // @Column("text", { array: true, nullable: true }) 
+  // @Field(() => [String], { nullable: "items" })
+  // @Column("text", { array: true, nullable: true })
   // claims: string[];
 
   @Field(type => [Role], { nullable: "items" })
@@ -252,58 +250,53 @@ export class User extends BaseEntity {
     } else if (this.lastName) {
       this.fullName = this.lastName;
     } else {
-      this.fullName =  'کاربر وردست'; 
+      this.fullName = "کاربر وردست";
     }
   }
 
   async wholePermissionNames(): Promise<string[]> {
     try {
       const userRoles = await this.roles;
-      
+
       const permissionNamesSet = new Set<string>();
       for (const role of userRoles) {
-        
         // Ensure role.permissions is loaded
         const roleWithPermissions = await Role.findOne({
-          where : {
-            id:role.id,
+          where: {
+            id: role.id,
           },
-          relations: ['permissions']
+          relations: ["permissions"],
         });
-  
+
         if (!roleWithPermissions) {
           console.error(`Role with ID ${role.id} not found`);
           continue;
         }
-  
-        const rolePermissions = roleWithPermissions.permissions;
-  
-        if (!Array.isArray(rolePermissions)) {
-          console.error('rolePermissions is not an array:', rolePermissions);
-          continue;  // Skip this role if permissions are not in the expected format
-        }
-  
-        for (const permission of rolePermissions) {
 
-  
+        const rolePermissions = roleWithPermissions.permissions;
+
+        if (!Array.isArray(rolePermissions)) {
+          console.error("rolePermissions is not an array:", rolePermissions);
+          continue; // Skip this role if permissions are not in the expected format
+        }
+
+        for (const permission of rolePermissions) {
           // Ensure permission has a name property
-          if (permission && typeof permission.name === 'string') {
+          if (permission && typeof permission.name === "string") {
             permissionNamesSet.add(permission.name);
           } else {
-            console.error('permission is not valid:', permission);
+            console.error("permission is not valid:", permission);
           }
         }
       }
-  
-      
+
       // Convert the set to an array and return
       return Array.from(permissionNamesSet);
     } catch (error) {
-      console.error('Error in wholePermissionNames:', error);
-      throw error;  // Rethrow the error after logging it
+      console.error("Error in wholePermissionNames:", error);
+      throw error; // Rethrow the error after logging it
     }
   }
-  
 
   public getPermissionCacheKey(): string | null {
     if (!this.id) {

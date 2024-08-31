@@ -27,17 +27,23 @@ export class EventTrackerReportResolver {
 
   @Permission("gql.base.event_tracker.report.events_chart")
   @Query(() => ReportEventsCountChart, { name: "pastDurationEventsChart" })
-  pastDurationEventsChart(@CurrentUser() user: User,
-     @Args("sellerId", { type: () => Int, nullable: true }) sellerId?: number,
+  pastDurationEventsChart(
+    @CurrentUser() user: User,
+    @Args("sellerId", { type: () => Int, nullable: true }) sellerId?: number,
   ) {
-    return this.eventTrackerReportService.pastDurationEventsChart(user,sellerId);
+    return this.eventTrackerReportService.pastDurationEventsChart(
+      user,
+      sellerId,
+    );
   }
-
 
   @Permission("gql.base.event_tracker.report.events_chart")
   @Query(() => OrderReportChartResponse)
-  orderPercentage(@Args("orderPercentageInput") orderPercentageInput: OrderPercentageInput) {
-    return this.eventTrackerReportService.orderPecentageChart(orderPercentageInput)
+  orderPercentage(
+    @Args("orderPercentageInput") orderPercentageInput: OrderPercentageInput,
+  ) {
+    return this.eventTrackerReportService.orderPecentageChart(
+      orderPercentageInput,
+    );
   }
-
 }

@@ -19,8 +19,8 @@ export class CreateFilePublicDto {
   modelId?: number;
 
   @IsOptional()
-  modelType ?: string;
-  
+  modelType?: string;
+
   @IsOptional()
-  orderColumn ?: number;
+  orderColumn?: number;
 }

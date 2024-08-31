@@ -1,11 +1,8 @@
-import { Module } from '@nestjs/common';
-import { OrderOfferResolver } from './orderOffer.resolver';
-import { OrderOfferService } from './orderOffer.service';
+import { Module } from "@nestjs/common";
+import { OrderOfferResolver } from "./orderOffer.resolver";
+import { OrderOfferService } from "./orderOffer.service";
 
 @Module({
-  providers: [
-    OrderOfferResolver,
-    OrderOfferService
-  ]
+  providers: [OrderOfferResolver, OrderOfferService],
 })
 export class OrderOfferModule {}

@@ -1,5 +1,5 @@
 import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
-import { IsInt, IsNotEmpty,IsUUID,IsOptional } from "class-validator";
+import { IsInt, IsNotEmpty, IsUUID, IsOptional } from "class-validator";
 import { CreateCategoryInput } from "./create-category.input";
 
 @InputType()

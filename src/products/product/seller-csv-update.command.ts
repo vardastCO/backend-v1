@@ -13,7 +13,7 @@ import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-in
 import { ContactInfoTypes } from "src/users/contact-info/enums/contact-info-types.enum";
 // import { Seller } from "../seller/entities/seller.entity";
 import { User } from "src/users/user/entities/user.entity";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { UserLanguagesEnum } from "src/users/user/enums/user-languages.enum";
 import { UserStatusesEnum } from "src/users/user/enums/user-statuses.enum";
 import { Role } from "src/users/authorization/role/entities/role.entity";
@@ -40,8 +40,7 @@ export class SellerCsvUpdateCommand extends CommandRunner {
         .map(attribute => {
           attribute = attribute ?? "";
           // const [ name, category,brand,sku,filter,uom] = attribute;
-          const [sellerName, city, address, phone] =
-            attribute;
+          const [sellerName, city, address, phone] = attribute;
           return {
             sellerName,
             // activity,
@@ -85,20 +84,22 @@ export class SellerCsvUpdateCommand extends CommandRunner {
 
     for (const csvProduct of csvProducts.list) {
       // const { name, category, brand, sku, filter, uom } = csvProduct;
-      const { sellerName, city, address, phone } =
-        csvProduct;
-      
+      const { sellerName, city, address, phone } = csvProduct;
+
       // console.log('csvProduct',csvProduct)
 
       try {
         if (phone && sellerName) {
-          const user: User = await this.createUser(sellerName, await this.convertPersianToEnglish(phone));
+          const user: User = await this.createUser(
+            sellerName,
+            await this.convertPersianToEnglish(phone),
+          );
         }
         //  const user: User = await this.createUser(sellerName, 'نامعلوم');
         // const contactInfo: ContactInfo = await this.createContact(
         //   phone,
         //   seller.id,
-        // );       
+        // );
         // await this.createAddress(
         //   city,
         //   address,
@@ -124,7 +125,7 @@ export class SellerCsvUpdateCommand extends CommandRunner {
       username: phone,
       timezone: "Asia/Terhan",
       status: UserStatusesEnum.ACTIVE,
-      displayRoleId:1,
+      displayRoleId: 1,
     });
     user.roles = Promise.resolve([userRole]);
     await user.save();
@@ -133,18 +134,17 @@ export class SellerCsvUpdateCommand extends CommandRunner {
   }
 
   async convertPersianToEnglish(persianNumber) {
-    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-  
+    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    const englishDigits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+
     let englishNumber = persianNumber;
     for (let i = 0; i < persianDigits.length; i++) {
-      const persianDigit = new RegExp(persianDigits[i], 'g');
+      const persianDigit = new RegExp(persianDigits[i], "g");
       englishNumber = englishNumber.replace(persianDigit, englishDigits[i]);
     }
-  
+
     return englishNumber;
   }
-  
 
   async createContact(number: string, id: number): Promise<ContactInfo> {
     const contactInfo = ContactInfo.create({
@@ -161,11 +161,7 @@ export class SellerCsvUpdateCommand extends CommandRunner {
     return contactInfo;
   }
 
-  async createAddress(
-    city_name: string,
-    address: string,
-    id: number,
-  ) {
+  async createAddress(city_name: string, address: string, id: number) {
     if (address) {
       try {
         let city = await City.findOneBy({

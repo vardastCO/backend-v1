@@ -39,7 +39,6 @@ export class ContactInfo extends BaseEntity {
   @Column()
   title: string;
 
-
   @Field({ nullable: true })
   @Column({ nullable: true })
   code?: string;
@@ -50,7 +49,7 @@ export class ContactInfo extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  ext ?: string;
+  ext?: string;
 
   @Field(() => ContactInfoTypes)
   @Column("enum", { enum: ContactInfoTypes })

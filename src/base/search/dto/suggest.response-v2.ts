@@ -9,6 +9,4 @@ import { Seller } from "src/products/seller/entities/seller.entity";
 export class SuggestResponseV2 {
   @Field(() => [ProductEntity], { nullable: "items" })
   products: ProductEntity[];
-
-
 }

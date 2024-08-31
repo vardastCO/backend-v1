@@ -9,8 +9,6 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-
-
 @ObjectType()
 @Entity("temp_seller")
 export class TempSeller extends BaseEntity {
@@ -28,7 +26,6 @@ export class TempSeller extends BaseEntity {
   @Column({ nullable: true })
   seller_name: string;
 
-
   @Field({ nullable: true })
   @Index()
   @Column({ nullable: true })
@@ -43,7 +40,4 @@ export class TempSeller extends BaseEntity {
   @Index()
   @Column({ nullable: true })
   address: string;
-
-
-  
 }

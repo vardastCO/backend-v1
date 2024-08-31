@@ -7,7 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsPositive,
-  Length
+  Length,
 } from "class-validator";
 import { Country } from "src/base/location/country/entities/country.entity";
 import { CellphoneUtil } from "src/base/utilities/cellphone.util";
@@ -20,7 +20,6 @@ export class ValidateCellphoneInput {
   @IsInt()
   @IsPositive()
   countryId: number;
-
 
   @Field()
   @IsNotEmpty()

@@ -45,6 +45,6 @@ export class IsUnique implements ValidatorConstraintInterface {
   // }
 
   defaultMessage(args: ValidationArguments) {
-    return 'این کالا قبلا ثبت شده است' 
+    return "این کالا قبلا ثبت شده است";
   }
 }

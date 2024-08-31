@@ -23,7 +23,7 @@ import { CompressionService } from "src/compression.service";
   imports: [CsvModule],
   providers: [
     ProductResolver,
-    ProductService, 
+    ProductService,
     ProductCsvSeedCommand,
     ProductCsvUpdateCommand,
     BrandCsvUpdateCommand,
@@ -39,7 +39,7 @@ import { CompressionService } from "src/compression.service";
     AttProductValueCommand,
     SeperateProductCommand,
     CompressionService,
-    DecompressionService
+    DecompressionService,
   ],
 })
 export class ProductModule {}

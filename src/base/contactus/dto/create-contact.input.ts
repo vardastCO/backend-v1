@@ -1,14 +1,8 @@
 import { Field, InputType } from "@nestjs/graphql";
-import {
-  IsNotEmpty,
-  IsString,
-  IsOptional,
-} from "class-validator";
-
+import { IsNotEmpty, IsString, IsOptional } from "class-validator";
 
 @InputType()
 export class CreateContactInput {
-
   @Field()
   @IsNotEmpty()
   fullname: string;
@@ -29,5 +23,4 @@ export class CreateContactInput {
   @IsOptional()
   @IsString()
   fileuuid?: string;
-  
 }

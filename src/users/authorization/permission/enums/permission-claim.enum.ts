@@ -9,7 +9,6 @@ export enum PermissionClaimEnum {
   USER = "USER",
   PROJECT = "PROJECT",
   ORDER = "ORDER",
-
 }
 
 registerEnumType(PermissionClaimEnum, {

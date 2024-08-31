@@ -12,20 +12,20 @@ export const graphqlAsyncConfig: ApolloDriverAsyncConfig = {
   imports: [ConfigModule],
   inject: [ConfigService, I18nService],
   useFactory: async (
-      configService: ConfigService,
-      i18nService: I18nService,
+    configService: ConfigService,
+    i18nService: I18nService,
   ): Promise<ApolloDriverConfig> => ({
     autoSchemaFile: true,
-    introspection: true, 
+    introspection: true,
     nodeEnv: configService.get<string>("APP_ENVIRONMENT"),
     formatError: function (
-        formattedError: GraphQLFormattedError,
-        error: unknown,
+      formattedError: GraphQLFormattedError,
+      error: unknown,
     ): GraphQLFormattedError {
       formattedError.extensions.displayMessage =
-          formattedError.extensions.code === "BAD_REQUEST"
-              ? formattedError.message
-              : i18nService.t(`exceptions.${formattedError.extensions.code}`);
+        formattedError.extensions.code === "BAD_REQUEST"
+          ? formattedError.message
+          : i18nService.t(`exceptions.${formattedError.extensions.code}`);
 
       if (!formattedError.extensions.hasOwnProperty("displayErrors")) {
         formattedError.extensions.displayErrors = [
@@ -33,12 +33,12 @@ export const graphqlAsyncConfig: ApolloDriverAsyncConfig = {
         ];
       }
       if (
-          formattedError.extensions.code === "BAD_REQUEST" &&
-          formattedError.extensions?.originalError.hasOwnProperty("message") &&
-          Array.isArray(formattedError.extensions?.originalError["message"])
+        formattedError.extensions.code === "BAD_REQUEST" &&
+        formattedError.extensions?.originalError.hasOwnProperty("message") &&
+        Array.isArray(formattedError.extensions?.originalError["message"])
       ) {
         formattedError.extensions.displayErrors =
-            formattedError.extensions?.originalError["message"];
+          formattedError.extensions?.originalError["message"];
       }
       return formattedError;
     },
@@ -49,7 +49,4 @@ export const graphqlAsyncConfig: ApolloDriverAsyncConfig = {
       return { req, res };
     },
   }),
-
-
 };
-

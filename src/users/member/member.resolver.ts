@@ -20,10 +20,7 @@ import { IndexMemberInput } from "./dto/index-member.input";
 
 @Resolver(() => Member)
 export class MemberResolver {
-  constructor(
-    private readonly memberService: MemberService,
-  ) {}
-
+  constructor(private readonly memberService: MemberService) {}
 
   @Permission("gql.products.seller_representative.store")
   @Mutation(() => Boolean)
@@ -32,13 +29,9 @@ export class MemberResolver {
     createMemberInput: CreateMemberInput,
     @CurrentUser() user: User,
   ) {
-    return this.memberService.create(
-      createMemberInput,
-      user,
-    );
+    return this.memberService.create(createMemberInput, user);
   }
 
-  
   @Permission("gql.products.seller_representative.index")
   @Query(() => PaginationMemberResponse, {
     name: "members",
@@ -52,10 +45,7 @@ export class MemberResolver {
     )
     indexMemberInput?: IndexMemberInput,
   ) {
-    return this.memberService.paginate(
-      user,
-      indexMemberInput,
-    );
+    return this.memberService.paginate(user, indexMemberInput);
   }
 
   @Permission("gql.products.seller_representative.show")

@@ -11,20 +11,16 @@ import {
   MaxLength,
 } from "class-validator";
 
-
 @InputType()
 export class CreateUserLegalInput {
-
   @Field()
   @IsNotEmpty()
   @IsString()
   @MaxLength(255)
   cellphone: string;
 
-
   @Field()
   @IsNotEmpty()
   @IsInt()
   legalId: number;
-
 }

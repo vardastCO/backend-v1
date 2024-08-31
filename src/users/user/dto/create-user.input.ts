@@ -11,7 +11,7 @@ import {
   IsOptional,
   IsStrongPassword,
   MaxLength,
-  ValidateIf
+  ValidateIf,
 } from "class-validator";
 import { Country } from "src/base/location/country/entities/country.entity";
 import { CellphoneUtil } from "src/base/utilities/cellphone.util";
@@ -57,12 +57,12 @@ export class CreateUserInput {
   })
   password?: string;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   @MaxLength(10)
   nationalCode?: string;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   mustChangePassword?: boolean;
 
@@ -100,7 +100,7 @@ export class CreateUserInput {
   // @IsOptional()
   // suspensionReason?: string;
 
-  @Field(type => Int,{nullable:true})
+  @Field(type => Int, { nullable: true })
   @IsOptional()
   displayRoleId?: number;
 

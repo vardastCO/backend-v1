@@ -9,22 +9,22 @@ export class PreOrderDTO {
   @Field(() => String)
   uuid: string;
 
-  @Field(() => String,{nullable: true})
+  @Field(() => String, { nullable: true })
   destination: string;
 
-  @Field(() => String,{nullable: true})
+  @Field(() => String, { nullable: true })
   request_date: string;
 
-  @Field(() => Date,{nullable: true})
+  @Field(() => Date, { nullable: true })
   need_date?: Date;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   payment_method?: string;
 
-  @Field(() => Date,{nullable: true})
+  @Field(() => Date, { nullable: true })
   bid_start?: Date;
 
-  @Field(() => Date,{nullable: true})
+  @Field(() => Date, { nullable: true })
   bid_end?: Date;
 
   @Field(() => [Line], { nullable: true })
@@ -33,5 +33,3 @@ export class PreOrderDTO {
   @Field({ nullable: true })
   lineDetail?: string;
 }
-
-

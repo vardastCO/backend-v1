@@ -1,4 +1,4 @@
-import {  Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateCountryInput } from "./dto/create-country.input";
@@ -8,9 +8,7 @@ import { Country } from "./entities/country.entity";
 import { PaginationCountryResponse } from "./dto/pagination-country.response";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
-import {
-  Inject,
-} from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 @Injectable()
 export class CountryService {

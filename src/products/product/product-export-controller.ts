@@ -39,7 +39,7 @@
 
 //     res.setHeader('Content-Type', 'text/csv');
 //     res.setHeader('Content-Disposition', 'attachment; filename=products.csv');
-    
+
 //     // Assuming writeRecords writes directly to the response
 //     res.send();
 //   }

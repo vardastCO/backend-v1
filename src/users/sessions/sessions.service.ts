@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSessionInput } from './dto/create-session.input';
-import { UpdateSessionInput } from './dto/update-session.input';
+import { Injectable } from "@nestjs/common";
+import { CreateSessionInput } from "./dto/create-session.input";
+import { UpdateSessionInput } from "./dto/update-session.input";
 
 @Injectable()
 export class SessionsService {
   create(createSessionInput: CreateSessionInput) {
-    return 'This action adds a new session';
+    return "This action adds a new session";
   }
 
   findAll() {

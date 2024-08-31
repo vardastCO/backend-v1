@@ -1,7 +1,6 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { PreOrderDTO } from "./preOrderDTO";
 
-
 @ObjectType()
 export class PublicPreOrderDTO {
   @Field()
@@ -16,4 +15,3 @@ export class PublicPreOrderDTO {
   @Field(() => Int)
   categoryId: number;
 }
-

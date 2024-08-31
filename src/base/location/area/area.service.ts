@@ -6,11 +6,7 @@ import { PaginationAreaResponse } from "./dto/pagination-area.response";
 import { UpdateAreaInput } from "./dto/update-area.input";
 import { Area } from "./entities/area.entity";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import {
-  Injectable,
-  NotFoundException,
-  Inject,
-} from "@nestjs/common";
+import { Injectable, NotFoundException, Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { CompressionService } from "src/compression.service";
@@ -31,7 +27,7 @@ export class AreaService {
 
   async findAll(indexAreaInput?: IndexAreaInput): Promise<Area[]> {
     const { take, skip, cityId } = indexAreaInput || {};
-    
+
     const cacheKey = `find-all-area-${cityId}-${take}-${skip}`;
 
     const cachedResult = await this.cacheManager.get<string>(cacheKey);
@@ -44,7 +40,11 @@ export class AreaService {
       where: { cityId },
     });
 
-    await this.cacheManager.set(cacheKey,this.compressionService.compressData(result),CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(result),
+      CacheTTL.TWO_WEEK,
+    );
 
     return result;
   }
@@ -103,7 +103,11 @@ export class AreaService {
     const count = await this.areaRepository.count({
       where: { cityId },
     });
-    await this.cacheManager.set(cacheKey,this.compressionService.compressData(count),CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(count),
+      CacheTTL.TWO_WEEK,
+    );
 
     return count;
   }

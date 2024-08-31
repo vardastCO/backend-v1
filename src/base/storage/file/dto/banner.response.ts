@@ -3,15 +3,15 @@ import { File } from "../entities/file.entity";
 
 @ObjectType()
 export class BannerResponse {
-    @Field(() => [File])
-    small: File[];
-  
-    @Field(() => [File])
-    medium: File[];
-  
-    @Field(() => [File])
-    large: File[];
-  
-    @Field(() => [File])
-    xlarge: File[];
+  @Field(() => [File])
+  small: File[];
+
+  @Field(() => [File])
+  medium: File[];
+
+  @Field(() => [File])
+  large: File[];
+
+  @Field(() => [File])
+  xlarge: File[];
 }

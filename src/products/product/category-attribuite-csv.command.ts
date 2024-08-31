@@ -7,7 +7,7 @@ import { InjectMinio } from "nestjs-minio";
 import { Category } from "src/base/taxonomy/category/entities/category.entity";
 import { Attribute } from "../attribute/entities/attribute.entity";
 import { AttributeTypesEnum } from "../attribute/enums/attribute-types.enum";
-import { EntityManager } from 'typeorm';
+import { EntityManager } from "typeorm";
 @Command({
   name: "category:update",
   description: "update category from given csv file base on official format.",
@@ -38,8 +38,7 @@ export class CategoryCsvUpdateFilterCommand extends CommandRunner {
     },
   };
   constructor(
-
-    private readonly entityManager: EntityManager ,
+    private readonly entityManager: EntityManager,
     private readonly csvParser: CsvParser,
     @InjectMinio() private readonly minioClient: Client,
     private readonly configService: ConfigService,
@@ -81,11 +80,11 @@ export class CategoryCsvUpdateFilterCommand extends CommandRunner {
         // Loop through each part
         for (let i = 0; i < parts.length; i++) {
           const attributeSlug = `${parts[i]}:${find_category.id}`;
-         
+
           let attribute: Attribute | null = await Attribute.findOneBy({
             slug: attributeSlug,
           });
-          
+
           if (!attribute) {
             attribute = Attribute.create({
               name: parts[i],
@@ -99,8 +98,8 @@ export class CategoryCsvUpdateFilterCommand extends CommandRunner {
           }
           await this.entityManager.query(
             `INSERT INTO product_attribute_categories ("attributeId", "categoryId") VALUES ($1, $2)`,
-            [attribute.id,  find_category.id]
-          )
+            [attribute.id, find_category.id],
+          );
         }
       } catch (e) {
         console.log("Error processing product:", e);

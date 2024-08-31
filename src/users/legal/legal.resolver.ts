@@ -1,9 +1,4 @@
-import {
-  Args,
-  Mutation,
-  Query,
-  Resolver
-} from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { Permission } from "../authorization/permission.decorator";
 import { User } from "../user/entities/user.entity";
@@ -15,7 +10,6 @@ import { UpdateLegalInput } from "./dto/update-legal.input";
 import { PaginationLegalResponse } from "./dto/pagination-legal.response";
 import { IndexLegalInput } from "./dto/index-legal.input";
 import { CreateUserLegalInput } from "./dto/create-user-legal.input";
-
 
 @Resolver(() => Legal)
 export class LegalResolver {
@@ -36,7 +30,11 @@ export class LegalResolver {
     @Args("updateLegalInput") updateLegalInput: UpdateLegalInput,
     @CurrentUser() user: User,
   ) {
-    return this.legalService.update(updateLegalInput.id, updateLegalInput, user);
+    return this.legalService.update(
+      updateLegalInput.id,
+      updateLegalInput,
+      user,
+    );
   }
 
   @Permission("gql.users.address.store")
@@ -61,6 +59,4 @@ export class LegalResolver {
   findOneLegal(@Args("id") id: number) {
     return this.legalService.findOne(id);
   }
-
-
 }

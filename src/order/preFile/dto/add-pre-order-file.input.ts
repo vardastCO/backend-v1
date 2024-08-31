@@ -1,4 +1,3 @@
-
 import { Field, InputType, Int } from "@nestjs/graphql";
 import {
   IsBoolean,
@@ -12,7 +11,6 @@ import {
 } from "class-validator";
 @InputType()
 export class AddFilePreOrderInput {
-
   @Field(() => String)
   @IsNotEmpty()
   file_uuid: string;

@@ -21,7 +21,7 @@ export class Blog extends BaseEntity {
   description: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true ,default:1})
+  @Column({ nullable: true, default: 1 })
   categoryId: number;
 
   // @Field({ nullable: true })

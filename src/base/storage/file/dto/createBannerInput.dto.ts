@@ -1,11 +1,5 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import {
-    IsInt,
-    IsNotEmpty,
-    IsOptional,
-    IsString
-} from "class-validator";
-
+import { IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 @InputType()
 export class CreateBannerInput {
@@ -18,22 +12,21 @@ export class CreateBannerInput {
   @IsOptional()
   @IsString()
   name?: string;
-    
+
   @Field()
   @IsNotEmpty()
   @IsString()
   medium_uuid: string;
-   
+
   @Field()
   @IsNotEmpty()
   @IsString()
   large_uuid: string;
-   
+
   @Field()
   @IsNotEmpty()
   @IsString()
   xlarge_uuid: string;
-  
 
   @Field({ nullable: true })
   @IsOptional()
@@ -42,7 +35,7 @@ export class CreateBannerInput {
 
   @Field(() => Int, {
     description: "First Banner with sort 0 is considered primary.",
-    nullable:true
+    nullable: true,
   })
   @IsOptional()
   @IsInt()

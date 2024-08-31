@@ -10,7 +10,6 @@ import {
 import { IndexInput } from "src/base/utilities/dto/index.input";
 import { TypeMember } from "../enums/type-member.enum";
 
-
 @InputType()
 export class IndexMemberInput extends IndexInput {
   @Field(() => TypeMember)
@@ -18,11 +17,9 @@ export class IndexMemberInput extends IndexInput {
   @IsEnum(TypeMember)
   type: TypeMember;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   @IsInt()
   @IsPositive()
   relatedId?: number;
-
- 
 }

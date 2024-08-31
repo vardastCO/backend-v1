@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserResolver } from './user.resolver';
-import { UserService } from './user.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { UserResolver } from "./user.resolver";
+import { UserService } from "./user.service";
 
-describe('UserResolver', () => {
+describe("UserResolver", () => {
   let resolver: UserResolver;
   let service: UserService;
 
@@ -13,7 +13,9 @@ describe('UserResolver', () => {
         {
           provide: UserService,
           useValue: {
-            findOne: jest.fn().mockResolvedValue({ id: '1', name: 'Test User' }),
+            findOne: jest
+              .fn()
+              .mockResolvedValue({ id: "1", name: "Test User" }),
           },
         },
       ],
@@ -23,12 +25,12 @@ describe('UserResolver', () => {
     service = module.get<UserService>(UserService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(resolver).toBeDefined();
   });
-  it('should return a user', async () => {
-    const user = await resolver.findOne(1, '');
-    expect(user).toEqual({ id: '1', name: 'Test User' });
-    expect(service.findOne).toHaveBeenCalledWith(1, '');  // Updated to match the actual call
+  it("should return a user", async () => {
+    const user = await resolver.findOne(1, "");
+    expect(user).toEqual({ id: "1", name: "Test User" });
+    expect(service.findOne).toHaveBeenCalledWith(1, ""); // Updated to match the actual call
   });
 });

@@ -18,5 +18,4 @@ export class AttributesProductService extends BaseEntity {
   @Field()
   @Column()
   name: string;
-
 }

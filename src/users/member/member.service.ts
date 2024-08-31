@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { I18n, I18nService } from "nestjs-i18n";
 import { AuthorizationService } from "src/users/authorization/authorization.service";
 import { User } from "src/users/user/entities/user.entity";
@@ -8,7 +12,6 @@ import { Member } from "./entities/members.entity";
 import { MemberRoles } from "./enums/member.enum";
 import { PaginationMemberResponse } from "./dto/pagination-member.response";
 import { IndexMemberInput } from "./dto/index-member.input";
-
 
 @Injectable()
 export class MemberService {
@@ -22,16 +25,15 @@ export class MemberService {
     user: User,
   ): Promise<boolean> {
     const findUser = await User.findOneBy({
-      cellphone:createMemberInput.cellphone
-    })
-    
-    
+      cellphone: createMemberInput.cellphone,
+    });
+
     if (findUser) {
-      delete createMemberInput.cellphone
+      delete createMemberInput.cellphone;
       const hasMember = await Member.findOneBy({
         relatedId: createMemberInput.relatedId,
-        userId: findUser.id
-      })
+        userId: findUser.id,
+      });
 
       if (hasMember) {
         throw new BadRequestException(
@@ -43,14 +45,13 @@ export class MemberService {
       member.userId = await findUser.id;
       member.type = createMemberInput.typeMember;
       member.position = createMemberInput.position;
-      member.role = createMemberInput.role ?? MemberRoles.ADMIN
+      member.role = createMemberInput.role ?? MemberRoles.ADMIN;
       // member.adminId = user.id
       member.relatedId = createMemberInput.relatedId;
-      await member.save()
-      return true
+      await member.save();
+      return true;
     } else {
-      return false
-
+      return false;
     }
   }
 
@@ -72,26 +73,21 @@ export class MemberService {
     indexMemberInput?: IndexMemberInput,
   ): Promise<PaginationMemberResponse> {
     indexMemberInput.boot();
-    const { take, skip ,type,relatedId } = indexMemberInput || {};
+    const { take, skip, type, relatedId } = indexMemberInput || {};
     const whereCondition: any = {};
-  
-  
+
     if (type && relatedId) {
       whereCondition.relatedId = relatedId;
       whereCondition.type = type;
-    } 
+    }
     const [data, total] = await Member.findAndCount({
       skip,
       take,
-      where:whereCondition,
+      where: whereCondition,
       order: { id: "DESC" },
     });
 
-    return PaginationMemberResponse.make(
-      indexMemberInput,
-      total,
-      data,
-    );
+    return PaginationMemberResponse.make(indexMemberInput, total, data);
   }
 
   async findOne(id: number): Promise<Member> {
@@ -104,19 +100,16 @@ export class MemberService {
     return member;
   }
 
-  
-
   async update(
     id: number,
     updateMemberInput: UpdateMemberInput,
     user: User,
   ): Promise<Member> {
-    const member: Member =
-      await Member.preload({
-        id,
-        ...updateMemberInput,
-      });
-    
+    const member: Member = await Member.preload({
+      id,
+      ...updateMemberInput,
+    });
+
     if (!member) {
       throw new NotFoundException();
     }
@@ -125,7 +118,6 @@ export class MemberService {
     return member;
   }
 
-
   async remove(id: number): Promise<boolean> {
     try {
       const member: Member = await Member.findOneBy({ id });
@@ -133,9 +125,8 @@ export class MemberService {
       member.id = id;
       return true;
     } catch (e) {
-      console.log('err in remove member', e)
+      console.log("err in remove member", e);
       return false;
     }
-   
   }
 }

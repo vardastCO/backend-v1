@@ -49,27 +49,29 @@ export class RegistrationResolver {
     return this.registrationService.signup(signupInput, context.req.ip);
   }
 
-
   @Mutation(() => Blacklist)
   @Permission("gql.products.seller_representative.update")
-  createBlackList(@Args("CreateBlackListInput") createBlackListInput: CreateBlackListInput) {
-    return this.registrationService.createBlackList(createBlackListInput)
+  createBlackList(
+    @Args("CreateBlackListInput") createBlackListInput: CreateBlackListInput,
+  ) {
+    return this.registrationService.createBlackList(createBlackListInput);
   }
-  
 
   @Mutation(() => Boolean)
   @Permission("gql.products.seller_representative.update")
   removeBlackList(@Args("id") id: number) {
-    return this.registrationService.removeBlack(id)
+    return this.registrationService.removeBlack(id);
   }
-
 
   @Mutation(() => Blacklist)
   @Permission("gql.products.seller_representative.update")
   updateBlackList(
-    @Args("updateBlackListInput") updateBlackListInput: UpdateBlackListInput
+    @Args("updateBlackListInput") updateBlackListInput: UpdateBlackListInput,
   ) {
-    return this.registrationService.updateBlackList(updateBlackListInput.id, updateBlackListInput);
+    return this.registrationService.updateBlackList(
+      updateBlackListInput.id,
+      updateBlackListInput,
+    );
   }
 
   @Query(() => Blacklist)
@@ -77,7 +79,6 @@ export class RegistrationResolver {
     return this.registrationService.findOneBlack(id);
   }
 
-   
   @Permission("gql.products.seller_representative.update")
   @Query(() => PaginationBlackListResponse, { name: "blackLists" })
   findAll(

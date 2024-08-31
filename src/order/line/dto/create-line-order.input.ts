@@ -1,4 +1,3 @@
-
 import { Field, InputType, Int } from "@nestjs/graphql";
 import {
   IsIn,
@@ -23,18 +22,17 @@ const UOM_VALUES = [
   "شاخه",
   "کیسه",
   "جفت",
-  "عدد"
+  "عدد",
 ];
 @InputType()
 export class CreateLineInput {
   @Field()
-  @IsNotEmpty({message:"این فیلد ضروری است"})
+  @IsNotEmpty({ message: "این فیلد ضروری است" })
   @IsString()
   @MaxLength(255)
   item_name: string;
 
-
-  @Field(() => String,{nullable:true}) 
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(255)
@@ -44,7 +42,7 @@ export class CreateLineInput {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @IsNumberString({ message: 'مقدار به صورت عدد وارد شود' })
+  @IsNumberString({ message: "مقدار به صورت عدد وارد شود" })
   qty?: string;
 
   @Field(() => String, { nullable: true })
@@ -52,7 +50,9 @@ export class CreateLineInput {
   @IsString()
   @MaxLength(255)
   @IsIn(UOM_VALUES, {
-    message: `مقدار واحد میتواند فقط مقادیر مشخصی داشته باشد: ${UOM_VALUES.join(', ')}`
+    message: `مقدار واحد میتواند فقط مقادیر مشخصی داشته باشد: ${UOM_VALUES.join(
+      ", ",
+    )}`,
   })
   uom?: string;
 
@@ -64,13 +64,13 @@ export class CreateLineInput {
   // @IsEnum(MultiTypeOrder)
   // uom?: MultiTypeUom = MultiTypeUom.PIECE;
 
-  @Field(() => String,{nullable:true}) 
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(255)
   attribuite?: string;
 
-  @Field(() => String,{nullable:true}) 
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(255)

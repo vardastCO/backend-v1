@@ -20,7 +20,7 @@ export class BrandFile extends BaseEntity {
 
   @Column()
   brandId: number;
-  
+
   @Field({ nullable: true })
   @Column({ nullable: true })
   name?: string;
@@ -34,9 +34,9 @@ export class BrandFile extends BaseEntity {
   fileId: number;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: BrandTypeEnum,
-    default: BrandTypeEnum.LOGO 
+    default: BrandTypeEnum.LOGO,
   })
   type: BrandTypeEnum;
 }

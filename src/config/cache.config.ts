@@ -14,6 +14,8 @@ export const cacheAsyncConfig: CacheModuleAsyncOptions = {
     configService: ConfigService,
   ): Promise<CacheModuleOptions> => ({
     store: redisStore as unknown as CacheStore,
-    url: `redis://:g90pM89O@${configService.get("REDIS_HOST")}:${configService.get("REDIS_PORT")}`,
+    url: `redis://:g90pM89O@${configService.get(
+      "REDIS_HOST",
+    )}:${configService.get("REDIS_PORT")}`,
   }),
 };

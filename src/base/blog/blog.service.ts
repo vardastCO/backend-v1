@@ -7,14 +7,14 @@ import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { IndexBlogInput } from "./dto/IndexBlogInput";
 import { PaginationBlogResponse } from "./dto/PaginationBlogResponse";
 import { Blog } from "./entities/blog.entity";
-import * as zlib from 'zlib';
+import * as zlib from "zlib";
 import { EntityManager } from "typeorm";
 @Injectable()
 export class BlogService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly entityManager: EntityManager,
-  ) { }
+  ) {}
   // constructor(
   //   // @InjectRepository(Blog)
   //   // private readonly blogRepository: Repository<Blog>,
@@ -24,79 +24,91 @@ export class BlogService {
     try {
       const cacheKey = `findTopMostParent:${categoryId}:categories`;
       const cachedData = await this.cacheManager.get<number>(cacheKey);
-  
+
       if (cachedData) {
-        return cachedData ;
+        return cachedData;
       }
       let currentCategoryId = categoryId;
       let parentCategoryId = null;
       let loopCounter = 0;
-    
+
       while (currentCategoryId !== null && loopCounter < 4) {
-          const result = await this.entityManager.query(
-              'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
-              [currentCategoryId]
-          );
-          if (result.length === 0) {
-              break;
-          }
-    
-          const category = result[0];
-          parentCategoryId = category.parentCategoryId;
-          
-          if (parentCategoryId === null) {
-              return category.id;
-          }
-    
+        const result = await this.entityManager.query(
+          'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
+          [currentCategoryId],
+        );
+        if (result.length === 0) {
+          break;
+        }
+
+        const category = result[0];
+        parentCategoryId = category.parentCategoryId;
+
+        if (parentCategoryId === null) {
+          return category.id;
+        }
+
         currentCategoryId = parentCategoryId;
         loopCounter++;
       }
-      await this.cacheManager.set(cacheKey,currentCategoryId,CacheTTL.TWO_WEEK)
+      await this.cacheManager.set(
+        cacheKey,
+        currentCategoryId,
+        CacheTTL.TWO_WEEK,
+      );
       return currentCategoryId;
     } catch (error) {
-      console.log('err in findTopMostParent',error)
+      console.log("err in findTopMostParent", error);
     }
- 
   }
   async getAllBlogs(
     indexBlogInput?: IndexBlogInput,
   ): Promise<PaginationBlogResponse> {
     try {
-
       if (indexBlogInput.categoryId) {
-        indexBlogInput.categoryId = await this.findTopMostParent(indexBlogInput.categoryId)
+        indexBlogInput.categoryId = await this.findTopMostParent(
+          indexBlogInput.categoryId,
+        );
       }
 
       const cacheKey = `blogs_${JSON.stringify(indexBlogInput)}`;
-      const cachedData = await this.cacheManager.get<string>(
-        cacheKey,
-      );
-      let posts 
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
+      let posts;
       if (cachedData) {
-        const decompressedData = zlib.gunzipSync(Buffer.from(cachedData, 'base64')).toString('utf-8');
+        const decompressedData = zlib
+          .gunzipSync(Buffer.from(cachedData, "base64"))
+          .toString("utf-8");
         const parsedData: PaginationBlogResponse = JSON.parse(decompressedData);
         return parsedData;
       }
       if (indexBlogInput.categoryId) {
-        const categoriesParam = this.getCategoryMapping(indexBlogInput.categoryId);
+        const categoriesParam = this.getCategoryMapping(
+          indexBlogInput.categoryId,
+        );
         const [response_1] = await Promise.all([
-          axios.get(`https://blog.vardast.com/wp-json/wp/v2/posts?per_page=5&_embed&categories=${categoriesParam}`),
+          axios.get(
+            `https://blog.vardast.com/wp-json/wp/v2/posts?per_page=5&_embed&categories=${categoriesParam}`,
+          ),
         ]);
-    
-        posts = [
-          ...(response_1.data?.slice(0, 5) || []),
-        ];
+
+        posts = [...(response_1.data?.slice(0, 5) || [])];
       } else {
         const [response_1, response_2, response_3] = await Promise.all([
-          axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=4'),
-          axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=3&_embed&categories=24'),
-          axios.get('https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=5')
+          axios.get(
+            "https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=4",
+          ),
+          axios.get(
+            "https://blog.vardast.com/wp-json/wp/v2/posts?per_page=3&_embed&categories=24",
+          ),
+          axios.get(
+            "https://blog.vardast.com/wp-json/wp/v2/posts?per_page=1&_embed&categories=5",
+          ),
         ]);
-    
+
         posts = [
           ...(response_1.data?.slice(0, 1) || []),
           ...(response_2.data?.slice(0, 3) || []),
-          ...(response_3.data?.slice(0, 1) || [])
+          ...(response_3.data?.slice(0, 1) || []),
         ];
       }
 
@@ -110,7 +122,7 @@ export class BlogService {
           return 1;
         }
         return 0;
-      })
+      });
 
       const createdBlogs: Blog[] = await Promise.all(
         sortedPosts.map(async post => {
@@ -128,13 +140,13 @@ export class BlogService {
             image_url,
             description,
             categoryId,
-            date
+            date,
           );
 
           return newBlog;
         }),
       );
-  
+
       const paginatedBlogs = createdBlogs.slice(0, 5);
 
       const result: PaginationBlogResponse = PaginationBlogResponse.make(
@@ -144,7 +156,7 @@ export class BlogService {
       );
       const compressedData = zlib.gzipSync(JSON.stringify(result));
 
-      await this.cacheManager.set(cacheKey, compressedData,CacheTTL.ONE_DAY);
+      await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
 
       return result;
     } catch (e) {
@@ -153,24 +165,23 @@ export class BlogService {
   }
 
   getCategoryMapping(categoryId) {
- 
     const mapping = {
-        139: 15,
-        134: 16,
-        106: 8,
-        96: 7,
-        61: 9,
-        69: 10,
-        805: 12,
-        102: 11,
-        117: 14,
-        373: 18,
-        394: 13,
-        1005: 19,
-        1: 6,
-        789: 17,
+      139: 15,
+      134: 16,
+      106: 8,
+      96: 7,
+      61: 9,
+      69: 10,
+      805: 12,
+      102: 11,
+      117: 14,
+      373: 18,
+      394: 13,
+      1005: 19,
+      1: 6,
+      789: 17,
     };
-    
+
     return mapping[categoryId] || categoryId;
   }
 
@@ -180,7 +191,7 @@ export class BlogService {
     image_url: string,
     description: string,
     categoryId: number,
-    date:string
+    date: string,
   ): Promise<Blog> {
     if (title) {
       try {
@@ -188,7 +199,7 @@ export class BlogService {
           url: url,
           title: title,
           image_url: image_url,
-          date:date
+          date: date,
         });
 
         if (blog) {
@@ -201,7 +212,7 @@ export class BlogService {
           image_url,
           description,
           categoryId,
-          date:date
+          date: date,
         });
 
         await blog.save();

@@ -25,7 +25,7 @@ export class SeperateProductCommand extends CommandRunner {
   // }
 
   async run(): Promise<void> {
-    console.log('hi');
+    console.log("hi");
 
     const batchSize = 10;
     const totalProduct = await Product.count();
@@ -39,31 +39,28 @@ export class SeperateProductCommand extends CommandRunner {
         });
 
         for (const product of products) {
-
           try {
             let parent_product_service = await ParentProductEntity.create();
 
-       
-            
-            let prouduct_service = await ProductEntity.create()
-            parent_product_service.name = product.name
-            parent_product_service.brandId = product.brandId
-            parent_product_service.uomId = product.uomId
-            parent_product_service.categoryId = product.categoryId
-            await parent_product_service.save()
+            let prouduct_service = await ProductEntity.create();
+            parent_product_service.name = product.name;
+            parent_product_service.brandId = product.brandId;
+            parent_product_service.uomId = product.uomId;
+            parent_product_service.categoryId = product.categoryId;
+            await parent_product_service.save();
 
-            prouduct_service.name = product.name
-            prouduct_service.sku = product.sku
-            prouduct_service.parentId = await parent_product_service.id
-            prouduct_service.id = product.id
-            prouduct_service.description = product.description ?? null
+            prouduct_service.name = product.name;
+            prouduct_service.sku = product.sku;
+            prouduct_service.parentId = await parent_product_service.id;
+            prouduct_service.id = product.id;
+            prouduct_service.description = product.description ?? null;
 
-            await prouduct_service.save()
+            await prouduct_service.save();
 
-            product.parentId=parent_product_service.id
-            await product.save()
-           
-            await new Promise((resolve) => setTimeout(resolve, 10));
+            product.parentId = parent_product_service.id;
+            await product.save();
+
+            await new Promise(resolve => setTimeout(resolve, 10));
           } catch (e) {
             console.log("Error processing attribute:", e);
           }

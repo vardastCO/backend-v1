@@ -9,8 +9,8 @@ export class AuthorizationService {
   private user: User;
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private readonly entityManager: EntityManager
-  ) { 
+    private readonly entityManager: EntityManager,
+  ) {
     // this.user = GqlExecutionContext.create(context).getContext().req.user;
   }
 
@@ -41,31 +41,34 @@ export class AuthorizationService {
   async hasRole(roleName: string): Promise<boolean> {
     if (!this.user) return false;
     const cacheKey = `hasRole_admin_{${JSON.stringify(this.user.id)}}`;
-    const cachedData = await this.cacheManager.get<boolean>(
-      cacheKey,
-    );
+    const cachedData = await this.cacheManager.get<boolean>(cacheKey);
     if (cachedData) {
-      return cachedData
+      return cachedData;
     }
 
     const roleIdToCheck = 2;
-  
+
     const query = `
       SELECT * 
       FROM users_authorization_user_roles 
       WHERE "userId" = $1 
         AND "roleId" = $2
     `;
-  
-    try {
 
-      const userRoles = await this.entityManager.query(query, [this.user.id, roleIdToCheck]);
-      await this.cacheManager.set(cacheKey, userRoles.length > 0, CacheTTL.ONE_WEEK);
+    try {
+      const userRoles = await this.entityManager.query(query, [
+        this.user.id,
+        roleIdToCheck,
+      ]);
+      await this.cacheManager.set(
+        cacheKey,
+        userRoles.length > 0,
+        CacheTTL.ONE_WEEK,
+      );
       return userRoles.length > 0;
     } catch (error) {
-      console.error('Error executing SQL query:', error);
+      console.error("Error executing SQL query:", error);
       return false;
     }
   }
-  
 }

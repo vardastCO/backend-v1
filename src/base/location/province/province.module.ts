@@ -10,7 +10,13 @@ import { CompressionService } from "src/compression.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Province]), CityModule],
-  providers: [ProvinceResolver, ProvinceService, ProvinceSeeder,CompressionService,DecompressionService],
+  providers: [
+    ProvinceResolver,
+    ProvinceService,
+    ProvinceSeeder,
+    CompressionService,
+    DecompressionService,
+  ],
   exports: [ProvinceService],
 })
 export class ProvinceModule {}

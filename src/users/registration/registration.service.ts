@@ -1,5 +1,9 @@
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { hash } from "argon2";
 import { I18n, I18nService } from "nestjs-i18n";
 import { KavenegarService } from "src/base/kavenegar/kavenegar.service";
@@ -40,29 +44,29 @@ export class RegistrationService {
   constructor(
     private readonly kavenegarService: KavenegarService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    @I18n() protected readonly i18n: I18nService
-  ) { }
-  
+    @I18n() protected readonly i18n: I18nService,
+  ) {}
+
   async validateCellphone(
     validateCellphoneInput: ValidateCellphoneInput,
     ipAddress: string,
   ): Promise<ValidateCellphoneResponse> {
-  
     await validateCellphoneInput.validateAndFormatCellphone();
     validateCellphoneInput.validationType =
       validateCellphoneInput.validationType ?? ValidationTypes.SIGNUP;
-    
+
     const blacklist = await this.loadBlacklistIntoCacheIfNotExists();
     if (blacklist.has(validateCellphoneInput.cellphone)) {
       throw new BadRequestException(
         await this.i18n.translate("exceptions.BLACK_LIST_CELL_PHONE_LOGIN"),
       );
     }
-    
-  
+
     const now = new Date();
-    now.setSeconds(now.getSeconds() - OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS);
-  
+    now.setSeconds(
+      now.getSeconds() - OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS,
+    );
+
     let lastUnexpiredOtp = await OneTimePassword.createQueryBuilder()
       .where({
         requesterIp: ipAddress,
@@ -74,36 +78,37 @@ export class RegistrationService {
       })
       .orderBy({ '"createdAt"': "DESC" })
       .getOne();
-  
+
     let isNewTokenSend: boolean = !lastUnexpiredOtp;
-  
+
     if (isNewTokenSend) {
       lastUnexpiredOtp = OneTimePassword.create({
         requesterIp: ipAddress,
         type: validationTypeToOtpTypeMap[validateCellphoneInput.validationType],
         receiver: validateCellphoneInput.cellphone,
       }).generateNewToken();
-  
+
       // const key = `kavenegar:${validateCellphoneInput.cellphone}:${lastUnexpiredOtp.token}`;
       // await this.cacheManager.set(key, 'OTP', CacheTTL.TEN_SECONDS);
-      
+
       await this.kavenegarService.lookup(
         validateCellphoneInput.cellphone,
         "verify",
         lastUnexpiredOtp.token,
       );
-  
+
       await (await lastUnexpiredOtp.hashTheToken()).save();
     }
-  
+
     const secondsPastFromOtpGeneration = Math.round(
       (new Date().getTime() - lastUnexpiredOtp.createdAt.getTime()) / 1000,
     );
-  
+
     return {
       validationKey: lastUnexpiredOtp.id,
       remainingSeconds:
-        OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS - secondsPastFromOtpGeneration,
+        OneTimePassword.SMS_OTP_EXPIRES_IN_SECONDS -
+        secondsPastFromOtpGeneration,
       nextState: AuthStates.VALIDATE_OTP,
       message: isNewTokenSend
         ? `رمز یکبار مصرف به شماره ${lastUnexpiredOtp.receiver} پیامک شد.`
@@ -111,16 +116,16 @@ export class RegistrationService {
     };
   }
 
-  async  loadBlacklistIntoCacheIfNotExists(): Promise<Set<string>> {
-    const blacklistKey = 'blacklist:all';
+  async loadBlacklistIntoCacheIfNotExists(): Promise<Set<string>> {
+    const blacklistKey = "blacklist:all";
     let blacklist = await this.cacheManager.get<string[]>(blacklistKey);
-  
+
     if (!blacklist) {
       const blacklistEntries = await Blacklist.find();
       blacklist = blacklistEntries.map(entry => entry.cellphone);
       await this.cacheManager.set(blacklistKey, blacklist, CacheTTL.TWO_WEEK);
     }
-  
+
     return new Set(blacklist);
   }
 
@@ -154,10 +159,14 @@ export class RegistrationService {
       };
     }
 
-    console.log('validate otp;',lastUnexpiredOtp.receiver,validateOtpInput.token)
+    console.log(
+      "validate otp;",
+      lastUnexpiredOtp.receiver,
+      validateOtpInput.token,
+    );
 
     if (!(await lastUnexpiredOtp.doesTokenMatches(validateOtpInput.token))) {
-      console.log('wrong password')
+      console.log("wrong password");
       throw new BadRequestException("رمز یکبار مصرف وارد شده اشتباه است.");
     }
 
@@ -181,7 +190,6 @@ export class RegistrationService {
       !anyUsersExists
     ) {
       return {
-        
         nextState: AuthStates.VALIDATE_CELLPHONE,
         message: "خطایی در فرآیند رخ داده، لطفا فرآیند را از ابتدا شروع کنید.",
       };
@@ -237,7 +245,7 @@ export class RegistrationService {
     lastRecentValidatedOtp.state = OneTimePasswordStates.USED;
 
     const iran = await Country.findOneBy({ alphaTwo: "IR" });
-    const userRole = await Role.findOneBy({ name : "user"});
+    const userRole = await Role.findOneBy({ name: "user" });
     const user = User.create({
       firstName: signupInput.firstName,
       lastName: signupInput.lastName,
@@ -266,23 +274,30 @@ export class RegistrationService {
     };
   }
 
-  async createBlackList(createBlackListInput: CreateBlackListInput): Promise<Blacklist>{
+  async createBlackList(
+    createBlackListInput: CreateBlackListInput,
+  ): Promise<Blacklist> {
     const { cellphone, reason } = createBlackListInput;
     const blackExists: Blacklist = await Blacklist.findOneBy({
-      cellphone
-    })
+      cellphone,
+    });
     if (blackExists) {
       throw new BadRequestException(
         await this.i18n.translate("exceptions.BLACK_LIST_CELL_PHONE"),
       );
     }
 
-    const black: Blacklist = await Blacklist.create<Blacklist>(createBlackListInput);
+    const black: Blacklist = await Blacklist.create<Blacklist>(
+      createBlackListInput,
+    );
     await black.save();
     return black;
   }
 
-  async updateBlackList(id: number, updateBlackList: UpdateBlackListInput): Promise<Blacklist>{
+  async updateBlackList(
+    id: number,
+    updateBlackList: UpdateBlackListInput,
+  ): Promise<Blacklist> {
     console.log(updateBlackList);
     // const { cellphone, reason } = updateBlackList;
 
@@ -313,51 +328,54 @@ export class RegistrationService {
 
     await updatedBlack.save();
 
-    return updatedBlack ; 
+    return updatedBlack;
   }
 
   async findOneBlack(id: number): Promise<Blacklist> {
     const black: Blacklist = await Blacklist.findOneBy({ id });
 
     if (!black) {
-      throw new NotFoundException('Not Found');
+      throw new NotFoundException("Not Found");
     }
 
     return black;
   }
 
-  async removeBlack(id: number): Promise<boolean>{
+  async removeBlack(id: number): Promise<boolean> {
     const black: Blacklist = await Blacklist.findOneBy({ id });
     if (!black) {
-      throw new NotFoundException('Not Found');
+      throw new NotFoundException("Not Found");
     }
     await Blacklist.remove(black);
-    return true
+    return true;
   }
 
   async blackListPaginate(
     indexBlackListInput?: IndexBlackListInput,
   ): Promise<PaginationBlackListResponse> {
     indexBlackListInput.boot();
-    const { take, skip, cellphone, reason } =
-      indexBlackListInput || {};
+    const { take, skip, cellphone, reason } = indexBlackListInput || {};
 
-    const whereConditions = {}
+    const whereConditions = {};
     if (cellphone) {
-      whereConditions['cellphone'] =  Like(`%${cellphone}%`)
+      whereConditions["cellphone"] = Like(`%${cellphone}%`);
     }
 
     if (reason) {
-      whereConditions['reason'] =  Like(`%${reason}%`)
+      whereConditions["reason"] = Like(`%${reason}%`);
     }
 
     const [data, total] = await Blacklist.findAndCount({
       take,
       skip,
-      where: whereConditions
+      where: whereConditions,
     });
 
-    const result = PaginationBlackListResponse.make(indexBlackListInput, total, data);
+    const result = PaginationBlackListResponse.make(
+      indexBlackListInput,
+      total,
+      data,
+    );
     return result;
   }
 }

@@ -11,8 +11,6 @@ import {
 import { File } from "./file.entity";
 import { ThreeBannerStatuses } from "../enums/three-banner-statuses.enum";
 
-
-
 @ObjectType()
 @Entity("banners")
 export class Banner extends BaseEntity {
@@ -39,7 +37,6 @@ export class Banner extends BaseEntity {
   @Index()
   @Column()
   mediumId: number;
-
 
   @Field(() => File)
   @OneToOne(() => File)
@@ -74,5 +71,4 @@ export class Banner extends BaseEntity {
   })
   @Column("smallint", { default: 0 })
   sort?: number;
-
 }

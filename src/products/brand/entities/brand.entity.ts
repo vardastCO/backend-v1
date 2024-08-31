@@ -23,7 +23,6 @@ import {
   AfterUpdate,
 } from "typeorm";
 
-
 @ObjectType()
 @Entity("product_brands")
 @Index("idx_brand_name", ["name"])
@@ -36,7 +35,6 @@ export class Brand extends BaseEntity {
   @Column({ unique: true })
   name: string;
 
-
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   name_en?: string;
@@ -44,7 +42,6 @@ export class Brand extends BaseEntity {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   name_fa?: string;
-
 
   @Field(() => Category, { nullable: true })
   @ManyToOne(() => Category, { nullable: true })
@@ -62,30 +59,28 @@ export class Brand extends BaseEntity {
   status: ThreeStateSupervisionStatuses;
 
   @Field(() => Int, { defaultValue: 1 })
-  @Column( )
+  @Column()
   sum: number;
-  
-  @Field(() => Int, { nullable: true, defaultValue: 1 })
-  @Column({ type: 'int', nullable: true, default: 1 })
-  views?: number;
 
+  @Field(() => Int, { nullable: true, defaultValue: 1 })
+  @Column({ type: "int", nullable: true, default: 1 })
+  views?: number;
 
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   slug?: string;
 
   @Field(() => Int, { nullable: true })
-  @Column( {nullable: true })
+  @Column({ nullable: true })
   rating?: number = 4;
 
   @Field(() => Int, { nullable: true })
-  @Column( {nullable: true })
+  @Column({ nullable: true })
   sellersCount?: number = 0;
 
-  
   @Field(() => Int, { nullable: true })
-  @Column( {nullable: true })
-  categoriesCount?: number= 0;
+  @Column({ nullable: true })
+  categoriesCount?: number = 0;
 
   @Field(() => File, { nullable: true })
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
@@ -94,9 +89,8 @@ export class Brand extends BaseEntity {
   // @Column({ nullable: true })
   // logoFileId: number;
 
-
   @Field({ nullable: true })
-  @Column({nullable: true })
+  @Column({ nullable: true })
   bio?: string;
 
   @Field(() => File, { nullable: true })
@@ -113,9 +107,8 @@ export class Brand extends BaseEntity {
   @OneToMany(() => Address, address => null, { nullable: true })
   addresses: Address[];
 
-
   @Field({ nullable: true })
-  @Column({nullable: true })
+  @Column({ nullable: true })
   cityId?: number;
 
   @Field(() => File, { nullable: true })
@@ -126,7 +119,6 @@ export class Brand extends BaseEntity {
   @Field(type => [Product], { nullable: "items" })
   @OneToMany(type => Product, product => product.brand)
   products: Promise<Product[]>;
-  
 
   @Field(() => File, { nullable: true })
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
@@ -156,6 +148,6 @@ export class Brand extends BaseEntity {
       this.name = `${this.name_fa} (${this.name_en})`;
     } else if (this.name_fa) {
       this.name = this.name_fa;
-    } 
+    }
   }
 }

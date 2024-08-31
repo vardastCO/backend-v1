@@ -18,7 +18,7 @@ import {
 
 @ObjectType()
 @Entity("product_offers")
-@Index(["productId", "sellerId"], { unique: true }) 
+@Index(["productId", "sellerId"], { unique: true })
 export class Offer extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
@@ -76,10 +76,10 @@ export class Offer extends BaseEntity {
 
   @Field()
   @Column({ nullable: true })
-  deletedAt: Date; 
+  deletedAt: Date;
 
   @Field(() => Price, { nullable: true })
   @ManyToOne(() => Price)
-  @Index() 
+  @Index()
   lastPublicConsumerPrice: Promise<Price>;
 }

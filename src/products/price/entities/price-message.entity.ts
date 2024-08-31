@@ -19,7 +19,9 @@ import { Price } from "./price.entity";
 @Entity("product_prices_message")
 export class MessagePrice extends BaseEntity {
   @Field(() => Int)
-  @PrimaryGeneratedColumn({ primaryKeyConstraintName: "product_prices_message_id" })
+  @PrimaryGeneratedColumn({
+    primaryKeyConstraintName: "product_prices_message_id",
+  })
   id: number;
 
   @Field({ nullable: true })
@@ -27,15 +29,16 @@ export class MessagePrice extends BaseEntity {
   message?: string;
 
   @Field(() => MessagePriceTypesEnum)
-  @Column("enum", { enum: MessagePriceTypesEnum , default : MessagePriceTypesEnum.ERROR})
+  @Column("enum", {
+    enum: MessagePriceTypesEnum,
+    default: MessagePriceTypesEnum.ERROR,
+  })
   type: MessagePriceTypesEnum;
 
-
-  @Field(() => Price,{ nullable: true })
+  @Field(() => Price, { nullable: true })
   @ManyToOne(() => Price, price => price.discount)
   price: Promise<Price>;
   @Index()
   @Column({ nullable: true })
   priceId: number;
-
 }

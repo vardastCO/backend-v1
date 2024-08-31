@@ -18,36 +18,32 @@ import { Uom } from "../uom/entities/uom.entity";
 })
 export class ProductCsvUpdateCommand extends CommandRunner {
   private headerMap = {
-    "name": "name",
-    "category": "category",
-    "sku" : "sku",
+    name: "name",
+    category: "category",
+    sku: "sku",
     // "filter":"filter",
     // "uom" : "uom"
   };
- 
+
   private valueMap = {
     csvAttributes: value => {
       const attributes = value.split(/\n|(\r\n)/) ?? [];
       return attributes
-          .map((attribute) => {
-            attribute = attribute ?? "";
-            // const [ name, category,brand,sku,filter,uom] = attribute;
-             const [ sku,category,name,brand] = attribute;
-            return {
-              name,
-              category,
-              brand,
-              sku,
-              // uom,
-              // filter
-    
-            };
-          })
-          .filter((a) => a)
-          .reduce((carry, cleanAttribute) => {
-          
-          
-          
+        .map(attribute => {
+          attribute = attribute ?? "";
+          // const [ name, category,brand,sku,filter,uom] = attribute;
+          const [sku, category, name, brand] = attribute;
+          return {
+            name,
+            category,
+            brand,
+            sku,
+            // uom,
+            // filter
+          };
+        })
+        .filter(a => a)
+        .reduce((carry, cleanAttribute) => {
           return carry;
         }, {});
     },
@@ -60,10 +56,9 @@ export class ProductCsvUpdateCommand extends CommandRunner {
     super();
   }
   async run(passedParam: string[], options?: any): Promise<void> {
-
     const [csvFile] = passedParam;
     const stream = Fs.createReadStream(csvFile, "utf8");
-   
+
     const csvProducts = await this.csvParser.parse(
       stream,
       CsvProduct,
@@ -81,204 +76,180 @@ export class ProductCsvUpdateCommand extends CommandRunner {
 
     const batchSize = 5;
     let batchCount = 0;
-  
+
     for (let i = 0; i < csvProducts.list.length; i += batchSize) {
       // for (let i = 0; i < 5; i += batchSize) {
       const batch = csvProducts.list.slice(i, i + batchSize);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      try{
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      try {
         for (const csvProduct of batch) {
-            // const { name, category, brand, sku,filter , uom } = csvProduct;
-            const { sku , category ,name} = csvProduct;
-            let product: Product = await Product.findOneBy({
-              sku: sku,
-            });
-            if(!product){
-              throw product;
-            }
-            product.name = name   
-            console.log('input',category)
-            const category2: Category = await this.firstOrCreateCategory(category);
-    
-            if (!category2) {
-              throw category;
-            }
-            console.log('output',category2.title)
-            product.categoryId = category2.id
-  
-            // product.save()
-    
-            // let attributesArray = filter.split('-');
-  
-            // // Use forEach to iterate over the array
-            // attributesArray.forEach(async function(attribute) {
-  
-            //     try {
-            //           const attributeValue = await AttributeValue.findOne({
-            //             where: {
-            //               productId:product.id,
-            //             },
-            //           });
-            //           if(attributeValue){
-            //             const attributeSlug = `${attribute.name}:${category2.id}`;
-            //             let you = Attribute.findOneBy({
-            //               id : attributeValue.attributeId
-  
-            //             });
-  
-            //             if (!you) {
-            //               attribute = Attribute.create({
-            //                 name: attributess.name,
-            //                 type: AttributeTypesEnum.TEXT,
-            //                 values: null,
-            //                 slug: attributeSlug,
-            //                 uomId:  null,
-            //               });
-  
-            //               (await attribute).isPublic = true ;
-            //               (await attribute).isFilterable = true ;
-            //               (await attribute).isRequired = true ;
-                                                 
-            //               attribute.categories = Promise.resolve([category2]);
-            //               await attribute.save();
-            //             } else {
-            //               (await you).isPublic = true ;
-            //               (await you).isFilterable = true ;
-            //               (await you).isRequired = true ;
-    
-            //               (await you).save()
-    
-            //               console.log('you',you)
-  
-            //           }
-            //           }
-                          
-             
-      
-            //     } catch (error) {
-            //       console.error('Error retrieving attribute values:', error);
-            //       // Handle the error appropriately
-            //     }
-  
-            // });
-      
-    
-            // let brand2: Brand = await this.firstOrCreateBrand(brand);
-    
-            // if (!brand2) {
-            
-            //     throw product;
-              
-            // }
-            // product.brandId = brand2.id;
-            // try{
-            //   await product.save();
-            // }catch(e){
+          // const { name, category, brand, sku,filter , uom } = csvProduct;
+          const { sku, category, name } = csvProduct;
+          let product: Product = await Product.findOneBy({
+            sku: sku,
+          });
+          if (!product) {
+            throw product;
+          }
+          product.name = name;
+          console.log("input", category);
+          const category2: Category = await this.firstOrCreateCategory(
+            category,
+          );
 
-            // }
-          
-    
-            // console.log('Saved', product.name);
-            //=============================================\\
+          if (!category2) {
+            throw category;
+          }
+          console.log("output", category2.title);
+          product.categoryId = category2.id;
 
-            // let unit = await this.firstOrCreateUom(csvProduct.uom);
-            // if (!unit) {
-            //   product.uomId = 1
-                
-            // } else {
-            //   product.uomId = unit.id
-            // }
-            
+          // product.save()
 
-            await product.save()
+          // let attributesArray = filter.split('-');
 
-        }  
-      }catch(e){
-        console.log('rrrrrr',e)
+          // // Use forEach to iterate over the array
+          // attributesArray.forEach(async function(attribute) {
+
+          //     try {
+          //           const attributeValue = await AttributeValue.findOne({
+          //             where: {
+          //               productId:product.id,
+          //             },
+          //           });
+          //           if(attributeValue){
+          //             const attributeSlug = `${attribute.name}:${category2.id}`;
+          //             let you = Attribute.findOneBy({
+          //               id : attributeValue.attributeId
+
+          //             });
+
+          //             if (!you) {
+          //               attribute = Attribute.create({
+          //                 name: attributess.name,
+          //                 type: AttributeTypesEnum.TEXT,
+          //                 values: null,
+          //                 slug: attributeSlug,
+          //                 uomId:  null,
+          //               });
+
+          //               (await attribute).isPublic = true ;
+          //               (await attribute).isFilterable = true ;
+          //               (await attribute).isRequired = true ;
+
+          //               attribute.categories = Promise.resolve([category2]);
+          //               await attribute.save();
+          //             } else {
+          //               (await you).isPublic = true ;
+          //               (await you).isFilterable = true ;
+          //               (await you).isRequired = true ;
+
+          //               (await you).save()
+
+          //               console.log('you',you)
+
+          //           }
+          //           }
+
+          //     } catch (error) {
+          //       console.error('Error retrieving attribute values:', error);
+          //       // Handle the error appropriately
+          //     }
+
+          // });
+
+          // let brand2: Brand = await this.firstOrCreateBrand(brand);
+
+          // if (!brand2) {
+
+          //     throw product;
+
+          // }
+          // product.brandId = brand2.id;
+          // try{
+          //   await product.save();
+          // }catch(e){
+
+          // }
+
+          // console.log('Saved', product.name);
+          //=============================================\\
+
+          // let unit = await this.firstOrCreateUom(csvProduct.uom);
+          // if (!unit) {
+          //   product.uomId = 1
+
+          // } else {
+          //   product.uomId = unit.id
+          // }
+
+          await product.save();
+        }
+      } catch (e) {
+        console.log("rrrrrr", e);
       }
-  
+
       batchCount++;
       console.log(`Batch ${batchCount} processed.`);
     }
-  
-    console.log("Finished.");
-  
 
-  
+    console.log("Finished.");
   }
 
-
-
   async firstOrCreateCategory(title: string): Promise<Category> {
-
     const existingCategories: Category[] = await Category.findBy({
       title: title,
     });
 
     if (existingCategories.length > 0) {
-      
       return existingCategories[0];
     } else {
-      
       const newCategory = Category.create({
         title: title,
         slug: title,
-        vocabularyId: 1, 
-        parentCategoryId: 3876, 
+        vocabularyId: 1,
+        parentCategoryId: 3876,
       });
 
       await newCategory.save();
 
       return newCategory;
     }
-
-   
   }
 
   async firstOrCreateBrand(title: string): Promise<Brand> {
-
-    let brn =   await Brand.findOneBy({
-     name: title,
-   });
-
-   
-   if(!brn){
-    brn = Brand.create({
+    let brn = await Brand.findOneBy({
       name: title,
-      slug: title,
     });
-    await brn.save()
-  }
-  return brn ;
-  
- }
- async firstOrCreateUom(name: string): Promise<Uom> {
-  let uom = await Uom.findOneBy({
-    name:name,
- });
-  if (!uom) {
-    try{
-      uom = Uom.create({
-        name: name,
-        slug: name,
-        symbol: name,
-        isActive: true,
+
+    if (!brn) {
+      brn = Brand.create({
+        name: title,
+        slug: title,
       });
-      await uom.save();
-
-    }catch(e){
-      console.log('eeeeeeeeee',e)
+      await brn.save();
     }
-
-
+    return brn;
   }
-  console.log('uom',uom)
-  return uom;
-}
-
-
-
- 
+  async firstOrCreateUom(name: string): Promise<Uom> {
+    let uom = await Uom.findOneBy({
+      name: name,
+    });
+    if (!uom) {
+      try {
+        uom = Uom.create({
+          name: name,
+          slug: name,
+          symbol: name,
+          isActive: true,
+        });
+        await uom.save();
+      } catch (e) {
+        console.log("eeeeeeeeee", e);
+      }
+    }
+    console.log("uom", uom);
+    return uom;
+  }
 }
 class CsvProduct {
   name: string;

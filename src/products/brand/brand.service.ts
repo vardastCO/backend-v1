@@ -104,16 +104,17 @@ export class BrandService {
       hasCatalogeFile,
       hasPriceList,
     } = indexBrandInput || {};
-    const admin = await this.authorizationService.setUser(user).hasRole("admin");
+    const admin = await this.authorizationService
+      .setUser(user)
+      .hasRole("admin");
     if (!admin && indexBrandInput.page > 10) {
-      indexBrandInput.page = 10
+      indexBrandInput.page = 10;
     }
     const cacheKey = `brands_${JSON.stringify(indexBrandInput)}`;
 
     const cachedData = await this.cacheManager.get<string>(cacheKey);
 
     if (cachedData && !admin) {
-
       const decompressedData = zlib
         .gunzipSync(Buffer.from(cachedData, "base64"))
         .toString("utf-8");
@@ -126,19 +127,19 @@ export class BrandService {
 
     switch (indexBrandInput.sortType) {
       case SortBrandEnum.NEWEST:
-        order['createdAt'] = "DESC";
+        order["createdAt"] = "DESC";
         break;
       case SortBrandEnum.RATING:
-        order['rating'] = "DESC";
+        order["rating"] = "DESC";
         break;
       case SortBrandEnum.VIEW:
-          order['views'] = "DESC";
+        order["views"] = "DESC";
         break;
       case SortBrandEnum.SUM:
-          order['sum'] = "DESC";
+        order["sum"] = "DESC";
         break;
       default:
-        order['rating'] = "DESC";
+        order["rating"] = "DESC";
         break;
     }
     if (name) {
@@ -153,10 +154,11 @@ export class BrandService {
     // }
     whereConditions[`id`] = Not(12269);
     if (category_Ids && category_Ids.length > 0) {
-      const ids = await this.findBrandCategories(await this.findDeepestChild(category_Ids))
+      const ids = await this.findBrandCategories(
+        await this.findDeepestChild(category_Ids),
+      );
       whereConditions.id = In(ids);
     }
-
 
     if (cityId) {
       whereConditions[`cityId`] = cityId;
@@ -188,12 +190,12 @@ export class BrandService {
         ? Not(IsNull())
         : IsNull();
     }
-   
+
     const [data, total] = await Brand.findAndCount({
       skip,
       take,
       where: whereConditions,
-      order: order
+      order: order,
     });
     try {
       const jsonString = JSON.stringify(data)
@@ -212,11 +214,7 @@ export class BrandService {
       );
       if (!admin) {
         const compressedData = zlib.gzipSync(JSON.stringify(response));
-        await this.cacheManager.set(
-          cacheKey,
-          compressedData,
-          CacheTTL.ONE_DAY,
-        );
+        await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_DAY);
       }
 
       return response;
@@ -231,18 +229,17 @@ export class BrandService {
         }
       }
     } catch (e) {
-      console.log('err in processFile ',e)
+      console.log("err in processFile ", e);
     }
-   
   }
   private async incrementBrandViews(brand: Brand) {
     try {
       await this.entityManager.query(
         `UPDATE product_brands SET views = views + 1 WHERE id = $1`,
-        [brand.id]
+        [brand.id],
       );
     } catch (error) {
-      console.log('err in incrementBrandViews',error)
+      console.log("err in incrementBrandViews", error);
     }
   }
   async findOne(id: number): Promise<Brand> {
@@ -263,7 +260,7 @@ export class BrandService {
           this.processFile(parsedData.priceList),
           this.processFile(parsedData.bannerDesktop),
           this.processFile(parsedData.logoFile),
-          this.incrementBrandViews(parsedData)
+          this.incrementBrandViews(parsedData),
         ]);
         return parsedData;
       }
@@ -280,18 +277,25 @@ export class BrandService {
       }
       const brand = brandsql[0];
       try {
-        const [bannerDesktop,bannerMobile, priceList, catalog,logo, bannerFile, addresses] =
-          await Promise.all([
-            this.fetchFile(brand.bannerDesktopId),
-            this.fetchFile(brand.bannerMobileId),
-            this.fetchFile(brand.priceListId),
-            this.fetchFile(brand.catalogId),
-            this.fetchFile(brand.logoFileId),
-            this.fetchFile(brand.bannerFileId),
-            this.incrementBrandViews(brand),
-            this.getAddressesOf(brand)
-          ]);
-        
+        const [
+          bannerDesktop,
+          bannerMobile,
+          priceList,
+          catalog,
+          logo,
+          bannerFile,
+          addresses,
+        ] = await Promise.all([
+          this.fetchFile(brand.bannerDesktopId),
+          this.fetchFile(brand.bannerMobileId),
+          this.fetchFile(brand.priceListId),
+          this.fetchFile(brand.catalogId),
+          this.fetchFile(brand.logoFileId),
+          this.fetchFile(brand.bannerFileId),
+          this.incrementBrandViews(brand),
+          this.getAddressesOf(brand),
+        ]);
+
         brand.bannerDesktop = bannerDesktop;
         brand.bannerMobile = bannerMobile;
         brand.priceList = priceList;
@@ -308,11 +312,10 @@ export class BrandService {
         );
         return brand;
       } catch (e) {
-        console.log('err in find one brand ',e)
+        console.log("err in find one brand ", e);
       }
-
     } catch (e) {
-      console.log('err in find one brand out',e)
+      console.log("err in find one brand out", e);
     }
   }
   async fetchFile(id) {
@@ -436,127 +439,128 @@ export class BrandService {
 
   async findBrandCategories(categoryIds: number[]): Promise<number[]> {
     try {
-     
       const cacheKey = `find:brand:${JSON.stringify(categoryIds)}:categories`;
       const cachedData = await this.cacheManager.get<number[]>(cacheKey);
-  
+
       if (cachedData) {
-        return cachedData ;
+        return cachedData;
       }
-      
+
       const result = await this.entityManager.query(
         'SELECT "brandId" FROM category_brands WHERE "categoryId" = ANY($1::int[])',
-        [categoryIds]
+        [categoryIds],
       );
 
-      const brandIds = result.map(row => row.brandId); 
+      const brandIds = result.map(row => row.brandId);
 
       await this.cacheManager.set(cacheKey, brandIds, CacheTTL.TWO_WEEK);
       return brandIds;
     } catch (error) {
-      console.log('err in findBrandCategories',error)
+      console.log("err in findBrandCategories", error);
     }
- 
   }
   async findDeepestChild(categoryIds: number[]): Promise<number[]> {
     try {
-
-      const cacheKey = `findDeepestChild:brand:${categoryIds.join(',')}:categories`;
+      const cacheKey = `findDeepestChild:brand:${categoryIds.join(
+        ",",
+      )}:categories`;
       const cachedData = await this.cacheManager.get<number[]>(cacheKey);
-  
-      if (cachedData) {
 
+      if (cachedData) {
         return cachedData;
       }
-  
+
       const deepestChildren: Set<number> = new Set();
       const visitedCategories: Set<number> = new Set();
       let currentLevelCategories: number[] = [...categoryIds];
-  
-  
+
       while (currentLevelCategories.length > 0) {
         const nextLevelCategories: number[] = [];
-  
+
         const results = await this.entityManager.query(
           'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE "parentCategoryId" = ANY($1::int[])',
-          [currentLevelCategories]
+          [currentLevelCategories],
         );
-  
+
         if (results.length === 0) {
-   
           currentLevelCategories.forEach(id => deepestChildren.add(id));
           break;
         }
-  
 
         results.forEach(category => {
           nextLevelCategories.push(category.id);
           visitedCategories.add(category.id);
         });
-  
 
         currentLevelCategories = nextLevelCategories;
       }
-  
+
       const allParentCategories = await this.entityManager.query(
         'SELECT DISTINCT "parentCategoryId" FROM base_taxonomy_categories WHERE "parentCategoryId" = ANY($1::int[])',
-        [Array.from(deepestChildren)]
+        [Array.from(deepestChildren)],
       );
-  
-      const parentCategoryIds = new Set(allParentCategories.map(category => category.parentCategoryId));
-  
-      const filteredDeepestChildren = Array.from(deepestChildren).filter(id => !parentCategoryIds.has(id));
-  
-     await this.cacheManager.set(cacheKey, filteredDeepestChildren, CacheTTL.TWO_WEEK);
+
+      const parentCategoryIds = new Set(
+        allParentCategories.map(category => category.parentCategoryId),
+      );
+
+      const filteredDeepestChildren = Array.from(deepestChildren).filter(
+        id => !parentCategoryIds.has(id),
+      );
+
+      await this.cacheManager.set(
+        cacheKey,
+        filteredDeepestChildren,
+        CacheTTL.TWO_WEEK,
+      );
 
       return filteredDeepestChildren;
     } catch (error) {
-      console.log('Error in findDeepestChild:', error);
+      console.log("Error in findDeepestChild:", error);
       return [];
     }
   }
-  
-  
-  
-  
 
   async findTopMostParent(categoryId: number): Promise<number> {
     try {
       const cacheKey = `findTopMostParent:${categoryId}:categories`;
       const cachedData = await this.cacheManager.get<number>(cacheKey);
-  
+
       if (cachedData) {
-        return cachedData ;
+        return cachedData;
       }
       let currentCategoryId = categoryId;
       let parentCategoryId = null;
       let loopCounter = 0;
-    
+
       while (currentCategoryId !== null && loopCounter < 4) {
-          const result = await this.entityManager.query(
-              'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
-              [currentCategoryId]
-          );
-          if (result.length === 0) {
-              break;
-          }
-    
-          const category = result[0];
-          parentCategoryId = category.parentCategoryId;
-          
-          if (parentCategoryId === null) {
-              return category.id;
-          }
-    
+        const result = await this.entityManager.query(
+          'SELECT id, "parentCategoryId" FROM base_taxonomy_categories WHERE id = $1',
+          [currentCategoryId],
+        );
+        if (result.length === 0) {
+          break;
+        }
+
+        const category = result[0];
+        parentCategoryId = category.parentCategoryId;
+
+        if (parentCategoryId === null) {
+          return category.id;
+        }
+
         currentCategoryId = parentCategoryId;
         loopCounter++;
       }
-      await this.cacheManager.set(cacheKey,currentCategoryId,CacheTTL.TWO_WEEK)
+      await this.cacheManager.set(
+        cacheKey,
+        currentCategoryId,
+        CacheTTL.TWO_WEEK,
+      );
       return currentCategoryId;
     } catch (error) {
-      console.log('err in findTopMostParent',error)
+      console.log("err in findTopMostParent", error);
     }
- 
   }
   async getContactInfosOf(brand: Brand): Promise<ContactInfo[]> {
     const cacheKey = `contactInfos:${brand.id}:brand`;
@@ -575,7 +579,7 @@ export class BrandService {
       .orderBy({ sort: "ASC" })
       .getMany();
 
-    await this.cacheManager.set(cacheKey, contactInfos,CacheTTL.ONE_WEEK);
+    await this.cacheManager.set(cacheKey, contactInfos, CacheTTL.ONE_WEEK);
 
     return contactInfos;
   }
@@ -594,7 +598,7 @@ export class BrandService {
       .orderBy({ sort: "ASC" })
       .getMany();
 
-    await this.cacheManager.set(cacheKey, addresses,CacheTTL.ONE_WEEK);
+    await this.cacheManager.set(cacheKey, addresses, CacheTTL.ONE_WEEK);
 
     return addresses;
   }

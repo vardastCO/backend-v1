@@ -36,29 +36,31 @@ export class AuthorizationGuard implements CanActivate {
 
     const userPermissions: string[] =
       (await this.cacheManager.get(user.getPermissionCacheKey())) ?? [];
-    
+
     if (userPermissions.length === 0) {
       try {
         const userInstance = await user;
         const userRoleArray = await userInstance.roles;
-    
+
         if (userRoleArray.length === 0) {
-          console.log('User has no roles');
+          console.log("User has no roles");
           return false;
         }
-    
-        const queryBuilder = Permission.createQueryBuilder('permission')
-          .innerJoin('permission.roles', 'role')
-          .where('role.id IN (:...roleIds)', { roleIds: userRoleArray.map(role => role.id) })
-          .andWhere('permission.name = :permissionName', { permissionName });
-    
+
+        const queryBuilder = Permission.createQueryBuilder("permission")
+          .innerJoin("permission.roles", "role")
+          .where("role.id IN (:...roleIds)", {
+            roleIds: userRoleArray.map(role => role.id),
+          })
+          .andWhere("permission.name = :permissionName", { permissionName });
+
         const userPermissionArray = await queryBuilder.getMany();
-    
+
         if (userPermissionArray.length > 0) {
-          return true
+          return true;
         }
       } catch (error) {
-        console.error('Error fetching user permissions:', error.message);
+        console.error("Error fetching user permissions:", error.message);
         throw error;
       }
     }

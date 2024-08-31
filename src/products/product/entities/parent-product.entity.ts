@@ -45,9 +45,7 @@ export class ParentProductEntity extends BaseEntity {
   @Column()
   uomId: number;
 
-
   @Field(() => [Option], { nullable: "items" })
   @OneToMany(() => Option, option => option.parentProduct)
   option: Promise<Option[]>;
-
 }

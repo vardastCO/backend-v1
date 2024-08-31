@@ -21,14 +21,12 @@ import {
 import { Project } from "./project.entity";
 import { Address } from "src/users/address/entities/address.entity";
 
-
 @ObjectType()
 @Entity("project_has_address")
 export class ProjectHasAddress extends BaseEntity {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
-
 
   @Field(() => Project)
   @ManyToOne(() => Project)
@@ -41,6 +39,4 @@ export class ProjectHasAddress extends BaseEntity {
   address: Promise<Address>;
   @Column()
   addressId: number;
-  
-  
 }

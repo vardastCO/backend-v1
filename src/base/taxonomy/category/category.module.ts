@@ -10,8 +10,14 @@ import { CompressionService } from "src/compression.service";
 import { DecompressionService } from "src/decompression.service";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category]),FileModule ],
-  providers: [CategoryResolver, CategoryService, CategorySeeder,CompressionService,DecompressionService],
+  imports: [TypeOrmModule.forFeature([Category]), FileModule],
+  providers: [
+    CategoryResolver,
+    CategoryService,
+    CategorySeeder,
+    CompressionService,
+    DecompressionService,
+  ],
   exports: [CategoryService],
   controllers: [CategoryController],
 })

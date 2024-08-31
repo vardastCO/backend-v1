@@ -38,8 +38,7 @@ export class CreateSellerInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsInt()
-  rating ?: number;
-
+  rating?: number;
 
   @Field({ nullable: true, defaultValue: true })
   @IsOptional()

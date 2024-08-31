@@ -17,20 +17,24 @@ import { DiscountTypesEnum } from "../enums/price-discount-types.enum";
 @Entity("product_prices_discount")
 export class DiscountPrice extends BaseEntity {
   @Field(() => Int)
-  @PrimaryGeneratedColumn({ primaryKeyConstraintName: "product_prices_discount_id" })
+  @PrimaryGeneratedColumn({
+    primaryKeyConstraintName: "product_prices_discount_id",
+  })
   id: number;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
   value?: string;
 
-
   @Field({ nullable: true })
   @Column({ nullable: true })
   calculated_price?: string;
 
   @Field(() => DiscountTypesEnum)
-  @Column("enum", { enum: DiscountTypesEnum , default : DiscountTypesEnum.PERCENT})
+  @Column("enum", {
+    enum: DiscountTypesEnum,
+    default: DiscountTypesEnum.PERCENT,
+  })
   type: DiscountTypesEnum;
 
   @Field(() => Price)
@@ -39,5 +43,4 @@ export class DiscountPrice extends BaseEntity {
   @Index()
   @Column()
   priceId: number;
-
 }

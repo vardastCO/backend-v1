@@ -15,7 +15,7 @@ export class EventTrackerResolver {
 
   @Public()
   @Mutation(() => Boolean)
-    
+
   // @Permission("gql.base.event_tracker.create")
   createEventTracker(
     @Args("createEventTrackerInput")
@@ -23,7 +23,7 @@ export class EventTrackerResolver {
     @CurrentUser() user: User,
     @Context() context: ExecutionContext,
     @Request() request,
-  ) : Promise<boolean> {
+  ): Promise<boolean> {
     return this.eventTrackerService.create(
       createEventTrackerInput,
       user,

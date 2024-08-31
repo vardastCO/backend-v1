@@ -1,10 +1,7 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import {
-  IsNotEmpty,IsString,IsEnum,IsOptional
-} from "class-validator";
+import { IsNotEmpty, IsString, IsEnum, IsOptional } from "class-validator";
 @InputType()
 export class AddSellerOrderOffer {
-
   @Field(() => Int)
   @IsNotEmpty()
   orderOfferId: number;
@@ -28,7 +25,6 @@ export class AddSellerOrderOffer {
   @IsNotEmpty()
   @IsString()
   seller_name: string;
-
 
   @Field()
   @IsNotEmpty()

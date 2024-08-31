@@ -6,9 +6,7 @@ import { IndexProvinceInput } from "./dto/index-province.input";
 import { PaginationProvinceResponse } from "./dto/pagination-province.response";
 import { UpdateProvinceInput } from "./dto/update-province.input";
 import { Province } from "./entities/province.entity";
-import {
-  Inject,
-} from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
@@ -29,7 +27,6 @@ export class ProvinceService {
   }
 
   async findAll(indexProvinceInput?: IndexProvinceInput): Promise<Province[]> {
-
     const { take, skip, countryId } = indexProvinceInput || {};
 
     const cacheKey = `province_find_${take}_${skip}_${countryId}`;
@@ -44,10 +41,14 @@ export class ProvinceService {
       skip,
       take,
       where: { countryId },
-      order: { sort: 'ASC', id: 'DESC' },
+      order: { sort: "ASC", id: "DESC" },
     });
 
-    await this.cacheManager.set(cacheKey,this.compressionService.compressData(provinces),CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(provinces),
+      CacheTTL.TWO_WEEK,
+    );
 
     return provinces;
   }
@@ -98,7 +99,9 @@ export class ProvinceService {
   }
 
   async count(indexProvinceInput: IndexProvinceInput): Promise<number> {
-    const cacheKey = `province_count_${JSON.stringify(indexProvinceInput)}_service`;
+    const cacheKey = `province_count_${JSON.stringify(
+      indexProvinceInput,
+    )}_service`;
 
     const cachedCount = await this.cacheManager.get<string>(cacheKey);
 
@@ -106,9 +109,15 @@ export class ProvinceService {
       return this.decompressionService.decompressData(cachedCount);
     }
 
-    const count = await this.provinceRepository.count({ where: indexProvinceInput });
+    const count = await this.provinceRepository.count({
+      where: indexProvinceInput,
+    });
 
-    await this.cacheManager.set(cacheKey,this.compressionService.compressData(count), CacheTTL.TWO_WEEK); 
+    await this.cacheManager.set(
+      cacheKey,
+      this.compressionService.compressData(count),
+      CacheTTL.TWO_WEEK,
+    );
 
     return count;
   }

@@ -30,10 +30,10 @@ export class Seller extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => Int, { nullable:true ,defaultValue: 1 })
+  @Field(() => Int, { nullable: true, defaultValue: 1 })
   @Column({ nullable: true })
   @Index()
-  sum : number;
+  sum: number;
 
   @Field()
   @Column({ unique: true })
@@ -50,8 +50,8 @@ export class Seller extends BaseEntity {
 
   @Field(() => Int, { nullable: true })
   @Index()
-  @Column( {nullable: true })
-  rating?: number= 4;
+  @Column({ nullable: true })
+  rating?: number = 4;
 
   @Field(() => File, { nullable: true })
   @OneToOne(() => File, file => null, { eager: true, nullable: true })
@@ -79,12 +79,12 @@ export class Seller extends BaseEntity {
 
   @Field(() => Int, { nullable: true })
   @Index()
-  @Column( {nullable: true })
+  @Column({ nullable: true })
   brandsCount?: number = 0;
-  
+
   @Field(() => Int, { nullable: true })
-  @Column( {nullable: true })
-  categoriesCount?: number= 0;
+  @Column({ nullable: true })
+  categoriesCount?: number = 0;
 
   @Field(() => Boolean)
   @Column("boolean", { default: false })
@@ -125,7 +125,7 @@ export class Seller extends BaseEntity {
   myProduct: Promise<Offer[]>;
 
   @Field(() => [Brand], { nullable: "items" })
-  @OneToMany(() => Brand, brand => null, { nullable: true } )
+  @OneToMany(() => Brand, brand => null, { nullable: true })
   brands: Brand[];
 
   @Field(() => [ContactInfo])
@@ -146,6 +146,4 @@ export class Seller extends BaseEntity {
   get myProductLength(): Promise<number> {
     return this.myProduct.then(offers => offers.length);
   }
-  
-
 }

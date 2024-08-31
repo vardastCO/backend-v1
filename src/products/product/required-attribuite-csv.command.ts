@@ -50,9 +50,8 @@ export class RequiredCsvUpdateFilterCommand extends CommandRunner {
                 attribute.isRequired = true;
                 await attribute.save();
               } catch (e) {
-               console.log('lll',e) 
+                console.log("lll", e);
               }
-            
             }
             console.log("done.");
             await new Promise(resolve => setTimeout(resolve, 100));

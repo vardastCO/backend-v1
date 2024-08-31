@@ -11,9 +11,6 @@ import {
 import { Category } from "./category.entity";
 import { AttributesProductService } from "src/products/attribute/entities/attribute_product.entity";
 
-
-
-
 @ObjectType()
 @Entity("category_filter")
 export class Filter_Category extends BaseEntity {
@@ -21,16 +18,13 @@ export class Filter_Category extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field(() => Int,{ nullable: true })
+  @Field(() => Int, { nullable: true })
   @Index()
   @Column({ nullable: true })
   categoryId: number;
 
-  
-  @Field(() => Int,{ nullable: true })
+  @Field(() => Int, { nullable: true })
   @Index()
   @Column({ nullable: true })
   attribuiteId: number;
-
-
 }

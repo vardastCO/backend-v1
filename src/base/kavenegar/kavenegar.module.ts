@@ -12,7 +12,7 @@ import { CronJobService } from "src/cron-job.service";
       maxRedirects: 5,
     }),
   ],
-  providers: [KavenegarService,CronJobService],
+  providers: [KavenegarService, CronJobService],
   exports: [KavenegarService],
 })
 export class KavenegarModule {}

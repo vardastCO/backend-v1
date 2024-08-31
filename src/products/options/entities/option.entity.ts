@@ -26,23 +26,21 @@ export class Option extends BaseEntity {
   @ManyToOne(() => ParentProductEntity)
   parentProduct: Promise<ParentProductEntity>;
   @Index()
-  @JoinColumn({ name: 'parentProductId' })
+  @JoinColumn({ name: "parentProductId" })
   @Column()
   parentProductId: number;
-    
+
   @Field(() => AttributesProductService)
   @ManyToOne(() => AttributesProductService)
   attribuite: Promise<AttributesProductService>;
   @Index()
   @Column()
   attribuiteId: number;
-    
+
   @Field(() => ValuesService)
   @ManyToOne(() => ValuesService)
   value: Promise<ValuesService>;
   @Index()
   @Column()
   valueId: number;
-    
-
 }

@@ -81,16 +81,20 @@ export class PriceResolver {
     return this.priceService.getCreatedByOf(price);
   }
 
-
   @Public()
   @Query(() => ChartOutput, { name: "priceChart" })
   priceChart(@Args("chartInput") chartInput: ChartInput) {
-    return this.priceService.priceChart(chartInput)
+    return this.priceService.priceChart(chartInput);
   }
 
   @Public()
   @Query(() => String, { name: "calculatePrice" })
-  calculatePrice(@Args("amount") amount: string,@Args("valueDiscount") valueDiscount: string) {
-    return Math.floor((Number(amount) * ((100 - Number(valueDiscount))/100))).toString();
+  calculatePrice(
+    @Args("amount") amount: string,
+    @Args("valueDiscount") valueDiscount: string,
+  ) {
+    return Math.floor(
+      Number(amount) * ((100 - Number(valueDiscount)) / 100),
+    ).toString();
   }
 }

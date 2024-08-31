@@ -11,7 +11,7 @@ export class SuggestResponse {
 
   @Field(() => [Category], { nullable: "items" })
   categories: Category[];
-  
+
   @Field(() => [Seller], { nullable: "items" })
   seller: Seller[];
 

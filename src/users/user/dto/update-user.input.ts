@@ -5,18 +5,17 @@ import { CreateUserInput } from "./create-user.input";
 
 @InputType()
 export class UpdateUserInput extends PartialType(CreateUserInput) {
-  @Field(() => Int,{nullable:true})
+  @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
   id?: number;
 
-  
   @Field(() => [Int], { nullable: true })
   @IsOptional()
   @IsInt({ each: true })
-  roleIds?: number[]; 
+  roleIds?: number[];
 
-  @Field(type => Int,{nullable:true})
+  @Field(type => Int, { nullable: true })
   @IsOptional()
   displayRoleId?: number;
 
@@ -24,5 +23,4 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {
   @IsOptional()
   @IsString()
   password?: string;
-
 }

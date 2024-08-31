@@ -6,12 +6,12 @@ import { UserStatusesEnum } from "../enums/user-statuses.enum";
 @InputType()
 export class IndexUserInput extends IndexInput {
   @Field(() => UserStatusesEnum, {
-    nullable: true
+    nullable: true,
   })
   @IsOptional()
   @IsEnum(UserStatusesEnum)
   status?: UserStatusesEnum;
-  
+
   @Field({ nullable: true })
   @IsOptional()
   displayRoleId?: number;
@@ -28,13 +28,13 @@ export class IndexUserInput extends IndexInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  birth?: Date; 
+  birth?: Date;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
   cellphone?: string;
-  
+
   @Field(() => [Int], { nullable: true })
   @IsOptional()
   @IsArray()

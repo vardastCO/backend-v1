@@ -32,7 +32,7 @@ export class OfferService {
     private userService: UserService,
     private readonly entityManager: EntityManager,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    @InjectDataSource() private readonly dataSource: DataSource
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
   async create(createOfferInput: CreateOfferInput, user: User): Promise<Offer> {
     const hasMasterPermission = await this.authorizationService
@@ -65,7 +65,7 @@ export class OfferService {
     } catch (e) {
       throw new BadRequestException("the product is exist in Offer list");
     }
- 
+
     return offer;
   }
 
@@ -96,7 +96,7 @@ export class OfferService {
   async paginate(
     user: User,
     indexOfferInput?: IndexOfferInput,
-    admin?:boolean
+    admin?: boolean,
   ): Promise<PaginationOfferResponse> {
     indexOfferInput.boot();
     const hasMasterPermission = await this.authorizationService
@@ -110,7 +110,6 @@ export class OfferService {
     if (!hasMasterPermission && !sellerId && !admin) {
       sellerId = (await this.userService.getSellerRecordOf(user))?.id;
     }
-
 
     const whereCondition = { productId, isPublic, isAvailable, status };
     if (sellerId) {
@@ -169,7 +168,11 @@ export class OfferService {
     return offer;
   }
 
-  async remove(productId: number, user: User, offerId: number): Promise<boolean> {
+  async remove(
+    productId: number,
+    user: User,
+    offerId: number,
+  ): Promise<boolean> {
     try {
       const sellerId = (await this.userService.getSellerRecordOf(user))?.id;
       let offer: Offer;
@@ -179,24 +182,27 @@ export class OfferService {
       if (keyExists) {
         await this.cacheManager.del(cacheKey);
       }
-  
+
       if (offerId) {
-        console.log('offerId',offerId)
+        console.log("offerId", offerId);
         offer = await Offer.findOneBy({ id: offerId });
       } else {
-        console.log('no have offer')
-        offer = await Offer.findOneBy({ productId: productId, sellerId: sellerId });
+        console.log("no have offer");
+        offer = await Offer.findOneBy({
+          productId: productId,
+          sellerId: sellerId,
+        });
       }
-  
+
       if (offer) {
         try {
           await offer.remove();
-          const prices = await Price.findOneBy({ sellerId, productId })
+          const prices = await Price.findOneBy({ sellerId, productId });
           await prices.remove();
-        } catch (e){
-         console.log('reeemove offer',e)
+        } catch (e) {
+          console.log("reeemove offer", e);
         }
- 
+
         return true;
       } else {
         // Handle the case where the offer is not found
@@ -207,7 +213,6 @@ export class OfferService {
       return false;
     }
   }
-  
 
   async getProductOf(offer: Offer) {
     return await offer.product;
@@ -295,15 +300,14 @@ export class OfferService {
 
       // Find seller
       const [data, total] = await Seller.findAndCount({
-        skip:indexBrandToSeller.skip,
-        take:indexBrandToSeller.take,
-        where: {  id: In(uniqueSellerIds), },
-  
+        skip: indexBrandToSeller.skip,
+        take: indexBrandToSeller.take,
+        where: { id: In(uniqueSellerIds) },
       });
 
       const modifiedData = await Promise.all(
         data.map(async seller => {
-          // seller.sum = await this.getOfferLength(seller.id) 
+          // seller.sum = await this.getOfferLength(seller.id)
           return seller;
         }),
       );
@@ -312,7 +316,6 @@ export class OfferService {
         total,
       };
 
-      
       // cache result
       // await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK);
 
@@ -327,18 +330,20 @@ export class OfferService {
   ): Promise<PaginationSellerResponse> {
     try {
       indexBrandToSeller.boot();
-    
+
       const { brandId, take, skip } = indexBrandToSeller;
 
-      const cacheKey = `indexTakeBrandToSeller_sellers_brand_${JSON.stringify(indexBrandToSeller)}`;
+      const cacheKey = `indexTakeBrandToSeller_sellers_brand_${JSON.stringify(
+        indexBrandToSeller,
+      )}`;
       const cacheData = await this.cacheManager.get<PaginationSellerResponse>(
-        cacheKey
+        cacheKey,
       );
       if (cacheData) {
         cacheData.data.forEach(seller => {
           seller.createdAt = new Date(seller.createdAt);
           seller.updatedAt = new Date(seller.updatedAt);
-        })
+        });
         return cacheData;
       }
 
@@ -368,39 +373,38 @@ export class OfferService {
           ORDER BY ps."sum" desc, ps."rating" desc 
           LIMIT $2
           OFFSET $3;
-      `
+      `;
       let sellers = await this.dataSource.query(query, [brandId, take, skip]);
 
-      let total = 0
+      let total = 0;
       const modifiedSellers = sellers.map((seller: any) => {
-        total = seller['total'];
-        delete seller['total']
+        total = seller["total"];
+        delete seller["total"];
         const s: Seller = Seller.create(seller);
         return s;
-      })
-     
+      });
+
       // add logoFole and bannerfile
-      for (let i = 0; i < modifiedSellers.length; i++){
+      for (let i = 0; i < modifiedSellers.length; i++) {
         const seller = sellers[i];
         const s = modifiedSellers[i];
         if (seller.logoFileId) {
-            const cacheKey = `seller_logofile_${JSON.stringify(seller.logoFileId)}`;
-            const cacheData = await this.cacheManager.get<PaginationSellerResponse>(
-              cacheKey
-            );
-            if (cacheData) {
-              s.logoFile = cacheData;
-            } else {
-              const file = await File.findOneBy({ id: seller.logoFileId })
-              s.logoFile = file;
-              await this.cacheManager.set(cacheKey, file, CacheTTL.ONE_WEEK);
-            }
-        }
-        else {
-            s.logoFile = null;
+          const cacheKey = `seller_logofile_${JSON.stringify(
+            seller.logoFileId,
+          )}`;
+          const cacheData =
+            await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
+          if (cacheData) {
+            s.logoFile = cacheData;
+          } else {
+            const file = await File.findOneBy({ id: seller.logoFileId });
+            s.logoFile = file;
+            await this.cacheManager.set(cacheKey, file, CacheTTL.ONE_WEEK);
+          }
+        } else {
+          s.logoFile = null;
         }
       }
-
 
       const response = PaginationSellerResponse.make(
         indexBrandToSeller,
@@ -408,8 +412,9 @@ export class OfferService {
         modifiedSellers,
       );
 
-      const jsonString = JSON.stringify(response).replace(/__bannerFile__/g, 'bannerFile')
-      .replace(/__logoFile__/g, 'logoFile');
+      const jsonString = JSON.stringify(response)
+        .replace(/__bannerFile__/g, "bannerFile")
+        .replace(/__logoFile__/g, "logoFile");
 
       const result = JSON.parse(jsonString);
 
@@ -421,13 +426,11 @@ export class OfferService {
     }
   }
 
-
   async getSellerOf(offer: Offer) {
     return await offer.seller;
   }
 
   async getLastPublicConsumerPriceOf(offer: Offer): Promise<Price> {
-
     try {
       // const cacheKey = `consumer_lowestPrice_${offer.id}`;
       // const cachedResult = await this.cacheManager.get<Price>(cacheKey);
@@ -440,15 +443,15 @@ export class OfferService {
       // .orderBy('"Price".createdAt', 'DESC')
       // .getOne();
       const result = await Price.findOne({
-        where: { productId: offer.productId , sellerId: offer.sellerId },
-        order: { createdAt: 'DESC' },
+        where: { productId: offer.productId, sellerId: offer.sellerId },
+        order: { createdAt: "DESC" },
       });
 
-    // Optionally, you can add caching logic here
+      // Optionally, you can add caching logic here
 
-    return result;
+      return result;
     } catch (e) {
-      console.log('eeeeeeeeeeee',e)
+      console.log("eeeeeeeeeeee", e);
     }
   }
   async getOfferLength(id): Promise<number> {

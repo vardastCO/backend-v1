@@ -1,9 +1,5 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import {
-  IsEnum,
-  IsInt,
-  IsNotEmpty
-} from "class-validator";
+import { IsEnum, IsInt, IsNotEmpty } from "class-validator";
 import { ChartEnum } from "../enums/chart.enum";
 
 @InputType()
@@ -13,8 +9,6 @@ export class ChartInput {
   @IsNotEmpty()
   productId: number;
 
-
-  
   @Field(() => ChartEnum, {
     defaultValue: ChartEnum.WEEKLY,
     nullable: true,
@@ -22,5 +16,4 @@ export class ChartInput {
   @IsNotEmpty()
   @IsEnum(ChartEnum)
   type: ChartEnum = ChartEnum.WEEKLY;
-
 }

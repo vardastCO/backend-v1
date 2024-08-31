@@ -19,7 +19,7 @@ import { ContactInfo } from "src/users/contact-info/entities/contact-info.entity
 import { ContactInfoRelatedTypes } from "src/users/contact-info/enums/contact-info-related-types.enum";
 import { User } from "src/users/user/entities/user.entity";
 import { UserService } from "src/users/user/user.service";
-import { EntityManager, In, Like,Not,IsNull } from "typeorm";
+import { EntityManager, In, Like, Not, IsNull } from "typeorm";
 import { PaginationBrandResponse } from "../brand/dto/pagination-brand.response";
 import { Brand } from "../brand/entities/brand.entity";
 import { Offer } from "../offer/entities/offer.entity";
@@ -90,30 +90,31 @@ export class SellerService {
     user: User,
     indexSellerInput?: IndexSellerInput,
   ): Promise<Seller[]> {
-
     indexSellerInput.boot();
     const cacheKey = `all_sellers_admin_${JSON.stringify(indexSellerInput)}`;
 
     // Try to get the result from the cache
     const cachedResult = await this.cacheManager.get<Seller[]>(cacheKey);
-  
+
     if (cachedResult) {
       // Return the cached result if available
       return cachedResult;
     }
 
     try {
-      const queryBuilder = Seller.createQueryBuilder()
+      const queryBuilder = Seller.createQueryBuilder();
       if (indexSellerInput.name) {
-        queryBuilder.andWhere("name ILIKE :query", { query: `%${indexSellerInput.name}%` });
+        queryBuilder.andWhere("name ILIKE :query", {
+          query: `%${indexSellerInput.name}%`,
+        });
       }
-      
+
       const result = await queryBuilder
-      .skip(indexSellerInput.skip)
-      .take(indexSellerInput.take)
-      .getMany();
+        .skip(indexSellerInput.skip)
+        .take(indexSellerInput.take)
+        .getMany();
       await this.cacheManager.set(cacheKey, result, CacheTTL.ONE_WEEK); // Set TTL as needed
-      
+
       return result;
     } catch (error) {
       // Handle error appropriately (e.g., log it, throw a custom error)
@@ -155,49 +156,52 @@ export class SellerService {
   async paginate(
     user: User,
     indexSellerInput?: IndexSellerInput,
-    client?:boolean
+    client?: boolean,
   ): Promise<PaginationSellerResponse> {
-
     indexSellerInput.boot();
-    const { take, skip, isPublic, status, createdById, name,hasLogoFile } =
+    const { take, skip, isPublic, status, createdById, name, hasLogoFile } =
       indexSellerInput || {};
-    const admin = await this.authorizationService.setUser(user).hasRole("admin");
+    const admin = await this.authorizationService
+      .setUser(user)
+      .hasRole("admin");
     if (!admin && indexSellerInput.page > 10) {
-      indexSellerInput.page = 10
+      indexSellerInput.page = 10;
     }
     const cacheKey = `sellers_${JSON.stringify(indexSellerInput)}`;
-    const cachedData = await this.cacheManager.get<PaginationSellerResponse>(cacheKey);
+    const cachedData = await this.cacheManager.get<PaginationSellerResponse>(
+      cacheKey,
+    );
     if (cachedData && !admin) {
       return cachedData;
     }
-    
+
     const whereConditions: any = {};
     if (name) {
       whereConditions[`name`] = Like(`%${name}%`);
     }
     if (client) {
-      whereConditions['sellerType'] = SellerType.ONLINE || SellerType.NORMAL
+      whereConditions["sellerType"] = SellerType.ONLINE || SellerType.NORMAL;
     }
 
     if (indexSellerInput.hasLogoFile !== undefined) {
-      whereConditions[`logoFile`] = indexSellerInput.hasLogoFile ? Not(IsNull()) : IsNull();
+      whereConditions[`logoFile`] = indexSellerInput.hasLogoFile
+        ? Not(IsNull())
+        : IsNull();
     }
 
     if (indexSellerInput.type) {
       whereConditions[`sellerType`] = indexSellerInput.type as SellerType;
     }
-    
 
     const [data, total] = await Seller.findAndCount({
       skip,
       take,
-      where : whereConditions,
+      where: whereConditions,
       order: {
         rating: "DESC",
       },
-      // relations: [ 'brands'], 
+      // relations: [ 'brands'],
     });
-
 
     try {
       const modifiedData = await Promise.all(
@@ -205,16 +209,17 @@ export class SellerService {
           // if (client) {
           //   seller.brands = index < 4 ? await this.getOfferBrand(seller.id) : [];
           // } else {
-            seller.brands = []
+          seller.brands = [];
           // }
           return seller;
-        })
+        }),
       );
 
-      const jsonString = JSON.stringify(modifiedData).replace(/__bannerFile__/g, 'bannerFile')
-        .replace(/__logoFile__/g, 'logoFile')
-        .replace(/__offers__/g, 'offers')
-        .replace(/__has_offers__/g, 'has_offers');
+      const jsonString = JSON.stringify(modifiedData)
+        .replace(/__bannerFile__/g, "bannerFile")
+        .replace(/__logoFile__/g, "logoFile")
+        .replace(/__offers__/g, "offers")
+        .replace(/__has_offers__/g, "has_offers");
 
       const result = JSON.parse(jsonString);
       const response = PaginationSellerResponse.make(
@@ -223,21 +228,18 @@ export class SellerService {
         result,
       );
       if (!admin) {
-        await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK);//one week ?
+        await this.cacheManager.set(cacheKey, response, CacheTTL.ONE_WEEK); //one week ?
       }
       return response;
     } catch (e) {}
-
-     
-
   }
 
   async findLastSellerOffer(sellerId: number): Promise<Offer[]> {
     const lastOffer = await Offer.findOne({
       where: { sellerId },
-      order: { createdAt: 'DESC' },
+      order: { createdAt: "DESC" },
     });
-  
+
     return lastOffer ? [lastOffer] : [];
   }
   private async processFile(filePromise: Promise<any> | undefined) {
@@ -251,22 +253,19 @@ export class SellerService {
   async findOne(id: number): Promise<Seller> {
     try {
       const cacheKey = `seller_${JSON.stringify(id)}`;
-  
-      const cachedData = await this.cacheManager.get<string>(cacheKey);
-    
-      if (cachedData) {
 
+      const cachedData = await this.cacheManager.get<string>(cacheKey);
+
+      if (cachedData) {
         const decompressedData = zlib
-        .gunzipSync(Buffer.from(cachedData, "base64"))
-        .toString("utf-8");
-      const parsedData: Seller = JSON.parse(decompressedData);
-      parsedData.createdAt = new Date();
-      parsedData.updatedAt = new Date();
-      await Promise.all([
-        this.processFile(parsedData.logoFile),
-      ]);
-      parsedData.representatives = Promise.all([])
-      return parsedData;
+          .gunzipSync(Buffer.from(cachedData, "base64"))
+          .toString("utf-8");
+        const parsedData: Seller = JSON.parse(decompressedData);
+        parsedData.createdAt = new Date();
+        parsedData.updatedAt = new Date();
+        await Promise.all([this.processFile(parsedData.logoFile)]);
+        parsedData.representatives = Promise.all([]);
+        return parsedData;
       }
       const seller = await Seller.findOne({
         where: { id: id },
@@ -278,32 +277,29 @@ export class SellerService {
       try {
         const [contacts, addresses] = await Promise.all([
           seller.contacts,
-          seller.addresses, 
+          seller.addresses,
         ]);
         seller.contacts = contacts;
         seller.addresses = addresses;
-        seller.representatives = Promise.all([])
-        const jsonString = JSON.stringify(seller).replace(/__logoFile__/g, 'logoFile')
-          .replace(/__bannerFile__/g, 'bannerFile')
-          .replace(/__representatives__/g, 'representatives')
+        seller.representatives = Promise.all([]);
+        const jsonString = JSON.stringify(seller)
+          .replace(/__logoFile__/g, "logoFile")
+          .replace(/__bannerFile__/g, "bannerFile")
+          .replace(/__representatives__/g, "representatives");
 
-      ;
-
-      const compressedData = zlib.gzipSync(jsonString);
-      await this.cacheManager.set(
-        cacheKey,
-        compressedData,
-        CacheTTL.ONE_WEEK,
-      );
+        const compressedData = zlib.gzipSync(jsonString);
+        await this.cacheManager.set(
+          cacheKey,
+          compressedData,
+          CacheTTL.ONE_WEEK,
+        );
       } catch (e) {
-        console.log('err find one seller ',e)
+        console.log("err find one seller ", e);
       }
       return seller;
-
     } catch (e) {
-      throw e
+      throw e;
     }
-   
   }
 
   async logSellerView(sellerId: number): Promise<void> {
@@ -316,14 +312,14 @@ export class SellerService {
   }
 
   async getSellerViewCount(sellerId: number): Promise<number> {
-    const index = 'seller_views';
+    const index = "seller_views";
 
     const query = {
       query: {
         term: { sellerId },
       },
     };
-    const baseURL = 'http://elasticsearch:9200';
+    const baseURL = "http://elasticsearch:9200";
     const url = `${baseURL}/${index}/_search`;
 
     try {
@@ -331,7 +327,7 @@ export class SellerService {
       const count = response.data.hits.total.value;
       return count;
     } catch (error) {
-      console.error('Error retrieving seller view count:', error.message);
+      console.error("Error retrieving seller view count:", error.message);
       // Handle error as needed
       return 0;
     }
@@ -347,9 +343,8 @@ export class SellerService {
       throw new NotFoundException();
     }
 
-    
     // delete cache
-    const cacheKey = `seller_${JSON.stringify(id)}`
+    const cacheKey = `seller_${JSON.stringify(id)}`;
     const keyExists = await this.cacheManager.get(cacheKey);
     if (keyExists) {
       await this.cacheManager.del(cacheKey);
@@ -427,7 +422,7 @@ export class SellerService {
       .orderBy({ sort: "ASC" })
       .getMany();
 
-    await this.cacheManager.set(cacheKey, contactInfos,CacheTTL.ONE_WEEK);
+    await this.cacheManager.set(cacheKey, contactInfos, CacheTTL.ONE_WEEK);
 
     return contactInfos;
   }
@@ -446,7 +441,7 @@ export class SellerService {
       .orderBy({ sort: "ASC" })
       .getMany();
 
-    await this.cacheManager.set(cacheKey, addresses,CacheTTL.ONE_WEEK);
+    await this.cacheManager.set(cacheKey, addresses, CacheTTL.ONE_WEEK);
 
     return addresses;
   }
@@ -470,30 +465,26 @@ export class SellerService {
       .innerJoinAndSelect(`${queryBuilder.alias}.offers`, "offer")
       .where("offer.sellerId = :sellerId", { sellerId })
       .getMany();
-    
+
     const uniqueBrandIds = [
       ...new Set(
-        await Promise.all(
-          products.map(async product => product.brandId),
-        ),
+        await Promise.all(products.map(async product => product.brandId)),
       ),
     ];
 
     const [data, sum] = await Brand.findAndCount({
       skip,
       take,
-      where: {id: In(uniqueBrandIds)}
+      where: { id: In(uniqueBrandIds) },
     });
-
 
     const jsonString = JSON.stringify(data)
       .replace(/__bannerFile__/g, "bannerFile")
       .replace(/__logoFile__/g, "logoFile");
-    
-    
+
     // Parse the modified JSON back to objects
     const modifiedDataWithOutText = JSON.parse(jsonString);
-    
+
     const response = PaginationBrandResponse.make(
       indexSellerBrandInput,
       sum,
@@ -510,18 +501,18 @@ export class SellerService {
     const query = `
       SELECT COUNT(*) AS count
       FROM products p
-      WHERE p."brandId"  = $1;`
+      WHERE p."brandId"  = $1;`;
     const result = await this.entityManager.query(query, [id]);
     const count = parseInt(result[0].count, 10);
     return count;
   }
 
-  async getOfferLength(id:number): Promise<number> {
+  async getOfferLength(id: number): Promise<number> {
     const query = `
       select count(*) as offer_length
       from product_offers p 
       where "sellerId" = $1
-    `
+    `;
     const result = await this.entityManager.query(query, [id]);
     const count = parseInt(result[0].offer_length, 10);
     return count;
@@ -529,36 +520,39 @@ export class SellerService {
 
   async getOfferBrand(id): Promise<Brand[]> {
     const seller = await Seller.findOneBy({ id: id });
-    const offers = await seller.offers; 
+    const offers = await seller.offers;
 
-    const brands = await Promise.all(offers.map(async (offer) => {
-      const product = await offer.product;
-      return product?.brandId;
-    }));
+    const brands = await Promise.all(
+      offers.map(async offer => {
+        const product = await offer.product;
+        return product?.brandId;
+      }),
+    );
 
-    const uniqueBrandIds = brands.filter((brand) => brand !== undefined) as number[];
+    const uniqueBrandIds = brands.filter(
+      brand => brand !== undefined,
+    ) as number[];
 
-    const result =  await Brand.findBy({
-      id: In(uniqueBrandIds)
+    const result = await Brand.findBy({
+      id: In(uniqueBrandIds),
     });
 
-
     // const query = `
-    //   select distinct * 
-    //   from product_brands pb 
+    //   select distinct *
+    //   from product_brands pb
     //   where pb."id" in (
-    //     SELECT distinct p."brandId" 
+    //     SELECT distinct p."brandId"
     //     FROM products p
     //     WHERE p."id" IN (
-    //         SELECT "productId" 
-    //         FROM product_offers po 
+    //         SELECT "productId"
+    //         FROM product_offers po
     //         WHERE "sellerId" = $1
     //     )
     //   )
     // `
 
     // const res = await this.entityManager.query(query, [id]);
-    return result
+    return result;
   }
 
   /**
@@ -592,9 +586,6 @@ export class SellerService {
 
       seller.logoFile = Promise.resolve(file);
       user.avatarFile = Promise.resolve(file);
-      
-      
-      
     }
 
     user.fullName = becomeASellerInput.name;
@@ -602,7 +593,7 @@ export class SellerService {
     const repUserRoles = await user.roles;
     repUserRoles.push(await Role.findOneBy({ name: "seller" }));
     user.roles = Promise.resolve(repUserRoles);
-    seller.sellerType = SellerType.NORMAL
+    seller.sellerType = SellerType.NORMAL;
     await seller.save();
     await user.save();
 

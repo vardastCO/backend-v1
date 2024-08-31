@@ -2,10 +2,10 @@ import { Field, ObjectType } from "@nestjs/graphql";
 
 @ObjectType()
 export class OrderCountResponse {
-  @Field(() => [String], { nullable: 'items' })
+  @Field(() => [String], { nullable: "items" })
   labels: string[];
 
-  @Field(() => [[String]], { nullable: 'items' })
+  @Field(() => [[String]], { nullable: "items" })
   data: string[][];
 }
 

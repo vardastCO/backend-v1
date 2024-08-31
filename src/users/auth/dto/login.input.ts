@@ -12,7 +12,6 @@ export class LoginInput {
   @IsNotEmpty()
   password: string;
 
-
   @Field(() => UserType, {
     defaultValue: UserType.REAL,
     nullable: true,

@@ -36,23 +36,23 @@ export class Project extends BaseEntity {
   name?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   uuid?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true,default:'0'})
+  @Column({ nullable: true, default: "0" })
   closedOrdersCount?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true,default:'0'})
+  @Column({ nullable: true, default: "0" })
   openOrdersCount?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true,default:'0'})
+  @Column({ nullable: true, default: "0" })
   failedOrdersCount?: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true,default:'0'})
+  @Column({ nullable: true, default: "0" })
   totalOrdersCount?: string;
 
   @Field({ nullable: true })
@@ -60,15 +60,18 @@ export class Project extends BaseEntity {
   description?: string;
 
   @Field({ nullable: true })
-  @Column({  default: '0', nullable: true  })
+  @Column({ default: "0", nullable: true })
   wallet?: string;
 
   @Field(() => Date, { nullable: true })
-  @CreateDateColumn({ type: 'timestamp', nullable: true })
+  @CreateDateColumn({ type: "timestamp", nullable: true })
   createTime?: Date;
 
   @Field(() => [ProjectHasAddress], { nullable: "items" })
-  @OneToMany(() => ProjectHasAddress, projectHasAddress => projectHasAddress.project)
+  @OneToMany(
+    () => ProjectHasAddress,
+    projectHasAddress => projectHasAddress.project,
+  )
   addresses: Promise<ProjectHasAddress[]>;
 
   @Field(() => [UserProject], { nullable: "items" })
@@ -92,5 +95,5 @@ export class Project extends BaseEntity {
   @Field()
   @Index()
   @Column({ nullable: true })
-  deleted_at: string; 
+  deleted_at: string;
 }

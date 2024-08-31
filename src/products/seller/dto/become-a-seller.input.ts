@@ -28,8 +28,7 @@ export class BecomeASellerInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  rating ?: number;
-
+  rating?: number;
 
   @Field({ nullable: true })
   @IsOptional()

@@ -28,11 +28,12 @@ export class FavoriteResolver {
     @CurrentUser() currentUser: User,
     @IsRealUserType() isRealUserType?: boolean,
   ): Promise<FavoriteResponse> {
-    const data : Product[] | Brand[] | Seller[] = await this.favoriteService.findFavorites(
-      favoritesInput.type,
-      currentUser,
-      isRealUserType
-    );
+    const data: Product[] | Brand[] | Seller[] =
+      await this.favoriteService.findFavorites(
+        favoritesInput.type,
+        currentUser,
+        isRealUserType,
+      );
     let responseData: { [key: string]: Product[] | Brand[] | Seller[] } = {};
 
     // Set the property name based on favoritesInput.type
@@ -41,11 +42,11 @@ export class FavoriteResolver {
     } else if (favoritesInput.type === EntityTypeEnum.SELLER) {
       responseData = { seller: data };
     } else if (favoritesInput.type === EntityTypeEnum.BASKET) {
-        responseData = { product: data };
+      responseData = { product: data };
     } else if (favoritesInput.type === EntityTypeEnum.BRAND) {
       responseData = { brand: data };
     }
-  
+
     return responseData as FavoriteResponse;
   }
 
@@ -59,7 +60,7 @@ export class FavoriteResolver {
       currentUser.id,
       updateFavoriteInput.entityId,
       updateFavoriteInput.type,
-      isRealUserType
+      isRealUserType,
     );
   }
 
@@ -79,11 +80,10 @@ export class FavoriteResolver {
         currentUser,
         updateFavoriteInput.entityId,
         updateFavoriteInput.type,
-        isRealUserType
+        isRealUserType,
       );
     } catch (e) {
-      console.log('',e)
+      console.log("", e);
     }
-    
   }
 }

@@ -1,6 +1,6 @@
-import { Field, InputType, } from "@nestjs/graphql";
+import { Field, InputType } from "@nestjs/graphql";
 import { IsEnum, IsNotEmpty, Length, MaxLength } from "class-validator";
-import { UserType, } from "../enums/type-user.enum";
+import { UserType } from "../enums/type-user.enum";
 @InputType()
 export class LoginOTPInput {
   @Field()
@@ -13,7 +13,6 @@ export class LoginOTPInput {
   @MaxLength(255)
   validationKey: string;
 
-  
   @Field(() => UserType, {
     defaultValue: UserType.REAL,
     nullable: true,

@@ -13,7 +13,7 @@ import { ThreeStateSupervisionStatuses } from "src/base/utilities/enums/three-st
 import { IsUnique } from "src/base/utilities/validations/is-unique.validation";
 import { Product } from "../entities/product.entity";
 import { ProductTypesEnum } from "../enums/product-types.enum";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 @InputType()
 export class CreateProductSellerInput {

@@ -29,10 +29,12 @@ export class AuthResolver {
     );
   }
 
-  
   @Mutation(() => LoginResponse)
   @Public()
-  loginWithOtp(@Args("LoginOTPInput") LoginOTPInput: LoginOTPInput, @Context() context) {
+  loginWithOtp(
+    @Args("LoginOTPInput") LoginOTPInput: LoginOTPInput,
+    @Context() context,
+  ) {
     return this.authService.loginOTP(
       LoginOTPInput,
       context.req.ip,
@@ -42,7 +44,10 @@ export class AuthResolver {
 
   @Mutation(() => LoginResponse)
   @Public()
-  changeNumberWithOtp(@Args("loginOTPInput") changeNumberInput: ChangeNumberInput, @Context() context) {
+  changeNumberWithOtp(
+    @Args("loginOTPInput") changeNumberInput: ChangeNumberInput,
+    @Context() context,
+  ) {
     return this.authService.changeNumberWithOtp(
       changeNumberInput,
       context.req.ip,
@@ -74,7 +79,7 @@ export class AuthResolver {
 
   @Query(() => User)
   whoAmI(@CurrentUser() user: User, @IsRealUserType() isRealUserType: boolean) {
-    return this.authService.whoAmI(user,isRealUserType);
+    return this.authService.whoAmI(user, isRealUserType);
   }
 
   private _getAccessTokenFromHeader(context): string {

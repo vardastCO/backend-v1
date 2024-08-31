@@ -6,7 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsPositive,
-  IsEnum
+  IsEnum,
 } from "class-validator";
 import { PriceTypesEnum } from "../enums/price-types.enum";
 import { DiscountTypesEnum } from "../enums/price-discount-types.enum";
@@ -18,13 +18,12 @@ export class CreatePriceInput {
   @IsNotEmpty()
   productId: number;
 
-  
   @Field(() => PriceTypesEnum)
   @IsNotEmpty()
   @IsEnum(PriceTypesEnum)
-  type: PriceTypesEnum = PriceTypesEnum.CONSUMER ;
+  type: PriceTypesEnum = PriceTypesEnum.CONSUMER;
 
-  @Field(() => Int,{ nullable: true })
+  @Field(() => Int, { nullable: true })
   @IsInt()
   @IsOptional()
   sellerId?: number;
@@ -37,7 +36,7 @@ export class CreatePriceInput {
   @Field({ nullable: true })
   @IsBoolean()
   isPublic: boolean = true;
-
+  
   @Field()
   @IsNotEmpty()
   @IsInt()
@@ -49,8 +48,7 @@ export class CreatePriceInput {
   @IsOptional()
   valueDiscount?: string;
 
-
-  @Field(() => DiscountTypesEnum, { nullable: true})
+  @Field(() => DiscountTypesEnum, { nullable: true })
   @IsEnum(DiscountTypesEnum)
   @IsOptional()
   typeDiscount?: DiscountTypesEnum;

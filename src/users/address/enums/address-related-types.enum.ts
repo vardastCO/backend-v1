@@ -5,7 +5,7 @@ export enum AddressRelatedTypes {
   BRAND = "Brand",
   USER = "User",
   LEGAL = "LEGAL",
-  PROJECT = "PROJECT"
+  PROJECT = "PROJECT",
 }
 
 registerEnumType(AddressRelatedTypes, {

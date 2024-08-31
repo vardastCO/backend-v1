@@ -1,5 +1,5 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import { IsNotEmpty, IsOptional,  IsUUID ,Validate } from "class-validator";
+import { IsNotEmpty, IsOptional, IsUUID, Validate } from "class-validator";
 import { IsUnique } from "../../../utilities/validations/is-unique.validation";
 import { Category } from "../entities/category.entity";
 
@@ -21,7 +21,6 @@ export class CreateCategoryInput {
   @IsOptional()
   titleEn?: string;
 
-
   @Field({ nullable: true })
   @IsOptional()
   description?: string;
@@ -35,12 +34,10 @@ export class CreateCategoryInput {
   @IsOptional()
   icon?: string;
 
-
   @Field({ nullable: true })
   @IsOptional()
   @IsUUID("4")
   fileUuid?: string;
-
 
   @Field(() => Int, { nullable: true, defaultValue: 0 })
   @IsOptional()

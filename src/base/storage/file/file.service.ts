@@ -13,7 +13,7 @@ import { CreateBannerInput } from "./dto/createBannerInput.dto";
 import { IndexFileInput } from "./dto/index-file.input";
 import { PaginationFileResponse } from "./dto/pagination-file.response";
 import { PresignedUrlObject } from "./dto/presigned-url.response";
-import {  UpdateBannerInput } from "./dto/updateBannerInput.dto";
+import { UpdateBannerInput } from "./dto/updateBannerInput.dto";
 import { Banner } from "./entities/banners.entity";
 import { File } from "./entities/file.entity";
 
@@ -77,7 +77,7 @@ export class FileService {
     return await file.directory;
   }
 
-  async createBanner(createBannerInput: CreateBannerInput): Promise<Banner>{
+  async createBanner(createBannerInput: CreateBannerInput): Promise<Banner> {
     try {
       const {
         small_uuid,
@@ -86,7 +86,7 @@ export class FileService {
         xlarge_uuid,
         link_url,
         name,
-        sort
+        sort,
       } = createBannerInput;
 
       const [small, medium, large, xlarge] = await Promise.all([
@@ -110,73 +110,80 @@ export class FileService {
             uuid: xlarge_uuid,
           },
         }),
-    ]);
+      ]);
 
-      
       if (!(small && medium && large && xlarge)) {
         throw new BadRequestException(
-          (await this.i18n.translate("exceptions.NOT_FOUND")),
+          await this.i18n.translate("exceptions.NOT_FOUND"),
         );
       }
 
       const input = {
-        smallId :  small.id,
-        mediumId :  medium.id,
-        largeId :  large.id,
+        smallId: small.id,
+        mediumId: medium.id,
+        largeId: large.id,
         xlargeId: xlarge.id,
         name: name,
-        sort : sort ?? 0
-      }
+        sort: sort ?? 0,
+      };
 
-
-      const banner: Banner =  Banner.create<Banner>(input);
+      const banner: Banner = Banner.create<Banner>(input);
       if (link_url) {
-        banner.url = link_url
+        banner.url = link_url;
       }
-      
+
       await banner.save();
       return banner;
     } catch (error) {
-      console.log("Failed to create banner. Error : " , error);
+      console.log("Failed to create banner. Error : ", error);
     }
   }
 
-
-  async removeBanner(id: number): Promise<Banner>{
+  async removeBanner(id: number): Promise<Banner> {
     try {
       const banner: Banner = await Banner.findOneBy({ id });
       if (!banner) {
         throw new BadRequestException(
-          (await this.i18n.translate("exceptions.NOT_FOUND")),
+          await this.i18n.translate("exceptions.NOT_FOUND"),
         );
       }
-      const result = banner
+      const result = banner;
       await banner.remove();
       result.id = id;
       return result;
-
     } catch (error) {
       console.log("Failed to remove banner. Error: ", error);
     }
   }
 
-
-  async updateBanner(id: number, updateBannerInput: UpdateBannerInput): Promise<Banner> {
+  async updateBanner(
+    id: number,
+    updateBannerInput: UpdateBannerInput,
+  ): Promise<Banner> {
     try {
-
       const banner = await Banner.findOne({ where: { id } });
       if (!banner) {
-        throw new BadRequestException(await this.i18n.translate("exceptions.NOT_FOUND"));
+        throw new BadRequestException(
+          await this.i18n.translate("exceptions.NOT_FOUND"),
+        );
       }
-  
-      const { small_uuid, large_uuid, medium_uuid, xlarge_uuid, link_url,name,sort } = updateBannerInput;
-  
+
+      const {
+        small_uuid,
+        large_uuid,
+        medium_uuid,
+        xlarge_uuid,
+        link_url,
+        name,
+        sort,
+      } = updateBannerInput;
+
       const files = await File.find({
-        where: { uuid: In([small_uuid, medium_uuid, large_uuid, xlarge_uuid]) }
+        where: { uuid: In([small_uuid, medium_uuid, large_uuid, xlarge_uuid]) },
       });
-  
+
       const fileMap = new Map(files.map(file => [file.uuid, file]));
-  
+
       if (small_uuid && fileMap.has(small_uuid)) {
         banner.smallId = fileMap.get(small_uuid)?.id;
       }
@@ -192,21 +199,20 @@ export class FileService {
       banner.url = link_url ?? banner.url;
       banner.name = name ?? banner.name;
       banner.sort = sort ?? banner.sort;
-  
+
       await banner.save();
-  
+
       return banner;
     } catch (error) {
       console.error("Failed to update Banner. Error: ", error);
     }
   }
-  
-  
-  
+
   async getPresignedUrlOf(file: File): Promise<PresignedUrlObject> {
     const now = new Date();
-    const baseUrl = process.env.STORAGE_MINIO_URL || 'https://storage.vardast.ir/vardast/';
-    const url = `${baseUrl}${file.name}`
+    const baseUrl =
+      process.env.STORAGE_MINIO_URL || "https://storage.vardast.ir/vardast/";
+    const url = `${baseUrl}${file.name}`;
 
     return {
       url: url,

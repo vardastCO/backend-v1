@@ -26,11 +26,7 @@ export class ProjectResolver {
     @CurrentUser() user: User,
     @IsRealUserType() isRealUserType?: boolean,
   ) {
-    return this.projectService.create(
-      createProjectInput,
-      user,
-      isRealUserType,
-    );
+    return this.projectService.create(createProjectInput, user, isRealUserType);
   }
   @Permission("gql.users.address.store")
   @Mutation(() => Project)
@@ -108,10 +104,13 @@ export class ProjectResolver {
   @Permission("gql.users.address.store")
   @Mutation(() => Boolean)
   removeProject(
-    @Args('id', { type: () => Int, nullable: true }, new ValidationPipe({ transform: true }))
+    @Args(
+      "id",
+      { type: () => Int, nullable: true },
+      new ValidationPipe({ transform: true }),
+    )
     id: number,
   ) {
-   
     return this.projectService.removeProject(id);
   }
 

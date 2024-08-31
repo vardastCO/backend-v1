@@ -1,10 +1,8 @@
 import { Field, InputType } from "@nestjs/graphql";
 import { IsInt, IsOptional, IsString } from "class-validator";
 
-
-
 @InputType()
-export class IndexPublicOrderInput  {
+export class IndexPublicOrderInput {
   @Field({ nullable: true })
   @IsInt()
   @IsOptional()
@@ -14,5 +12,4 @@ export class IndexPublicOrderInput  {
   @IsInt()
   @IsOptional()
   number?: number;
-
 }

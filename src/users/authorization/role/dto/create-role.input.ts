@@ -1,9 +1,15 @@
 import { Field, InputType, Int } from "@nestjs/graphql";
-import {IsNotEmpty, IsOptional, MaxLength, MinLength, Validate} from "class-validator";
+import {
+  IsNotEmpty,
+  IsOptional,
+  MaxLength,
+  MinLength,
+  Validate,
+} from "class-validator";
 import { Permission } from "../../permission/entities/permission.entity";
-import {IsUnique} from "../../../../base/utilities/validations/is-unique.validation";
-import {Country} from "../../../../base/location/country/entities/country.entity";
-import {Role} from "../entities/role.entity";
+import { IsUnique } from "../../../../base/utilities/validations/is-unique.validation";
+import { Country } from "../../../../base/location/country/entities/country.entity";
+import { Role } from "../entities/role.entity";
 import { PermissionClaimEnum } from "../../permission/enums/permission-claim.enum";
 
 @InputType()
@@ -38,5 +44,4 @@ export class CreateRoleInput {
   @Field(() => [Int], { nullable: "items" })
   @IsNotEmpty()
   claims: PermissionClaimEnum[] | null;
-
 }

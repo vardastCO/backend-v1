@@ -6,7 +6,11 @@ import { AuthorizationService } from "src/users/authorization/authorization.serv
 import { User } from "src/users/user/entities/user.entity";
 import { DataSource, EntityManager } from "typeorm";
 import { OrderPercentageInput } from "./dto/order-percentage.input";
-import { OrderCountResponse, OrderPercentageResponse, OrderReportChartResponse } from "./dto/order-percentage.response";
+import {
+  OrderCountResponse,
+  OrderPercentageResponse,
+  OrderReportChartResponse,
+} from "./dto/order-percentage.response";
 import { ReportEventsCountChart } from "./dto/report-events-count-chart.response";
 import { ReportTotalEventsCount } from "./dto/report-total-events-count.response";
 
@@ -16,7 +20,7 @@ export class EventTrackerReportService {
     @InjectDataSource() private readonly dataSource: DataSource,
     private authorizationService: AuthorizationService,
     private readonly entityManager: EntityManager,
-    @I18n() protected readonly i18n: I18nService
+    @I18n() protected readonly i18n: I18nService,
   ) {}
 
   async pastDurationTotalEventsCount(
@@ -49,17 +53,24 @@ export class EventTrackerReportService {
     return data[0];
   }
 
-  async pastDurationEventsChart(user: User,sellerId:number): Promise<ReportEventsCountChart> {
+  async pastDurationEventsChart(
+    user: User,
+    sellerId: number,
+  ): Promise<ReportEventsCountChart> {
     let params: number[];
     if (sellerId) {
       // If sellerId is provided, find the corresponding userId from SellerRepresentative entity
-      const sellerRepresentative = await SellerRepresentative.findOne({ where: { sellerId } });
-  
+      const sellerRepresentative = await SellerRepresentative.findOne({
+        where: { sellerId },
+      });
+
       if (sellerRepresentative) {
         params = [sellerRepresentative.userId];
       } else {
         // Handle the case when sellerId is provided but no corresponding SellerRepresentative is found
-        throw new Error('No corresponding SellerRepresentative found for the given sellerId');
+        throw new Error(
+          "No corresponding SellerRepresentative found for the given sellerId",
+        );
       }
     } else {
       // If sellerId is not provided, use the user's id from the passed parameter
@@ -67,7 +78,7 @@ export class EventTrackerReportService {
     }
     let filterString =
       'AND contacts. "relatedId" in(SELECT "sellerId" FROM product_seller_representatives WHERE "userId" = $1)';
-    
+
     const rawSql = `
     SELECT
       count(*)
@@ -145,8 +156,10 @@ export class EventTrackerReportService {
     };
   }
 
-
-  async calculateDate(startDate?: Date, endDate?: Date): Promise<{startDateTimestamp: string, endDateTimestamp: string}>{
+  async calculateDate(
+    startDate?: Date,
+    endDate?: Date,
+  ): Promise<{ startDateTimestamp: string; endDateTimestamp: string }> {
     if (!endDate) {
       endDate = new Date();
     }
@@ -160,23 +173,28 @@ export class EventTrackerReportService {
       startDate = new Date(startDate);
       endDate = new Date(endDate);
       if (startDate > endDate) {
-        [startDate, endDate] = [endDate, startDate]
+        [startDate, endDate] = [endDate, startDate];
       }
       const timeDiff = endDate.getTime() - startDate.getTime();
       const diffInDays = timeDiff / (1000 * 60 * 60 * 24);
       if (diffInDays > 14) {
         throw new BadRequestException(
-          (await this.i18n.translate("exceptions.ORDER_REPORT_CHARD_INPUT_DATE_IS_NOT_VALID")),
+          await this.i18n.translate(
+            "exceptions.ORDER_REPORT_CHARD_INPUT_DATE_IS_NOT_VALID",
+          ),
         );
       }
     }
 
     const startDateTimestamp = startDate.toISOString();
     const endDateTimestamp = endDate.toISOString();
-    return {startDateTimestamp, endDateTimestamp}
+    return { startDateTimestamp, endDateTimestamp };
   }
 
-  async getOrderReport(startDateTimestamp: string, endDateTimestamp: string): Promise<OrderCountResponse> {
+  async getOrderReport(
+    startDateTimestamp: string,
+    endDateTimestamp: string,
+  ): Promise<OrderCountResponse> {
     const query = `
         SELECT 
             jyear(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')) || '/' ||
@@ -200,28 +218,30 @@ export class EventTrackerReportService {
             jmonth(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM')),
             jday(TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM'));
   
-    `
-    const rows = await this.entityManager.query(
-      query,
-      [startDateTimestamp, endDateTimestamp]
-    );
+    `;
+    const rows = await this.entityManager.query(query, [
+      startDateTimestamp,
+      endDateTimestamp,
+    ]);
     const labels: string[] = [];
-    const data: string[][] = [[], [], []]; 
+    const data: string[][] = [[], [], []];
     rows.map(row => {
       const { label, completed_count, closed_count, inprogress_count } = row;
 
-        labels.push(label);
-        data[0].push(completed_count);
-        data[1].push(closed_count);
-        data[2].push(inprogress_count);
+      labels.push(label);
+      data[0].push(completed_count);
+      data[1].push(closed_count);
+      data[2].push(inprogress_count);
     });
 
-
-    return { labels: labels, data: data } as OrderCountResponse
+    return { labels: labels, data: data } as OrderCountResponse;
   }
 
-  async getOrderPercentageReport(startDateTimestamp: string, endDateTimestamp: string): Promise<OrderPercentageResponse> {
-        const query = `
+  async getOrderPercentageReport(
+    startDateTimestamp: string,
+    endDateTimestamp: string,
+  ): Promise<OrderPercentageResponse> {
+    const query = `
           SELECT 
               CASE WHEN COUNT(*) > 0 
                   THEN ROUND((COUNT(CASE WHEN po.status = 'COMPLETED' THEN 1 END) * 100.0) / COUNT(*), 2)
@@ -242,28 +262,31 @@ export class EventTrackerReportService {
           WHERE 
               TO_TIMESTAMP(po."request_date", 'MM/DD/YYYY, HH:MI:SS AM') 
               BETWEEN $1 AND $2;
-    `
-    const [percentageRows] = (await this.entityManager.query(
-      query,
-      [startDateTimestamp, endDateTimestamp]
-    ));
+    `;
+    const [percentageRows] = await this.entityManager.query(query, [
+      startDateTimestamp,
+      endDateTimestamp,
+    ]);
 
     return percentageRows as OrderPercentageResponse;
   }
-  
 
-  async orderPecentageChart(orderPercentageInput: OrderPercentageInput): Promise<OrderReportChartResponse> {
+  async orderPecentageChart(
+    orderPercentageInput: OrderPercentageInput,
+  ): Promise<OrderReportChartResponse> {
     let { startDate, endDate } = orderPercentageInput;
 
-    const {startDateTimestamp, endDateTimestamp} = await this.calculateDate(startDate, endDate)
-    
-    let report: OrderReportChartResponse = {} as OrderReportChartResponse;
-    [report['orderCount'], report['orderPercent']] = await Promise.all([
-      this.getOrderReport(startDateTimestamp, endDateTimestamp),
-      this.getOrderPercentageReport(startDateTimestamp, endDateTimestamp)
-    ]);
- 
-   return report
-  }
+    const { startDateTimestamp, endDateTimestamp } = await this.calculateDate(
+      startDate,
+      endDate,
+    );
 
+    let report: OrderReportChartResponse = {} as OrderReportChartResponse;
+    [report["orderCount"], report["orderPercent"]] = await Promise.all([
+      this.getOrderReport(startDateTimestamp, endDateTimestamp),
+      this.getOrderPercentageReport(startDateTimestamp, endDateTimestamp),
+    ]);
+
+    return report;
+  }
 }

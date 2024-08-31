@@ -34,9 +34,8 @@ export class Price extends BaseEntity {
   @Column()
   productId: number;
 
-
   @Field(() => PriceTypesEnum)
-  @Column("enum", { enum: PriceTypesEnum , default : PriceTypesEnum.CONSUMER})
+  @Column("enum", { enum: PriceTypesEnum, default: PriceTypesEnum.CONSUMER })
   type: PriceTypesEnum;
 
   @Field(() => Int)
@@ -57,11 +56,9 @@ export class Price extends BaseEntity {
   @Column({ nullable: true })
   attributeValueId: number;
 
-
   @Field(() => [MessagePrice], { nullable: "items" })
   @OneToMany(() => MessagePrice, messagePrice => messagePrice.price)
   messagePrices: Promise<MessagePrice[]>;
-
 
   @Field(() => [DiscountPrice], { nullable: true })
   @OneToMany(() => DiscountPrice, discountPrice => discountPrice.price)
@@ -84,5 +81,5 @@ export class Price extends BaseEntity {
 
   @Field()
   @Column({ nullable: true })
-  deletedAt: Date; 
+  deletedAt: Date;
 }

@@ -23,13 +23,10 @@ import { RefreshResponse } from "./dto/refresh.response";
 import { UserType } from "./enums/type-user.enum";
 import { Legal } from "../legal/entities/legal.entity";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import {
-  Inject,
-} from "@nestjs/common";
+import { Inject } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
 import { Member } from "../member/entities/members.entity";
-
 
 @Injectable()
 export class AuthService {
@@ -37,8 +34,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) { }
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async validateUser(username: string, password: string): Promise<User | null> {
     const user: User = await this.userService.findOneBy({ username });
@@ -58,7 +55,7 @@ export class AuthService {
     const now = new Date();
     now.setSeconds(
       now.getSeconds() -
-      OneTimePassword.SIGNUP_DEADLINE_AFTER_VALIDATION_SECONDS,
+        OneTimePassword.SIGNUP_DEADLINE_AFTER_VALIDATION_SECONDS,
     );
     const lastRecentValidatedOtp = await OneTimePassword.createQueryBuilder()
       .where({
@@ -70,22 +67,24 @@ export class AuthService {
       })
       .orderBy({ '"createdAt"': "DESC" })
       .getOne();
-    
+
     // console.log('last',lastRecentValidatedOtp)
-  
+
     if (!lastRecentValidatedOtp) {
       throw new BadRequestException(
         "token is not expired yet or is invalid altogether.",
       );
     }
-  
-    const user: User = await User.findOneBy({ cellphone: LoginOTPInput.cellphone });
-  
+
+    const user: User = await User.findOneBy({
+      cellphone: LoginOTPInput.cellphone,
+    });
+
     if (user) {
       const userWholePermissions = await this.userService.cachePermissionsOf(
         user,
       );
-  
+
       let session = await Session.findOneBy({ userId: user.id });
 
       if (!session) {
@@ -95,7 +94,7 @@ export class AuthService {
           agent,
           loginIp: requestIP,
         });
-      
+
         await session.save();
       }
 
@@ -107,21 +106,29 @@ export class AuthService {
       //   user,
       //   abilities: userWholePermissions,
       // }])
-  
+
       return {
-        accessToken: this._generateNewAccessToken(user, session,LoginOTPInput.type),
+        accessToken: this._generateNewAccessToken(
+          user,
+          session,
+          LoginOTPInput.type,
+        ),
         accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-        refreshToken: this._generateNewRefreshToken(user, session,LoginOTPInput.type),
+        refreshToken: this._generateNewRefreshToken(
+          user,
+          session,
+          LoginOTPInput.type,
+        ),
         refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
         user,
         type: LoginOTPInput.type,
-        legal : null,
+        legal: null,
         abilities: userWholePermissions,
       };
     }
-  
+
     lastRecentValidatedOtp.state = OneTimePasswordStates.USED;
-  
+
     const iran = await Country.findOneBy({ alphaTwo: "IR" });
     const userRole = await Role.findOneBy({ name: "user" });
     let newUser: User = User.create({
@@ -137,15 +144,15 @@ export class AuthService {
       displayRoleId: userRole.id,
     });
     newUser.roles = Promise.resolve([userRole]);
-  
+
     await newUser.save();
     await lastRecentValidatedOtp.save();
     const userWholePermissions = await this.userService.cachePermissionsOf(
       newUser,
     );
 
-    console.log('new user',newUser.cellphone)
-  
+    console.log("new user", newUser.cellphone);
+
     // await User.update(
     //   { id: newUser.id },
     //   {
@@ -161,13 +168,21 @@ export class AuthService {
     await session.save();
 
     return {
-      accessToken: this._generateNewAccessToken(newUser, session,LoginOTPInput.type),
+      accessToken: this._generateNewAccessToken(
+        newUser,
+        session,
+        LoginOTPInput.type,
+      ),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(newUser, session,LoginOTPInput.type),
+      refreshToken: this._generateNewRefreshToken(
+        newUser,
+        session,
+        LoginOTPInput.type,
+      ),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user: newUser,
       type: LoginOTPInput.type,
-      legal : null,
+      legal: null,
       abilities: userWholePermissions,
     };
   }
@@ -179,7 +194,7 @@ export class AuthService {
     const now = new Date();
     now.setSeconds(
       now.getSeconds() -
-      OneTimePassword.SIGNUP_DEADLINE_AFTER_VALIDATION_SECONDS,
+        OneTimePassword.SIGNUP_DEADLINE_AFTER_VALIDATION_SECONDS,
     );
     const lastRecentValidatedOtp = await OneTimePassword.createQueryBuilder()
       .where({
@@ -191,22 +206,23 @@ export class AuthService {
       })
       .orderBy({ '"createdAt"': "DESC" })
       .getOne();
-    
-  
+
     if (!lastRecentValidatedOtp) {
       throw new BadRequestException(
         "token is not expired yet or is invalid altogether.",
       );
     }
-  
-    const user: User = await User.findOneBy({ cellphone: changeNumberInput.cellphone });
+
+    const user: User = await User.findOneBy({
+      cellphone: changeNumberInput.cellphone,
+    });
     if (!user) {
       throw new BadRequestException(
         "user is not found yet or is invalid altogether.",
       );
     }
-    user.cellphone = changeNumberInput.cellphone_new
-    await user.save()
+    user.cellphone = changeNumberInput.cellphone_new;
+    await user.save();
     const userWholePermissions = await this.userService.cachePermissionsOf(
       user,
     );
@@ -219,22 +235,28 @@ export class AuthService {
         agent,
         loginIp: requestIP,
       });
-    
+
       await session.save();
     }
 
     return {
-      accessToken: this._generateNewAccessToken(user, session,changeNumberInput.type),
+      accessToken: this._generateNewAccessToken(
+        user,
+        session,
+        changeNumberInput.type,
+      ),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(user, session,changeNumberInput.type),
+      refreshToken: this._generateNewRefreshToken(
+        user,
+        session,
+        changeNumberInput.type,
+      ),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
-      type:changeNumberInput.type,
-      legal : null,
+      type: changeNumberInput.type,
+      legal: null,
       abilities: userWholePermissions,
     };
-    
-  
   }
 
   async login(
@@ -271,13 +293,13 @@ export class AuthService {
     user.sessions = Promise.resolve([]);
     user.country = null;
     return {
-      accessToken: this._generateNewAccessToken(user, session,type),
+      accessToken: this._generateNewAccessToken(user, session, type),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(user, session,type),
+      refreshToken: this._generateNewRefreshToken(user, session, type),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
       type: type,
-      legal : null,
+      legal: null,
       abilities: userWholePermissions,
     };
   }
@@ -350,13 +372,21 @@ export class AuthService {
     user.sessions = Promise.resolve([]);
     user.country = null;
     return {
-      accessToken: this._generateNewAccessToken(user, session,refreshInput.type),
+      accessToken: this._generateNewAccessToken(
+        user,
+        session,
+        refreshInput.type,
+      ),
       accessTokenTtl: this.configService.get<number>("AUTH_JWT_ACCESS_TTL"),
-      refreshToken: this._generateNewRefreshToken(user, session,refreshInput.type),
+      refreshToken: this._generateNewRefreshToken(
+        user,
+        session,
+        refreshInput.type,
+      ),
       refreshTokenTtl: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
       user,
       type: refreshInput.type,
-      legal : null,
+      legal: null,
       abilities: userWholePermissions,
     };
   }
@@ -366,7 +396,6 @@ export class AuthService {
     requestIP: string,
     accessToken: string,
   ): Promise<LogoutResponse> {
-  
     const accessTokenPayload = this.jwtService.decode(accessToken);
     await Session.update(
       { id: accessTokenPayload["sid"], deletedAt: IsNull() },
@@ -381,20 +410,28 @@ export class AuthService {
     return { user };
   }
 
-  private _generateNewAccessToken(user: User, session: Session,type:UserType): string {
+  private _generateNewAccessToken(
+    user: User,
+    session: Session,
+    type: UserType,
+  ): string {
     return this.jwtService.sign({
       uuid: user.uuid,
       sid: session.id,
-      type:type
+      type: type,
     });
   }
 
-  private _generateNewRefreshToken(user: User, session: Session,type:UserType): string {
+  private _generateNewRefreshToken(
+    user: User,
+    session: Session,
+    type: UserType,
+  ): string {
     return this.jwtService.sign(
       {
         uuid: user.uuid,
         sid: session.id,
-        type:type
+        type: type,
       },
       {
         expiresIn: this.configService.get<number>("AUTH_JWT_REFRESH_TTL"),
@@ -404,26 +441,24 @@ export class AuthService {
   }
 
   async whoAmI(user: User, isRealUserType: boolean): Promise<User> {
-
     const member = await Member.findOneBy({
       userId: user.id,
     });
-  
+
     if (!member) {
-      user.legal = null; 
+      user.legal = null;
       return user;
     }
 
     const legalData = await Legal.findOneBy({
-      id: member.relatedId
+      id: member.relatedId,
     });
     if (legalData) {
-      legalData.position = member.position
+      legalData.position = member.position;
     }
-    user.legal = legalData ?? null; 
+    user.legal = legalData ?? null;
     user.sessions = Promise.resolve([]);
     user.country = null;
     return user;
   }
-  
 }

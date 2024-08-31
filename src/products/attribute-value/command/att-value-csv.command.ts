@@ -14,19 +14,19 @@ export class AttProductValueCommand extends CommandRunner {
   }
 
   async convertPersianToEnglishNumbers(str) {
-    const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const persianNumbers = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    const englishNumbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
     for (let i = 0; i < persianNumbers.length; i++) {
-        const persianDigit = new RegExp(persianNumbers[i], 'g');
-        str = str.replace(persianDigit, englishNumbers[i]);
+      const persianDigit = new RegExp(persianNumbers[i], "g");
+      str = str.replace(persianDigit, englishNumbers[i]);
     }
 
     return str;
   }
 
   async run(): Promise<void> {
-    console.log('hi');
+    console.log("hi");
 
     const batchSize = 10;
     const totalAttributes = await AttributeValue.count();
@@ -40,9 +40,8 @@ export class AttProductValueCommand extends CommandRunner {
         });
 
         for (const att of atts) {
-
-
-          let attribute_values_service = await AttributeValuesProductService.create();
+          let attribute_values_service =
+            await AttributeValuesProductService.create();
 
           try {
             let attribute = await AttributesProductService.findOneBy({
@@ -54,27 +53,27 @@ export class AttProductValueCommand extends CommandRunner {
             }
             // console.log('aaa',att.value)
 
-            const jsonString = JSON.stringify(att.value).replace(/"/g, '');
+            const jsonString = JSON.stringify(att.value).replace(/"/g, "");
 
-            if (jsonString !== '{}') {
+            if (jsonString !== "{}") {
               let value = await ValuesService.findOneBy({
-                value : jsonString
+                value: jsonString,
               });
-  
+
               if (!value) {
                 value = ValuesService.create({
-                  value : jsonString
-                })
+                  value: jsonString,
+                });
               }
-              await value.save()
+              await value.save();
               attribute_values_service.attributeId = await attribute.id;
               attribute_values_service.productId = att.productId;
-              attribute_values_service.valueId = value.id
+              attribute_values_service.valueId = value.id;
 
               await attribute_values_service.save();
             }
-           
-            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            await new Promise(resolve => setTimeout(resolve, 10));
           } catch (e) {
             console.log("Error processing attribute:", e);
           }

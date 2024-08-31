@@ -85,5 +85,5 @@ export class Attribute extends BaseEntity {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
-  attribute: { options?: { [key: string]: string; }; defaults?: string[]; };
+  attribute: { options?: { [key: string]: string }; defaults?: string[] };
 }

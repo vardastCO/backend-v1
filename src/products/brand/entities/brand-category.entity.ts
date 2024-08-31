@@ -13,7 +13,6 @@ import {
 } from "typeorm";
 import { Brand } from "./brand.entity";
 
-
 @ObjectType()
 @Unique(["categoryId", "brandId"])
 @Entity("category_brands")
@@ -27,14 +26,14 @@ export class CategoryBrand extends BaseEntity {
   category: Promise<Category>;
   @Index()
   @Column()
-  categoryId: number ;
+  categoryId: number;
 
   @Field(() => Brand)
   @ManyToOne(() => Brand)
   brand: Promise<Brand>;
   @Index()
   @Column()
-  brandId: number ;
+  brandId: number;
 
   @Field()
   @CreateDateColumn()
@@ -43,5 +42,4 @@ export class CategoryBrand extends BaseEntity {
   @Field()
   @UpdateDateColumn()
   updatedAt: Date;
-
 }

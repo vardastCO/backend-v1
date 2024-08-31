@@ -7,9 +7,8 @@ import {
   Parent,
   Query,
   ResolveField,
-  Resolver
+  Resolver,
 } from "@nestjs/graphql";
-
 
 import { Cache } from "cache-manager";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
@@ -27,9 +26,6 @@ import { Banner } from "./entities/banners.entity";
 import { File } from "./entities/file.entity";
 import { FileService } from "./file.service";
 import { UpdateBannerInput } from "./dto/updateBannerInput.dto";
-
-
-
 
 @Resolver(() => File)
 export class FileResolver {
@@ -125,7 +121,11 @@ export class FileResolver {
       const parsedData: Banner[] = JSON.parse(decompressedData);
       return parsedData;
     }
-    const response = await Banner.find({ take: 15,relations:['small','medium','large','xlarge'],order :{sort:'ASC'} });
+    const response = await Banner.find({
+      take: 15,
+      relations: ["small", "medium", "large", "xlarge"],
+      order: { sort: "ASC" },
+    });
     const updatedData = this.replaceKeys(response);
     const compressedData = zlib.gzipSync(JSON.stringify(updatedData));
     await this.cacheManager.set(cacheKey, compressedData, CacheTTL.ONE_WEEK);
@@ -133,10 +133,11 @@ export class FileResolver {
   }
   @Public()
   @Query(() => Banner)
-  async findOneBanner(
-    @Args("id") id: number,
-  ): Promise<Banner> {
-    return await Banner.findOne({ where: {id},relations:['small','medium','large','xlarge'] });
+  async findOneBanner(@Args("id") id: number): Promise<Banner> {
+    return await Banner.findOne({
+      where: { id },
+      relations: ["small", "medium", "large", "xlarge"],
+    });
   }
   replaceKeys(data) {
     return data.map(item => {
@@ -151,7 +152,6 @@ export class FileResolver {
     });
   }
 
-
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => Banner)
   async removeBanner(@Args("id", { type: () => Int }) id: number) {
@@ -163,17 +163,20 @@ export class FileResolver {
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => Banner)
   async updateBanner(
-    @Args("updateBannerInput") updateBannerInput: UpdateBannerInput
+    @Args("updateBannerInput") updateBannerInput: UpdateBannerInput,
   ) {
     const cacheKey = `get_banners`;
     await this.cacheManager.del(cacheKey);
-    return this.fileService.updateBanner(updateBannerInput.id, updateBannerInput);
+    return this.fileService.updateBanner(
+      updateBannerInput.id,
+      updateBannerInput,
+    );
   }
-  
+
   @Permission("gql.base.storage.file.destroy")
   @Mutation(() => Banner)
   async createBanner(
-    @Args("createBannerInput") createBannerInput: CreateBannerInput
+    @Args("createBannerInput") createBannerInput: CreateBannerInput,
   ) {
     const cacheKey = `get_banners`;
     await this.cacheManager.del(cacheKey);

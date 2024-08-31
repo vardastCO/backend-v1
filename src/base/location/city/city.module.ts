@@ -10,7 +10,13 @@ import { DecompressionService } from "src/decompression.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([City]), AreaModule],
-  providers: [CityResolver, CityService, CitySeeder,CompressionService,DecompressionService],
+  providers: [
+    CityResolver,
+    CityService,
+    CitySeeder,
+    CompressionService,
+    DecompressionService,
+  ],
   exports: [CityService],
 })
 export class CityModule {}

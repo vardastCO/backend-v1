@@ -17,7 +17,7 @@ export class IndexAddressInput extends IndexInput {
   @IsEnum(AddressRelatedTypes)
   relatedType: AddressRelatedTypes;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   @IsInt()
   @IsPositive()

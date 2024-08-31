@@ -27,35 +27,35 @@ import { SuggestResponseV2 } from "./dto/suggest.response-v2";
 import { TotalInfoResponse } from "./dto/totalInfo.output";
 import { PreOrder } from "src/order/preOrder/entities/pre-order.entity";
 
-
 @Injectable()
 export class SearchService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache,
-  private readonly entityManager: EntityManager,
-  ) { }
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly entityManager: EntityManager,
+  ) {}
 
-    convertToEnglishNumbersAndReplace(text) {
+  convertToEnglishNumbersAndReplace(text) {
     // Replace Arabic numbers with English numbers
     const arabicToEnglishNumbers = {
-        '٠': '0',
-        '١': '1',
-        '٢': '2',
-        '٣': '3',
-        '٤': '4',
-        '٥': '5',
-        '٦': '6',
-        '٧': '7',
-        '٨': '8',
-        '٩': '9'
+      "٠": "0",
+      "١": "1",
+      "٢": "2",
+      "٣": "3",
+      "٤": "4",
+      "٥": "5",
+      "٦": "6",
+      "٧": "7",
+      "٨": "8",
+      "٩": "9",
     };
 
-    text = text.replace(/[٠-٩]/g, (char) => arabicToEnglishNumbers[char]);
+    text = text.replace(/[٠-٩]/g, char => arabicToEnglishNumbers[char]);
 
     // Replace specific Arabic characters with Persian equivalents
     text = text.replace(/ي/g, "ی").replace(/ك/g, "ک");
 
     return text;
-}
+  }
   async filters(
     filterInput: FilterableAttributesInput,
   ): Promise<FilterableAttributesResponse> {
@@ -145,28 +145,27 @@ export class SearchService {
     };
   }
 
-  async  findOrCreateSearchEntity(query: string) {
+  async findOrCreateSearchEntity(query: string) {
     await this.entityManager.query(
-        `INSERT INTO search_query (query, views)
+      `INSERT INTO search_query (query, views)
          VALUES ($1, $2)
          ON CONFLICT (query)
          DO UPDATE SET views = search_query.views + 1`,
-        [query, 1]
+      [query, 1],
     );
   }
   async suggest(suggestInput: SuggestInput): Promise<SuggestResponse> {
     let { query, cityId, SKU } = suggestInput;
-    query = this.convertToEnglishNumbersAndReplace(query)
+    query = this.convertToEnglishNumbersAndReplace(query);
     query = query.replace(/ي/g, "ی").replace(/ك/g, "ک");
 
-  
     const productsQuery = this.getProductsSearchQuery(query);
     // const sellerQuery = this.getSellerSearchQuery(query, cityId);
     const brandQuery = this.getBrandQuery(query);
-    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query); 
-  
-    const categoriesQuery = await this.getCategoriesSearchQuery(query); 
-  
+    const updateSearchEntityPromise = this.findOrCreateSearchEntity(query);
+
+    const categoriesQuery = await this.getCategoriesSearchQuery(query);
+
     const [products, categories, seller, brand] = await Promise.all([
       SKU
         ? productsQuery
@@ -174,16 +173,14 @@ export class SearchService {
             .limit(suggestvalue)
             .getMany()
         : productsQuery.limit(suggestvalue).getMany(),
-      categoriesQuery ? categoriesQuery.limit(suggestvalue).getMany() : [], 
+      categoriesQuery ? categoriesQuery.limit(suggestvalue).getMany() : [],
       [],
       brandQuery.limit(suggestvalue).getMany(),
-      updateSearchEntityPromise
+      updateSearchEntityPromise,
     ]);
-  
+
     return { products, categories, seller, brand };
   }
-  
-  
 
   async suggestv2(suggestInput: SuggestInput): Promise<SuggestResponseV2> {
     const { query, cityId, SKU } = suggestInput;
@@ -322,9 +319,9 @@ export class SearchService {
         {
           query,
         },
-    )
+      )
       .andWhere({
-        deletedAt : IsNull()
+        deletedAt: IsNull(),
       })
       .orderBy(
         `ts_rank_cd(to_tsvector('english', COALESCE(name, '')), websearch_to_tsquery(:query))`,
@@ -332,31 +329,31 @@ export class SearchService {
       )
       .skip(skip)
       .take(take);
-  
+
     return products;
   }
 
   async getCategoriesSearchQuery(
     query: string,
     take?: number,
-    skip?: number
+    skip?: number,
   ): Promise<SelectQueryBuilder<Category> | null> {
     const product = await Product.findOne({
       where: {
-        name: Like(`%${query}%`)
-      }
+        name: Like(`%${query}%`),
+      },
     });
-  
+
     if (!product) {
-      return null; 
+      return null;
     }
-  
-    return Category.createQueryBuilder('category')
-      .where('category.id = :productId', { productId: product.categoryId })
+
+    return Category.createQueryBuilder("category")
+      .where("category.id = :productId", { productId: product.categoryId })
       .skip(skip)
       .take(take);
   }
-  
+
   private getSellerSearchQuery(
     query: string,
     take?: number,

@@ -20,7 +20,7 @@ export class ImageCategory extends BaseEntity {
   id: number;
 
   @Field(() => Category)
-  @ManyToOne(() => Category, (category) => category?.imageCategory)
+  @ManyToOne(() => Category, category => category?.imageCategory)
   category: Promise<Category>;
   @Column()
   categoryId: number;

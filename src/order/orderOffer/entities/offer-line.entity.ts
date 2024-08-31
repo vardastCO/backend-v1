@@ -23,8 +23,6 @@ import { OfferOrder } from "./order-offer.entity";
 import { TypeOrderOffer } from "src/order/enums/type-order-offer.enum";
 import { User } from "src/users/user/entities/user.entity";
 
-
-
 @ObjectType()
 @Entity("offer_has_line")
 export class OfferLine extends BaseEntity {
@@ -39,15 +37,13 @@ export class OfferLine extends BaseEntity {
   @Column()
   offerOrderId: number;
 
-
   @Field(() => Line)
-  @ManyToOne(() => Line,{ eager: true })
+  @ManyToOne(() => Line, { eager: true })
   line: Promise<Line>;
   @Index()
   @Column()
   lineId: number;
 
-  
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, user => null, { nullable: true })
   user: Promise<User>;
@@ -76,5 +72,4 @@ export class OfferLine extends BaseEntity {
     default: TypeOrderOffer.CLIENT,
   })
   type: TypeOrderOffer;
-  
 }

@@ -4,8 +4,6 @@ import { IndexInput } from "src/base/utilities/dto/index.input";
 import { PreOrderStatus } from "src/order/enums/pre-order-states.enum";
 import { TypeOrder } from "../enum/type-order.enum";
 
-
-
 @InputType()
 export class IndexPreOrderInput extends IndexInput {
   @Field({ nullable: true })
@@ -36,5 +34,5 @@ export class IndexPreOrderInput extends IndexInput {
   })
   @IsOptional()
   @IsEnum(TypeOrder)
-  typeOrder?: TypeOrder ;
+  typeOrder?: TypeOrder;
 }

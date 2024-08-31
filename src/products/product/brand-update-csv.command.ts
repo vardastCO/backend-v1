@@ -9,7 +9,7 @@ import { Directory } from "src/base/storage/directory/entities/directory.entity"
 import { File } from "src/base/storage/file/entities/file.entity";
 import { Address } from "src/users/address/entities/address.entity";
 import { AddressRelatedTypes } from "src/users/address/enums/address-related-types.enum";
-import { EntityManager } from 'typeorm';
+import { EntityManager } from "typeorm";
 import { Brand } from "../brand/entities/brand.entity";
 import { Country } from "src/base/location/country/entities/country.entity";
 import { City } from "src/base/location/city/entities/city.entity";
@@ -24,7 +24,7 @@ export class BrandCsvUpdateCommand extends CommandRunner {
     brandId: "brandId",
     sku: "sku",
     address: "address",
-    description : "description"
+    description: "description",
   };
 
   private valueMap = {
@@ -34,13 +34,13 @@ export class BrandCsvUpdateCommand extends CommandRunner {
         .map(attribute => {
           attribute = attribute ?? "";
 
-          const [name, brandId,sku,address,description] = attribute;
+          const [name, brandId, sku, address, description] = attribute;
           return {
             name,
             brandId,
             sku,
             address,
-            description
+            description,
           };
         })
         .filter(a => a)
@@ -50,8 +50,7 @@ export class BrandCsvUpdateCommand extends CommandRunner {
     },
   };
   constructor(
-
-    private readonly entityManager: EntityManager ,
+    private readonly entityManager: EntityManager,
     private readonly csvParser: CsvParser,
     @InjectMinio() private readonly minioClient: Client,
     private readonly configService: ConfigService,
@@ -89,67 +88,65 @@ export class BrandCsvUpdateCommand extends CommandRunner {
     );
 
     for (const csvProduct of csvProducts.list) {
-
-      const {
-        name,
-        brandId,
-        sku,
-        address,
-        description
-      } = csvProduct;
+      const { name, brandId, sku, address, description } = csvProduct;
 
       console.log("sku : ", sku);
 
       try {
         if (!brandId) {
-          throw "not found brand id "
+          throw "not found brand id ";
         }
         const find_brand: Brand = await Brand.findOneBy({
-          id:brandId,
+          id: brandId,
         });
         if (!find_brand) {
           throw "not found brand";
         }
-        console.log('find brand' , brandId)
-        find_brand.bio = description
-        console.log('find brand bio ' , find_brand.bio)
-        await find_brand.save()
+        console.log("find brand", brandId);
+        find_brand.bio = description;
+        console.log("find brand bio ", find_brand.bio);
+        await find_brand.save();
         try {
-          const new_address = new Address()
-          new_address.address = address
-          new_address.cityId = City.TEHRAN
-          new_address.countryId = Country.IR
-          new_address.relatedType = AddressRelatedTypes.BRAND
-          new_address.provinceId = Province.TEHRAN
-          new_address.relatedId = find_brand.id
-          new_address.title = 'برند آدرس'
-          await new_address.save()
+          const new_address = new Address();
+          new_address.address = address;
+          new_address.cityId = City.TEHRAN;
+          new_address.countryId = Country.IR;
+          new_address.relatedType = AddressRelatedTypes.BRAND;
+          new_address.provinceId = Province.TEHRAN;
+          new_address.relatedId = find_brand.id;
+          new_address.title = "برند آدرس";
+          await new_address.save();
         } catch (error) {
-          console.log('err in address',error)
+          console.log("err in address", error);
         }
-       
-        console.log("files length : ", this.files.length)
+
+        console.log("files length : ", this.files.length);
         for (const filename of this.files) {
           try {
-            const parts = filename.split('-');
+            const parts = filename.split("-");
             if (parts.length >= 2) {
               const fileSku = parts[0];
-              console.log('fileSku',fileSku,sku)
+              console.log("fileSku", fileSku, sku);
               if (`${fileSku}` == `${sku}`) {
-                console.log('fileSku',fileSku)
+                console.log("fileSku", fileSku);
                 const sortOrder = 1;
-                const fileRecord = await this.addImage(imageDirectory, filename, find_brand, sortOrder);
-            
-                find_brand.logoFile = Promise.resolve(fileRecord)
+                const fileRecord = await this.addImage(
+                  imageDirectory,
+                  filename,
+                  find_brand,
+                  sortOrder,
+                );
+
+                find_brand.logoFile = Promise.resolve(fileRecord);
                 await find_brand.save();
 
                 await this.delay(100);
               }
               // await this.delay(100);
             }
-            console.log('no part lengh 2 ')
+            console.log("no part lengh 2 ");
           } catch (error) {
-            console.log('Warning:', error);
+            console.log("Warning:", error);
           }
         }
       } catch (e) {
@@ -167,45 +164,41 @@ export class BrandCsvUpdateCommand extends CommandRunner {
   ) {
     try {
       const filepath = `${imageDirectory}/${filename}`;
-    const file = {
-      buffer: Fs.readFileSync(filepath),
-      mimetype: Mime.lookup(filepath),
-      size: Fs.statSync(filepath).size,
-    };
+      const file = {
+        buffer: Fs.readFileSync(filepath),
+        mimetype: Mime.lookup(filepath),
+        size: Fs.statSync(filepath).size,
+      };
 
-    const randomizedFilename = File.generateNewFileName(file);
+      const randomizedFilename = File.generateNewFileName(file);
 
-    const fileRecord: File = File.create<File>({
-      modelType: 'Brand',
-      name: `${this.directory.path}/${randomizedFilename}`,
-      originalName: filename,
-      size: file.size,
-      mimeType: file.mimetype,
-      disk: "minio",
-      bucketName: this.bucketName,
-    });
-    fileRecord.directory = Promise.resolve(this.directory);
-    await fileRecord.save();
+      const fileRecord: File = File.create<File>({
+        modelType: "Brand",
+        name: `${this.directory.path}/${randomizedFilename}`,
+        originalName: filename,
+        size: file.size,
+        mimeType: file.mimetype,
+        disk: "minio",
+        bucketName: this.bucketName,
+      });
+      fileRecord.directory = Promise.resolve(this.directory);
+      await fileRecord.save();
 
-
-    await this.minioClient.putObject(
-      this.bucketName,
-      fileRecord.name,
-      file.buffer,
-      {
-        "Content-Type": file.mimetype,
-        "File-Uuid": fileRecord.uuid,
-        "File-Id": fileRecord.id,
-      },
-
+      await this.minioClient.putObject(
+        this.bucketName,
+        fileRecord.name,
+        file.buffer,
+        {
+          "Content-Type": file.mimetype,
+          "File-Uuid": fileRecord.uuid,
+          "File-Id": fileRecord.id,
+        },
       );
-    
-      return fileRecord
-    
+
+      return fileRecord;
     } catch (error) {
-      console.log('err in add images',error)
+      console.log("err in add images", error);
     }
-    
   }
 }
 

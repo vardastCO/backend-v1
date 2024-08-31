@@ -5,4 +5,3 @@
 //       queue: 'test_queue',
 //     },
 //   });
-  

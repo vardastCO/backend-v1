@@ -39,9 +39,9 @@ export class PermissionResolver {
   }
 
   @PermissionGuard("gql.users.authorization.permission.index")
-  @Query(() => [PermissionClaimEnum], { name: "allClaim" }) 
+  @Query(() => [PermissionClaimEnum], { name: "allClaim" })
   allClaim() {
-    const allClaims = Object.values(PermissionClaimEnum); 
+    const allClaims = Object.values(PermissionClaimEnum);
     return allClaims;
   }
 

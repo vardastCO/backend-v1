@@ -9,7 +9,13 @@ import { CompressionService } from "src/compression.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Area])],
-  providers: [AreaResolver, AreaService, AreaSeeder,CompressionService,DecompressionService],
+  providers: [
+    AreaResolver,
+    AreaService,
+    AreaSeeder,
+    CompressionService,
+    DecompressionService,
+  ],
   exports: [AreaService],
 })
 export class AreaModule {}

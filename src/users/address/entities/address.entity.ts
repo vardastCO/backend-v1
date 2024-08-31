@@ -67,11 +67,11 @@ export class Address extends BaseEntity {
   postalCode?: string;
 
   @Field(() => Float, { nullable: true })
-  @Column("float", { nullable: true , default : 35.78077793394653})
+  @Column("float", { nullable: true, default: 35.78077793394653 })
   latitude?: number;
 
   @Field(() => Float, { nullable: true })
-  @Column("float", { nullable: true , default : 51.448873906960394 })
+  @Column("float", { nullable: true, default: 51.448873906960394 })
   longitude?: number;
 
   @Field(() => Int, {

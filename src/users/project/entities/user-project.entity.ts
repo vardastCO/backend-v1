@@ -6,7 +6,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Unique
+  Unique,
 } from "typeorm";
 import { UserTypeProject } from "../enums/type-user-project.enum";
 import { Project } from "./project.entity";
@@ -43,8 +43,6 @@ export class UserProject extends BaseEntity {
   type: UserTypeProject;
 
   @Field({ nullable: true })
-  @Column({  default: '0', nullable: true  })
+  @Column({ default: "0", nullable: true })
   wallet?: string;
-
-
 }

@@ -6,7 +6,9 @@ import * as path from "path";
 // }
 
 export const loadFiles = (filePattern: string[]): string[] => {
-  return filePattern.map(pattern => glob.sync(path.resolve(process.cwd(), pattern))).reduce((acc, filePath) => acc.concat(filePath), []);
+  return filePattern
+    .map(pattern => glob.sync(path.resolve(process.cwd(), pattern)))
+    .reduce((acc, filePath) => acc.concat(filePath), []);
 };
 
 export const importSeed = async (filePath: string): Promise<any> => {

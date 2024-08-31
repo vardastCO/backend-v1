@@ -1,4 +1,4 @@
-import { Field, InputType, } from "@nestjs/graphql";
+import { Field, InputType } from "@nestjs/graphql";
 import { IsEnum, IsNotEmpty, Length, MaxLength } from "class-validator";
 import { UserType } from "../enums/type-user.enum";
 @InputType()
@@ -25,5 +25,4 @@ export class ChangeNumberInput {
   @IsNotEmpty()
   @IsEnum(UserType)
   type?: UserType = UserType.REAL;
-  
 }

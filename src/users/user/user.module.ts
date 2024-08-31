@@ -22,7 +22,7 @@ import { CompressionService } from "src/compression.service";
     UserService,
     DevUserSeeder,
     CompressionService,
-    DecompressionService
+    DecompressionService,
   ],
   exports: [UserService],
 })

@@ -33,7 +33,7 @@ export class Category extends BaseEntity {
   vocabularyId: number;
 
   @Field(() => Int, { nullable: true, defaultValue: 1 })
-  @Column({ type: 'int', nullable: true, default: 1 })
+  @Column({ type: "int", nullable: true, default: 1 })
   views?: number;
 
   @Field(() => Category, { nullable: true })
@@ -52,19 +52,19 @@ export class Category extends BaseEntity {
   title: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true   })
+  @Column({ nullable: true })
   titleEn?: string;
 
   @Field({ nullable: true })
-  @Column({nullable: true  })
+  @Column({ nullable: true })
   slug?: string;
 
   @Field({ nullable: true })
-  @Column({nullable: true })
+  @Column({ nullable: true })
   description?: string;
 
   @Field({ nullable: true })
-  @Column({nullable: true })
+  @Column({ nullable: true })
   url?: string;
 
   @Field({ nullable: true })
@@ -92,9 +92,7 @@ export class Category extends BaseEntity {
   @ManyToMany(() => Attribute, attribute => attribute.categories)
   attributes: Promise<Attribute[]>;
 
-
-  @Field(() => [ImageCategory],{ nullable: true })
-  @OneToMany(() => ImageCategory, (imageCategory) => imageCategory?.category)
+  @Field(() => [ImageCategory], { nullable: true })
+  @OneToMany(() => ImageCategory, imageCategory => imageCategory?.category)
   imageCategory?: Promise<ImageCategory[]>;
-
 }

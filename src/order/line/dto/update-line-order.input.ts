@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty,IsOptional,IsEnum } from "class-validator";
+import { IsInt, IsNotEmpty, IsOptional, IsEnum } from "class-validator";
 import { InputType, Field, Int, PartialType } from "@nestjs/graphql";
 import { CreateLineInput } from "./create-line-order.input";
 
@@ -8,6 +8,4 @@ export class UpdateLineInput extends PartialType(CreateLineInput) {
   @IsNotEmpty()
   @IsInt()
   id: number;
-
-  
 }

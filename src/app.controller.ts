@@ -3,30 +3,31 @@
 // import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
 // import { User } from './users/user/entities/user.entity';
 // import { connect } from 'amqplib';
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Post, Body, Param } from "@nestjs/common";
+import { AppService } from "./app.service";
 // import { ElasticsearchServices } from './elastic/elastic-service';
 import { Public } from "src/users/auth/decorators/public.decorator";
 // import { ElasticService } from './elastic/elastic-service';
-import { HealthCheckService, HttpHealthIndicator, HealthCheck } from '@nestjs/terminus';
+import {
+  HealthCheckService,
+  HttpHealthIndicator,
+  HealthCheck,
+} from "@nestjs/terminus";
 @Public()
-@Controller('health')
+@Controller("health")
 export class AppController {
   constructor(
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
     private readonly appService: AppService,
-    // private readonly elasticsearchService: ElasticsearchServices,
-  ) { }
+  ) // private readonly elasticsearchService: ElasticsearchServices,
+  {}
   // private channel;
   // @Post()
   // async sendMessage(@Body() messageDto: MessageDto,@CurrentUser() user: User) {
   //   try {
-      
 
   //     this.rabbitMQService.sendMessage(messageDto.chatRoomId, messageDto.senderId, messageDto.message);
-    
-
 
   //     // Add logic to handle message sending, e.g., storing in a database, notifying the user, etc.
   //     return { status: 'OK' };
@@ -98,13 +99,16 @@ export class AppController {
   @HealthCheck()
   check() {
     return this.health.check([
-      async () => this.http.pingCheck('vardast-version', 'https://dev.vardast.com/app/version'),
+      async () =>
+        this.http.pingCheck(
+          "vardast-version",
+          "https://dev.vardast.com/app/version",
+        ),
     ]);
   }
 
-  @Get('/app')
+  @Get("/app")
   getHello(): string {
     return this.appService.getHello();
   }
-  
 }

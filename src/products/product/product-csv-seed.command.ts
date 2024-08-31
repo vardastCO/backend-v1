@@ -54,7 +54,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
           attribute = attribute ?? "";
           if (!attribute.match(this.attributeRegex)) {
             console.warn(
-                `Attribute '${attribute}' is not matching the regex provided, skipping.`
+              `Attribute '${attribute}' is not matching the regex provided, skipping.`,
             );
             return null;
           }
@@ -188,9 +188,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
         product.brand = Promise.resolve(
           await this.firstOrCreateBrand(csvProduct.brand),
         );
-        const category = await this.firstOrCreateCategory(
-          csvProduct.category,
-        );
+        const category = await this.firstOrCreateCategory(csvProduct.category);
         // const percentage = await this.calculatePercentage(category.title, csvProduct.category );
 
         // if(percentage < .6)
@@ -236,8 +234,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
           // seller
           const seller = await this.firstOrCreateSeller(csvProduct.brand);
 
-          const amount =
-            +(csvProduct.price + "").replace(/[^0-9.]/g, "") / 10;
+          const amount = +(csvProduct.price + "").replace(/[^0-9.]/g, "") / 10;
           const price = Price.create({
             amount,
             type: PriceTypesEnum.CONSUMER,
@@ -316,7 +313,7 @@ export class ProductCsvSeedCommand extends CommandRunner {
       Brand.create({
         name: name,
         slug: name,
-        sum:1
+        sum: 1,
       });
     if (!this.brandNameToObjectMap.hasOwnProperty(name)) {
       await brand.save();

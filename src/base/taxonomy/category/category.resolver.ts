@@ -20,7 +20,7 @@ import { UpdateCategoryInput } from "./dto/update-category.input";
 import { Category } from "./entities/category.entity";
 import { User } from "src/users/user/entities/user.entity";
 import { CurrentUser } from "src/users/auth/decorators/current-user.decorator";
-import {ImageCategory} from "./entities/category-image.entity";
+import { ImageCategory } from "./entities/category-image.entity";
 import { AllCategoryInput } from "./dto/input-category-all.input";
 import { PaginationCategoryResponse } from "./dto/pagination-category.response";
 import { CacheTTL } from "src/base/utilities/cache-ttl.util";
@@ -34,13 +34,13 @@ export class CategoryResolver {
     private readonly categoryService: CategoryService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   @Permission("gql.base.taxonomy.category.store")
   @Mutation(() => Category)
   createCategory(
     @Args("createCategoryInput") createCategoryInput: CreateCategoryInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ) {
     return this.categoryService.create(createCategoryInput, user);
   }
@@ -61,7 +61,6 @@ export class CategoryResolver {
     )
     indexCategoryInput?: IndexCategoryInput,
   ): Promise<PaginationCategoryResponse> {
-  
     return this.categoryService.findPaginate(indexCategoryInput);
   }
 
@@ -110,17 +109,16 @@ export class CategoryResolver {
     return this.categoryService.getCategoriesV2(indexCategoryInput);
   }
 
-
-
   @Permission("gql.base.taxonomy.category.update")
   @Mutation(() => Category)
   updateCategory(
     @Args("updateCategoryInput") updateCategoryInput: UpdateCategoryInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: User,
   ) {
     return this.categoryService.update(
       updateCategoryInput.id,
-      updateCategoryInput, user
+      updateCategoryInput,
+      user,
     );
   }
 
@@ -138,7 +136,6 @@ export class CategoryResolver {
   @ResolveField(type => [Category])
   children(@Parent() category: Category): Promise<Category[]> {
     return this.categoryService.getChildrenOf(category);
-
   }
 
   @ResolveField(returns => Int)
@@ -163,24 +160,22 @@ export class CategoryResolver {
   @ResolveField(returns => Vocabulary)
   async vocabulary(@Parent() category: Category): Promise<Vocabulary> {
     const { vocabularyId } = category;
-  
-    const cacheKey = `vocabulary_${vocabularyId}`;
-  
-    const cachedVocabulary = await this.cacheManager.get<Vocabulary>(cacheKey);
-  
-    if (cachedVocabulary !== undefined) {
 
+    const cacheKey = `vocabulary_${vocabularyId}`;
+
+    const cachedVocabulary = await this.cacheManager.get<Vocabulary>(cacheKey);
+
+    if (cachedVocabulary !== undefined) {
       return cachedVocabulary;
     }
-  
+
     // If not cached, query the database
     const vocabulary = await this.dataSource
       .getRepository(Vocabulary)
       .findOneBy({ id: vocabularyId });
-  
+
     if (vocabulary) {
-      
-      await this.cacheManager.set(cacheKey, vocabulary, CacheTTL.TWO_WEEK)
+      await this.cacheManager.set(cacheKey, vocabulary, CacheTTL.TWO_WEEK);
     }
     return vocabulary;
   }
@@ -197,7 +192,7 @@ export class CategoryResolver {
 
     if (count === undefined) {
       count = await this.categoryService.productsCountOf(category);
-      await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK); 
+      await this.cacheManager.set(cacheKey, count, CacheTTL.TWO_WEEK);
     }
 
     return count;
@@ -205,7 +200,8 @@ export class CategoryResolver {
 
   @Mutation(() => ImageCategory)
   createCategoryImage(
-    @Args("createImageCategory") createImageCategoryInput: createImageCategoryInput,
+    @Args("createImageCategory")
+    createImageCategoryInput: createImageCategoryInput,
     @CurrentUser() user: User,
   ) {
     return this.categoryService.createImage(createImageCategoryInput, user);

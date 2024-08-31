@@ -14,7 +14,6 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-
 @ObjectType()
 @Entity("users_addresses_project")
 export class ProjectAddress extends BaseEntity {
@@ -44,10 +43,10 @@ export class ProjectAddress extends BaseEntity {
   @Column()
   cityId: number;
 
-  @Field(() => Province,{nullable:true})
+  @Field(() => Province, { nullable: true })
   @ManyToOne(() => Province)
   province: Promise<Province>;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   provinceId?: number;
 
   @Field()
@@ -58,7 +57,6 @@ export class ProjectAddress extends BaseEntity {
   @Column({ nullable: true })
   postalCode?: string;
 
-
   @Field(() => ThreeStateSupervisionStatuses)
   @Column("enum", {
     enum: ThreeStateSupervisionStatuses,
@@ -66,10 +64,7 @@ export class ProjectAddress extends BaseEntity {
   })
   status: ThreeStateSupervisionStatuses;
 
-  
-
   @Field()
   @CreateDateColumn()
   createdAt: Date;
-
 }

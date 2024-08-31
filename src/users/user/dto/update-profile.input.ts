@@ -1,8 +1,8 @@
 import { Field, InputType, Int, PartialType } from "@nestjs/graphql";
-import { MaxLength, Length,IsOptional,IsString } from "class-validator";
+import { MaxLength, Length, IsOptional, IsString } from "class-validator";
 
 @InputType()
-export class UpdateProfileInput  {
+export class UpdateProfileInput {
   @Field({ nullable: true })
   @IsOptional()
   @MaxLength(255)
