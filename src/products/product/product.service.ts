@@ -406,6 +406,8 @@ export class ProductService {
       );
     }
 
+    
+
     return result;
   }
   async getUoms(uomResultIds: number[]) {
