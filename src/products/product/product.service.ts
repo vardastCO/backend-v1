@@ -398,6 +398,7 @@ export class ProductService {
     );
 
     if (!admin) {
+      
       const compressedData = zlib.gzipSync(JSON.stringify(result));
       await this.cacheManager.set(
         cacheKey,
@@ -406,7 +407,7 @@ export class ProductService {
       );
     }
 
-    
+
 
     return result;
   }
