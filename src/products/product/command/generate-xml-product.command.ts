@@ -66,9 +66,9 @@ export class XmlProductCommand extends CommandRunner {
         size: compressedBuffer.length,
       };
 
-      await this.minioClient.putObject("vardast", zipFileName, file.buffer, {
-        "Content-Type": file.mimetype,
-      });
+      // await this.minioClient.putObject("vardast", zipFileName, file.buffer, {
+      //   "Content-Type": file.mimetype,
+      // });
 
       //  zipFileStream.write(compressedBuffer);
     }

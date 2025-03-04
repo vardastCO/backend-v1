@@ -18,7 +18,6 @@ import { CronJobService } from "./cron-job.service";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { KavenegarService } from "./base/kavenegar/kavenegar.service";
 import { KavenegarModule } from "./base/kavenegar/kavenegar.module";
-import { TerminusModule } from "@nestjs/terminus";
 import { OrderModule } from "./order/order.module";
 // import { RabbitMQModule } from "./rabitmq/rabbitmq.module";
 // import { ElasticsearchModule } from '@nestjs/elasticsearch';
@@ -32,7 +31,6 @@ import { OrderModule } from "./order/order.module";
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TerminusModule,
     KavenegarModule,
     I18nModule.forRoot(i18nConfig),
     CacheModule.registerAsync(cacheAsyncConfig),

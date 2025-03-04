@@ -77,7 +77,6 @@
     "@nestjs/schedule" : "*",
     "winston-daily-rotate-file" : "*",
     "@types/compression" : "*",
-    "@nestjs/terminus" : "*",
     "@persian-tools/persian-tools":"*",
     "@nestjs/platform-fastify" : "*",
     "@nestjs/cache-manager" : "2.2.1",

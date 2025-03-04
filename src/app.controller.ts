@@ -8,17 +8,10 @@ import { AppService } from "./app.service";
 // import { ElasticsearchServices } from './elastic/elastic-service';
 import { Public } from "src/users/auth/decorators/public.decorator";
 // import { ElasticService } from './elastic/elastic-service';
-import {
-  HealthCheckService,
-  HttpHealthIndicator,
-  HealthCheck,
-} from "@nestjs/terminus";
 @Public()
 @Controller("health")
 export class AppController {
   constructor(
-    private health: HealthCheckService,
-    private http: HttpHealthIndicator,
     private readonly appService: AppService,
   ) // private readonly elasticsearchService: ElasticsearchServices,
   {}
@@ -95,17 +88,7 @@ export class AppController {
   //   };
   //   return await this.elasticsearchService.search(index, query);
   // }
-  @Get()
-  @HealthCheck()
-  check() {
-    return this.health.check([
-      async () =>
-        this.http.pingCheck(
-          "vardast-version",
-          "https://dev.vardast.com/app/version",
-        ),
-    ]);
-  }
+
 
   @Get("/app")
   getHello(): string {

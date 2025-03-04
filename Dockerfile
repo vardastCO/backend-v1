@@ -14,7 +14,7 @@ FROM base AS development
 WORKDIR /usr/src/app
 
 # Copy only package.json and pnpm lock for installation
-COPY --chown=node:node package.json pnpm-lock.yaml ./
+COPY --chown=node:node package.json ./
 
 RUN pnpm install 
 

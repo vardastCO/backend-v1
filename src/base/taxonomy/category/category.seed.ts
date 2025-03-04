@@ -68,16 +68,16 @@ export default class CategorySeeder {
             await this.dataSource.transaction(async () => {
               await fileRecord.save({ transaction: false });
 
-              await this.minioClient.putObject(
-                "vardast",
-                `${directory.path}/${randomizedFilename}`,
-                file.buffer,
-                {
-                  "Content-Type": file.mimetype,
-                  "File-Uuid": fileRecord.uuid,
-                  "File-Id": fileRecord.id,
-                },
-              );
+              // await this.minioClient.putObject(
+              //   "vardast",
+              //   `${directory.path}/${randomizedFilename}`,
+              //   file.buffer,
+              //   {
+              //     "Content-Type": file.mimetype,
+              //     "File-Uuid": fileRecord.uuid,
+              //     "File-Id": fileRecord.id,
+              //   },
+              // );
             });
             try {
               const items = await this.dataSource.manager.query(

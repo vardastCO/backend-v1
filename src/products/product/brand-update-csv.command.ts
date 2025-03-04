@@ -184,16 +184,16 @@ export class BrandCsvUpdateCommand extends CommandRunner {
       fileRecord.directory = Promise.resolve(this.directory);
       await fileRecord.save();
 
-      await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
 
       return fileRecord;
     } catch (error) {

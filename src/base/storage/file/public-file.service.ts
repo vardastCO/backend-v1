@@ -65,16 +65,16 @@ export class PublicFileService {
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
 
-      const uploadedFileInfo = await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // const uploadedFileInfo = await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     });
 
     // TODO: add retention for files
@@ -136,16 +136,16 @@ export class PublicFileService {
 
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
-      const uploadedFileInfo = await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // const uploadedFileInfo = await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     });
 
     brand.catalog = Promise.resolve(fileRecord);
@@ -213,16 +213,16 @@ export class PublicFileService {
 
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
-      const uploadedFileInfo = await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // const uploadedFileInfo = await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     });
     if (type == "desktop") {
       brand.bannerDesktop = Promise.resolve(fileRecord);
@@ -291,16 +291,16 @@ export class PublicFileService {
 
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
-      const uploadedFileInfo = await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // const uploadedFileInfo = await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     });
 
     brand.bannerMobile = Promise.resolve(fileRecord);
@@ -369,16 +369,16 @@ export class PublicFileService {
 
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
-      const uploadedFileInfo = await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // const uploadedFileInfo = await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     });
 
     seller.logoFile = Promise.resolve(fileRecord);
@@ -455,16 +455,16 @@ export class PublicFileService {
 
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
-      const uploadedFileInfo = await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // const uploadedFileInfo = await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     });
 
     brand.priceList = Promise.resolve(fileRecord);
@@ -526,16 +526,16 @@ export class PublicFileService {
 
     await this.dataSource.transaction(async () => {
       await fileRecord.save({ transaction: false });
-      const uploadedFileInfo = await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // const uploadedFileInfo = await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     });
 
     // TODO: add retention for files

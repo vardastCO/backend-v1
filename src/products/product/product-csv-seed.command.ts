@@ -688,18 +688,18 @@ export class ProductCsvSeedCommand extends CommandRunner {
       });
       await image.save();
 
-      await this.minioClient.putObject(
-        this.bucketName,
-        fileRecord.name,
-        file.buffer,
-        {
-          "Content-Type": file.mimetype,
-          "File-Uuid": fileRecord.uuid,
-          "File-Id": fileRecord.id,
-        },
-      );
+      // await this.minioClient.putObject(
+      //   this.bucketName,
+      //   fileRecord.name,
+      //   file.buffer,
+      //   {
+      //     "Content-Type": file.mimetype,
+      //     "File-Uuid": fileRecord.uuid,
+      //     "File-Id": fileRecord.id,
+      //   },
+      // );
     } catch (e) {
-      console.log("faaaaaaa", e);
+      console.log("err", e);
     }
   }
 }
